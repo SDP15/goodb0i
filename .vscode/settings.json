@@ -1,0 +1,10 @@
+{
+    "C_Cpp.clang_format_fallbackStyle": "LLVM",
+    "C_Cpp.clang_format_sortIncludes": true,
+    "files.associations": {
+        "*.mll": "llvm",
+        "*.sll": "llvm",
+        "*.oll": "llvm",
+        "stdexcept": "cpp"
+    }
+}
