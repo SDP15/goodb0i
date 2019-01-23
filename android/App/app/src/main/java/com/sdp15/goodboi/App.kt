@@ -1,7 +1,11 @@
 package com.sdp15.goodboi
 
 import android.app.Application
+import com.sdp15.goodboi.view.login.LoginViewModel
 import org.koin.android.ext.android.startKoin
+import org.koin.androidx.viewmodel.experimental.builder.viewModel
+import org.koin.androidx.viewmodel.ext.koin.viewModel
+import org.koin.dsl.module.module
 import org.koin.log.Logger
 import timber.log.Timber
 
@@ -12,7 +16,7 @@ class App : Application() {
 
         Timber.plant(Timber.DebugTree())
 
-        startKoin(this, listOf(), logger=object: Logger {
+        startKoin(this, modules, logger=object: Logger {
             override fun debug(msg: String) = Timber.d(msg)
 
             override fun err(msg: String) = Timber.e(msg)
@@ -21,4 +25,10 @@ class App : Application() {
         })
 
     }
+
+    private val modules = listOf(
+        module {
+            viewModel<LoginViewModel>()
+        }
+    )
 }
