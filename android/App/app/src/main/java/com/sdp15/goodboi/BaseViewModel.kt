@@ -1,8 +1,7 @@
 package com.sdp15.goodboi
 
-import androidx.annotation.ColorInt
-import androidx.annotation.NavigationRes
 import androidx.lifecycle.ViewModel
+import androidx.annotation.NavigationRes
 
 abstract class BaseViewModel<T> : ViewModel() {
 
