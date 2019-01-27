@@ -9,4 +9,6 @@ abstract class BaseViewModel<T> : ViewModel() {
 
     val actions = SingleLiveData<T>()
 
+    abstract fun bind()
+
 }

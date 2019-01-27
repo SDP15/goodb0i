@@ -51,6 +51,7 @@ class LoginFragment : androidx.fragment.app.Fragment() {
         vm.validInput.observe(this, Observer {
             if (it.first) {
                 login_code_input.error = null
+                findNavController().navigate(R.id.scanner_fragment)
             } else {
                 login_code_input.error = getString(it.second)
             }

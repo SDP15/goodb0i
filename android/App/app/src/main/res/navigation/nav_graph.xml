@@ -8,11 +8,12 @@
     <action android:id="@+id/error"
         app:destination="@+id/error_fragment"/>
 
+    <action android:id="@+id/scanner" app:destination="@id/scanner_fragment" />
+
     <fragment android:id="@+id/login_fragment"
         android:name="com.sdp15.goodboi.view.login.LoginFragment"
         android:label="login_fragment"
         tools:layout="@layout/layout_login">
-
 
 
     </fragment>
@@ -23,5 +24,10 @@
         tools:layout="@layout/layout_error">
 
     </fragment>
+
+    <fragment android:id="@+id/scanner_fragment"
+        android:name="com.sdp15.goodboi.view.scanner.ScannerFragment"
+        android:label="scanner_fragment"
+        tools:layout="@layout/layout_scanner" />
 
 </navigation>

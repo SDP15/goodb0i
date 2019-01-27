@@ -9,6 +9,10 @@ class LoginViewModel : BaseViewModel<LoginViewModel.LoginAction>(), LoginFragmen
 
     val validInput = MutableLiveData<Pair<Boolean, @StringRes Int>>()
 
+    override fun bind() {
+
+    }
+
     override fun onInput(input: String) {
         if (input.length == 10) {
             validInput.postValue(Pair(true, 0))
