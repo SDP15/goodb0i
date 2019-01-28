@@ -5,8 +5,7 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/login_fragment">
 
-    <action android:id="@+id/error"
-        app:destination="@+id/error_fragment"/>
+
 
     <action android:id="@+id/scanner" app:destination="@id/scanner_fragment" />
 
@@ -28,6 +27,10 @@
     <fragment android:id="@+id/scanner_fragment"
         android:name="com.sdp15.goodb0i.view.scanner.ScannerFragment"
         android:label="scanner_fragment"
-        tools:layout="@layout/layout_scanner" />
+        tools:layout="@layout/layout_scanner">
+
+        <action android:id="@+id/error"
+                app:destination="@+id/error_fragment"/>
+    </fragment>
 
 </navigation>

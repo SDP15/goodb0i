@@ -1,6 +1,7 @@
 package com.sdp15.goodb0i.view.scanner
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.hardware.camera2.CameraAccessException
 import android.hardware.camera2.CameraCharacteristics
@@ -68,9 +69,7 @@ class ScannerFragment : Fragment() {
                 Timber.i("Taken")
                 val bitmap = jpeg?.size?.let { BitmapFactory.decodeByteArray(jpeg, 0, it) }
                 bitmap?.let {
-                    val image = FirebaseVisionImage.fromBitmap(bitmap)
-                    Timber.i("FirebaseVisionImage created")
-                    vm.onImageCaptured(image)
+                    vm.onImageCaptured(bitmap)
                 }
             }
         })
@@ -88,7 +87,7 @@ class ScannerFragment : Fragment() {
 
     interface ScannerFragmentInteractor {
 
-        fun onImageCaptured(image: FirebaseVisionImage)
+        fun onImageCaptured(image: Bitmap)
 
     }
 
