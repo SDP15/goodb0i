@@ -1,4 +1,4 @@
-package com.sdp15.goodboi
+package com.sdp15.goodb0i
 
 import androidx.test.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4
@@ -19,6 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getTargetContext()
-        assertEquals("com.sdp15.goodboi", appContext.packageName)
+        assertEquals("com.sdp15.goodb0i", appContext.packageName)
     }
 }

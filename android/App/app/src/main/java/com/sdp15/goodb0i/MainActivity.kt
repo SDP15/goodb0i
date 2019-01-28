@@ -1,4 +1,4 @@
-package com.sdp15.goodboi
+package com.sdp15.goodb0i
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle

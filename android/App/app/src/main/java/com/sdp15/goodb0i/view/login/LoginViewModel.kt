@@ -1,9 +1,9 @@
-package com.sdp15.goodboi.view.login
+package com.sdp15.goodb0i.view.login
 
 import androidx.annotation.StringRes
 import androidx.lifecycle.MutableLiveData
-import com.sdp15.goodboi.BaseViewModel
-import com.sdp15.goodboi.R
+import com.sdp15.goodb0i.BaseViewModel
+import com.sdp15.goodb0i.R
 
 class LoginViewModel : BaseViewModel<LoginViewModel.LoginAction>(), LoginFragment.LoginInteractor {
 

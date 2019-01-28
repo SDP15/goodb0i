@@ -1,4 +1,4 @@
-package com.sdp15.goodboi
+package com.sdp15.goodb0i
 
 import android.text.Editable
 import android.text.TextWatcher

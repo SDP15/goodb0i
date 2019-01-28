@@ -6,15 +6,11 @@
     android:orientation="vertical">
 
 
-    <com.camerakit.CameraKitView
+    <com.otaliastudios.cameraview.CameraView
         android:id="@+id/camera_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:adjustViewBounds="true"
-        android:keepScreenOn="true"
-        app:camera_facing="back"
-        app:camera_flash="auto"
-        app:camera_focus="continuous"
-        app:camera_permissions="camera" />
+        android:keepScreenOn="true" />
 
 </LinearLayout>

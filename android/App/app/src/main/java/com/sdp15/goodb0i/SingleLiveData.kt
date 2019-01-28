@@ -1,4 +1,4 @@
-package com.sdp15.goodboi
+package com.sdp15.goodb0i
 
 import androidx.annotation.MainThread
 import androidx.lifecycle.LifecycleOwner
@@ -25,5 +25,9 @@ class SingleLiveData<T> : MutableLiveData<T>() {
         hasValue.set(true)
     }
 
-
+    @MainThread
+    override fun postValue(value: T) {
+        super.postValue(value)
+        hasValue.set(true)
+    }
 }

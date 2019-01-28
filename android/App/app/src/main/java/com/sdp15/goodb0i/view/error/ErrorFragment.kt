@@ -1,4 +1,4 @@
-package com.sdp15.goodboi.view.error
+package com.sdp15.goodb0i.view.error
 
 import android.content.Context
 import android.net.Uri
@@ -7,7 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.sdp15.goodboi.R
+import com.sdp15.goodb0i.R
 
 
 // TODO: Rename parameter arguments, choose names that match

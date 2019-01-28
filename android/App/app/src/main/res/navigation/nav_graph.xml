@@ -11,7 +11,7 @@
     <action android:id="@+id/scanner" app:destination="@id/scanner_fragment" />
 
     <fragment android:id="@+id/login_fragment"
-        android:name="com.sdp15.goodboi.view.login.LoginFragment"
+        android:name="com.sdp15.goodb0i.view.login.LoginFragment"
         android:label="login_fragment"
         tools:layout="@layout/layout_login">
 
@@ -19,14 +19,14 @@
     </fragment>
 
     <fragment android:id="@+id/error_fragment"
-        android:name="com.sdp15.goodboi.view.error.ErrorFragment"
+        android:name="com.sdp15.goodb0i.view.error.ErrorFragment"
         android:label="error_fragment"
         tools:layout="@layout/layout_error">
 
     </fragment>
 
     <fragment android:id="@+id/scanner_fragment"
-        android:name="com.sdp15.goodboi.view.scanner.ScannerFragment"
+        android:name="com.sdp15.goodb0i.view.scanner.ScannerFragment"
         android:label="scanner_fragment"
         tools:layout="@layout/layout_scanner" />
 
