@@ -21,24 +21,25 @@ class StockService {
     }
 
     suspend fun getAllStock(): List<Stock> = dbQuery {
-        AllStock.selectAll().map { toStock(it) }
+        AllStock.selectAll().map(AllStock::toStock)
     }
 
     suspend fun getStock(id: Int): Stock? = dbQuery {
         AllStock.select {
             (AllStock.id eq id)
-        }.mapNotNull { toStock(it) }
+        }.mapNotNull(AllStock::toStock)
                 .singleOrNull()
     }
 
-    suspend fun updateStock(stock: NewStock): Stock? {
+    suspend fun updateStock(stock: Stock): Stock? {
         val id = stock.id
-        return if (id == null) {
+        return if (id == -1) { //TODO: Better way of doing this
             addStock(stock)
         } else {
             dbQuery {
 
                 AllStock.update({ AllStock.id eq id }) {
+                    //TODO: Is there a cleaner way to do this?
                     it[name] = stock.name
                     it[averageSellingUnitWeight] = stock.averageSellingUnitWeight
                     it[contentsMeasureType] = stock.contentsMeasureType
@@ -49,8 +50,7 @@ class StockService {
                     it[description] = stock.description.joinToString("//")
                     it[price]= stock.price
                     it[superDepartment] = stock.superDepartment
-                    it[unitprice] = stock.unitprice
-
+                    it[unitPrice] = stock.unitPrice
                 }
             }
             getStock(id).also {
@@ -59,11 +59,21 @@ class StockService {
         }
     }
 
-    suspend fun addStock(stock: NewStock): Stock {
+    suspend fun addStock(stock: Stock): Stock {
         var key = 0
         dbQuery {
             key = (AllStock.insert {
                 it[name] = stock.name
+                it[averageSellingUnitWeight] = stock.averageSellingUnitWeight
+                it[contentsMeasureType] = stock.contentsMeasureType
+                it[contentsQuantity] = stock.contentsQuantity
+                it[unitOfSale] = stock.unitOfSale
+                it[unitQuantity] = stock.unitQuantity
+                it[department] = stock.department
+                it[description] = stock.description.joinToString("//")
+                it[price]= stock.price
+                it[superDepartment] = stock.superDepartment
+                it[unitPrice] = stock.unitPrice
             } get AllStock.id)!!
         }
         return getStock(key)!!.also {
@@ -78,11 +88,5 @@ class StockService {
             if (it) onChange(ChangeType.DELETE, id)
         }
     }
-
-    private fun toStock(row: ResultRow): Stock =
-            Stock(
-                    id = row[AllStock.id],
-                    name = row[AllStock.name]
-            )
 
 }

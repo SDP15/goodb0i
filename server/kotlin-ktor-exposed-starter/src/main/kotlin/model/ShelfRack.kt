@@ -3,7 +3,7 @@ package model
 import org.jetbrains.exposed.sql.Table
 
 
-object ShelfRacks : Table() {
+object AllShelfRacks : Table() {
     val id = integer("id").primaryKey().autoIncrement()
     val capacity = integer("capacity")
     val info = varchar("info", 255)

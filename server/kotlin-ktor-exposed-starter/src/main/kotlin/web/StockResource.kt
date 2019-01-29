@@ -9,7 +9,7 @@ import io.ktor.request.receive
 import io.ktor.response.respond
 import io.ktor.routing.*
 import io.ktor.websocket.webSocket
-import model.NewStock
+import model.Stock
 import service.StockService
 
 fun Route.stock(stockService: StockService) {
@@ -27,12 +27,12 @@ fun Route.stock(stockService: StockService) {
         }
 
         post("/") {
-            val stock = call.receive<NewStock>()
+            val stock = call.receive<Stock>()
             call.respond(HttpStatusCode.Created, stockService.addStock(stock))
         }
 
         put("/") {
-            val stock = call.receive<NewStock>()
+            val stock = call.receive<Stock>()
             val updated = stockService.updateStock(stock)
             if(updated == null) call.respond(HttpStatusCode.NotFound)
             else call.respond(HttpStatusCode.OK, updated)

@@ -1,14 +1,19 @@
 package service
 
+import AllShelf.quantity
+import com.google.gson.Gson
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import model.AllStock
+import model.Stock
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils.create
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.transactions.transaction
+import java.io.BufferedReader
+import java.io.File
 
 object DatabaseFactory {
 
@@ -17,18 +22,9 @@ object DatabaseFactory {
         Database.connect(hikari())
         transaction {
             create(AllStock)
-            AllStock.insert {
-                it[name] = "stock one"
-                it[quantity] = 27
-                it[dateUpdated] = System.currentTimeMillis()
-            }
-            AllStock.insert {
-                it[name] = "stock two"
-                it[quantity] = 14
-                it[dateUpdated] = System.currentTimeMillis()
-            }
         }
     }
+
 
     private fun hikari(): HikariDataSource {
         val config = HikariConfig()

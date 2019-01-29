@@ -1,4 +1,5 @@
 import com.fasterxml.jackson.databind.SerializationFeature
+import com.google.gson.Gson
 import io.ktor.application.Application
 import io.ktor.application.install
 import io.ktor.features.CallLogging
@@ -9,6 +10,9 @@ import io.ktor.routing.Routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.ktor.websocket.WebSockets
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import model.Stock
 import org.litote.kmongo.async.KMongo
 import org.litote.kmongo.async.findOne
 import org.litote.kmongo.async.getCollection
@@ -16,8 +20,8 @@ import org.litote.kmongo.eq
 import service.DatabaseFactory
 import service.StockService
 import web.stock
+import java.io.File
 
-import org.litote.kmongo.*
 
 fun Application.module() {
     install(DefaultHeaders)
@@ -33,6 +37,15 @@ fun Application.module() {
     DatabaseFactory.init()
 
     val stockService = StockService()
+    launch {
+        println("Stock insert running")
+        getTestData().forEach {
+            println("Inserting $it")
+            stockService.addStock(it)
+        }
+        print("Stock insert finished")
+    }
+
 
     install(Routing) {
         stock(stockService)
@@ -40,15 +53,21 @@ fun Application.module() {
 
 }
 
-data class Jedi(val name: String, val age: Int)
 
-fun main(args: Array<String>) {
-    embeddedServer(Netty, 8080, watchPaths = listOf("MainKt"), module = Application::module).start()
-    val client = KMongo.createClient() //get com.mongodb.MongoClient new instance
-    val database = client.getDatabase("test") //normal java driver usage
-    val col = database.getCollection<Jedi>() //KMongo extension method
-//here the name of the collection by convention is "jedi"
-//you can use getCollection<Jedi>("otherjedi") if the collection name is different
-    col.insertOne(Jedi("Luke Skywalker", 19)) {_, _ -> }
-
+private fun getTestData(): Array<Stock> {
+    val path = System.getProperty("user.dir") + "/src/main/resources/items.json"
+    val file = File(path).bufferedReader()
+    val gson = Gson()
+    return gson.fromJson(file, Array<Stock>::class.java)
 }
+
+class Main {
+    companion object {
+        @JvmStatic fun main(args: Array<String>) {
+            embeddedServer(Netty, 8080, watchPaths = listOf("MainKt"), module = Application::module).start()
+            val wd = System.getProperty("user.dir")
+            println("Working directory $wd")
+        }
+    }
+}
+

@@ -26,7 +26,7 @@ data class Item(
         val price: Double,
         @SerializedName("superDepartment")
         val superDepartment: String,
-        @SerializedName("unitprice")
+        @SerializedName("unitPrice")
         val unitprice: Double
 )
 
@@ -48,7 +48,7 @@ object Test {
         "ContentsQuantity": 3.408,
         "department": "Milk, Butter & Eggs",
         "price": 1.5,
-        "unitprice": 0.44
+        "unitPrice": 0.44
       },
       {
         "superDepartment": "Fresh Food",
@@ -62,7 +62,7 @@ object Test {
         "ContentsQuantity": 250,
         "department": "Cheese",
         "price": 1.9,
-        "unitprice": 7.6
+        "unitPrice": 7.6
       },
       {
         "superDepartment": "Fresh Food",
@@ -76,7 +76,7 @@ object Test {
         "ContentsQuantity": 250,
         "department": "Milk, Butter & Eggs",
         "price": 2.0,
-        "unitprice": 8.0
+        "unitPrice": 8.0
       },
       {
         "superDepartment": "Fresh Food",
@@ -90,7 +90,7 @@ object Test {
         "ContentsQuantity": 650,
         "department": "Fresh Meat & Poultry",
         "price": 3.8,
-        "unitprice": 5.85
+        "unitPrice": 5.85
       },
       {
         "superDepartment": "Fresh Food",
@@ -104,7 +104,7 @@ object Test {
         "ContentsQuantity": 1080,
         "department": "Fresh Meat & Poultry",
         "price": 5.0,
-        "unitprice": 4.63
+        "unitPrice": 4.63
       },
       {
         "superDepartment": "Fresh Food",
@@ -118,7 +118,7 @@ object Test {
         "ContentsQuantity": 500,
         "department": "Fresh Meat & Poultry",
         "price": 1.49,
-        "unitprice": 2.98
+        "unitPrice": 2.98
       },
       {
         "superDepartment": "Fresh Food",
@@ -132,7 +132,7 @@ object Test {
         "ContentsQuantity": 230,
         "department": "Fresh Salad & Dips",
         "price": 1.0,
-        "unitprice": 4.35
+        "unitPrice": 4.35
       },
       {"superDepartment": "Fresh Food",
         "ContentsMeasureType": "SNGL",
@@ -145,7 +145,7 @@ object Test {
         "ContentsQuantity": 1,
         "department": "Fresh Vegetables",
         "price": 1.5,
-        "unitprice": 1.5
+        "unitPrice": 1.5
       },
       {"superDepartment": "Fresh Food",
         "ContentsMeasureType": "G",
@@ -158,7 +158,7 @@ object Test {
         "ContentsQuantity": 240,
         "department": "Fresh Vegetables",
         "price": 1.3,
-        "unitprice": 5.42
+        "unitPrice": 5.42
       },
       {
         "superDepartment": "Fresh Food",
@@ -171,7 +171,7 @@ object Test {
         "ContentsQuantity": 6,
         "department": "Fresh Fruit",
         "price": 1.39,
-        "unitprice": 0.232
+        "unitPrice": 0.232
       },
       {
         "superDepartment": "Fresh Food",
@@ -185,7 +185,7 @@ object Test {
         "ContentsQuantity": 5,
         "department": "Fresh Fruit",
         "price": 2.25,
-        "unitprice": 0.45
+        "unitPrice": 0.45
       },
       {
         "superDepartment": "Fresh Food",
@@ -199,7 +199,7 @@ object Test {
         "ContentsQuantity": 0.5,
         "department": "Fresh Fruit",
         "price": 2.0,
-        "unitprice": 4.0
+        "unitPrice": 4.0
       },
       {
         "superDepartment": "Bakery",
@@ -213,7 +213,7 @@ object Test {
         "ContentsQuantity": 5,
         "department": "Bread & Rolls",
         "price": 1.6,
-        "unitprice": 0.32
+        "unitPrice": 0.32
       },
       {
         "superDepartment": "Bakery",
@@ -227,7 +227,7 @@ object Test {
         "ContentsQuantity": 800,
         "department": "Bread & Rolls",
         "price": 0.7,
-        "unitprice": 0.088
+        "unitPrice": 0.088
       },
       {
         "superDepartment": "Bakery",
@@ -241,7 +241,7 @@ object Test {
         "ContentsQuantity": 4,
         "department": "Doughnuts, Cookies & Muffins",
         "price": 1.8,
-        "unitprice": 0.45
+        "unitPrice": 0.45
       },
       {
         "superDepartment": "Fresh Food",
@@ -255,7 +255,7 @@ object Test {
         "ContentsQuantity": 240,
         "department": "Chilled Fish & Seafood",
         "price": 6.4,
-        "unitprice": 2.67
+        "unitPrice": 2.67
       },
       {
         "superDepartment": "Frozen Food",
@@ -269,7 +269,7 @@ object Test {
         "ContentsQuantity": 0.5,
         "department": "Frozen Fish & Seafood",
         "price": 2.75,
-        "unitprice": 5.5
+        "unitPrice": 5.5
       },
       {
         "superDepartment": "Fresh Food",
@@ -283,7 +283,7 @@ object Test {
         "ContentsQuantity": 150,
         "department": "Chilled Fish & Seafood",
         "price": 3.75,
-        "unitprice": 25.0
+        "unitPrice": 25.0
       },
       {
         "superDepartment": "Food Cupboard",
@@ -297,7 +297,7 @@ object Test {
         "ContentsQuantity": 500,
         "department": "Cereals",
         "price": 2.4,
-        "unitprice": 0.48
+        "unitPrice": 0.48
       },
       {
         "superDepartment": "Food Cupboard",
@@ -311,7 +311,7 @@ object Test {
         "ContentsQuantity": 550,
         "department": "Table Sauces, Marinades & Dressings",
         "price": 0.42,
-        "unitprice": 0.076
+        "unitPrice": 0.076
       },
       {
         "image": "http://img.tesco.com/Groceries/pi/402/5000184592402/IDShot_90x90.jpg",
@@ -326,7 +326,7 @@ object Test {
         "ContentsQuantity": 500,
         "department": "Dried Pasta, Rice, Noodles & Cous Cous",
         "price": 0.64,
-        "unitprice": 1.28
+        "unitPrice": 1.28
       },
       {
         "superDepartment": "Food Cupboard",
@@ -340,7 +340,7 @@ object Test {
         "ContentsQuantity": 168,
         "department": "Chocolate",
         "price": 1.5,
-        "unitprice": 0.893
+        "unitPrice": 0.893
       },
       {
         "superDepartment": "Food Cupboard",
@@ -354,7 +354,7 @@ object Test {
         "ContentsQuantity": 180,
         "department": "Sweets, Mints & Chewing Gum",
         "price": 1.0,
-        "unitprice": 0.556
+        "unitPrice": 0.556
       },
       {
         "superDepartment": "Food Cupboard",
@@ -368,7 +368,7 @@ object Test {
         "ContentsQuantity": 75,
         "department": "Crisps, Snacks & Popcorn",
         "price": 1.6,
-        "unitprice": 2.14
+        "unitPrice": 2.14
       }
    ]"""
 
