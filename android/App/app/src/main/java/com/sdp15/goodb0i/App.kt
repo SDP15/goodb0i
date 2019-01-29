@@ -2,6 +2,8 @@ package com.sdp15.goodb0i
 
 import android.app.Application
 import com.google.firebase.FirebaseApp
+import com.sdp15.goodb0i.data.store.ItemLoader
+import com.sdp15.goodb0i.data.store.TestDataItemLoader
 import com.sdp15.goodb0i.view.login.LoginViewModel
 import com.sdp15.goodb0i.view.scanner.ScannerViewModel
 import org.koin.android.ext.android.startKoin
@@ -33,6 +35,9 @@ class App : Application() {
         module {
             viewModel<LoginViewModel>()
             viewModel<ScannerViewModel>()
+        },
+        module {
+            single<ItemLoader> { TestDataItemLoader }
         }
     )
 }
