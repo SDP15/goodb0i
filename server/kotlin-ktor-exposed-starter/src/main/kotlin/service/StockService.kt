@@ -14,7 +14,7 @@ class StockService {
 
     fun removeChangeListener(id: Int) = listeners.remove(id)
 
-    private suspend fun onChange(type: ChangeType, id: Int, entity: Stock?=null) {
+    private suspend fun onChange(type: ChangeType, id: Int, entity: Stock? = null) {
         listeners.values.forEach {
             it.invoke(Notification(type, id, entity))
         }
@@ -40,8 +40,17 @@ class StockService {
 
                 AllStock.update({ AllStock.id eq id }) {
                     it[name] = stock.name
-                    it[quantity] = stock.quantity
-                    it[dateUpdated] = System.currentTimeMillis()
+                    it[averageSellingUnitWeight] = stock.averageSellingUnitWeight
+                    it[contentsMeasureType] = stock.contentsMeasureType
+                    it[contentsQuantity] = stock.contentsQuantity
+                    it[unitOfSale] = stock.unitOfSale
+                    it[unitQuantity] = stock.unitQuantity
+                    it[department] = stock.department
+                    it[description] = stock.description.joinToString("//")
+                    it[price]= stock.price
+                    it[superDepartment] = stock.superDepartment
+                    it[unitprice] = stock.unitprice
+
                 }
             }
             getStock(id).also {
@@ -55,8 +64,6 @@ class StockService {
         dbQuery {
             key = (AllStock.insert {
                 it[name] = stock.name
-                it[quantity] = stock.quantity
-                it[dateUpdated] = System.currentTimeMillis()
             } get AllStock.id)!!
         }
         return getStock(key)!!.also {
@@ -68,15 +75,14 @@ class StockService {
         return dbQuery {
             AllStock.deleteWhere { AllStock.id eq id } > 0
         }.also {
-            if(it) onChange(ChangeType.DELETE, id)
+            if (it) onChange(ChangeType.DELETE, id)
         }
     }
 
     private fun toStock(row: ResultRow): Stock =
             Stock(
                     id = row[AllStock.id],
-                    name = row[AllStock.name],
-                    quantity = row[AllStock.quantity],
-                    dateUpdated = row[AllStock.dateUpdated]
+                    name = row[AllStock.name]
             )
+
 }

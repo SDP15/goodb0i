@@ -48,6 +48,8 @@ dependencies {
     compile 'org.litote.kmongo:kmongo-async:3.9.1'
 
 
+    implementation 'com.google.code.gson:gson:2.8.5'
+
     compile "ch.qos.logback:logback-classic:1.2.1"
     testCompile "org.assertj:assertj-core:3.11.1"
     testCompile "io.rest-assured:rest-assured:3.2.0"
