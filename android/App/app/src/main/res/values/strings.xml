@@ -8,7 +8,7 @@
 
     <string name="error_invalid_code_format">Invalid code format</string>
 
-    <string name="welcome_header">Welcome to GOODB0i</string>
+    <string name="welcome_header">Welcome to</string>
     <string name="action_prepare_order">PREPARE YOUR ORDER</string>
     <string name="action_start_shopping">START SHOPPING</string>
     <string name="label_order_saved">Your Order Has Been Saved</string>
