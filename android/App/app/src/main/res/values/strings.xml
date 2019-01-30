@@ -8,4 +8,18 @@
 
     <string name="error_invalid_code_format">Invalid code format</string>
 
+    <string name="welcome_header">Welcome to GOODB0i</string>
+    <string name="action_prepare_order">PREPARE YOUR ORDER</string>
+    <string name="action_start_shopping">START SHOPPING</string>
+    <string name="label_order_saved">Your Order Has Been Saved</string>
+    <string name="label_your_orders">Your Orders</string>
+    <string name="prompt_order_number">Please enter your order number</string>
+    <string name="label_help">Help Information</string>
+    <string name="label_assistant_coming">An Assistant is coming to you. Please Wait</string>
+    <string name="content_help">help text  </string>
+    <string name="label_loading">LOADING</string>
+    <string name="label_navigating_to">Navigating to</string>
+    <string name="label_approaching">Approaching</string>
+    <string name="action_add_to_cart">Add to cart</string>
+    <string name="action_dont_add_to_art">Don\'t add</string>
 </resources>
