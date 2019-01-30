@@ -54,6 +54,9 @@ teams
 # .nfs files are created when an open file is removed but is still being accessed
 .nfs*
 
+## IntelliJ ##
+.idea/*
+
 ### VisualStudioCode ###
 .vscode/*
 !.vscode/settings.json
