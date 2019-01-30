@@ -18,4 +18,6 @@ The robot moves along its way and consumes an element of the queue (LEFT, RIGHT 
 
 An instruction gets also consumed when the robot detects the end of an aisle, although that's still to be confirmed. Any obstacle detection overrides previous commands. 
 
+All these behaviours are detailed in the `line_following.py` file. 
+
 Feel free to add any comment if anything needs further explanations. 
