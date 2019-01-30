@@ -61,11 +61,17 @@ def runMotor(cl, motor_1, motor_2):
         if motor_1.state==["running"] && motor_2.state==["running"]:
             motor.run_forever()
 
-        onIntersectionDetected(motor)
+        detectLines()
 
 
 def turnMotor(direction, motor):
     #TODO: implement this function to make the rear wheels of the robot turn
+
+    
+def detectLines:
+    #TODO: implement this function to detect lines and intersections on the floor
+    onIntersectionDetected()
+
 
 def onIntersectionDetected(motor):
     motor.stop()
