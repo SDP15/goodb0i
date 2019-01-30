@@ -7,7 +7,7 @@
     android:background="@color/darkBackground"
     tools:context=".MainActivity">
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/welcomelbl"
         android:layout_width="280dp"
         android:layout_height="wrap_content"
@@ -18,7 +18,7 @@
         android:textColor="@android:color/background_light"
         android:textSize="50sp" />
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/applbl"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -30,7 +30,7 @@
         android:textSize="50sp" />
 
     <Button
-        android:id="@+id/shopBtn"
+        android:id="@+id/button_shop"
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:layout_alignParentBottom="true"
@@ -38,22 +38,24 @@
         android:layout_marginBottom="146dp"
         android:background="@drawable/main_buttons"
         android:gravity="center"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:padding="10dp"
-        android:text="Button"
         android:textAlignment="center"
         android:textColor="@android:color/background_light"
         android:textSize="30sp"
         tools:text="@string/action_start_shopping" />
 
-    <Button
-        android:id="@+id/createOrderBtn2"
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/button_create_order"
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:layout_centerInParent="true"
         android:background="@drawable/main_buttons"
         android:gravity="center"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:padding="10dp"
-        android:text="Button"
         android:textAlignment="center"
         android:textColor="@android:color/background_light"
         android:textSize="30sp"
