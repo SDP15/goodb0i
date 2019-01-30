@@ -7,6 +7,6 @@
     <color name="colorPositive">#1fba14</color>
     <color name="colorNegative">#ad1616</color>
 
-    <color name="tescoBlue">#00539F</color>
-    <color name="tescoRed">#EE1C2E</color>
+    <color name="darkBackground">#000000</color>
+    <color name="colourCyan">#00FFF4</color>
 </resources>
