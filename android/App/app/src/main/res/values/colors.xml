@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#008577</color>
-    <color name="colorPrimaryDark">#00574B</color>
-    <color name="colorAccent">#D81B60</color>
-
     <color name="colorPositive">#1fba14</color>
     <color name="colorNegative">#ad1616</color>
 
     <color name="darkBackground">#000000</color>
     <color name="buttonColor">#2E2E2E</color>
     <color name="colourCyan">#00FFF4</color>
+
+    <color name="colorPrimary">#000a12</color>
+    <color name="colorPrimaryDark">#000000</color>
+    <color name="colorAccent">#00FFF5</color>
+    <color name="colorWhite">#FFFFFF</color>
+
 </resources>
