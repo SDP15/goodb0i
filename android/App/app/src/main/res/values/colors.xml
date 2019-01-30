@@ -8,5 +8,6 @@
     <color name="colorNegative">#ad1616</color>
 
     <color name="darkBackground">#000000</color>
+    <color name="buttonColor">#2E2E2E</color>
     <color name="colourCyan">#00FFF4</color>
 </resources>
