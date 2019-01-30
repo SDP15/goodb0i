@@ -67,8 +67,8 @@ def runMotor(cl, motor_1, motor_2):
 def turnMotor(direction, motor):
     #TODO: implement this function to make the rear wheels of the robot turn
 
-    
-def detectLines:
+
+def detectLines():
     #TODO: implement this function to detect lines and intersections on the floor
     onIntersectionDetected()
 
