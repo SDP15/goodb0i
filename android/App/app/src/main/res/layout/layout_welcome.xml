@@ -8,26 +8,24 @@
     tools:context=".MainActivity">
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/welcomelbl"
+        android:id="@+id/welcome_header"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:text="@string/welcome_header"
-        android:theme="@style/TitleText"
-        android:layout_marginTop="96dp"/>
+        style="@style/TitleText" />
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/applbl"
+        android:id="@+id/welcome_subhead"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/welcomelbl"
+        android:layout_below="@+id/welcome_header"
         android:layout_centerHorizontal="true"
         android:text="@string/app_name"
-        android:textColor="@color/colourCyan"
-        android:theme="@style/TitleText" />
+        style="@style/TitleSubText"/>
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/button_shop"
         android:layout_width="match_parent"
         android:layout_height="80dp"
@@ -36,12 +34,9 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="146dp"
-        android:background="@drawable/main_buttons"
         android:gravity="center"
         android:padding="10dp"
         android:textAlignment="center"
-        android:textColor="@android:color/background_light"
-        android:textSize="30sp"
         tools:text="@string/action_start_shopping" />
 
     <androidx.appcompat.widget.AppCompatButton
@@ -51,11 +46,7 @@
         android:layout_centerInParent="true"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:background="@drawable/main_buttons"
         android:gravity="center"
         android:padding="10dp"
-        android:textAlignment="center"
-        android:textColor="@android:color/background_light"
-        android:textSize="30sp"
         tools:text="@string/action_prepare_order" />
 </RelativeLayout>

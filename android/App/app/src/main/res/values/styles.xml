@@ -8,12 +8,42 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:background">@color/darkBackground</item>
         <item name="android:textColor">@android:color/white</item>
+        <item name="android:buttonStyle">@style/RoundedButton</item>
     </style>
 
     <style name="TitleText" parent="TextAppearance.AppCompat">
         <item name="android:textColor">@android:color/primary_text_dark</item>
-        <item name="android:textSize">48sp</item>
+        <item name="android:textSize">@dimen/title_text_size</item>
+        <item name="android:layout_marginTop">@dimen/title_top_margin</item>
     </style>
+
+    <style name="TitleSubText" parent="TitleText">
+        <item name="android:layout_marginTop">0dp</item>
+        <item name="android:textColor">@color/colorAccent</item>
+    </style>
+
+    <style name="RoundedButton" parent="Base.Widget.AppCompat.Button">
+        <item name="android:background">@drawable/main_buttons</item>
+        <item name="android:textSize">@dimen/button_text_size</item>
+        <item name="android:textColor">@android:color/background_light</item>
+    </style>
+
+    <style name="BorderedButton" parent="Base.Widget.AppCompat.Button">
+        <item name="android:background">@drawable/view_border</item>
+        <item name="android:textSize">@dimen/button_text_size</item>
+        <item name="android:textColor">@android:color/background_light</item>
+        <item name="android:layout_marginStart">@dimen/button_horizontal_margin</item>
+        <item name="android:layout_marginEnd">@dimen/button_horizontal_margin</item>
+        <item name="android:height">@dimen/button_height</item>
+    </style>
+
+    <style name="BorderedTextView">
+        <item name="android:background">@drawable/view_border</item>
+        <item name="android:padding">@dimen/textview_padding</item>
+        <item name="android:textSize">@dimen/textview_textsize</item>
+        <item name="android:textColor">@color/colorWhite</item>
+    </style>
+
 
 
 </resources>
