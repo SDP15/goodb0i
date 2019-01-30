@@ -4,7 +4,7 @@ import threading
 import datetime
 
 
-server_ip = "172.20.113.221"
+server_ip = "172.20.113.221" #TODO: my laptop's IP. To be changed later
 server_port = 5005
 
 # The server will send instructions as a series of messages that will be stored in
