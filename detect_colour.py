@@ -22,15 +22,11 @@ class colourTrack:
 
         i = 0
 
-        def zero():
-           print("No colour")
-        def one():
-           print("BLACK")
-        def two():
-           print("COLOUR")
+
 
 
     def detect(self):
+        # returns 1 if the colour detected is black. 0 otherwise 
         while i<100:
            val = int(cl.value())
            if val==0:
@@ -40,6 +36,15 @@ class colourTrack:
            elif val >=5:
                two()
 
+    def zero():
+       print("No colour")
+       return 0
+    def one():
+       print("BLACK")
+       return 1
+    def two():
+       print("COLOUR")
+       return 1
 
 
 
