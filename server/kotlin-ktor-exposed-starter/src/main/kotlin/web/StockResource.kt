@@ -34,7 +34,7 @@ fun Route.stock(stockService: StockService) {
         put("/") {
             val stock = call.receive<Stock>()
             val updated = stockService.updateStock(stock)
-            if(updated == null) call.respond(HttpStatusCode.NotFound)
+            if (updated == null) call.respond(HttpStatusCode.NotFound)
             else call.respond(HttpStatusCode.OK, updated)
         }
 
@@ -55,7 +55,7 @@ fun Route.stock(stockService: StockService) {
             stockService.addChangeListener(this.hashCode()) {
                 outgoing.send(Frame.Text(mapper.writeValueAsString(it)))
             }
-            while(true) {
+            while (true) {
                 incoming.receiveOrNull() ?: break
             }
         } finally {

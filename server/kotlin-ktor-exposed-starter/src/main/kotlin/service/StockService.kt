@@ -1,6 +1,9 @@
 package service
 
-import model.*
+import model.Stocks
+import model.ChangeType
+import model.Notification
+import model.Stock
 import org.jetbrains.exposed.sql.*
 import service.DatabaseFactory.dbQuery
 
@@ -21,69 +24,24 @@ class StockService {
     }
 
     suspend fun getAllStock(): List<Stock> = dbQuery {
-        AllStock.selectAll().map(AllStock::toStock)
+        Stock.all().toList()
     }
 
     suspend fun getStock(id: Int): Stock? = dbQuery {
-        AllStock.select {
-            (AllStock.id eq id)
-        }.mapNotNull(AllStock::toStock)
-                .singleOrNull()
+            Stock.findById(id)
     }
 
     suspend fun updateStock(stock: Stock): Stock? {
-        val id = stock.id
-        return if (id == -1) { //TODO: Better way of doing this
-            addStock(stock)
-        } else {
-            dbQuery {
 
-                AllStock.update({ AllStock.id eq id }) {
-                    //TODO: Is there a cleaner way to do this?
-                    it[name] = stock.name
-                    it[averageSellingUnitWeight] = stock.averageSellingUnitWeight
-                    it[contentsMeasureType] = stock.contentsMeasureType
-                    it[contentsQuantity] = stock.contentsQuantity
-                    it[unitOfSale] = stock.unitOfSale
-                    it[unitQuantity] = stock.unitQuantity
-                    it[department] = stock.department
-                    it[description] = stock.description.joinToString("//")
-                    it[price]= stock.price
-                    it[superDepartment] = stock.superDepartment
-                    it[unitPrice] = stock.unitPrice
-                }
-            }
-            getStock(id).also {
-                onChange(ChangeType.UPDATE, id, it)
-            }
-        }
     }
 
     suspend fun addStock(stock: Stock): Stock {
-        var key = 0
-        dbQuery {
-            key = (AllStock.insert {
-                it[name] = stock.name
-                it[averageSellingUnitWeight] = stock.averageSellingUnitWeight
-                it[contentsMeasureType] = stock.contentsMeasureType
-                it[contentsQuantity] = stock.contentsQuantity
-                it[unitOfSale] = stock.unitOfSale
-                it[unitQuantity] = stock.unitQuantity
-                it[department] = stock.department
-                it[description] = stock.description.joinToString("//")
-                it[price]= stock.price
-                it[superDepartment] = stock.superDepartment
-                it[unitPrice] = stock.unitPrice
-            } get AllStock.id)!!
-        }
-        return getStock(key)!!.also {
-            onChange(ChangeType.CREATE, key, it)
-        }
+        Stock.new {  }
     }
 
     suspend fun deleteStock(id: Int): Boolean {
         return dbQuery {
-            AllStock.deleteWhere { AllStock.id eq id } > 0
+            Stocks.deleteWhere { Stocks.id eq id } > 0
         }.also {
             if (it) onChange(ChangeType.DELETE, id)
         }

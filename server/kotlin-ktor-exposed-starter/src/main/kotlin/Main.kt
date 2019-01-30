@@ -10,13 +10,8 @@ import io.ktor.routing.Routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.ktor.websocket.WebSockets
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import model.Stock
-import org.litote.kmongo.async.KMongo
-import org.litote.kmongo.async.findOne
-import org.litote.kmongo.async.getCollection
-import org.litote.kmongo.eq
 import service.DatabaseFactory
 import service.StockService
 import web.stock
@@ -63,7 +58,8 @@ private fun getTestData(): Array<Stock> {
 
 class Main {
     companion object {
-        @JvmStatic fun main(args: Array<String>) {
+        @JvmStatic
+        fun main(args: Array<String>) {
             embeddedServer(Netty, 8080, watchPaths = listOf("MainKt"), module = Application::module).start()
             val wd = System.getProperty("user.dir")
             println("Working directory $wd")
