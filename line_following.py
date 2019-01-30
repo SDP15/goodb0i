@@ -2,6 +2,7 @@ from tcpcom import TCPClient
 from time import sleep
 import threading
 import datetime
+from detect_colour import colourTrack
 
 
 server_ip = "172.20.113.221" #TODO: my laptop's IP. To be changed later
@@ -66,12 +67,7 @@ def runMotor(cl, motor_1, motor_2):
 
 def turnMotor(direction, motor):
     #TODO: implement this function to make the rear wheels of the robot turn
-
-
-def detectLines():
-    #TODO: implement this function to detect lines and intersections on the floor
-    onIntersectionDetected()
-
+    colourTrack.detect()  
 
 def onIntersectionDetected(motor):
     motor.stop()
