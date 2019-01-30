@@ -62,12 +62,12 @@ def runMotor(cl, motor_1, motor_2):
         if motor_1.state==["running"] && motor_2.state==["running"]:
             motor.run_forever()
 
-        detectLines()
+        colourTrack.detect()
 
 
 def turnMotor(direction, motor):
     #TODO: implement this function to make the rear wheels of the robot turn
-    colourTrack.detect()  
+
 
 def onIntersectionDetected(motor):
     motor.stop()
