@@ -9,37 +9,35 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/welcomelbl"
-        android:layout_width="280dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="39dp"
         android:text="@string/welcome_header"
-        android:textColor="@android:color/background_light"
-        android:textSize="50sp" />
+        android:theme="@style/TitleText"
+        android:layout_marginTop="96dp"/>
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/applbl"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
+        android:layout_below="@+id/welcomelbl"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="123dp"
         android:text="@string/app_name"
         android:textColor="@color/colourCyan"
-        android:textSize="50sp" />
+        android:theme="@style/TitleText" />
 
     <Button
         android:id="@+id/button_shop"
         android:layout_width="match_parent"
         android:layout_height="80dp"
-        android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="146dp"
         android:background="@drawable/main_buttons"
         android:gravity="center"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
         android:padding="10dp"
         android:textAlignment="center"
         android:textColor="@android:color/background_light"
@@ -51,10 +49,10 @@
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:layout_centerInParent="true"
-        android:background="@drawable/main_buttons"
-        android:gravity="center"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
+        android:background="@drawable/main_buttons"
+        android:gravity="center"
         android:padding="10dp"
         android:textAlignment="center"
         android:textColor="@android:color/background_light"

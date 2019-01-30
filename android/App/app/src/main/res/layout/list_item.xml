@@ -38,28 +38,31 @@
         android:id="@+id/item_button_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/text_item_quantity"
-        app:layout_constraintBottom_toBottomOf="parent">
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_item_quantity">
 
         <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/button_negative"
             android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_weight="0.5"
-            android:layout_height="wrap_content" android:id="@+id/button_negative"
+            android:adjustViewBounds="false"
             android:background="@color/colorNegative"
             android:minHeight="48dp"
-            android:src="@drawable/ic_remove_circle_white"
             android:scaleType="fitCenter"
-            android:adjustViewBounds="false"/>
+            android:src="@drawable/ic_remove_circle_white" />
 
         <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/button_positive"
             android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_weight="0.5"
-            android:layout_height="wrap_content" android:id="@+id/button_positive"
+            android:adjustViewBounds="false"
             android:background="@color/colorPositive"
             android:minHeight="48dp"
-            android:src="@drawable/ic_add_circle_white"
             android:scaleType="fitCenter"
-            android:adjustViewBounds="false"/>
+            android:src="@drawable/ic_add_circle_white" />
 
     </LinearLayout>
 
