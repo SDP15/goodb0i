@@ -20,6 +20,14 @@ fun Route.stock(stockService: StockService) {
             call.respond(stockService.getAllStock())
         }
 
+        get("/search/{query}" ) {
+            println("Query ${call.parameters["query"]}")
+
+            val stock = stockService.search(call.parameters["query"])
+            if (stock.isEmpty()) call.respond(HttpStatusCode.NotFound)
+            else call.respond(stock)
+        }
+
         get("/{id}") {
             val stock = stockService.getStock(call.parameters["id"]?.toInt()!!)
             if (stock == null) call.respond(HttpStatusCode.NotFound)

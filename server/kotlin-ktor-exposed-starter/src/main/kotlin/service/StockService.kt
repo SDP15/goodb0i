@@ -31,6 +31,12 @@ class StockService {
                 .singleOrNull()
     }
 
+    suspend fun search(query: String?): List<Stock> = dbQuery {
+        AllStock.selectAll().filter {
+            (it[AllStock.name] + it[AllStock.description] + it[AllStock.department] + it[AllStock.superDepartment]).toLowerCase().contains(query?.toLowerCase() ?: "")
+        }.map(AllStock::toStock)
+    }
+
     suspend fun updateStock(stock: Stock): Stock? {
         val id = stock.id
         return if (id == -1) { //TODO: Better way of doing this
