@@ -28,7 +28,7 @@
 
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/button_create_order"
+        android:id="@+id/button_prepare_order"
         android:layout_width="match_parent"
         android:layout_height="@dimen/button_height"
         android:layout_centerInParent="true"
