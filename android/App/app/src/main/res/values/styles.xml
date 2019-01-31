@@ -26,6 +26,7 @@
         <item name="android:background">@drawable/main_buttons</item>
         <item name="android:textSize">@dimen/button_text_size</item>
         <item name="android:textColor">@android:color/background_light</item>
+        <item name="android:height">80dp</item>
     </style>
 
     <style name="BorderedButton" parent="Base.Widget.AppCompat.Button">
