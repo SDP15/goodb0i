@@ -22,7 +22,8 @@
     <string name="label_approaching">Approaching</string>
     <string name="action_add_to_cart">Add to cart</string>
     <string name="action_dont_add_to_art">Don\'t add</string>
-    <string name="goodboi">GOODB0i</string>
+    <string name="goodboi">@string/app_name</string>
     <string name="view_shopping_list">View Shopping List</string>
-    <style name="label_loading">LOADING</style>
+    <string name="action_repeat">Repeat</string>
+    <string name="action_scan">Scan</string>
 </resources>
