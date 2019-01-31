@@ -24,4 +24,5 @@
     <string name="action_dont_add_to_art">Don\'t add</string>
     <string name="goodboi">GOODB0i</string>
     <string name="view_shopping_list">View Shopping List</string>
+    <style name="label_loading">LOADING</style>
 </resources>

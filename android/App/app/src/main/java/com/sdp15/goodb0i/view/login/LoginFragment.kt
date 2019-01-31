@@ -9,7 +9,7 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.sdp15.goodb0i.R
 import com.sdp15.goodb0i.watchText
-import kotlinx.android.synthetic.main.layout_login.*
+import kotlinx.android.synthetic.main.layout_pin_input.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
@@ -41,7 +41,7 @@ class LoginFragment : androidx.fragment.app.Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.layout_login, container, false)
+        return inflater.inflate(R.layout.layout_pin_input, container, false)
     }
 
 

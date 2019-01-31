@@ -12,7 +12,7 @@
     <fragment android:id="@+id/login_fragment"
         android:name="com.sdp15.goodb0i.view.login.LoginFragment"
         android:label="login_fragment"
-        tools:layout="@layout/layout_login">
+        tools:layout="@layout/layout_pin_input">
 
 
     </fragment>
