@@ -3,15 +3,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/login_fragment">
+    app:startDestination="@id/pin_fragment">
 
 
 
     <action android:id="@+id/scanner" app:destination="@id/scanner_fragment" />
 
-    <fragment android:id="@+id/login_fragment"
-        android:name="com.sdp15.goodb0i.view.login.LoginFragment"
-        android:label="login_fragment"
+    <fragment android:id="@+id/pin_fragment"
+        android:name="com.sdp15.goodb0i.view.pin.PinFragment"
+        android:label="pin_fragment"
         tools:layout="@layout/layout_pin_input">
 
 

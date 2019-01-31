@@ -1,11 +1,11 @@
-package com.sdp15.goodb0i.view.login
+package com.sdp15.goodb0i.view.pin
 
 import androidx.annotation.StringRes
 import androidx.lifecycle.MutableLiveData
 import com.sdp15.goodb0i.BaseViewModel
 import com.sdp15.goodb0i.R
 
-class LoginViewModel : BaseViewModel<LoginViewModel.LoginAction>(), LoginFragment.LoginInteractor {
+class PinViewModel : BaseViewModel<PinViewModel.LoginAction>(), PinFragment.PinInteractor {
 
     val validInput = MutableLiveData<Pair<Boolean, @StringRes Int>>()
 

@@ -4,7 +4,7 @@ import android.app.Application
 import com.google.firebase.FirebaseApp
 import com.sdp15.goodb0i.data.store.ItemLoader
 import com.sdp15.goodb0i.data.store.TestDataItemLoader
-import com.sdp15.goodb0i.view.login.LoginViewModel
+import com.sdp15.goodb0i.view.pin.PinViewModel
 import com.sdp15.goodb0i.view.scanner.ScannerViewModel
 import org.koin.android.ext.android.startKoin
 import org.koin.androidx.viewmodel.experimental.builder.viewModel
@@ -33,7 +33,7 @@ class App : Application() {
 
     private val modules = listOf(
         module {
-            viewModel<LoginViewModel>()
+            viewModel<PinViewModel>()
             viewModel<ScannerViewModel>()
         },
         module {

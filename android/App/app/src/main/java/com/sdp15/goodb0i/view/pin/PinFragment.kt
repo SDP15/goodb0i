@@ -1,4 +1,4 @@
-package com.sdp15.goodb0i.view.login
+package com.sdp15.goodb0i.view.pin
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -21,15 +21,15 @@ private const val ARG_PARAM2 = "param2"
 /**
  * A simple [Fragment] subclass.
  * Activities that contain this fragment must implement the
- * [LoginFragment.OnFragmentInteractionListener] interface
+ * [PinFragment.OnFragmentInteractionListener] interface
  * to handle interaction events.
- * Use the [LoginFragment.newInstance] factory method to
+ * Use the [PinFragment.newInstance] factory method to
  * create an instance of this fragment.
  *
  */
-class LoginFragment : androidx.fragment.app.Fragment() {
+class PinFragment : androidx.fragment.app.Fragment() {
 
-    private val vm: LoginViewModel by viewModel()
+    private val vm: PinViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,7 +72,7 @@ class LoginFragment : androidx.fragment.app.Fragment() {
     }
 
 
-    interface LoginInteractor {
+    interface PinInteractor {
 
         fun onInput(input: String)
 
