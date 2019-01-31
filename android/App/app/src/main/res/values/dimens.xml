@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <dimen name="rounded_corner_radius">12dp</dimen>
     <dimen name="default_horizontal_margin">16dp</dimen>
     <dimen name="default_margin_bottom">48dp</dimen>
     <dimen name="button_horizontal_margin">@dimen/default_horizontal_margin</dimen>
