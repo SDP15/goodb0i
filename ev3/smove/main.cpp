@@ -45,9 +45,9 @@ public:
     }
 
     if (button::left.pressed()) {
-      steerDrive->runForever(-50);
+      steerDrive->runForever(-5);
     } else if (button::right.pressed()) {
-      steerDrive->runForever(50);
+      steerDrive->runForever(5);
     } else {
       steerDrive->stop();
     }

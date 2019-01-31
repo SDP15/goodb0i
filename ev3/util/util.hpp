@@ -30,7 +30,7 @@ public:
     maxSpeed = mtr->max_speed();
     std::cerr << "Motor " << motor_addr << " max speed: " << maxSpeed
               << std::endl;
-    mtr->set_stop_action(ev3dev::motor::stop_action_brake);
+    mtr->set_stop_action(ev3dev::motor::stop_action_hold);
     mtr->stop();
   }
 
