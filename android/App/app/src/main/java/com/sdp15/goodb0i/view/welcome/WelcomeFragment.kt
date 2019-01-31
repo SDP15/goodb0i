@@ -7,28 +7,32 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatButton
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.navigation.Navigation
+import androidx.navigation.fragment.findNavController
 import com.sdp15.goodb0i.R
-import com.sdp15.goodb0i.bindView
+import kotlinx.android.synthetic.main.layout_welcome.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import timber.log.Timber
 
 class WelcomeFragment : Fragment() {
 
     private val vm: WelcomeViewModel by viewModel()
 
-    private val prepareOrderButton by bindView<AppCompatButton>(R.id.button_prepare_order)
-    private val startShoppingButton by bindView<AppCompatButton>(R.id.button_prepare_order)
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onResume() {
+        super.onResume()
+        // NB: The ViewModel will immediately post an action to navigate to another fragment
+        // although we could just do that here, we may later need to implement other checks in the ViewModel
+        button_prepare_order.setOnClickListener {
+            vm.prepareOrder() }
+        button_enter_pin.setOnClickListener {
+            vm.startShopping() }
         vm.bind()
         vm.actions.observe(this, Observer {
-
+            if (it is WelcomeViewModel.WelcomeAction.Navigate) {
+                findNavController().navigate(it.destination)
+            }
         })
-    }
-
-    override fun onStart() {
-        super.onStart()
-        prepareOrderButton.setOnClickListener { }
     }
 
     override fun onCreateView(

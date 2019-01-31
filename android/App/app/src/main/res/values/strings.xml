@@ -11,6 +11,7 @@
     <string name="welcome_header">Welcome to</string>
     <string name="action_prepare_order">PREPARE YOUR ORDER</string>
     <string name="action_start_shopping">START SHOPPING</string>
+    <string name="action_enter_pin">ENTER PIN</string>
     <string name="label_order_saved">Your Order Has Been Saved</string>
     <string name="label_your_orders">Your Orders</string>
     <string name="prompt_order_number">Please enter your order number</string>

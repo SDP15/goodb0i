@@ -11,11 +11,11 @@ class WelcomeViewModel : BaseViewModel<WelcomeViewModel.WelcomeAction>(), Welcom
     }
 
     override fun prepareOrder() {
-        actions.postValue(WelcomeAction.Navigate(R.id.scanner_fragment))
+        actions.postValue(WelcomeAction.Navigate(R.id.pin_fragment))
     }
 
     override fun startShopping() {
-        actions.postValue(WelcomeAction.Navigate(R.id.scanner_fragment))
+        actions.postValue(WelcomeAction.Navigate(R.id.pin_fragment))
     }
 
     sealed class WelcomeAction {

@@ -6,7 +6,10 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:background">@color/darkBackground</item>
+        <!-- CameraView TextureView will crash if we set a drawable background.
+            A color doesn't need to be a drawable anyway, so we just set colorBackground
+         -->
+        <item name="android:colorBackground">@color/darkBackground</item>
         <item name="android:textColor">@android:color/white</item>
         <item name="android:buttonStyle">@style/RoundedButton</item>
     </style>

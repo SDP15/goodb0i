@@ -24,6 +24,9 @@
         tools:layout="@layout/layout_pin_input">
 
 
+        <action
+            android:id="@+id/action_pin_fragment_to_orders_fragment"
+            app:destination="@id/orders_fragment" />
     </fragment>
 
     <fragment android:id="@+id/error_fragment"
@@ -50,6 +53,9 @@
         android:label="orders_fragment"
         tools:layout="@layout/layout_your_orders">
 
+        <argument
+            android:name="pin"
+            app:argType="long" />
     </fragment>
 
     <fragment android:id="@+id/confirmation_fragment"

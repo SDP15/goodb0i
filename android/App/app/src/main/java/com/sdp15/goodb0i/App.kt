@@ -4,8 +4,12 @@ import android.app.Application
 import com.google.firebase.FirebaseApp
 import com.sdp15.goodb0i.data.store.ItemLoader
 import com.sdp15.goodb0i.data.store.TestDataItemLoader
+import com.sdp15.goodb0i.view.confirmation.ConfirmationViewModel
+import com.sdp15.goodb0i.view.item.ItemViewModel
+import com.sdp15.goodb0i.view.orders.OrdersViewModel
 import com.sdp15.goodb0i.view.pin.PinViewModel
 import com.sdp15.goodb0i.view.scanner.ScannerViewModel
+import com.sdp15.goodb0i.view.welcome.WelcomeViewModel
 import org.koin.android.ext.android.startKoin
 import org.koin.androidx.viewmodel.experimental.builder.viewModel
 import org.koin.dsl.module.module
@@ -35,6 +39,10 @@ class App : Application() {
         module {
             viewModel<PinViewModel>()
             viewModel<ScannerViewModel>()
+            viewModel<WelcomeViewModel>()
+            viewModel<ConfirmationViewModel>()
+            viewModel<ItemViewModel>()
+            viewModel<OrdersViewModel>()
         },
         module {
             single<ItemLoader> { TestDataItemLoader }
