@@ -30,7 +30,7 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
     private var search: Job? = null
 
     override fun onQueryChange(old: String, new: String) {
-        if (new.isEmpty()) return
+        if (new.isEmpty()) searchResults.postValue(emptyList())
         search?.cancel()
         search = GlobalScope.launch(Dispatchers.IO) {
             val results = loader.search(new).data
