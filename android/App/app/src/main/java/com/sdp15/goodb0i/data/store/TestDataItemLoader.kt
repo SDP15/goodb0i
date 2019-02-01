@@ -362,4 +362,7 @@ object TestDataItemLoader : ItemLoader {
         return PaginatedResult(items.filter { it.name.startsWith(query) }, 0, false)
     }
 
+    override suspend fun loadAll(): List<Item> {
+        return items.toList()
+    }
 }

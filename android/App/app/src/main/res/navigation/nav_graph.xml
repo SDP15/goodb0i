@@ -75,4 +75,12 @@
             app:destination="@id/scanner_fragment" />
     </fragment>
 
+    <fragment android:id="@+id/search_fragment" android:label="search_fragment"
+        android:name="com.sdp15.goodb0i.view.search.SearchFragment"
+        tools:layout="@layout/layout_search">
+
+    </fragment>
+
+    <action android:id="@+id/action_to_search_fragment" app:destination="@id/search_fragment"/>
+
 </navigation>

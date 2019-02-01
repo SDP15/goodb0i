@@ -15,7 +15,7 @@ class WelcomeViewModel : BaseViewModel<WelcomeViewModel.WelcomeAction>(), Welcom
     }
 
     override fun startShopping() {
-        actions.postValue(WelcomeAction.Navigate(R.id.pin_fragment))
+        actions.postValue(WelcomeAction.Navigate(R.id.search_fragment))
     }
 
     sealed class WelcomeAction {
