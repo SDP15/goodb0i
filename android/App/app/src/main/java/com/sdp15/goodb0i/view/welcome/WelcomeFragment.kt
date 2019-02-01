@@ -28,10 +28,10 @@ class WelcomeFragment : Fragment() {
         button_enter_pin.setOnClickListener {
             vm.startShopping() }
         vm.bind()
+        vm.transitions.observe(this, Observer {
+            findNavController().navigate(it)
+        })
         vm.actions.observe(this, Observer {
-            if (it is WelcomeViewModel.WelcomeAction.Navigate) {
-                findNavController().navigate(it.destination)
-            }
         })
     }
 
