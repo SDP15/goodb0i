@@ -16,7 +16,6 @@
     </fragment>
 
 
-    <action android:id="@+id/scanner" app:destination="@id/scanner_fragment" />
 
     <fragment android:id="@+id/pin_fragment"
         android:name="com.sdp15.goodb0i.view.pin.PinFragment"
