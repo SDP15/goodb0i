@@ -10,4 +10,5 @@
     <dimen name="title_text_size">48sp</dimen>
     <dimen name="textview_padding">16dp</dimen>
     <dimen name="textview_textsize">32sp</dimen>
+    <dimen name="search_view_inset">16dp</dimen>
 </resources>

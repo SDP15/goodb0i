@@ -8,4 +8,6 @@ interface ItemLoader {
 
     suspend fun search(query: String): PaginatedResult<Item>
 
+    suspend fun loadAll(): List<Item>
+
 }

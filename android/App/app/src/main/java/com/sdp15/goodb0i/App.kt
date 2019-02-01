@@ -9,6 +9,7 @@ import com.sdp15.goodb0i.view.item.ItemViewModel
 import com.sdp15.goodb0i.view.orders.OrdersViewModel
 import com.sdp15.goodb0i.view.pin.PinViewModel
 import com.sdp15.goodb0i.view.scanner.ScannerViewModel
+import com.sdp15.goodb0i.view.search.SearchViewModel
 import com.sdp15.goodb0i.view.welcome.WelcomeViewModel
 import org.koin.android.ext.android.startKoin
 import org.koin.androidx.viewmodel.experimental.builder.viewModel
@@ -43,6 +44,7 @@ class App : Application() {
             viewModel<ConfirmationViewModel>()
             viewModel<ItemViewModel>()
             viewModel<OrdersViewModel>()
+            viewModel<SearchViewModel>()
         },
         module {
             single<ItemLoader> { TestDataItemLoader }
