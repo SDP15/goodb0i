@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+
+    <androidx.appcompat.widget.AppCompatTextView
+            android:text="@string/label_shopping_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:id="@+id/title_lbl"
+            style="@style/TitleText" android:layout_marginTop="60dp"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/list_recycler"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            tools:listitem="@layout/list_item"
+            tools:itemCount="7" android:layout_weight="0.5" android:layout_marginTop="15dp"
+            android:layout_marginBottom="15dp">
+
+
+    </androidx.recyclerview.widget.RecyclerView>
+    <Button
+            android:text="@string/label_save"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:id="@+id/Save_btn" android:textSize="35sp"
+            style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog" android:background="@drawable/main_buttons"/>
+
+
+</LinearLayout>

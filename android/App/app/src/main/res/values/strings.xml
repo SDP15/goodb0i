@@ -27,4 +27,6 @@
     <string name="view_shopping_list">View Shopping List</string>
     <string name="action_repeat">Repeat</string>
     <string name="action_scan">Scan</string>
+    <string name="label_shopping_list">Your Shopping List</string>
+    <string name="label_save">Save</string>
 </resources>
