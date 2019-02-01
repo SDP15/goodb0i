@@ -7,11 +7,10 @@
 
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/title_lbl"
+        android:id="@+id/list_title"
         style="@style/TitleText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
         android:textAlignment="center"
         android:text="@string/label_shopping_list" />
 
@@ -19,9 +18,9 @@
         android:id="@+id/list_recycler"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginBottom="15dp"
-        android:layout_weight="0.5"
+        android:layout_weight="1"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
         tools:itemCount="7"
         tools:listitem="@layout/list_item">
 
@@ -29,7 +28,7 @@
     </androidx.recyclerview.widget.RecyclerView>
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/Save_btn"
+        android:id="@+id/list_save_button"
         style="@style/RoundedButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -359,7 +359,9 @@ object TestDataItemLoader : ItemLoader {
     }
 
     override suspend fun search(query: String): PaginatedResult<Item> {
-        return PaginatedResult(items.filter { it.name.startsWith(query) }, 0, false)
+        return PaginatedResult(items.filter {
+            (it.name + it.department + it.description).toLowerCase().contains(query.toLowerCase())
+        }, 0, false)
     }
 
     override suspend fun loadAll(): List<Item> {

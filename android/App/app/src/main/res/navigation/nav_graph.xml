@@ -13,9 +13,18 @@
         <action
             android:id="@+id/action_welcome_fragment_to_pin_fragment"
             app:destination="@id/pin_fragment" />
+
+        <action android:id="@+id/action_welcome_fragment_to_list_creation_fragment" app:destination="@id/list_creation_fragment"/>
+
     </fragment>
 
 
+    <fragment android:name="com.sdp15.goodb0i.view.list.ListPagingFragment"
+        android:id="@+id/list_creation_fragment"
+        android:label="list_creation_fragment">
+
+
+    </fragment>
 
     <fragment android:id="@+id/pin_fragment"
         android:name="com.sdp15.goodb0i.view.pin.PinFragment"
@@ -75,11 +84,11 @@
     </fragment>
 
     <fragment android:id="@+id/search_fragment" android:label="search_fragment"
-        android:name="com.sdp15.goodb0i.view.search.SearchFragment"
+        android:name="com.sdp15.goodb0i.view.list.SearchFragment"
         tools:layout="@layout/layout_search">
 
     </fragment>
 
-    <action android:id="@+id/action_to_search_fragment" app:destination="@id/search_fragment"/>
+
 
 </navigation>

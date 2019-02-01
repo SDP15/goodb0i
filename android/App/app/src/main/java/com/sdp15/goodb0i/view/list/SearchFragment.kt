@@ -1,4 +1,4 @@
-package com.sdp15.goodb0i.view.search
+package com.sdp15.goodb0i.view.list
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,16 +7,15 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.arlib.floatingsearchview.suggestions.model.SearchSuggestion
+import androidx.recyclerview.widget.RecyclerView
 import com.sdp15.goodb0i.R
 import kotlinx.android.synthetic.main.layout_search.*
+import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import timber.log.Timber
 
 class SearchFragment : Fragment() {
 
-    private val vm: SearchViewModel by viewModel()
-    private val adapter = ItemAdapter()
+    private val vm: ListViewModel by sharedViewModel()
 
     override fun onStart() {
         super.onStart()
@@ -26,10 +25,14 @@ class SearchFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        list_recycler.layoutManager = LinearLayoutManager(context)
+
+        // Specified explicitly as AS likes to autocomplete, and then later decide that it actually meant a different
+        // LinearLayoutManager
+        list_recycler.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
+        val adapter = ItemAdapter(vm::incrementItem, vm::decrementItem)
         list_recycler.adapter = adapter
-        vm.items.observe(this, Observer {
-            adapter.items = it
+        vm.searchResults.observe(this, Observer {
+            adapter.itemsChanged(ItemAdapter.ListDiff.All(it))
         })
         floating_search_view.setOnQueryChangeListener(vm::onQueryChange)
 

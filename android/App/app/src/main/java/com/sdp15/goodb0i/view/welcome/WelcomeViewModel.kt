@@ -11,7 +11,7 @@ class WelcomeViewModel : BaseViewModel<WelcomeViewModel.WelcomeAction>(), Welcom
     }
 
     override fun prepareOrder() {
-        transitions.postValue(R.id.search_fragment)
+        transitions.postValue(R.id.list_creation_fragment)
     }
 
     override fun startShopping() {
