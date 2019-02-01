@@ -11,7 +11,7 @@ import org.koin.standalone.KoinComponent
 import org.koin.standalone.inject
 import timber.log.Timber
 
-class SearchViewModel : BaseViewModel<SearchViewModel.SearchAction>(), KoinComponent {
+class SearchViewModel : BaseViewModel<SearchViewModel.SearchAction>(), SearchFragment.SearchFragmentInteractor, KoinComponent {
 
     private val loader: ItemLoader by inject()
 
@@ -23,6 +23,10 @@ class SearchViewModel : BaseViewModel<SearchViewModel.SearchAction>(), KoinCompo
             Timber.i("Loaded items $data")
             items.postValue(data)
         }
+    }
+
+    override fun onQueryChange(old: String, new: String) {
+
     }
 
     sealed class SearchAction {

@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.arlib.floatingsearchview.suggestions.model.SearchSuggestion
 import com.sdp15.goodb0i.R
 import kotlinx.android.synthetic.main.layout_search.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -30,6 +31,8 @@ class SearchFragment : Fragment() {
         vm.items.observe(this, Observer {
             adapter.items = it
         })
+        floating_search_view.setOnQueryChangeListener(vm::onQueryChange)
+
     }
 
     override fun onCreateView(
@@ -38,6 +41,12 @@ class SearchFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.layout_search, container, false)
+    }
+
+    interface SearchFragmentInteractor {
+
+        fun onQueryChange(old: String, new: String)
+
     }
 
 }
