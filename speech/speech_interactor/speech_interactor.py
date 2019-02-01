@@ -13,8 +13,8 @@ speech = LiveSpeech(
     no_search=False,
     full_utt=False,
     hmm=os.path.join(model_path, 'en-us'),
-    lm=os.path.join(model_path, 'en-us.lm.bin'),
-    #lm=False,
+    #lm=os.path.join(model_path, 'en-us.lm.bin'),
+    lm=False,
     dic=os.path.join(model_path, 'cmudict-en-us.dict'),
     kws='kws.list',
 )
@@ -32,38 +32,49 @@ class SpeechInteractor:
         #print(self.options)
     
     def listen(self):
+        phrase = ""
         for sphrase in speech:
             phrase = str(sphrase).lower()
-            print("You said:", phrase)
-            if phrase == 'repeat':
-                print("repeating")
-                say("I'll repeat. " +self.last_reply)
-            elif phrase in self.options:
-                print(phrase, "detected")
-                self.react(phrase)
-            elif "n/a" in self.options:
-                print("no keyword detected")
-                self.react("n/a")
-            else:
-                print("no keyword detected")
-                say(self.possible_states['errorMessage'])
-                self.listOptions()
-                self.nextState(self.state)
+            break
+        print("You said:", phrase)
+        if 'repeat' in phrase:
+            print("repeating")
+            self.say("I'll repeat. " +self.last_reply)
+            self.listen()
+        elif "options" in phrase:
+            print("outlining options")
+            self.listOptions()
+            self.listen()
+        notfound = True
+        optionindices = {}
+        for o in self.options:
+            if o in phrase:
+                notfound = False
+                print(o, "detected")
+                if phrase.index(o) > -1:
+                    optionindices[o] = phrase.index(o)
+        if optionindices:
+            self.react(max(optionindices,key=lambda l: optionindices[l]))
+            #print("optionindices")
+        if notfound and "n/a" in self.options:
+            print("no keyword detected")
+            self.react("n/a")
 
     def react(self, phrase):
-        say(self.options[phrase]['reply'])
+        self.say(self.options[phrase]['reply'])
         self.last_reply = self.options[phrase]['reply']
         self.nextState(self.options[phrase]['nextState'])
+        self.listen()
 
     def listOptions(self):
-        say("Your options are: %s, and repeat." 
+        self.say("Your options are: %s, and repeat." 
             % ", ".join(str(o) for o in self.options))
 
 
-def say(string):
-    engine = pyttsx.init()
-    engine.say(string)
-    engine.runAndWait()
+    def say(self, string):
+        engine = pyttsx.init()
+        engine.say(string)
+        engine.runAndWait()
 
 if __name__ == '__main__':
     sint = SpeechInteractor()

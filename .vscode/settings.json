@@ -6,5 +6,7 @@
         "*.sll": "llvm",
         "*.oll": "llvm",
         "stdexcept": "cpp"
-    }
+    },
+    "python.linting.pylintEnabled": true,
+    "python.linting.enabled": true
 }

@@ -2,13 +2,18 @@ import json
 
 errorMessage = "Sorry, I couldn't recognise your command."
 
-unconst = "That is not an option. Thou shalt obey me. Choose one of the other options."
+unconst = "That is not an option. Please try another option. To hear your options, say: options."
 
 tut1output = "Once you have selected an item, you can scan its barcode using the "\
              "camera on your phone. Don't worry, I will help you with this. "\
              "Once you have scanned the item, I can tell you information about "\
              "the item you have picked up. If you pick up the wrong item, "\
              "you can try again. Does this make sense?"
+
+tut0no = "I will tell you when we have arrived at an item. "\
+               "In this shop, the items will always be on your right. "\
+               "I will then tell you what item you have arrived at, "\
+               "and what shelf the item is on. Would you like an example?"
 
 interactor_states = {
   "init": {
@@ -17,38 +22,8 @@ interactor_states = {
       "nextState": "beginning0"
     },
     "n/a": {
-      "reply": "Hello there, in order to use good boy, please say start.",
+      "reply": "Hello there, in order to use good boy, please say: start.",
       "nextState": "init"
-    }
-  },
-  "waiting1": {
-    "start": {
-      "reply": "Hello, my name is Iona Trolley. Have you ever used good boy before?",
-      "nextState": "beginning1"
-    },
-    "n/a": {
-      "reply": "Hello there, in order to use good boy please say start.",
-      "nextState": "waiting1"
-    }
-  },
-  "waiting2": {
-    "start": {
-      "reply": "Hello, my name is Iona Trolley. Have you ever used good boy before?",
-      "nextState": "beginning2"
-    },
-    "n/a": {
-      "reply": "Hello there, in order to use good boy please say start.",
-      "nextState": "waiting2"
-    }
-  },
-  "waiting3": {
-    "start": {
-      "reply": "Hello, my name is Iona Trolley. Have you ever used good boy before?",
-      "nextState": "beginning3"
-    },
-    "n/a": {
-      "reply": "Hello there, in order to use good boy, please say start.",
-      "nextState": "waiting3"
     }
   },
   "beginning0": {
@@ -79,31 +54,24 @@ interactor_states = {
       "nextState": "tutorial0"
     },
     "no": {
-      "reply": "Okay. When you are ready to start shopping, say shopping. "\
-               "And to begin the tutorial, say tutorial",
+      "reply": "Okay. When you are ready to do something, say that thing.", #start shopping, say: shopping. "\
+              # "And to begin the tutorial, say: tutorial. ",
       "nextState": "limbo0"
     }
   },
-#  "beginning3": {
-#  },
   "shopping0": {
   },
   "shopping1": {
   },
-#  "shopping2": {
-#  },
-#  "shopping3": {
-#  },
+
   "tutorial0": {
     "yes": {
-      "reply": unconst,
-      "nextState": "tutorial0"
+      "reply": "I am a shopping trolley that follows a route around the shop to help you pick up items. To give me a list simply attach your"\
+                        "smartphone and send me the list... " + tut0no,
+      "nextState": "tutorial1"
     },
     "no": {
-      "reply": "I will tell you when we have arrived at an item. "\
-               "In this shop, the items will always be on your right. "\
-               "I will then tell you what item you have arrived at, "\
-               "and what shelf the item is on. Would you like an example?",
+      "reply": tut0no,
       "nextState": "tutorial1"
     }
   },
@@ -134,8 +102,8 @@ interactor_states = {
       "nextState": "shopping0"
     },
     "no": {
-      "reply": "Okay. When you are ready to start shopping, say shopping."\
-      "To begin the tutorial, say tutorial.",
+      "reply": "Okay. When you are ready to start shopping, say: shopping."\
+      "To begin the tutorial, say: tutorial.",
       "nextState": "limbo0"
     }
   },
@@ -149,12 +117,6 @@ interactor_states = {
       "nextState": "beginning2"
     }
   },
-#  "limbo1": {
-#  },
-#  "limbo2": {
-#  },
-#  "limbo3": {
-#  }
   "errorMessage" : errorMessage
 }
 
