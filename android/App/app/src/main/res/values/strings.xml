@@ -29,4 +29,6 @@
     <string name="label_shopping_list">Shopping list</string>
     <string name="label_save">Save</string>
     <string name="label_search">Search</string>
+    <string name="error_bluetooth_unable_to_connect">Unable to connect</string>
+    <string name="error_bluetooth_connection_lost">Device connection lost</string>
 </resources>

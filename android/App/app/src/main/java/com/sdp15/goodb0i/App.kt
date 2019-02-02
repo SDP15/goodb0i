@@ -5,6 +5,7 @@ import com.google.firebase.FirebaseApp
 import com.sdp15.goodb0i.data.store.ItemLoader
 import com.sdp15.goodb0i.data.store.TestDataItemLoader
 import com.sdp15.goodb0i.view.confirmation.ConfirmationViewModel
+import com.sdp15.goodb0i.view.connection.devices.DeviceListViewModel
 import com.sdp15.goodb0i.view.item.ItemViewModel
 import com.sdp15.goodb0i.view.list.ListViewModel
 import com.sdp15.goodb0i.view.orders.OrdersViewModel
@@ -45,6 +46,7 @@ class App : Application() {
             viewModel<ItemViewModel>()
             viewModel<OrdersViewModel>()
             viewModel<ListViewModel>()
+            viewModel<DeviceListViewModel>()
         },
         module {
             single<ItemLoader> { TestDataItemLoader }
