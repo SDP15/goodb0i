@@ -9,11 +9,13 @@ server_port = 5005
 
 class colourTrack:
 
-    def __init__():
-        cl = ev3.ColorSensor(ev3.INPUT_1)
+    def __init__(self):
+        cl_r = ev3.ColorSensor(ev3.INPUT_1)
+        cl_l = ev3.ColorSensor(ev3.INPUT_2)
         #cl.mode = 'COL_REFLECT'
 
-        cl.connected
+        cl_r.connected
+        cl_l.connected
 
         btn = ev3.Button
 
@@ -23,18 +25,29 @@ class colourTrack:
         i = 0
 
 
-
-
     def detect(self):
-        # returns 1 if the colour detected is black. 0 otherwise 
+        # returns 1 if the colour detected is black. 0 otherwise
+
+        i = 0
         while i<100:
-           val = int(cl.value())
-           if val==0:
-               zero()
-           elif val<5:
-               one()
-           elif val >=5:
-               two()
+           val = int(cl_r.value())
+           val_1 = int(cl_l.value())
+           i = i+1
+           if val==0 and val==0:
+               print("Both no colour")
+               return 0
+           elif val<5 and val_1<5:
+               print("Both black")
+               return 0
+           elif val <5:
+               print("First black, second colour or none")
+               return 1
+           elif val_1<5:
+               print("Second black, first colour or none")
+               return 2
+           else:
+               print("Other case")
+               return 0
 
     def zero():
        print("No colour")

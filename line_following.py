@@ -3,16 +3,16 @@ from time import sleep
 import threading
 import datetime
 from detect_colour import colourTrack
+import ev3dev.ev3 as ev3
 
 
-server_ip = "172.20.113.221" #TODO: my laptop's IP. To be changed later
-server_port = 5005
+server_ip = "172.20.122.166" #TODO: my laptop's IP. To be changed later
+server_port = 5006
 
 # The server will send instructions as a series of messages that will be stored in
 # a FIFO queue. The elements of the queue only get consumed when the robot gets to
 # an intersection
 
-instructions = Queue()
 
 class Queue:
     def __init__(self):
@@ -30,9 +30,14 @@ class Queue:
     def size(self):
         return len(self.items)
 
+instructions = Queue()
+
+isRunning = False
+
 
 def onStateChanged(state, msg):
     global isConnected
+    global isRunning
 
     if state == "LISTENING":
         print("DEBUG: Client:-- Listening...")
@@ -50,41 +55,123 @@ def onStateChanged(state, msg):
 
     elif state == "MESSAGE":
         print("DEBUG: Client:-- Instruction received: ", msg)
-        instructions.enqueue(msg)
+        if(msg=="STOP"):
+            stopRobot()
+            #main()
+        elif(msg=="START"):
+            startRobot()
+            #main()
+        else:
+            instructions.enqueue(msg)
 
-def runMotor(cl, motor_1, motor_2):
 
-    motor_1.connected
-    motor_2.connected
+def runMotor(cl, motor_l, motor_r):
+    # not quite sure yet of what to do with this
+    motor_l.connected
+    motor_r.connected
+
+    motor_l.stop()
+    motor_r.stop()
 
     while True:
 
-        if motor_1.state==["running"] && motor_2.state==["running"]:
-            motor.run_forever()
+        if motor_l.state==["running"] and motor_r.state==["running"]:
+            motor_l.run_forever()
+            motor_r.run_forever()
 
         colourTrack.detect()
 
+def startRobot():
+    motor_l=ev3.LargeMotor('outA')
+    motor_r=ev3.LargeMotor('outB')
+    steer=ev3.LargeMotor('outC')
 
-def turnMotor(direction, motor):
-    #TODO: implement this function to make the rear wheels of the robot turn
+    trackStart(motor_l, motor_r)
+
+def trackStart(motor_l, motor_r):
+    motor_l.connected
+    motor_r.connected
 
 
-def onIntersectionDetected(motor):
-    motor.stop()
+    while(True):
+        ("start mode triggered")
+        motor_l.run_forever(speed_sp=5)
+        motor_r.run_forever(speed_sp=5)
+        turnAtIntersection(motor_l, motor_r)
+
+def stopRobot():
+    motor_l=ev3.LargeMotor('outA')
+    motor_r=ev3.LargeMotor('outB')
+    steer=ev3.LargeMotor('outC')
+
+    motor_l.stop()
+    motor_r.stop()
+    steer.stop()
+
+
+def onIntersectionDetected(motor_l, motor_r):
+    motor_l.stop()
+    motor_r.stop()
+
     direction = instructions.dequeue()
-    if direction == "left" || direction == "right":
+    if direction == "left" or direction == "right":
        turnMotor(direction, motor)
     elif direction == "forward":
        runMotor(motor)
     else: # if the instruction is not known
        main()
 
+def turnAtIntersection(motor_l, motor_r):
+    colourTracking = colourTrack()
+    while(isRunning):
+        val = colourTracking.detect()
+        if val == 1: # the right-hand sensor detects black
+           motor_l.stop()
+           motor_l.run_forever(speed_sp=5)
+           motor_r.stop()
+           motor_r.run_forever(speed_sp=5)
+           steer.run_timed(time_sp=10, speed_sp=5)
+        elif val == 2: # the left-hand sensor detects black
+           motor_l.stop()
+           motor_l.run_forever(speed_sp=5)
+           motor_r.stop()
+           motor_r.run_forever(speed_sp=5)
+           steer.run_timed(time_sp=10, speed_sp=-5)
+
 
 def main():
     cl = ev3.ColorSensor(ev3.INPUT_1)
-    cl.mode = 'COL_REFLECT'
+    #cl.mode = 'COL_REFLECT'
+    global client
 
-    motor_1=ev3.LargeMotor('outA')
-    motor_2=ev3.LargeMotor('outB')
+    client = TCPClient(server_ip, server_port, stateChanged=onStateChanged)
+    print("Client starting")
+    isRunning = False
 
-    runMotor(cl, motor_1, motor_2)
+    try:
+        while True:
+            rc = client.connect()
+            sleep(0.01)
+            if rc:
+                isConnected = True
+
+                while isConnected:
+                    sleep(0.001)
+                    #print("waiting")
+            else:
+                print("Client:-- Connection failed")
+
+    except KeyboardInterrupt:
+        print("Bye.")
+
+    # mission done; close connection
+    #
+
+    #client.disconnect()
+    #print("Bye")
+    #threading.cleanup_stop_thread()  # needed if we want to restart the client
+
+
+
+if __name__ == '__main__':
+     main()
