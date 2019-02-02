@@ -1,15 +1,19 @@
 package com.sdp15.goodb0i
 
+import android.Manifest
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.IBinder
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.navigation.findNavController
 import com.sdp15.goodb0i.data.bluetooth.SafeHandler
 import com.sdp15.goodb0i.view.BaseFragment
@@ -21,6 +25,7 @@ class MainActivity : AppCompatActivity() {
 
     private var bluetoothService: BluetoothService? = null
     private val REQUEST_ENABLE_BT = 564
+    private val REQUEST_COARSE_LOCATION = 543
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,7 +50,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_ENABLE_BT) {
+        if (requestCode == REQUEST_ENABLE_BT || requestCode == REQUEST_COARSE_LOCATION) {
             if (resultCode == Activity.RESULT_OK) {
                 startBluetoothService()
             } else {
@@ -59,8 +64,13 @@ class MainActivity : AppCompatActivity() {
     fun startBluetoothService() {
         val adapter = BluetoothAdapter.getDefaultAdapter()
         if (adapter?.isEnabled == true) {
-            val intent = Intent(this, BluetoothService::class.java)
-            bindService(intent, connection, Context.BIND_AUTO_CREATE)
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                Timber.i("No access to coarse location")
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION), REQUEST_COARSE_LOCATION)
+            } else {
+                val intent = Intent(this, BluetoothService::class.java)
+                bindService(intent, connection, Context.BIND_AUTO_CREATE)
+            }
         } else {
             requestEnableBluetooth()
         }

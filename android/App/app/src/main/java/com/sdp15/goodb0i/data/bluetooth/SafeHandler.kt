@@ -2,7 +2,6 @@ package com.sdp15.goodb0i.data.bluetooth
 
 import android.os.Handler
 import android.os.Message
-import com.sdp15.goodb0i.view.connection.BluetoothService
 import java.lang.ref.WeakReference
 
 class SafeHandler(messageHandler: MessageHandler): Handler() {
@@ -11,22 +10,6 @@ class SafeHandler(messageHandler: MessageHandler): Handler() {
     override fun handleMessage(msg: Message) {
         super.handleMessage(msg)
         messageHandler.get()?.handleMessage(msg)
-        when (msg.what) {
-            BluetoothService.MessageCodes.CONNECTED -> {
-
-            }
-            BluetoothService.MessageCodes.STATE_CHANGE -> {
-
-            }
-            BluetoothService.MessageCodes.NEW_DEVICE -> {
-
-            }
-            BluetoothService.MessageCodes.TOAST -> {
-
-            }
-        }
-
-
     }
 
     interface MessageHandler {

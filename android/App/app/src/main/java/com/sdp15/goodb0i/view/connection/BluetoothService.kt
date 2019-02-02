@@ -12,6 +12,7 @@ import android.os.Binder
 import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
+import androidx.annotation.IntDef
 import com.sdp15.goodb0i.BuildConfig
 import com.sdp15.goodb0i.R
 import com.sdp15.goodb0i.data.bluetooth.DeviceInfo
@@ -38,7 +39,7 @@ class BluetoothService : Service() {
         const val TOAST = 5
         const val NEW_DEVICE = 6
     }
-    
+
     object ConnectionState {
         const val NONE = 0
         const val CONNECTING = 1
@@ -83,23 +84,29 @@ class BluetoothService : Service() {
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val action = intent.action
+            Timber.i("Broadcast: ${action == BluetoothDevice.ACTION_ACL_CONNECTED}")
             if (BluetoothDevice.ACTION_FOUND == action) {
                 val device = intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
                 Timber.i("Bluetooth device found $device")
 
                 // Signal strength in dBm
                 val rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE)
-                if (!devicesInfo.any { it.mac == device.address } && device.name.isNotBlank()) {
-                    devicesInfo.add(DeviceInfo(device.name, device.address, rssi))
+                if (!devicesInfo.any { it.mac == device.address } && device.name?.isNotBlank() == true) {
+                    val info = DeviceInfo(device.name, device.address, rssi)
+                    devicesInfo.add(info)
 
                     handler?.let {
                         val message = it.obtainMessage(MessageCodes.NEW_DEVICE)
                         val bundle = Bundle()
-                        bundle.putParcelable(MessageKeys.DEVICE_INFO, device)
+                        bundle.putParcelable(MessageKeys.DEVICE_INFO, info)
                         message.data = bundle
                         it.sendMessage(message)
                     }
                 }
+            } else if (BluetoothAdapter.ACTION_DISCOVERY_STARTED == action) {
+                Timber.i("Discovery scan started")
+            } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED == action) {
+                Timber.i("Discovery scan ended")
             }
         }
     }
@@ -112,6 +119,8 @@ class BluetoothService : Service() {
 
         devicesInfo.addAll(bondedDevices.map { DeviceInfo(it.name, it.address, 100) })
         Timber.i("Before scan $devicesInfo")
+        applicationContext.registerReceiver(receiver, IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_STARTED))
+        applicationContext.registerReceiver(receiver, IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED))
         applicationContext.registerReceiver(receiver, IntentFilter(BluetoothDevice.ACTION_FOUND))
         adapter.startDiscovery()
     }
@@ -121,6 +130,7 @@ class BluetoothService : Service() {
         transferThread?.cancel()
         transferThread = null
         connectThread = ConnectThread(bondedDevices[index])
+        state = ConnectionState.CONNECTING
         connectThread?.start()
     }
 
