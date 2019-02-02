@@ -30,6 +30,7 @@ class DeviceListFragment : BaseFragment() {
         deviceHandler = DeviceListHandler(vm)
         (activity as MainActivity).addMessageHandler(deviceHandler)
         (activity as MainActivity).startSearch()
+        //TODO: Check that bluetooth is enabled
     }
 
     override fun onAttach(context: Context?) {
