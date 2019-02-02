@@ -18,6 +18,8 @@ The robot moves along its way and consumes an element of the queue (LEFT, RIGHT 
 
 An instruction gets also consumed when the robot detects the end of an aisle, although that's still to be confirmed. Any obstacle detection overrides previous commands. 
 
-All these behaviours are detailed in the `line_following.py` file. 
+All these behaviours are detailed in the `line_following.py` file. It receives a `START` command from the server which makes the robot move and detect the colour of the floor. To stop the robot, a `STOP` command must be sent from the server. The file `detect_colour.py` details how the two colour sensors can detect a curve or an intersection in the lines on the floor. 
+
+The file `client.py` is just to understand how I implemented TCP protocols for this project but isn't used, whereas `server.py` is actually used.
 
 Feel free to add any comment if anything needs further explanations. 
