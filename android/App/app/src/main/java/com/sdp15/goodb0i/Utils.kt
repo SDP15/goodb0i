@@ -4,13 +4,13 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
 import android.view.animation.Animation
 import android.view.animation.Transformation
+import android.widget.EditText
 
-
+// Simplify use of TextWatcher to simple lambda
 fun EditText.watchText(action: (String) -> Unit) {
-    addTextChangedListener(object: TextWatcher {
+    addTextChangedListener(object : TextWatcher {
         override fun afterTextChanged(s: Editable?) {
 
         }
@@ -23,16 +23,17 @@ fun EditText.watchText(action: (String) -> Unit) {
         }
     })
 }
+
 //https://stackoverflow.com/questions/4946295/android-expand-collapse-animation
 fun expand(v: View) {
     v.measure(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-    val targetHeight = v.getMeasuredHeight()
+    val targetHeight = v.measuredHeight
 
     // Older versions of android (pre API 21) cancel animations for views with a height of 0.
     v.layoutParams.height = 1
     v.visibility = View.VISIBLE
     val a = object : Animation() {
-        protected override fun applyTransformation(interpolatedTime: Float, t: Transformation) {
+        override fun applyTransformation(interpolatedTime: Float, t: Transformation) {
             v.layoutParams.height = if (interpolatedTime == 1f)
                 ViewGroup.LayoutParams.WRAP_CONTENT
             else
@@ -40,22 +41,20 @@ fun expand(v: View) {
             v.requestLayout()
         }
 
-        override fun willChangeBounds(): Boolean {
-            return true
-        }
+        override fun willChangeBounds() = true
     }
 
     // 1dp/ms
-    a.duration = (targetHeight / v.getContext().getResources().getDisplayMetrics().density).toLong()
+    a.duration = (targetHeight / v.context.resources.displayMetrics.density).toLong()
     v.startAnimation(a)
 }
 
 
 fun collapse(v: View) {
-    val initialHeight = v.getMeasuredHeight()
+    val initialHeight = v.measuredHeight
 
     val a = object : Animation() {
-        protected override fun applyTransformation(interpolatedTime: Float, t: Transformation) {
+        override fun applyTransformation(interpolatedTime: Float, t: Transformation) {
             if (interpolatedTime == 1f) {
                 v.visibility = View.GONE
             } else {
@@ -64,12 +63,11 @@ fun collapse(v: View) {
             }
         }
 
-        override fun willChangeBounds(): Boolean {
-            return true
-        }
+        override fun willChangeBounds() = true
+
     }
 
     // 1dp/ms
-    a.duration = (initialHeight / v.getContext().getResources().getDisplayMetrics().density).toLong()
+    a.duration = (initialHeight / v.context.resources.displayMetrics.density).toLong()
     v.startAnimation(a)
 }

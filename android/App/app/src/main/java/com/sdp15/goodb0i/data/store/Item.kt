@@ -18,7 +18,6 @@ data class Item(
     @SerializedName("unitPrice") val unitPrice: Double
 
 
-
 ) {
     override fun equals(other: Any?): Boolean {
         return other is Item && other.id == id

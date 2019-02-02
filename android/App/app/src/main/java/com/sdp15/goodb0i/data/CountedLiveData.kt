@@ -6,7 +6,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import java.util.concurrent.atomic.AtomicInteger
 
-open class CountedLiveData<T>(val count: Int) : MutableLiveData<T>() {
+/**
+ * [MutableLiveData] implementation which allows each posted value to be read at most [count] times
+ */
+open class CountedLiveData<T>(private val count: Int) : MutableLiveData<T>() {
 
     private var currentCount = AtomicInteger(count)
 

@@ -1,6 +1,5 @@
 package com.sdp15.goodb0i.view.welcome
 
-import androidx.annotation.IdRes
 import com.sdp15.goodb0i.BaseViewModel
 import com.sdp15.goodb0i.R
 

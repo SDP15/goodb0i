@@ -10,8 +10,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.sdp15.goodb0i.R
 import kotlinx.android.synthetic.main.layout_search.*
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
-import org.koin.androidx.viewmodel.ext.android.viewModel
-import timber.log.Timber
 
 class ShoppingListFragment : Fragment() {
 
@@ -24,11 +22,9 @@ class ShoppingListFragment : Fragment() {
         val adapter = ItemAdapter(vm::incrementItem, vm::decrementItem)
         list_recycler.adapter = adapter
         vm.list.observe(this, Observer {
-            Timber.i("Setting list content $it")
             adapter.itemsChanged(it)
         })
     }
-
 
 
     override fun onCreateView(

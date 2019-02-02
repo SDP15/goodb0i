@@ -5,7 +5,6 @@ import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetectorOptions
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
-import com.sdp15.goodb0i.view.scanner.ScannerViewModel
 import timber.log.Timber
 
 class MLKitScanner : Scanner {
@@ -13,7 +12,8 @@ class MLKitScanner : Scanner {
     private val options = FirebaseVisionBarcodeDetectorOptions.Builder()
         .setBarcodeFormats( // TODO: Find out which code types we need to use
             //TODO: Make configurable in settings
-            FirebaseVisionBarcode.FORMAT_ALL_FORMATS)
+            FirebaseVisionBarcode.FORMAT_ALL_FORMATS
+        )
         .build()
 
     private val detector = FirebaseVision.getInstance()
@@ -21,7 +21,7 @@ class MLKitScanner : Scanner {
 
 
     override fun scanImage(image: Bitmap, callback: (BarcodeReading) -> Unit) {
-       detector.detectInImage(FirebaseVisionImage.fromBitmap(image))
+        detector.detectInImage(FirebaseVisionImage.fromBitmap(image))
             .addOnSuccessListener { barcodes ->
                 Timber.i("Barcodes detected $barcodes")
                 callback(BarcodeReading(0))

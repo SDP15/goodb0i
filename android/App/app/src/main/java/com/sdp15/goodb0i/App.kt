@@ -6,10 +6,10 @@ import com.sdp15.goodb0i.data.store.ItemLoader
 import com.sdp15.goodb0i.data.store.TestDataItemLoader
 import com.sdp15.goodb0i.view.confirmation.ConfirmationViewModel
 import com.sdp15.goodb0i.view.item.ItemViewModel
+import com.sdp15.goodb0i.view.list.ListViewModel
 import com.sdp15.goodb0i.view.orders.OrdersViewModel
 import com.sdp15.goodb0i.view.pin.PinViewModel
 import com.sdp15.goodb0i.view.scanner.ScannerViewModel
-import com.sdp15.goodb0i.view.list.ListViewModel
 import com.sdp15.goodb0i.view.welcome.WelcomeViewModel
 import org.koin.android.ext.android.startKoin
 import org.koin.androidx.viewmodel.experimental.builder.viewModel
@@ -26,7 +26,7 @@ class App : Application() {
 
         FirebaseApp.initializeApp(this)
 
-        startKoin(this, modules, logger=object: Logger {
+        startKoin(this, modules, logger = object : Logger {
             override fun debug(msg: String) = Timber.d(msg)
 
             override fun err(msg: String) = Timber.e(msg)

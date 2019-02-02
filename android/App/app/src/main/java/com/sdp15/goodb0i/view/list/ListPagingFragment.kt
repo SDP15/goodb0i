@@ -11,20 +11,22 @@ import com.sdp15.goodb0i.R
 import com.sdp15.goodb0i.view.BaseFragment
 import kotlinx.android.synthetic.main.layout_list_creation.*
 
+/**
+ * Fragment hosting [SearchFragment] and [ShoppingListFragment] in a ViewPager
+ */
 class ListPagingFragment : BaseFragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.layout_list_creation, container, false)
     }
 
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-
+        // Have to use childFragmentManager for nested fragments
         val vp = ViewPagerAdapter(childFragmentManager)
         list_viewpager.adapter = vp
         //list_tab_layout.setupWithViewPager(list_viewpager)
@@ -48,11 +50,6 @@ class ListPagingFragment : BaseFragment() {
         }
 
         override fun getCount(): Int = 2
-
-        override fun getPageTitle(position: Int): CharSequence? {
-
-            return if (position == 0) "Search" else "Trolley"
-        }
     }
 
 }

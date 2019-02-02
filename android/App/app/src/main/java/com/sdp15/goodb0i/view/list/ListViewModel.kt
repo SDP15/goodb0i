@@ -2,7 +2,6 @@ package com.sdp15.goodb0i.view.list
 
 import androidx.lifecycle.MutableLiveData
 import com.sdp15.goodb0i.BaseViewModel
-import com.sdp15.goodb0i.data.CountedLiveData
 import com.sdp15.goodb0i.data.store.Item
 import com.sdp15.goodb0i.data.store.ItemLoader
 import kotlinx.coroutines.Dispatchers
@@ -13,16 +12,17 @@ import org.koin.standalone.KoinComponent
 import org.koin.standalone.inject
 import timber.log.Timber
 
-class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.SearchFragmentInteractor, KoinComponent {
+class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.SearchFragmentInteractor,
+    KoinComponent {
 
     private val loader: ItemLoader by inject()
 
 
     // The current shopping list
-    private val currentList = mutableListOf<CartItem>()
-    val list = MutableLiveData<ItemAdapter.ListDiff<CartItem>>()
+    private val currentList = mutableListOf<TrolleyItem>()
+    val list = MutableLiveData<ItemAdapter.ListDiff<TrolleyItem>>()
 
-    val searchResults = MutableLiveData<List<CartItem>>()
+    val searchResults = MutableLiveData<List<TrolleyItem>>()
 
     override fun bind() {
     }
@@ -34,9 +34,10 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
         search?.cancel()
         search = GlobalScope.launch(Dispatchers.IO) {
             val results = loader.search(new).data
-            val merged = results.map {
-                    result -> CartItem(result,
-                currentList.firstOrNull { it.item.id == result.id }?.count ?: 0)
+            val merged = results.map { result ->
+                TrolleyItem(result,
+                    currentList.firstOrNull { it.item.id == result.id }?.count ?: 0
+                )
             }
             searchResults.postValue(merged.toList())
         }
@@ -45,9 +46,9 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
     fun incrementItem(item: Item) {
         Timber.i("Incrementing item ${item.name}")
         val i = currentList.indexOfFirst { it.item.id == item.id }
-        val diff: ItemAdapter.ListDiff<CartItem>
+        val diff: ItemAdapter.ListDiff<TrolleyItem>
         if (i == -1) {
-            val ci = CartItem(item, 1)
+            val ci = TrolleyItem(item, 1)
             currentList.add(ci)
             diff = ItemAdapter.ListDiff.Add(currentList, ci)
         } else {

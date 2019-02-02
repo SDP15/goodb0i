@@ -1,21 +1,13 @@
 package com.sdp15.goodb0i.view.scanner
 
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.os.Build
 import android.os.Bundle
-import android.util.SparseIntArray
 import android.view.LayoutInflater
-import android.view.Surface
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import com.camerakit.CameraKitView
-import com.google.firebase.ml.vision.common.FirebaseVisionImage
-import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
 import com.otaliastudios.cameraview.Audio
 import com.otaliastudios.cameraview.CameraListener
 import com.otaliastudios.cameraview.Gesture
@@ -24,8 +16,6 @@ import com.sdp15.goodb0i.R
 import kotlinx.android.synthetic.main.layout_scanner.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
-
-
 
 
 class ScannerFragment : Fragment() {
@@ -59,7 +49,7 @@ class ScannerFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        camera_view.addCameraListener(object: CameraListener() {
+        camera_view.addCameraListener(object : CameraListener() {
 
             override fun onPictureTaken(jpeg: ByteArray?) {
                 super.onPictureTaken(jpeg)

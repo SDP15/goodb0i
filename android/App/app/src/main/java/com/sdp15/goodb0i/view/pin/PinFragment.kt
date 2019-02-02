@@ -1,7 +1,6 @@
 package com.sdp15.goodb0i.view.pin
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,21 +11,6 @@ import com.sdp15.goodb0i.watchText
 import kotlinx.android.synthetic.main.layout_pin_input.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Activities that contain this fragment must implement the
- * [PinFragment.OnFragmentInteractionListener] interface
- * to handle interaction events.
- * Use the [PinFragment.newInstance] factory method to
- * create an instance of this fragment.
- *
- */
 class PinFragment : androidx.fragment.app.Fragment() {
 
     private val vm: PinViewModel by viewModel()
@@ -57,18 +41,11 @@ class PinFragment : androidx.fragment.app.Fragment() {
         vm.actions.observe(this, Observer {
 
         })
-
-
-
     }
 
     override fun onResume() {
         super.onResume()
         login_code_input.watchText(vm::onInput)
-    }
-
-    override fun onDetach() {
-        super.onDetach()
     }
 
 

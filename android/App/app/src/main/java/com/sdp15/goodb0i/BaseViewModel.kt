@@ -1,7 +1,8 @@
 package com.sdp15.goodb0i
 
-import androidx.lifecycle.ViewModel
 import androidx.annotation.NavigationRes
+import androidx.lifecycle.ViewModel
+import com.sdp15.goodb0i.data.SingleLiveData
 
 abstract class BaseViewModel<T> : ViewModel() {
 

@@ -13,10 +13,10 @@ import kotlinx.android.synthetic.main.list_item.view.*
 class ItemAdapter(val onIncrement: (Item) -> Unit, val onDecrement: (Item) -> Unit) :
     RecyclerView.Adapter<ItemAdapter.ItemViewHolder>() {
 
-    private var items: MutableList<CartItem> = mutableListOf()
+    private var items: MutableList<TrolleyItem> = mutableListOf()
     private var expanded: MutableList<Boolean> = mutableListOf()
 
-    fun itemsChanged(diff: ListDiff<CartItem>) {
+    fun itemsChanged(diff: ListDiff<TrolleyItem>) {
         when (diff) {
             is ListDiff.All -> {
                 items = diff.items.toMutableList()
