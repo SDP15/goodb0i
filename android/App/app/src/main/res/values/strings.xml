@@ -28,4 +28,5 @@
     <string name="action_scan">Scan</string>
     <string name="label_shopping_list">Shopping list</string>
     <string name="label_save">Save</string>
+    <string name="label_search">Search</string>
 </resources>

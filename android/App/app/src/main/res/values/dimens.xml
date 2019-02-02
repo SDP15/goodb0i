@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <dimen name="search_view_inset">16dp</dimen>
     <dimen name="rounded_corner_radius">12dp</dimen>
     <dimen name="default_horizontal_margin">16dp</dimen>
     <dimen name="default_margin_bottom">48dp</dimen>
@@ -10,5 +11,5 @@
     <dimen name="title_text_size">48sp</dimen>
     <dimen name="textview_padding">16dp</dimen>
     <dimen name="textview_textsize">32sp</dimen>
-    <dimen name="search_view_inset">16dp</dimen>
+
 </resources>

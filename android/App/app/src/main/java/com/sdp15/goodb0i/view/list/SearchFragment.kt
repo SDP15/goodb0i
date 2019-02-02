@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager.widget.ViewPager
 import com.sdp15.goodb0i.R
 import kotlinx.android.synthetic.main.layout_search.*
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
@@ -17,11 +18,12 @@ class SearchFragment : Fragment() {
 
     private val vm: ListViewModel by sharedViewModel()
 
+    private lateinit var viewPager: ViewPager
+
     override fun onStart() {
         super.onStart()
         vm.bind()
     }
-
 
     override fun onResume() {
         super.onResume()
@@ -35,13 +37,17 @@ class SearchFragment : Fragment() {
             adapter.itemsChanged(ItemAdapter.ListDiff.All(it))
         })
         floating_search_view.setOnQueryChangeListener(vm::onQueryChange)
-
+        floating_search_view.setOnMenuItemClickListener { // Only one menu item
+            viewPager.setCurrentItem(1, true)
+        }
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        // Container is the ViewPager. If we ever move SearchFragment out of a ViewPager, this will crash
+        viewPager = container as ViewPager
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.layout_search, container, false)
     }
