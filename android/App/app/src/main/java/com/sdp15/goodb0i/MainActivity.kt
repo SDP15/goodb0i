@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.navigation.findNavController
 import com.sdp15.goodb0i.view.BaseFragment
 import kotlinx.android.synthetic.main.activity_main.*
+import timber.log.Timber
 
 class MainActivity : AppCompatActivity() {
 
@@ -16,7 +17,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         val fragment = nav_host_fragment.childFragmentManager.fragments[0] // currently visible
-        if ((fragment as? BaseFragment)?.onBackPressed() == false) super.onBackPressed()
+        val handled = (fragment as? BaseFragment)?.onBackPressed() ?: false
+        if (!handled) {
+            super.onBackPressed()
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean = findNavController(R.id.nav_host_fragment).navigateUp()
