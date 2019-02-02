@@ -15,7 +15,6 @@ class ItemAdapter(val onIncrement: (Item) -> Unit, val onDecrement: (Item) -> Un
 
     private var items: MutableList<TrolleyItem> = mutableListOf()
     private var expanded: MutableList<Boolean> = mutableListOf()
-
     fun itemsChanged(diff: ListDiff<TrolleyItem>) {
         when (diff) {
             is ListDiff.All -> {
@@ -40,6 +39,7 @@ class ItemAdapter(val onIncrement: (Item) -> Unit, val onDecrement: (Item) -> Un
                 notifyItemChanged(items.indexOf(diff.item))
             }
         }
+
     }
 
     sealed class ListDiff<T>(val items: List<T>) {
@@ -66,12 +66,24 @@ class ItemAdapter(val onIncrement: (Item) -> Unit, val onDecrement: (Item) -> Un
                 }
                 expanded[position] = !expanded[position]
             }
+            var quantity = items[position].count
             val item = items[position].item
             text_item_name.text = item.name
-            text_item_quantity.text = item.unitQuantity
-            text_item_price.text = item.price.toString()
-            button_positive.setOnClickListener { onIncrement(item) }
-            button_negative.setOnClickListener { onDecrement(item) }
+            text_item_descr.text = item.description[0]
+            text_item_price.text = "£"+item.price.toString()
+            quantity_txt.text = quantity.toString()
+            button_positive.setOnClickListener {
+                onIncrement(item)
+                quantity++
+                quantity_txt.text = quantity.toString()
+            }
+            button_negative.setOnClickListener {
+                onDecrement(item)
+                if(quantity>0) {
+                    quantity--
+                    quantity_txt.text = quantity.toString()
+                }
+            }
 
         }
     }
