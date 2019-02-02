@@ -25,6 +25,15 @@
         <item name="android:textColor">@color/colorAccent</item>
     </style>
 
+    <style name="BodyText" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">@android:color/primary_text_dark</item>
+        <item name="android:textSize">@dimen/body_textsize</item>
+    </style>
+
+    <style name="BodyText.SubText" parent="BodyText">
+        <item name="android:textSize">@dimen/body_subtext_size</item>
+    </style>
+
     <style name="RoundedButton" parent="Base.Widget.AppCompat.Button">
         <item name="android:background">@drawable/main_buttons</item>
         <item name="android:textSize">@dimen/button_text_size</item>

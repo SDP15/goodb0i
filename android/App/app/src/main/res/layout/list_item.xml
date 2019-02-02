@@ -1,76 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="16dp">
+    android:layout_margin="16dp"
+    android:orientation="vertical">
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-    <androidx.appcompat.widget.AppCompatTextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/text_item_name"
-            android:layout_width="315dp"
+            style="@style/BodyText"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="Food" android:textSize="20sp"/>
+            app:layout_constraintWidth_default="percent"
+            app:layout_constraintWidth_percent="0.8"
+            tools:text="Food" />
 
 
-    <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/text_item_descr"
-            android:layout_width="315dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_item_name"
-            tools:text="Description" android:textSize="15sp"
-            android:layout_marginTop="16dp"/>
-
-    <androidx.appcompat.widget.AppCompatTextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/text_item_price"
-            android:layout_width="50dp"
+            style="@style/BodyText"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintBottom_toTopOf="@+id/item_button_container"
+            android:gravity="end"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="£10" android:textSize="20sp" app:layout_constraintVertical_bias="0.0"/>
+            app:layout_constraintVertical_bias="0.0"
+            app:layout_constraintWidth_default="percent"
+            app:layout_constraintWidth_percent="0.2"
+            tools:text="£10" />
 
-    <androidx.appcompat.widget.AppCompatTextView
-            android:text="0"
-            android:layout_width="50dp"
-            android:layout_height="wrap_content" android:id="@+id/quantity_txt" android:layout_weight="0.5"
-            android:textSize="15sp"
-            android:textAlignment="center" app:layout_constraintTop_toBottomOf="@+id/text_item_price"
-            app:layout_constraintRight_toRightOf="parent" android:layout_marginTop="16dp"/>
-    <LinearLayout
-            android:id="@+id/item_button_container"
-            android:layout_width="match_parent"
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/text_item_descr"
+            style="@style/BodyText.SubText"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_item_descr">
+            android:layout_marginTop="16dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_item_name"
+            app:layout_constraintWidth_default="percent"
+            app:layout_constraintWidth_percent="0.8"
+            tools:text="Description" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+
+            android:id="@+id/text_item_quantity"
+            style="@style/BodyText.SubText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_weight="0.5"
+            android:gravity="end"
+            app:layout_constraintBaseline_toBaselineOf="@+id/text_item_descr"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintWidth_default="percent"
+            app:layout_constraintWidth_percent="0.2"
+            tools:text="3" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/item_button_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone">
 
         <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/button_negative"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.5"
-                android:adjustViewBounds="false"
-                android:background="@color/colorNegative"
-                android:minHeight="48dp"
-                android:scaleType="fitCenter"
-                android:src="@drawable/ic_remove_circle_white"/>
+            android:id="@+id/button_negative"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:adjustViewBounds="false"
+            android:background="@color/colorNegative"
+            android:minHeight="48dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_remove_circle_white" />
 
         <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/button_positive"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.5"
-                android:adjustViewBounds="false"
-                android:background="@color/colorPositive"
-                android:minHeight="48dp"
-                android:scaleType="fitCenter"
-                android:src="@drawable/ic_add_circle_white"/>
+            android:id="@+id/button_positive"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:adjustViewBounds="false"
+            android:background="@color/colorPositive"
+            android:minHeight="48dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_add_circle_white" />
 
-    </LinearLayout>
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.appcompat.widget.LinearLayoutCompat>

@@ -31,6 +31,7 @@
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/item_display_item_name"
+            style="@style/BodyText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
@@ -39,6 +40,7 @@
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/item_display_shelf_contents"
+            style="@style/BodyText.SubText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/default_horizontal_margin"
