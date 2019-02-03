@@ -9,13 +9,14 @@ import androidx.lifecycle.Observer
 import androidx.viewpager.widget.ViewPager
 import com.sdp15.goodb0i.R
 import kotlinx.android.synthetic.main.layout_search.*
+import org.koin.android.ext.android.getKoin
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import timber.log.Timber
 
 class SearchFragment : Fragment() {
 
-    private val vm: ListViewModel by sharedViewModel()
 
+    lateinit var vm: ListViewModel
     private lateinit var viewPager: ViewPager
 
     override fun onStart() {
