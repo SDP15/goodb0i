@@ -8,7 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.sdp15.goodb0i.R
-import kotlinx.android.synthetic.main.layout_search.*
+import kotlinx.android.synthetic.main.layout_shoppinglist.*
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 class ShoppingListFragment : Fragment() {
@@ -24,6 +24,9 @@ class ShoppingListFragment : Fragment() {
 
         vm.list.observe(this, Observer {
             adapter.itemsChanged(it)
+        })
+        vm.totalPrice.observe(this, Observer {
+            label_total_price.text = getString(R.string.label_item_price, it)
         })
     }
 

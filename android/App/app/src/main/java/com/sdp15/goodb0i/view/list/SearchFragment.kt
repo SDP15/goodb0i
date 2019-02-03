@@ -39,7 +39,7 @@ class SearchFragment : Fragment() {
             if (it is ItemAdapter.ListDiff.Update) {
                 adapter.itemsChanged(it)
             } else if(it is ItemAdapter.ListDiff.Remove) {
-                // Co
+                // Removal in ShoppingListFragment causes an update to the same search item, if visible
                 adapter.itemsChanged(ItemAdapter.ListDiff.Update(it.items, it.item))
             }
         })
