@@ -8,14 +8,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.sdp15.goodb0i.R
 import com.sdp15.goodb0i.data.store.Item
 import kotlinx.android.synthetic.main.list_item.view.*
+import timber.log.Timber
 import kotlin.math.max
 
-class ItemAdapter(val onIncrement: (Item) -> Unit, val onDecrement: (Item) -> Unit,val total:Boolean) :
+class ItemAdapter(val onIncrement: (Item) -> Unit, val onDecrement: (Item) -> Unit, private val total: Boolean) :
     RecyclerView.Adapter<ItemAdapter.ItemViewHolder>() {
 
     private var items: MutableList<TrolleyItem> = mutableListOf()
     private var expanded: MutableList<Boolean> = mutableListOf()
-    private var keeptotal=total
     fun itemsChanged(diff: ListDiff<TrolleyItem>) {
         when (diff) {
             is ListDiff.All -> {
@@ -36,8 +36,11 @@ class ItemAdapter(val onIncrement: (Item) -> Unit, val onDecrement: (Item) -> Un
                 notifyItemRemoved(i)
             }
             is ListDiff.Update -> {
-                items = diff.items.toMutableList()
-                notifyItemChanged(items.indexOf(diff.item))
+                val index = items.indexOfFirst { it.item == diff.item.item }
+                if (index != -1) {
+                    items[index] = diff.item
+                    notifyItemChanged(index)
+                }
             }
         }
 
@@ -78,17 +81,17 @@ class ItemAdapter(val onIncrement: (Item) -> Unit, val onDecrement: (Item) -> Un
             val item = items[position].item
             var quantity = items[position].count
             text_item_name.text = item.name
-            if(item.description.first()!=null) {
+            if (item.description.firstOrNull() != null) {
                 text_item_descr.text = item.description.first()
             }
-            var tprice=getPrice(position)
+            var tprice = getPrice(position)
             text_item_price.text = context.getString(R.string.label_item_price, tprice)
             text_item_quantity.text = quantity.toString()
             button_positive.setOnClickListener {
                 onIncrement(item)
                 items[position].count = ++quantity
                 text_item_quantity.text = quantity.toString()
-                tprice=getPrice(position)
+                tprice = getPrice(position)
                 text_item_price.text = context.getString(R.string.label_item_price, tprice)
             }
             button_negative.setOnClickListener {
@@ -96,22 +99,17 @@ class ItemAdapter(val onIncrement: (Item) -> Unit, val onDecrement: (Item) -> Un
                 quantity = max(0, quantity - 1)
                 items[position].count = quantity
                 text_item_quantity.text = quantity.toString()
-                tprice=getPrice(position)
+                tprice = getPrice(position)
                 text_item_price.text = context.getString(R.string.label_item_price, tprice)
             }
 
         }
     }
-    fun getPrice(position: Int):Double{
+
+    private fun getPrice(position: Int): Double {
         val item = items[position].item
-        var quantity = items[position].count
-        var tprice: Double
-        if (keeptotal){
-            tprice=item.price*quantity
-        }else{
-            tprice=item.price
-        }
-        return tprice
+        val quantity = items[position].count
+        return if (total) item.price * quantity else item.price
     }
 
     inner class ItemViewHolder(val view: View) : RecyclerView.ViewHolder(view)

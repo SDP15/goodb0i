@@ -9,8 +9,6 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.sdp15.goodb0i.R
 import kotlinx.android.synthetic.main.layout_search.*
-import kotlinx.android.synthetic.main.list_item.*
-import kotlinx.android.synthetic.main.list_item.view.*
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 class ShoppingListFragment : Fragment() {
@@ -21,7 +19,7 @@ class ShoppingListFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         list_recycler.layoutManager = LinearLayoutManager(context)
-        val adapter = ItemAdapter(vm::incrementItem, vm::decrementItem,true)
+        val adapter = ItemAdapter(vm::incrementItem, vm::decrementItem, true)
         list_recycler.adapter = adapter
 
         vm.list.observe(this, Observer {

@@ -10,6 +10,7 @@ import androidx.viewpager.widget.ViewPager
 import com.sdp15.goodb0i.R
 import kotlinx.android.synthetic.main.layout_search.*
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
+import timber.log.Timber
 
 class SearchFragment : Fragment() {
 
@@ -28,10 +29,19 @@ class SearchFragment : Fragment() {
         // Specified explicitly as AS likes to autocomplete, and then later decide that it actually meant a different
         // LinearLayoutManager
         list_recycler.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
-        val adapter = ItemAdapter(vm::incrementItem, vm::decrementItem,false)
+        val adapter = ItemAdapter(vm::incrementItem, vm::decrementItem, false)
         list_recycler.adapter = adapter
         vm.searchResults.observe(this, Observer {
             adapter.itemsChanged(ItemAdapter.ListDiff.All(it))
+        })
+        vm.list.observe(this, Observer {
+            Timber.i("Observed change $it")
+            if (it is ItemAdapter.ListDiff.Update) {
+                adapter.itemsChanged(it)
+            } else if(it is ItemAdapter.ListDiff.Remove) {
+                // Co
+                adapter.itemsChanged(ItemAdapter.ListDiff.Update(it.items, it.item))
+            }
         })
         floating_search_view.setOnQueryChangeListener(vm::onQueryChange)
         floating_search_view.setOnMenuItemClickListener {
