@@ -136,6 +136,7 @@ object TestDataItemLoader : ItemLoader {
         "superDepartment": "Fresh Food",
         "ContentsMeasureType": "SNGL",
         "name": "Tesco Organic Small Bananas 6 Pack",
+        "description": ["Probably yellow"],
         "UnitOfSale": 1,
         "AverageSellingUnitWeight": 0.891,
         "UnitQuantity": "EACH",

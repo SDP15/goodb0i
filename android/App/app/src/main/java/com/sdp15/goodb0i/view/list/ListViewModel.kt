@@ -18,12 +18,13 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
 
     private val loader: ItemLoader by inject()
 
-
     // The current shopping list
     private val currentList = mutableListOf<TrolleyItem>()
     val list = MutableLiveData<ListDiff<TrolleyItem>>()
 
     val searchResults = MutableLiveData<List<TrolleyItem>>()
+
+    val totalPrice = MutableLiveData<Double>()
 
     override fun bind() {
     }
@@ -44,6 +45,8 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
         }
     }
 
+    private fun computePrice() = currentList.sumByDouble { it.count * it.item.price }
+
     fun incrementItem(item: Item) {
         Timber.i("Incrementing item ${item.name}")
         val i = currentList.indexOfFirst { it.item.id == item.id }
@@ -57,7 +60,7 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
             diff = ListDiff.Update(currentList, currentList[i])
         }
         list.postValue(diff)
-
+        totalPrice.postValue(computePrice())
     }
 
     fun decrementItem(item: Item) {
@@ -72,6 +75,7 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
                 list.postValue(ListDiff.Update(currentList, this))
             }
         }
+        totalPrice.postValue(computePrice())
     }
 
     sealed class ListAction {
