@@ -5,6 +5,8 @@
         "*.mll": "llvm",
         "*.sll": "llvm",
         "*.oll": "llvm",
-        "stdexcept": "cpp"
+        "stdexcept": "cpp",
+        "array": "cpp",
+        "fstream": "cpp"
     }
 }
