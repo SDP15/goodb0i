@@ -10,13 +10,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.sdp15.goodb0i.R
 import kotlinx.android.synthetic.main.layout_shoppinglist.*
 import org.koin.android.ext.android.getKoin
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
-class ShoppingListFragment() : Fragment() {
+class ShoppingListFragment : Fragment() {
 
-    lateinit var vm: ListViewModel
-
-
+    private val vm: ListViewModel by inject()
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)

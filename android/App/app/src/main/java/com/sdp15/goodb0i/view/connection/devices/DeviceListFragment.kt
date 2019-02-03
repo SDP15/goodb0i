@@ -1,13 +1,11 @@
 package com.sdp15.goodb0i.view.connection.devices
 
-import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.RecyclerView
 import com.sdp15.goodb0i.MainActivity
 import com.sdp15.goodb0i.R
 import com.sdp15.goodb0i.data.bluetooth.DeviceListHandler

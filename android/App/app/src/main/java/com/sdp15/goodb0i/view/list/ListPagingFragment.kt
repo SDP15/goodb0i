@@ -12,6 +12,9 @@ import com.sdp15.goodb0i.R
 import com.sdp15.goodb0i.view.BaseFragment
 import kotlinx.android.synthetic.main.layout_list_creation.*
 import org.koin.android.ext.android.getKoin
+import org.koin.android.ext.android.inject
+import org.koin.androidx.scope.ext.android.bindScope
+import org.koin.androidx.scope.ext.android.getScope
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**
@@ -19,7 +22,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  */
 class ListPagingFragment : BaseFragment() {
 
-    private val vm: ListViewModel by viewModel()
+    private val vm: ListViewModel by inject()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -30,9 +33,9 @@ class ListPagingFragment : BaseFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        getKoin().createScope("list_pager")
+        bindScope(getScope("list_pager"))
         vm.bind()
-
     }
 
     override fun onResume() {
@@ -41,10 +44,6 @@ class ListPagingFragment : BaseFragment() {
         val vp = ViewPagerAdapter(childFragmentManager, vm)
         list_viewpager.adapter = vp
         //list_tab_layout.setupWithViewPager(list_viewpager)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
     }
 
 
@@ -60,11 +59,6 @@ class ListPagingFragment : BaseFragment() {
 
         private val searchFragment = SearchFragment()
         private val listFragment = ShoppingListFragment()
-
-        init {
-            searchFragment.vm = vm
-            listFragment.vm = vm
-        }
 
         override fun getItem(position: Int): Fragment {
             return if (position == 0) searchFragment else listFragment

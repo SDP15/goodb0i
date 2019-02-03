@@ -11,13 +11,14 @@ import com.sdp15.goodb0i.R
 import com.sdp15.goodb0i.view.ListDiff
 import kotlinx.android.synthetic.main.layout_search.*
 import org.koin.android.ext.android.getKoin
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import timber.log.Timber
 
 class SearchFragment : Fragment() {
 
 
-    lateinit var vm: ListViewModel
+    private val vm: ListViewModel by inject()
     private lateinit var viewPager: ViewPager
 
     override fun onStart() {
@@ -38,11 +39,11 @@ class SearchFragment : Fragment() {
         })
         vm.list.observe(this, Observer {
             Timber.i("Observed change $it")
-            if (it is ItemAdapter.ListDiff.Update) {
+            if (it is ListDiff.Update) {
                 adapter.itemsChanged(it)
-            } else if(it is ItemAdapter.ListDiff.Remove) {
+            } else if(it is ListDiff.Remove) {
                 // Removal in ShoppingListFragment causes an update to the same search item, if visible
-                adapter.itemsChanged(ItemAdapter.ListDiff.Update(it.items, it.item))
+                adapter.itemsChanged(ListDiff.Update(it.items, it.item))
             }
         })
         floating_search_view.setOnQueryChangeListener(vm::onQueryChange)
