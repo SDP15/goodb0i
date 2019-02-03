@@ -1,14 +1,17 @@
-from tcpcom import TCPClient
-from time import sleep
-import threading
-import datetime
+from tcpcom import TCPServer
+import sys, getopt
 import socket
 
+'''
+The client, such as the Raspberry PI connects to a server (e.g. any DICE machine) and they can both communicate by sending
+messages back-and-forth.
+'''
+
 # connection configuration settings
-tcp_ip = socket.gethostbyname(socket.gethostname())
-print(tcp_ip)
-tcp_port = 5005
+print(socket.gethostbyname(socket.gethostname()))
+tcp_port = 5006
 tcp_reply = "Server message"
+
 
 def onStateChanged(state, msg):
     print state, msg
@@ -18,19 +21,24 @@ def onStateChanged(state, msg):
         print("Server:-- Listening...")
     elif state == "CONNECTED":
         isConnected = True
-        print("Server:-- Connected to " + msg)
 
-        server.sendMessage("This is a new message.")
+        start = raw_input("Enter START if you wish to start the robot\n")
+        server.sendMessage(start)
+        stop()
+
     elif state == "MESSAGE":
-        print("new messa")
         print("Server:-- Message received:", msg)
-        server.sendMessage("Message acknowledged.")
 
+def stop():
+    stop = raw_input("Enter STOP if you with to stop the robot\n")
+    server.sendMessage(stop)
+    print("message sent")
 
 def main():
     global server
     server = TCPServer(tcp_port, stateChanged=onStateChanged)
 
 
+
 if __name__ == '__main__':
-    main()
+     main()
