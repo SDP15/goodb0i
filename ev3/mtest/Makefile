@@ -11,5 +11,8 @@ CXXFLAGS=-std=gnu++14 ${CXXCFLAGS}
 
 all: ../mnt/${PROJNAME}
 
+main: main.cpp ../util/util.hpp Makefile 
+	$(CXX) $(CXXFLAGS) -o $@ $<
+
 ../mnt/${PROJNAME}: main
 	cp main ../mnt/${PROJNAME}
