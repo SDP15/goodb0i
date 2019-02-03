@@ -45,9 +45,6 @@ class ListPagingFragment : BaseFragment() {
         //list_tab_layout.setupWithViewPager(list_viewpager)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-    }
 
 
     override fun onBackPressed(): Boolean {

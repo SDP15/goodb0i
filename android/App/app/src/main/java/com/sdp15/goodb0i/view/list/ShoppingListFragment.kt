@@ -25,9 +25,9 @@ class ShoppingListFragment : Fragment() {
         list_recycler.adapter = adapter
 
         vm.list.observe(this, Observer {
-            // If empty, we want to load all of the items
+            // If empty, we want to load all of the items, rather than just the last diff
             if (adapter.itemCount == 0) {
-                adapter.itemsChanged(ListDiff.All(it.items))
+                adapter.itemsChanged(it.toAll())
             } else {
                 adapter.itemsChanged(it)
             }

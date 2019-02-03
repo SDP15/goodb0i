@@ -5,4 +5,8 @@ sealed class ListDiff<T>(val items: List<T>) {
     class Add<T>(items: List<T>, val item: T) : ListDiff<T>(items)
     class Remove<T>(items: List<T>, val item: T) : ListDiff<T>(items)
     class Update<T>(items: List<T>, val item: T) : ListDiff<T>(items)
+
+    // Convert a diff into All, to change the entire dataset
+    fun toAll() = All(items)
+
 }
