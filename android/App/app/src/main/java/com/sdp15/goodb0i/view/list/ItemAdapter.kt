@@ -1,13 +1,12 @@
 package com.sdp15.goodb0i.view.list
 
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.sdp15.goodb0i.R
-import com.sdp15.goodb0i.collapse
 import com.sdp15.goodb0i.data.store.Item
-import com.sdp15.goodb0i.expand
 import kotlinx.android.synthetic.main.list_item.view.*
 import kotlin.math.max
 
@@ -59,11 +58,19 @@ class ItemAdapter(val onIncrement: (Item) -> Unit, val onDecrement: (Item) -> Un
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
         holder.view.apply {
             item_button_container.visibility = if (expanded[position]) View.VISIBLE else View.GONE
+            //TODO: Why is this necessary
+            // As soon as any style is set on the Textviews, touch events cause them to switch to a black text color
+            setOnTouchListener { view, motionEvent ->
+                if (motionEvent.action == MotionEvent.ACTION_UP) view.callOnClick()
+                true
+            }
             setOnClickListener {
                 if (expanded[position]) {
-                    collapse(item_button_container)
+                    item_button_container.visibility = View.GONE
+                    //collapse(item_button_container)
                 } else {
-                    expand(item_button_container)
+                    item_button_container.visibility = View.VISIBLE
+                    //expand(item_button_container)
                 }
                 expanded[position] = !expanded[position]
             }

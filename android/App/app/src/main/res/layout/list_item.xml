@@ -1,75 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="16dp"
-    android:orientation="vertical">
+    android:animateLayoutChanges="true">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/text_item_name"
-            style="@style/BodyText"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintWidth_default="percent"
-            app:layout_constraintWidth_percent="0.8"
-            tools:text="Food" />
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/text_item_name"
+        style="@style/BodyText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent="0.8"
+        tools:text="Food" />
 
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/text_item_price"
-            style="@style/BodyText"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:gravity="end"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0"
-            app:layout_constraintWidth_default="percent"
-            app:layout_constraintWidth_percent="0.2"
-            tools:text="£10" />
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/text_item_price"
+        style="@style/BodyText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent="0.2"
+        tools:text="£10" />
 
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/text_item_descr"
-            style="@style/BodyText.SubText"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_item_name"
-            app:layout_constraintWidth_default="percent"
-            app:layout_constraintWidth_percent="0.8"
-            tools:text="Description" />
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/text_item_descr"
+        style="@style/BodyText.SubText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_item_name"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent="0.8"
+        tools:text="Description" />
 
-        <androidx.appcompat.widget.AppCompatTextView
+    <androidx.appcompat.widget.AppCompatTextView
 
-            android:id="@+id/text_item_quantity"
-            style="@style/BodyText.SubText"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_weight="0.5"
-            android:gravity="end"
-            app:layout_constraintBaseline_toBaselineOf="@+id/text_item_descr"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintWidth_default="percent"
-            app:layout_constraintWidth_percent="0.2"
-            tools:text="3" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        android:id="@+id/text_item_quantity"
+        style="@style/BodyText.SubText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_weight="0.5"
+        android:gravity="end"
+        app:layout_constraintBaseline_toBaselineOf="@+id/text_item_descr"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent="0.2"
+        tools:text="3" />
+
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/item_button_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone">
+        android:visibility="visible"
+        app:layout_constraintTop_toBottomOf="@+id/text_item_descr">
 
         <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/button_negative"
@@ -95,4 +92,5 @@
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
-</androidx.appcompat.widget.LinearLayoutCompat>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
