@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.viewpager.widget.ViewPager
 import com.sdp15.goodb0i.R
+import com.sdp15.goodb0i.view.ListDiff
 import kotlinx.android.synthetic.main.layout_search.*
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
@@ -31,7 +32,7 @@ class SearchFragment : Fragment() {
         val adapter = ItemAdapter(vm::incrementItem, vm::decrementItem)
         list_recycler.adapter = adapter
         vm.searchResults.observe(this, Observer {
-            adapter.itemsChanged(ItemAdapter.ListDiff.All(it))
+            adapter.itemsChanged(ListDiff.All(it))
         })
         floating_search_view.setOnQueryChangeListener(vm::onQueryChange)
         floating_search_view.setOnMenuItemClickListener {

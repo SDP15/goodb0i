@@ -6,15 +6,20 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.RecyclerView
 import com.sdp15.goodb0i.MainActivity
 import com.sdp15.goodb0i.R
 import com.sdp15.goodb0i.data.bluetooth.DeviceListHandler
 import com.sdp15.goodb0i.view.BaseFragment
+import com.sdp15.goodb0i.view.ListDiff
+import kotlinx.android.synthetic.main.layout_bluetooth.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class DeviceListFragment : BaseFragment() {
 
     private val vm: DeviceListViewModel by viewModel()
+    private val adapter = DeviceAdapter()
     private lateinit var deviceHandler: DeviceListHandler
 
     override fun onCreateView(
@@ -30,7 +35,13 @@ class DeviceListFragment : BaseFragment() {
         deviceHandler = DeviceListHandler(vm)
         (activity as MainActivity).addMessageHandler(deviceHandler)
         (activity as MainActivity).startSearch()
-        //TODO: Check that bluetooth is enabled
+        bluetooth_recycler.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
+        bluetooth_recycler.adapter = adapter
+        vm.bluetoothDevices.observe(this, Observer {
+            if (it is ListDiff.Add) {
+                adapter.addDevice(it.item)
+            }
+        })
     }
 
     override fun onAttach(context: Context?) {

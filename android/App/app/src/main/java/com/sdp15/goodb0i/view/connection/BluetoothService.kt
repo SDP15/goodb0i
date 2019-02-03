@@ -2,6 +2,7 @@ package com.sdp15.goodb0i.view.connection
 
 import android.app.Service
 import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothClass
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
 import android.content.BroadcastReceiver
@@ -93,6 +94,7 @@ class BluetoothService : Service() {
                 val rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE)
                 if (!devicesInfo.any { it.mac == device.address } && device.name?.isNotBlank() == true) {
                     val info = DeviceInfo(device.name, device.address, rssi)
+                    //TODO: Use BluetoothDevice.Device.Major to display device type
                     devicesInfo.add(info)
 
                     handler?.let {

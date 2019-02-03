@@ -20,6 +20,7 @@ class ShoppingListFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        //TODO: Check that this is the correct lifecycle event to bind an adapter
         list_recycler.layoutManager = LinearLayoutManager(context)
         val adapter = ItemAdapter(vm::incrementItem, vm::decrementItem)
         list_recycler.adapter = adapter

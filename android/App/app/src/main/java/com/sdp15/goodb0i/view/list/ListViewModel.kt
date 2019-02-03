@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import com.sdp15.goodb0i.BaseViewModel
 import com.sdp15.goodb0i.data.store.Item
 import com.sdp15.goodb0i.data.store.ItemLoader
+import com.sdp15.goodb0i.view.ListDiff
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
@@ -20,7 +21,7 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
 
     // The current shopping list
     private val currentList = mutableListOf<TrolleyItem>()
-    val list = MutableLiveData<ItemAdapter.ListDiff<TrolleyItem>>()
+    val list = MutableLiveData<ListDiff<TrolleyItem>>()
 
     val searchResults = MutableLiveData<List<TrolleyItem>>()
 
@@ -46,14 +47,14 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
     fun incrementItem(item: Item) {
         Timber.i("Incrementing item ${item.name}")
         val i = currentList.indexOfFirst { it.item.id == item.id }
-        val diff: ItemAdapter.ListDiff<TrolleyItem>
+        val diff: ListDiff<TrolleyItem>
         if (i == -1) {
             val ci = TrolleyItem(item, 1)
             currentList.add(ci)
-            diff = ItemAdapter.ListDiff.Add(currentList, ci)
+            diff = ListDiff.Add(currentList, ci)
         } else {
             currentList[i].count++
-            diff = ItemAdapter.ListDiff.Update(currentList, currentList[i])
+            diff = ListDiff.Update(currentList, currentList[i])
         }
         list.postValue(diff)
 
@@ -66,9 +67,9 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
             count--
             if (count == 0) {
                 currentList.remove(this)
-                list.postValue(ItemAdapter.ListDiff.Remove(currentList, this))
+                list.postValue(ListDiff.Remove(currentList, this))
             } else {
-                list.postValue(ItemAdapter.ListDiff.Update(currentList, this))
+                list.postValue(ListDiff.Update(currentList, this))
             }
         }
     }

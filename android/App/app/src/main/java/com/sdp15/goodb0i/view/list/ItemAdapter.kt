@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.sdp15.goodb0i.R
 import com.sdp15.goodb0i.data.store.Item
+import com.sdp15.goodb0i.view.ListDiff
 import kotlinx.android.synthetic.main.list_item.view.*
 import kotlin.math.max
 
@@ -40,13 +41,6 @@ class ItemAdapter(val onIncrement: (Item) -> Unit, val onDecrement: (Item) -> Un
             }
         }
 
-    }
-
-    sealed class ListDiff<T>(val items: List<T>) {
-        class All<T>(items: List<T>) : ListDiff<T>(items)
-        class Add<T>(items: List<T>, val item: T) : ListDiff<T>(items)
-        class Remove<T>(items: List<T>, val item: T) : ListDiff<T>(items)
-        class Update<T>(items: List<T>, val item: T) : ListDiff<T>(items)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
