@@ -22,7 +22,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  */
 class ListPagingFragment : BaseFragment() {
 
-    private val vm: ListViewModel by inject()
+    val vm: ListViewModel by viewModel()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,17 +33,20 @@ class ListPagingFragment : BaseFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        getKoin().createScope("list_pager")
-        bindScope(getScope("list_pager"))
         vm.bind()
+
     }
 
     override fun onResume() {
         super.onResume()
         // Have to use childFragmentManager for nested fragments
-        val vp = ViewPagerAdapter(childFragmentManager, vm)
+        val vp = ViewPagerAdapter(childFragmentManager)
         list_viewpager.adapter = vp
         //list_tab_layout.setupWithViewPager(list_viewpager)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
     }
 
 
@@ -55,7 +58,7 @@ class ListPagingFragment : BaseFragment() {
         return false
     }
 
-    private class ViewPagerAdapter(fragmentManager: FragmentManager, vm: ListViewModel) : FragmentPagerAdapter(fragmentManager) {
+    private class ViewPagerAdapter(fragmentManager: FragmentManager) : FragmentPagerAdapter(fragmentManager) {
 
         private val searchFragment = SearchFragment()
         private val listFragment = ShoppingListFragment()

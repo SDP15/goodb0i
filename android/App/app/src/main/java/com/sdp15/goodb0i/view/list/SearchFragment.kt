@@ -11,24 +11,17 @@ import com.sdp15.goodb0i.R
 import com.sdp15.goodb0i.view.ListDiff
 import kotlinx.android.synthetic.main.layout_search.*
 import org.koin.android.ext.android.getKoin
-import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import timber.log.Timber
 
 class SearchFragment : Fragment() {
 
-
-    private val vm: ListViewModel by inject()
+    lateinit var vm: ListViewModel
     private lateinit var viewPager: ViewPager
-
-    override fun onStart() {
-        super.onStart()
-        vm.bind()
-    }
 
     override fun onResume() {
         super.onResume()
-
+        vm = (parentFragment as ListPagingFragment).vm
         // Specified explicitly as AS likes to autocomplete, and then later decide that it actually meant a different
         // LinearLayoutManager
         list_recycler.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)

@@ -45,7 +45,7 @@ class App : Application() {
             viewModel<ConfirmationViewModel>()
             viewModel<ItemViewModel>()
             viewModel<OrdersViewModel>()
-            scope("list_pager") { ListViewModel() }
+            viewModel<ListViewModel>()
             viewModel<DeviceListViewModel>()
         },
         module {

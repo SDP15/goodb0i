@@ -26,6 +26,7 @@ class MainActivity : AppCompatActivity() {
     private var bluetoothService: BluetoothService? = null
     private val REQUEST_ENABLE_BT = 564
     private val REQUEST_COARSE_LOCATION = 543
+    private var isServiceBound = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -90,7 +91,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        unbindService(connection)
+        if(isBound) unbindService(connection)
     }
 
     override fun onSupportNavigateUp(): Boolean = findNavController(R.id.nav_host_fragment).navigateUp()
