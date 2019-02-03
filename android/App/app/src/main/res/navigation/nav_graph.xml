@@ -35,6 +35,17 @@
         <action
             android:id="@+id/action_pin_fragment_to_orders_fragment"
             app:destination="@id/orders_fragment" />
+
+        <action android:id="@+id/action_pin_fragment_to_device_list_fragment"
+            app:destination="@id/device_list_fragment"/>
+
+    </fragment>
+
+    <fragment android:id="@+id/device_list_fragment"
+        android:name="com.sdp15.goodb0i.view.connection.devices.DeviceListFragment"
+        android:label="device_list_fragment"
+        tools:layout="@layout/layout_bluetooth">
+
     </fragment>
 
     <fragment android:id="@+id/error_fragment"

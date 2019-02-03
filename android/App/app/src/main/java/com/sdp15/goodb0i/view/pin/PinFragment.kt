@@ -24,7 +24,6 @@ class PinFragment : androidx.fragment.app.Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.layout_pin_input, container, false)
     }
 
@@ -33,7 +32,7 @@ class PinFragment : androidx.fragment.app.Fragment() {
         vm.validInput.observe(this, Observer {
             if (it.first) {
                 login_code_input.error = null
-                findNavController().navigate(R.id.scanner_fragment)
+                findNavController().navigate(R.id.device_list_fragment)
             } else {
                 login_code_input.error = getString(it.second)
             }
