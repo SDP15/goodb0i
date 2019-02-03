@@ -21,7 +21,7 @@ class ShoppingListFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         list_recycler.layoutManager = LinearLayoutManager(context)
-        val adapter = ItemAdapter(vm::incrementItem, vm::decrementItem)
+        val adapter = ItemAdapter(vm::incrementItem, vm::decrementItem,true)
         list_recycler.adapter = adapter
 
         vm.list.observe(this, Observer {

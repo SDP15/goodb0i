@@ -28,7 +28,7 @@ class SearchFragment : Fragment() {
         // Specified explicitly as AS likes to autocomplete, and then later decide that it actually meant a different
         // LinearLayoutManager
         list_recycler.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
-        val adapter = ItemAdapter(vm::incrementItem, vm::decrementItem)
+        val adapter = ItemAdapter(vm::incrementItem, vm::decrementItem,false)
         list_recycler.adapter = adapter
         vm.searchResults.observe(this, Observer {
             adapter.itemsChanged(ItemAdapter.ListDiff.All(it))
