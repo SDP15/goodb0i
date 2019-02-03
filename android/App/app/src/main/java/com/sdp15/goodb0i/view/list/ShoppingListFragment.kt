@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.sdp15.goodb0i.R
+import com.sdp15.goodb0i.view.ListDiff
 import kotlinx.android.synthetic.main.layout_shoppinglist.*
 import org.koin.android.ext.android.getKoin
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
@@ -24,7 +25,12 @@ class ShoppingListFragment : Fragment() {
         list_recycler.adapter = adapter
 
         vm.list.observe(this, Observer {
-            adapter.itemsChanged(it)
+            // If empty, we want to load all of the items
+            if (adapter.itemCount == 0) {
+                adapter.itemsChanged(ListDiff.All(it.items))
+            } else {
+                adapter.itemsChanged(it)
+            }
         })
         vm.totalPrice.observe(this, Observer {
             label_total_price.text = getString(R.string.label_item_price, it)
