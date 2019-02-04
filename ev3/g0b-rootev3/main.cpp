@@ -17,7 +17,7 @@ using namespace std;
 using namespace ev3dev;
 
 unique_ptr<evutil::Drive> leftDrive, rightDrive, steerDrive;
-unique_ptr<ev3dev::color_sensor> leftColor, rightColor;
+unique_ptr<evutil::ColorSensor> leftColor, rightColor;
 unique_ptr<ev3dev::ultrasonic_sensor> sonar;
 unique_ptr<ev3dev::touch_sensor> wheelCalibrationSensor;
 
@@ -38,20 +38,22 @@ ostream &log() {
 void connectEv3Devices() {
   bool failed{false};
   leftDrive = make_unique<evutil::Drive>(OUTPUT_A, failed);
-  leftDrive->setReversed();
   rightDrive = make_unique<evutil::Drive>(OUTPUT_B, failed);
+  leftDrive->setReversed();
   rightDrive->setReversed();
+
   steerDrive = make_unique<evutil::Drive>(OUTPUT_C, failed);
 
-  leftColor =
-      evutil::createConnectedDevice<ev3dev::color_sensor>(INPUT_1, failed);
-  rightColor =
-      evutil::createConnectedDevice<ev3dev::color_sensor>(INPUT_2, failed);
+  leftColor = make_unique<evutil::ColorSensor>(INPUT_1, failed);
+  rightColor = make_unique<evutil::ColorSensor>(INPUT_2, failed);
 
   sonar =
       evutil::createConnectedDevice<ev3dev::ultrasonic_sensor>(INPUT_3, failed);
+  sonar->set_mode(sonar->mode_us_dist_cm);
+
   wheelCalibrationSensor =
       evutil::createConnectedDevice<ev3dev::touch_sensor>(INPUT_4, failed);
+  wheelCalibrationSensor->set_mode(wheelCalibrationSensor->mode_touch);
 
   if (failed) {
     throw runtime_error("Error initializing EV3 connections.");
@@ -73,8 +75,7 @@ void openLogFile() {
 
 class Robot {
 private:
-public:
-  Robot() { calibrateSteering(); }
+  int getForwardSpeed() { return 70; }
 
   void calibrateSteering() {
     cout << "Calibrating steering..." << endl;
@@ -93,31 +94,37 @@ public:
     // Make sure sensor mode is set for short reaction times.
     wheelCalibrationSensor->is_pressed(true);
 
-    log() << "* Phase 2: find minmax *" << endl;
+    log() << "* Phase 2: find right *" << endl;
     // Get min and max touch positions
-    int minTouchPos, maxTouchPos;
+    /*int minTouchPos, maxTouchPos;
     {
       steerDrive->stop();
       this_thread::yield();
       // Keep this number high, otherwise the motor turns very poorly and leads
       // to very inaccurate results
-      steerDrive->runForever(40);
+      steerDrive->runForever(50);
       // wait for it to reach the touch sensor
       while (!wheelCalibrationSensor->is_pressed(false)) {
-        this_thread::yield();
       }
       minTouchPos = steerDrive->getPosition();
       // and then for it to not be pressed anymore
       while (wheelCalibrationSensor->is_pressed(false)) {
-        this_thread::yield();
       }
       maxTouchPos = steerDrive->getDegrees();
     }
     steerDrive->stop();
     int calibratedPos{(minTouchPos + maxTouchPos) / 2};
+
     log() << "min pos = " << minTouchPos << endl;
     log() << "max pos = " << maxTouchPos << endl;
-    log() << "cal pos = " << calibratedPos << endl;
+    log() << "cal pos = " << calibratedPos << endl;*/
+
+    steerDrive->runForever(10);
+    this_thread::sleep_for(chrono::milliseconds{2000});
+    steerDrive->stop();
+    log() << "r pos" << steerDrive->getPosition();
+    int calibratedPos{steerDrive->getPosition() / 2};
+
     // Set zero point to middle.
     steerDrive->setPosition(steerDrive->getPosition() - calibratedPos);
     steerDrive->resetStopAction();
@@ -128,24 +135,32 @@ public:
     cout << "Steering calibrated" << endl;
   }
 
-  void process() {
-    if (button::up.pressed()) {
-      leftDrive->runForever();
-      rightDrive->runForever();
-    } else if (button::down.pressed()) {
-      leftDrive->runForever(-100);
-      rightDrive->runForever(-100);
-    } else {
-      leftDrive->stop();
-      rightDrive->stop();
-    }
+public:
+  Robot() { calibrateSteering(); }
 
-    if (button::left.pressed()) {
-      steerDrive->runForever(-5);
-    } else if (button::right.pressed()) {
-      steerDrive->runForever(5);
-    } else {
-      steerDrive->stop();
+  void process() {
+    // simple line follow
+    leftColor->update();
+    rightColor->update();
+    evutil::Color lcol{leftColor->getColor()};
+    evutil::Color rcol{rightColor->getColor()};
+    auto rrcol{rightColor->getRawRGB()};
+    cerr << (int)lcol << " " << (int)rcol << " " << rrcol.x << " " << rrcol.y
+         << " " << rrcol.z << endl;
+    constexpr int STEER_ANGLE{20};
+    leftDrive->runForever(getForwardSpeed());
+    rightDrive->runForever(getForwardSpeed());
+    if (lcol == evutil::Color::turnLeft || rcol == evutil::Color::turnLeft) {
+      steerDrive->runToDegree(-40);
+      this_thread::sleep_for(chrono::milliseconds{1000});
+    }
+    if ((lcol == evutil::Color::line && rcol == evutil::Color::line) ||
+        (lcol != evutil::Color::line && rcol != evutil::Color::line)) {
+      steerDrive->runToDegree(0);
+    } else if (lcol == evutil::Color::line) {
+      steerDrive->runToDegree(-STEER_ANGLE);
+    } else if (rcol == evutil::Color::line) {
+      steerDrive->runToDegree(STEER_ANGLE);
     }
   }
 };
@@ -175,6 +190,7 @@ int main() {
     if (signal(SIGINT, &sigintHandler) == SIG_ERR) {
       cerr << "Could not register SIGINT handler, continuing..." << endl;
     }
+    evutil::ColorCalibration::loadFromFile();
     connectEv3Devices();
     openLogFile();
 

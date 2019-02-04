@@ -8,5 +8,9 @@
         "stdexcept": "cpp",
         "array": "cpp",
         "fstream": "cpp"
-    }
+    },
+    "C_Cpp.default.includePath": [
+        "ev3/util",
+        "ev3/glm"
+    ]
 }

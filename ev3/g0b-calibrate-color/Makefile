@@ -1,5 +1,5 @@
 
-PROJNAME=main
+PROJNAME=g0b-calibrate-color
 
 include ../util/common.make
 

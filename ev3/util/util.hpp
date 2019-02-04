@@ -1,5 +1,9 @@
 
 #include "ev3dev.h"
+#include <fstream>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/glm.hpp>
+#include <glm/gtx/color_space.hpp>
 #include <iostream>
 #include <memory>
 
@@ -16,6 +20,109 @@ std::unique_ptr<T> createConnectedDevice(ev3dev::address_type addr,
   }
   return dev;
 }
+
+enum class Color { bg, line, turnLeft, turnRight, turnBoth };
+static const Color Colors[]{Color::bg, Color::line, Color::turnLeft};
+
+namespace ColorCalibration {
+static constexpr const char *const CAL_FILE = "zcal-color.cfg";
+static glm::ivec3 bg, line, turnLeft, turnRight, turnBoth;
+
+inline void loadFromFile() {
+  std::ifstream F{CAL_FILE};
+  F >> bg.x >> bg.y >> bg.z;
+  F >> line.x >> line.y >> line.z;
+  F >> turnLeft.x >> turnLeft.y >> turnLeft.z;
+  F >> turnRight.x >> turnRight.y >> turnRight.z;
+  F >> turnBoth.x >> turnBoth.y >> turnBoth.z;
+}
+
+inline void saveToFile() {
+  std::ofstream F{CAL_FILE};
+  F << bg.x << " " << bg.y << " " << bg.z << std::endl;
+  F << line.x << " " << line.y << " " << line.z << std::endl;
+  F << turnLeft.x << " " << turnLeft.y << " " << turnLeft.z << std::endl;
+  F << turnRight.x << " " << turnRight.y << " " << turnRight.z << std::endl;
+  F << turnBoth.x << " " << turnBoth.y << " " << turnBoth.z << std::endl;
+  F.flush();
+  F.close();
+}
+
+inline glm::ivec3 &getRGBForColor(Color c) {
+  switch (c) {
+  case Color::bg:
+    return bg;
+  case Color::line:
+    return line;
+  case Color::turnLeft:
+    return turnLeft;
+  case Color::turnRight:
+    return turnRight;
+  case Color::turnBoth:
+    return turnBoth;
+  }
+  return bg;
+}
+} // namespace ColorCalibration
+
+class ColorSensor {
+private:
+  std::unique_ptr<ev3dev::color_sensor> sensor;
+  glm::ivec3 currentRaw;
+  Color currentColor;
+
+public:
+  inline ColorSensor(ev3dev::address_type sensor_addr, bool &failFlag) {
+    sensor = createConnectedDevice<ev3dev::color_sensor>(sensor_addr, failFlag);
+    sensor->set_mode(sensor->mode_rgb_raw);
+    update();
+  }
+
+  inline void update() {
+    auto vals = sensor->raw(false);
+    currentRaw.x = std::get<0>(vals);
+    currentRaw.y = std::get<1>(vals);
+    currentRaw.z = std::get<2>(vals);
+
+    float minDist = 999999999;
+    Color minColor = Color::bg;
+
+    glm::vec3 crgb{currentRaw};
+    crgb.x /= (float)ColorCalibration::bg.x;
+    crgb.y /= (float)ColorCalibration::bg.y;
+    crgb.z /= (float)ColorCalibration::bg.z;
+    glm::vec3 chsv{hsvColor(crgb)};
+
+    if (chsv.z < 0.2) {
+      currentColor = Color::line;
+      return;
+    } else if (chsv.z > 0.8 && chsv.y < 0.3) {
+      currentColor = Color::bg;
+      return;
+    }
+
+    // Closest color in euclidean rgb space.
+    for (auto cmpColor : Colors) {
+      float dist{0};
+      glm::vec3 xrgb{ColorCalibration::getRGBForColor(cmpColor)};
+      xrgb.x /= (float)ColorCalibration::bg.x;
+      xrgb.y /= (float)ColorCalibration::bg.y;
+      xrgb.z /= (float)ColorCalibration::bg.z;
+      glm::vec3 xhsv{hsvColor(xrgb)};
+      glm::ivec3 dt = chsv - xhsv;
+      dist = dt.x * dt.x + dt.y * dt.y + dt.z * dt.z;
+      if (dist < minDist) {
+        minDist = dist;
+        minColor = cmpColor;
+      }
+    }
+    currentColor = minColor;
+  }
+
+  inline glm::ivec3 getRawRGB() { return currentRaw; }
+
+  inline Color getColor() { return currentColor; }
+};
 
 class Drive {
 private:
