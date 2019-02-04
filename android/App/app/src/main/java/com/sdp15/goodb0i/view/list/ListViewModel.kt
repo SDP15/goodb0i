@@ -32,16 +32,20 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
     private var search: Job? = null
 
     override fun onQueryChange(old: String, new: String) {
-        if (new.isEmpty()) searchResults.postValue(emptyList())
-        search?.cancel()
-        search = GlobalScope.launch(Dispatchers.IO) {
-            val results = loader.search(new).data
-            val merged = results.map { result ->
-                TrolleyItem(result,
-                    currentList.firstOrNull { it.item.id == result.id }?.count ?: 0
-                )
+        if (new.isEmpty()) {
+            searchResults.postValue(emptyList())
+        } else {
+            search?.cancel()
+            search = GlobalScope.launch(Dispatchers.IO) {
+                val results = loader.search(new).data
+                val merged = results.map { result ->
+                    TrolleyItem(
+                        result,
+                        currentList.firstOrNull { it.item.id == result.id }?.count ?: 0
+                    )
+                }
+                searchResults.postValue(merged.toList())
             }
-            searchResults.postValue(merged.toList())
         }
     }
 

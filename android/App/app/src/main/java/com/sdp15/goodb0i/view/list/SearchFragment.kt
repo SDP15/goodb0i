@@ -6,12 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
 import com.sdp15.goodb0i.R
 import com.sdp15.goodb0i.view.ListDiff
 import kotlinx.android.synthetic.main.layout_search.*
-import org.koin.android.ext.android.getKoin
-import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import timber.log.Timber
 
 class SearchFragment : Fragment() {
@@ -27,14 +26,24 @@ class SearchFragment : Fragment() {
         list_recycler.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
         val adapter = ItemAdapter(vm::incrementItem, vm::decrementItem, false)
         list_recycler.adapter = adapter
+        adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onChanged() {
+                super.onChanged()
+                if ((adapter.itemCount == 0 && search_view_switcher.nextView.id == R.id.list_empty_text) ||
+                    (adapter.itemCount > 0 && search_view_switcher.nextView.id == R.id.list_recycler)) {
+                    search_view_switcher.showNext()
+                }
+            }
+        })
         vm.searchResults.observe(this, Observer {
+            Timber.i("Sending results to search adapter $it")
             adapter.itemsChanged(ListDiff.All(it))
         })
         vm.list.observe(this, Observer {
             Timber.i("Observed change $it")
             if (it is ListDiff.Update) {
                 adapter.itemsChanged(it)
-            } else if(it is ListDiff.Remove) {
+            } else if (it is ListDiff.Remove) {
                 // Removal in ShoppingListFragment causes an update to the same search item, if visible
                 adapter.itemsChanged(ListDiff.Update(it.items, it.item))
             }

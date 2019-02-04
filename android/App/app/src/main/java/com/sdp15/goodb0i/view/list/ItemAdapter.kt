@@ -17,6 +17,7 @@ class ItemAdapter(val onIncrement: (Item) -> Unit, val onDecrement: (Item) -> Un
 
     private var items: MutableList<TrolleyItem> = mutableListOf()
     private var expanded: MutableList<Boolean> = mutableListOf()
+
     fun itemsChanged(diff: ListDiff<TrolleyItem>) {
         when (diff) {
             is ListDiff.All -> {
