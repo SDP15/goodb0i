@@ -1,10 +1,14 @@
 package com.sdp15.goodb0i.data.scanner
 
 import android.graphics.Bitmap
+import android.hardware.camera2.CameraAccessException
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetectorOptions
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
+import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
 import timber.log.Timber
 
 class MLKitScanner : Scanner {
@@ -12,8 +16,7 @@ class MLKitScanner : Scanner {
     private val options = FirebaseVisionBarcodeDetectorOptions.Builder()
         .setBarcodeFormats( // TODO: Find out which code types we need to use
             //TODO: Make configurable in settings
-            FirebaseVisionBarcode.FORMAT_DATA_MATRIX,
-            FirebaseVisionBarcode.FORMAT_QR_CODE
+            FirebaseVisionBarcode.FORMAT_ALL_FORMATS
         )
         .build()
 
@@ -21,14 +24,39 @@ class MLKitScanner : Scanner {
         .getVisionBarcodeDetector(options)
 
 
-    override fun scanImage(image: Bitmap, callback: (BarcodeReading) -> Unit) {
-        detector.detectInImage(FirebaseVisionImage.fromBitmap(image))
+    /**
+     * Get the angle by which an image must be rotated given the device's current
+     * orientation.
+     */
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    @Throws(CameraAccessException::class)
+    private fun getRotationCompensation(rotation: Int) = when (rotation) {
+        0 -> FirebaseVisionImageMetadata.ROTATION_0
+        90 -> FirebaseVisionImageMetadata.ROTATION_90
+        180 -> FirebaseVisionImageMetadata.ROTATION_180
+        270 -> FirebaseVisionImageMetadata.ROTATION_270
+        else -> {
+            FirebaseVisionImageMetadata.ROTATION_0
+        }
+    }
+
+    override fun scanImage(ba: ByteArray, rotation: Int, width: Int, height: Int, callback: (BarcodeReading) -> Unit) {
+        val metadata = FirebaseVisionImageMetadata.Builder()
+            .setWidth(width)
+            .setHeight(height)
+            .setFormat(FirebaseVisionImageMetadata.IMAGE_FORMAT_NV21)
+            .setRotation(getRotationCompensation(rotation))
+            .build()
+        detector.detectInImage(FirebaseVisionImage.fromByteArray(ba, metadata))
             .addOnSuccessListener { barcodes ->
-                Timber.i("Barcodes detected $barcodes")
-                callback(BarcodeReading(0))
+                if(barcodes.isNotEmpty()) Timber.i("Barcodes $barcodes")
+                callback(BarcodeReading(barcodes))
+
             }
             .addOnFailureListener {
                 Timber.e(it, "Barcode detection failure")
+                callback(BarcodeReading(emptyList()))
             }
     }
+
 }

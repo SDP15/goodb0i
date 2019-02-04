@@ -68,7 +68,7 @@ class ScannerFragment : Fragment() {
 
     interface ScannerFragmentInteractor {
 
-        fun onImageCaptured(image: ByteArray, rotation: Int, width: Int, height: Int)
+        fun onImageCaptured(ba: ByteArray, rotation: Int, width: Int, height: Int)
 
     }
 
