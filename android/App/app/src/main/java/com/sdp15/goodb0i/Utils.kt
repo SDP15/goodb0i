@@ -7,6 +7,8 @@ import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.Transformation
 import android.widget.EditText
+import android.widget.ViewSwitcher
+import androidx.recyclerview.widget.RecyclerView
 
 // Simplify use of TextWatcher to simple lambda
 fun EditText.watchText(action: (String) -> Unit) {
@@ -20,6 +22,20 @@ fun EditText.watchText(action: (String) -> Unit) {
 
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
             action(s?.toString() ?: "")
+        }
+    })
+}
+
+// Assumes that the ViewSwitcher contains a RecyclerView and some other view
+// Switches to the other view when the RecyclerView is empty
+fun ViewSwitcher.switchOnEmpty(adapter: RecyclerView.Adapter<*>) {
+    adapter.registerAdapterDataObserver(object: RecyclerView.AdapterDataObserver() {
+        override fun onChanged() {
+            super.onChanged()
+            if ((adapter.itemCount == 0 && nextView !is RecyclerView) ||
+                (adapter.itemCount > 0 && nextView is RecyclerView)) {
+                showNext()
+            }
         }
     })
 }

@@ -31,6 +31,7 @@
     <string name="label_search">Search</string>
     <string name="label_item_price">£%1$.2f</string>
     <string name="label_total_price">Total: £%1$.2f</string>
+    <string name="label_no_items_found">No items found</string>
     <string name="error_bluetooth_unable_to_connect">Unable to connect</string>
     <string name="error_bluetooth_connection_lost">Device connection lost</string>
 </resources>

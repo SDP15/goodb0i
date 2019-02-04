@@ -9,6 +9,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
 import com.sdp15.goodb0i.R
+import com.sdp15.goodb0i.switchOnEmpty
 import com.sdp15.goodb0i.view.ListDiff
 import kotlinx.android.synthetic.main.layout_search.*
 import timber.log.Timber
@@ -26,15 +27,8 @@ class SearchFragment : Fragment() {
         list_recycler.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
         val adapter = ItemAdapter(vm::incrementItem, vm::decrementItem, false)
         list_recycler.adapter = adapter
-        adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
-            override fun onChanged() {
-                super.onChanged()
-                if ((adapter.itemCount == 0 && search_view_switcher.nextView.id == R.id.list_empty_text) ||
-                    (adapter.itemCount > 0 && search_view_switcher.nextView.id == R.id.list_recycler)) {
-                    search_view_switcher.showNext()
-                }
-            }
-        })
+        search_view_switcher.switchOnEmpty(adapter)
+
         vm.searchResults.observe(this, Observer {
             Timber.i("Sending results to search adapter $it")
             adapter.itemsChanged(ListDiff.All(it))
