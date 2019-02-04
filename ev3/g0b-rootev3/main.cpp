@@ -75,7 +75,7 @@ void openLogFile() {
 
 class Robot {
 private:
-  int getForwardSpeed() { return 70; }
+  int getForwardSpeed() { return 65; }
 
   void calibrateSteering() {
     cout << "Calibrating steering..." << endl;
@@ -147,20 +147,31 @@ public:
     auto rrcol{rightColor->getRawRGB()};
     cerr << (int)lcol << " " << (int)rcol << " " << rrcol.x << " " << rrcol.y
          << " " << rrcol.z << endl;
-    constexpr int STEER_ANGLE{20};
-    leftDrive->runForever(getForwardSpeed());
-    rightDrive->runForever(getForwardSpeed());
-    if (lcol == evutil::Color::turnLeft || rcol == evutil::Color::turnLeft) {
+    constexpr int STEER_ANGLE{35};
+    /*if (lcol == evutil::Color::turnLeft || rcol == evutil::Color::turnLeft) {
       steerDrive->runToDegree(-40);
       this_thread::sleep_for(chrono::milliseconds{1000});
-    }
-    if ((lcol == evutil::Color::line && rcol == evutil::Color::line) ||
-        (lcol != evutil::Color::line && rcol != evutil::Color::line)) {
-      steerDrive->runToDegree(0);
-    } else if (lcol == evutil::Color::line) {
-      steerDrive->runToDegree(-STEER_ANGLE);
-    } else if (rcol == evutil::Color::line) {
-      steerDrive->runToDegree(STEER_ANGLE);
+    }*/
+    if (sonar->distance_centimeters() < 100) {
+      leftDrive->stop();
+      rightDrive->stop();
+    } else {
+      if ((lcol == evutil::Color::line && rcol == evutil::Color::line) ||
+          (lcol != evutil::Color::line && rcol != evutil::Color::line)) {
+        steerDrive->runToDegree(0);
+        leftDrive->runForever(getForwardSpeed());
+        rightDrive->runForever(getForwardSpeed());
+      } else if (lcol == evutil::Color::line) {
+        steerDrive->runToDegree(-STEER_ANGLE);
+        leftDrive->runForever(getForwardSpeed() / 2);
+        rightDrive->runForever(getForwardSpeed());
+        this_thread::sleep_for(chrono::milliseconds{150});
+      } else if (rcol == evutil::Color::line) {
+        steerDrive->runToDegree(STEER_ANGLE);
+        leftDrive->runForever(getForwardSpeed());
+        rightDrive->runForever(getForwardSpeed() / 2);
+        this_thread::sleep_for(chrono::milliseconds{150});
+      }
     }
   }
 };
