@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.otaliastudios.cameraview.Audio
 import com.otaliastudios.cameraview.CameraListener
 import com.otaliastudios.cameraview.Gesture
@@ -35,8 +36,7 @@ class ScannerFragment : Fragment() {
 
     private fun captureImage() {
         Timber.i("Capturing image")
-        camera_view.captureSnapshot()
-
+        camera_view.capturePicture()
     }
 
     override fun onCreateView(
@@ -49,32 +49,26 @@ class ScannerFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        camera_view.addCameraListener(object : CameraListener() {
 
-            override fun onPictureTaken(jpeg: ByteArray?) {
-                super.onPictureTaken(jpeg)
-                Timber.i("Taken")
-                val bitmap = jpeg?.size?.let { BitmapFactory.decodeByteArray(jpeg, 0, it) }
-                bitmap?.let {
-                    vm.onImageCaptured(bitmap)
-                }
-            }
-        })
-        camera_view.audio = Audio.OFF
-        camera_view.mapGesture(Gesture.TAP, GestureAction.FOCUS_WITH_MARKER)
-        camera_view.mapGesture(Gesture.LONG_TAP, GestureAction.CAPTURE)
     }
 
     override fun onResume() {
         super.onResume()
         camera_view.setLifecycleOwner(this)
-        captureImage()
+        camera_view.addFrameProcessor { frame ->
+            //Timber.i("ByteAray ${frame.data.size}")
+            vm.onImageCaptured(frame.data, frame.rotation, frame.size.width, frame.size.height)
+
+        }
+
+        camera_view.audio = Audio.OFF
+        camera_view.mapGesture(Gesture.TAP, GestureAction.FOCUS_WITH_MARKER)
     }
 
 
     interface ScannerFragmentInteractor {
 
-        fun onImageCaptured(image: Bitmap)
+        fun onImageCaptured(image: ByteArray, rotation: Int, width: Int, height: Int)
 
     }
 

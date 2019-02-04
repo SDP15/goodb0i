@@ -12,7 +12,8 @@ class MLKitScanner : Scanner {
     private val options = FirebaseVisionBarcodeDetectorOptions.Builder()
         .setBarcodeFormats( // TODO: Find out which code types we need to use
             //TODO: Make configurable in settings
-            FirebaseVisionBarcode.FORMAT_ALL_FORMATS
+            FirebaseVisionBarcode.FORMAT_DATA_MATRIX,
+            FirebaseVisionBarcode.FORMAT_QR_CODE
         )
         .build()
 

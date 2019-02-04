@@ -1,7 +1,10 @@
 package com.sdp15.goodb0i
 
 import android.app.Application
+import com.google.android.gms.vision.barcode.BarcodeDetector
 import com.google.firebase.FirebaseApp
+import com.sdp15.goodb0i.data.scanner.MLKitScanner
+import com.sdp15.goodb0i.data.scanner.Scanner
 import com.sdp15.goodb0i.data.store.ItemLoader
 import com.sdp15.goodb0i.data.store.TestDataItemLoader
 import com.sdp15.goodb0i.view.confirmation.ConfirmationViewModel
@@ -34,7 +37,6 @@ class App : Application() {
 
             override fun info(msg: String) = Timber.i(msg)
         })
-
     }
 
     private val modules = listOf(
@@ -50,6 +52,7 @@ class App : Application() {
         },
         module {
             single<ItemLoader> { TestDataItemLoader }
+            single<Scanner> { MLKitScanner()}
         }
     )
 }

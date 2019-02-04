@@ -9,6 +9,7 @@ import com.sdp15.goodb0i.view.ListDiff
 import com.sdp15.goodb0i.view.list.ListViewModel
 import com.sdp15.goodb0i.view.list.TrolleyItem
 import io.mockk.CapturingSlot
+import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import org.junit.Assert
@@ -27,6 +28,7 @@ class ListViewModelTest : KoinTest {
     private lateinit var item: Item
     private lateinit var listObserver: Observer<ListDiff<TrolleyItem>>
     private lateinit var listSlot: CapturingSlot<ListDiff<TrolleyItem>>
+
     @Before
     fun setUp() {
 //        declareMock<ItemLoader> {

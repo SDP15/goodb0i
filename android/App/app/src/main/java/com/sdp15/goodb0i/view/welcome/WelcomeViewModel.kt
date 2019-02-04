@@ -14,7 +14,7 @@ class WelcomeViewModel : BaseViewModel<WelcomeViewModel.WelcomeAction>(), Welcom
     }
 
     override fun startShopping() {
-        transitions.postValue(R.id.pin_fragment)
+        transitions.postValue(R.id.scanner_fragment)
     }
 
 
