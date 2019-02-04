@@ -66,7 +66,7 @@ interactor_states = {
 
   "tutorial0": {
     "yes": {
-      "reply": "I am a shopping trolley that follows a route around the shop to help you pick up items. To give me a list simply attach your"\
+      "reply": "I am a shopping trolley that follows a route around the shop to help you pick up items. To give me a list simply attach your "\
                         "smartphone and send me the list... " + tut0no,
       "nextState": "tutorial1"
     },

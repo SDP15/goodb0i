@@ -22,8 +22,8 @@ speech = LiveSpeech(
 
 class SpeechInteractor:
     def __init__(self, state_file='interactor_states.json'):
-        self.log_filename = "logs/{:}.txt".format(now.strftime("%Y-%m-%d-%H:%M:%S"))
-        print(self.log_filename)
+        self.log_filename = "logs/{:}.txt".format(now.strftime("%Y-%m-%d-%H%M%S")) # file name can't contain ':'
+        print(self.log_filename)                                                   # (at least on Windows)
         self.possible_states = json.load(open(state_file,'r'))
         self.last_reply = "I haven't said anything useful yet."
         self.nextState('init')
@@ -74,7 +74,7 @@ class SpeechInteractor:
     def say(self, string):
         # Logs the string that is given to the TTS engine
         with open(self.log_filename, 'a') as f:
-                f.write("{:}\n".format(string))
+            f.write("{:}\n".format(string))
     
         engine = pyttsx.init()
         engine.say(string)

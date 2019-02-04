@@ -9,10 +9,10 @@ universal_phrases = {'repeat', 'options'}
 now = datetime.datetime.now()
 
 
-# from pocketsphinx import LiveSpeech, get_model_path
+from pocketsphinx import LiveSpeech, AudioFile, get_model_path
 
 
-# model_path = get_model_path()
+model_path = get_model_path()
 
 
 
@@ -50,13 +50,15 @@ now = datetime.datetime.now()
 
 class SpeechInteractor:
     def __init__(self, state_file='interactor_states.json'):
-        self.log_filename = "logs/{:}.txt".format(now.strftime("%Y-%m-%d-%H:%M:%S"))
-        print(self.log_filename)
+        self.log_filename = "logs/{:}.txt".format(now.strftime("%Y-%m-%d-%H%M%S")) # file name can't contain ':'
+        print(self.log_filename)                                                   # (at least on Windows)
+        self.phrase_file_name = "phrase.raw"
         self.set_up_recognizer()
         self.set_up_pyttsx()
         self.all_states = json.load(open(state_file,'r'))
         self.last_reply = "I haven't said anything useful yet."
         self.nextState('init')
+        print('Interactor initialised.')
         self.record_phrase()        
         # self.listen()
 
@@ -64,15 +66,15 @@ class SpeechInteractor:
         self.recognizer = sr.Recognizer()
         #~~~~~~Comment out the 2 lines below to do dynamic thresholding eg get rid of ambient sound
         self.recognizer.dynamic_energy_threshold = False
-        self.recognizer.energy_threshold = 600
+        self.recognizer.energy_threshold = 1000 #600
 
-        #~~~~~This could could be added here to use the dynamic energy threshold
+        #~~~~~This could should be used before each phrase recording in order to use the dynamic energy threshold
         #with sr.Microphone(device_index=0, sample_rate=16000) as source:
         #     self.recognizer.adjust_for_ambient_noise(source, duration=1)
         
     def set_up_pyttsx(self):
         self.engine = pyttsx.init()
-        self.engine.setProperty('rate', 70)
+        self.engine.setProperty('rate', 170)
 
     def nextState(self, state):
         self.state = state
@@ -81,7 +83,7 @@ class SpeechInteractor:
 
 
     def listOptions(self):
-        self.say("Your options are: %s, and repeat." 
+        self.say("Your options are: %s, options and repeat." 
             % ", ".join(str(o) for o in self.options))
 
     
@@ -97,24 +99,45 @@ class SpeechInteractor:
         # Yeah dunno when i will be turning off the old laptop 
         # That'd be fine as well if you'd prefer that.
         with sr.Microphone(device_index=0, sample_rate=16000) as source:
-        #     self.recognizer.adjust_for_ambient_noise(source, duration=1)
-            audio = self.recognizer.listen(source)
-            sphrase = self.recognizer.recognize_sphinx(audio, keyword_entries=[
-            ("start", 1e-1),
-            ("yes", 5e-1),
-            ("no", 5e-1),
-            ("shopping", 1e-3),
-            ("tutorial", 1e-3),
-            ("repeat", 1e-2),
-            ("options", 1e-3)])
+            # self.recognizer.adjust_for_ambient_noise(source, duration=1)
+            print('Energy threshold:', self.recognizer.energy_threshold)
+            print('Listening')
+            audio = self.recognizer.listen(source) #, phrase_time_limit=5)
+            with open("phrase.raw", "wb") as f:
+                f.write(audio.get_raw_data())
+                print('Audio recorded')
+            speech = AudioFile(
+                audio_file=fname,
+                verbose=False,
+                # sampling_rate=16000,
+                buffer_size=2048,
+                no_search=False,
+                full_utt=False,
+                hmm=os.path.join(model_path, 'en-us'),
+                lm=False,
+                dic=os.path.join(model_path, 'cmudict-en-us.dict'),
+                kws='kws.list',
+            )
+
+            # The recogniser below is way too slow
+            # sphrase = self.recognizer.recognize_sphinx(audio, keyword_entries=[
+            # ("start", 1e-1),
+            # ("yes", 5e-1),
+            # ("no", 5e-1),
+            # ("shopping", 1e-3),
+            # ("tutorial", 1e-3),
+            # ("repeat", 1e-2),
+            # ("options", 1e-3)])
 
             words = set()
-            for word in str(sphrase).lower().split(' '):
-                words.add(word.strip())
-        if len(words) > 0:
-            print("\nYou said: {}".format(' '.join(list(words))))
-            output = self.choose_one_from_list(words)
-            self.make_decision(output)
+            for word in speech: #str(sphrase).lower().split(' '):
+                words.add(str(word).lower().strip())
+        
+        # if len(words) > 0:
+        # we need to make a decision at this stage even if listen() returns a phrase w/o a keyword
+        self.printlog("\nYou said: {}".format(' '.join(list(words))) if words else "\nYou didn't say a keyword.")
+        output = self.choose_one_from_list(words)
+        self.make_decision(output)
         
         #with open(self.path_prefix + "phrase.raw", "wb") as f:
 
@@ -149,6 +172,7 @@ class SpeechInteractor:
           self.say(self.all_states['errorMessage'])
           self.listOptions()
           self.nextState(self.state)
+          self.record_phrase()
 
 
 
@@ -160,14 +184,15 @@ class SpeechInteractor:
 
 
     def choose_one_from_list(self, words, allow_multiple=False):
-        detected_options = set(words) & set(self.options)
+        detected_options = set(words) & (set(self.options)|universal_phrases)
         if not detected_options:
-          # return None
-          return "n/a"
+            # return None
+            return "n/a"
         elif len(detected_options)==1:
-          return detected_options
+            # return the single string in the set
+            return list(detected_options)[0]
         else:
-          return "Multiple"
+            return "Multiple"
         # for word in words:
         #     if word in self.options:
         #         detected_options.add(word)
@@ -180,11 +205,16 @@ class SpeechInteractor:
 
 
     def say(self, string):
-        with open(self.log_filename, 'a') as f:
-          f.write("{:}\n".format(string))
+        self.printlog("{:}\n".format(string))
         # engine = pyttsx.init()
         self.engine.say(string)
         self.engine.runAndWait()
+
+    # Shorthand function for logging that also prints the logging in the terminal
+    def printlog(self, msg):
+        with open(self.log_filename, 'a') as f:
+          f.write(msg)
+        print("LOGGED:", msg)
 
 if __name__ == '__main__':
     speech = SpeechInteractor()
