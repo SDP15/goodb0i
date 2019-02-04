@@ -111,4 +111,18 @@ class ListViewModelTest : KoinTest {
             listSlot.captured.items.contains((listSlot.captured as ListDiff.Remove).item)
         )
     }
+
+    @Test
+    fun testPriceCalculation() {
+        every { item.price } answers { 1.23 }
+        val observer: Observer<Double> = mockk(relaxed = true)
+        val slot = slot<Double>()
+        vm.totalPrice.observeForever(observer)
+        vm.incrementItem(item)
+        io.mockk.verify(exactly = 1) {
+            observer.onChanged(capture(slot))
+        }
+        Assert.assertEquals("Price should be price of single item", 1.23, slot.captured, 0.0002)
+    }
+
 }

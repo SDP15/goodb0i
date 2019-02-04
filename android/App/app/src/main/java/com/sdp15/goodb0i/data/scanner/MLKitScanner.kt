@@ -14,8 +14,7 @@ import timber.log.Timber
 class MLKitScanner : Scanner {
 
     private val options = FirebaseVisionBarcodeDetectorOptions.Builder()
-        .setBarcodeFormats( // TODO: Find out which code types we need to use
-            //TODO: Make configurable in settings
+        .setBarcodeFormats(
             FirebaseVisionBarcode.FORMAT_ALL_FORMATS
         )
         .build()
