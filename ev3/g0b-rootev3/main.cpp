@@ -75,7 +75,7 @@ void openLogFile() {
 
 class Robot {
 private:
-  int getForwardSpeed() { return 65; }
+  int getForwardSpeed() { return 20; }
 
   void calibrateSteering() {
     cout << "Calibrating steering..." << endl;
@@ -147,12 +147,12 @@ public:
     auto rrcol{rightColor->getRawRGB()};
     cerr << (int)lcol << " " << (int)rcol << " " << rrcol.x << " " << rrcol.y
          << " " << rrcol.z << endl;
-    constexpr int STEER_ANGLE{35};
+    constexpr int STEER_ANGLE{40};
     /*if (lcol == evutil::Color::turnLeft || rcol == evutil::Color::turnLeft) {
       steerDrive->runToDegree(-40);
       this_thread::sleep_for(chrono::milliseconds{1000});
     }*/
-    if (sonar->distance_centimeters() < 100) {
+    if (sonar->distance_centimeters() < 60) {
       leftDrive->stop();
       rightDrive->stop();
     } else {
@@ -163,13 +163,13 @@ public:
         rightDrive->runForever(getForwardSpeed());
       } else if (lcol == evutil::Color::line) {
         steerDrive->runToDegree(-STEER_ANGLE);
-        leftDrive->runForever(getForwardSpeed() / 2);
+        leftDrive->runForever(getForwardSpeed() / 3);
         rightDrive->runForever(getForwardSpeed());
         this_thread::sleep_for(chrono::milliseconds{150});
       } else if (rcol == evutil::Color::line) {
         steerDrive->runToDegree(STEER_ANGLE);
         leftDrive->runForever(getForwardSpeed());
-        rightDrive->runForever(getForwardSpeed() / 2);
+        rightDrive->runForever(getForwardSpeed() / 3);
         this_thread::sleep_for(chrono::milliseconds{150});
       }
     }
