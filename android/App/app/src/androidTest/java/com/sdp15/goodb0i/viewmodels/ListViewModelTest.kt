@@ -8,10 +8,7 @@ import com.sdp15.goodb0i.data.store.TestDataItemLoader
 import com.sdp15.goodb0i.view.ListDiff
 import com.sdp15.goodb0i.view.list.ListViewModel
 import com.sdp15.goodb0i.view.list.TrolleyItem
-import io.mockk.CapturingSlot
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.slot
+import io.mockk.*
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
@@ -124,5 +121,26 @@ class ListViewModelTest : KoinTest {
         }
         Assert.assertEquals("Price should be price of single item", 1.23, slot.captured, 0.0002)
     }
+
+    @Test
+    fun testPriceOfMultipleItems() {
+        val price1 = 1.23
+        val price2 = 54.89
+        val secondItem: Item = mockk(relaxed = true)
+        every { item.price } answers { price1 }
+        every { secondItem.price } answers { price2 }
+        every { secondItem.id } answers { 2 }
+        val observer: Observer<Double> = mockk(relaxed = true)
+        val slot = slot<Double>()
+        vm.totalPrice.observeForever(observer)
+        vm.incrementItem(item)
+        vm.incrementItem(item)
+        vm.incrementItem(secondItem)
+        verify(exactly = 3) {
+            observer.onChanged(capture(slot))
+        }
+        Assert.assertEquals("",  2 * price1 + price2, slot.captured, 0.0002)
+    }
+
 
 }
