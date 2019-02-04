@@ -82,6 +82,7 @@ dependencies {
         exclude group: 'org.mockito', module: 'mockito-core'
     })
     androidTestImplementation ("org.koin:koin-test:$koin_version") { exclude group: 'org.mockito' }
+    androidTestImplementation "io.mockk:mockk-android:1.9"
     implementation 'androidx.viewpager:viewpager:1.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
 }

@@ -5,11 +5,14 @@ import androidx.lifecycle.Observer
 import androidx.test.runner.AndroidJUnit4
 import androidx.test.runner.AndroidJUnitRunner
 import com.nhaarman.mockitokotlin2.*
+import com.sdp15.goodb0i.data.store.Item
 import com.sdp15.goodb0i.data.store.ItemLoader
 import com.sdp15.goodb0i.data.store.TestDataItemLoader
 import com.sdp15.goodb0i.view.ListDiff
 import com.sdp15.goodb0i.view.list.ListViewModel
 import com.sdp15.goodb0i.view.list.TrolleyItem
+import io.mockk.mockk
+import io.mockk.slot
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
@@ -59,7 +62,17 @@ class ListViewModelTest : KoinTest {
 
     @Test
     fun testIncrementItem() {
-        vm.list.observeForever(listObserver)
+        val item: Item = mockk(relaxed = true)
+        val observer: Observer<ListDiff<TrolleyItem>> = mockk(relaxed = true)
+        val slot = slot<ListDiff<TrolleyItem>>()
+        vm.list.observeForever(observer)
+        vm.incrementItem(item)
+        io.mockk.verify(exactly = 1) {
+            observer.onChanged(capture(slot))
+        }
+        Assert.assertTrue("ListDiff should be add", slot.captured is ListDiff.Add)
+        Assert.assertEquals("Same item should be returned", item, (slot.captured as ListDiff.Add).item.item)
+        Assert.assertEquals("Count should be 1", 1, (slot.captured as ListDiff.Add).item.count)
     }
 
 }
