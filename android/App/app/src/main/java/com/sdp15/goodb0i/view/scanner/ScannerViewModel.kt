@@ -1,18 +1,9 @@
 package com.sdp15.goodb0i.view.scanner
 
-import android.graphics.Bitmap
-import android.hardware.camera2.CameraAccessException
-import android.hardware.camera2.CameraCharacteristics
-import android.os.Build
-import androidx.annotation.RequiresApi
-import com.google.firebase.ml.vision.FirebaseVision
-import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
-import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetectorOptions
-import com.google.firebase.ml.vision.common.FirebaseVisionImage
-import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
 import com.sdp15.goodb0i.BaseViewModel
+import com.sdp15.goodb0i.data.scanner.BarcodeReader
+import com.sdp15.goodb0i.data.scanner.BarcodeReaderCallback
 import com.sdp15.goodb0i.data.scanner.BarcodeReading
-import com.sdp15.goodb0i.data.scanner.Scanner
 import org.koin.standalone.KoinComponent
 import org.koin.standalone.inject
 import timber.log.Timber
@@ -21,7 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 class ScannerViewModel : BaseViewModel<ScannerViewModel.ScannerAction>(), ScannerFragment.ScannerFragmentInteractor,
     KoinComponent {
 
-    private val scanner: Scanner by inject()
+    private val scanner: BarcodeReader by inject()
     private val isRunning = AtomicBoolean(false)
 
 
@@ -34,18 +25,20 @@ class ScannerViewModel : BaseViewModel<ScannerViewModel.ScannerAction>(), Scanne
         if (!isRunning.get()) {
             isRunning.set(true)
             Timber.i("Starting new scan")
-            scanner.scanImage(ba, rotation, width, height) {
-                if (it.fvb.isNotEmpty()) {
-                    Timber.i("Barcodes ${it.fvb.first()}")
+            scanner.scanImage(ba, rotation, width, height, object: BarcodeReaderCallback {
+                override fun onBarcodeRead(reading: BarcodeReading) {
+                    Timber.i("Barcode read $reading")
+                    isRunning.set(false)
                 }
-                isRunning.set(false)
-            }
+
+                override fun onNoBarcodesFound() = isRunning.set(false)
+
+            })
         }
         //Timber.i("Image received")
     }
 
     sealed class ScannerAction {
-        object TakeImage : ScannerAction()
     }
 
 }

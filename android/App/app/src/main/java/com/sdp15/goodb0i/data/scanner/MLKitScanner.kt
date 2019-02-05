@@ -1,6 +1,5 @@
 package com.sdp15.goodb0i.data.scanner
 
-import android.graphics.Bitmap
 import android.hardware.camera2.CameraAccessException
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -11,7 +10,7 @@ import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
 import timber.log.Timber
 
-class MLKitScanner : Scanner {
+class MLKitScanner : BarcodeReader {
 
     private val options = FirebaseVisionBarcodeDetectorOptions.Builder()
         .setBarcodeFormats(
@@ -39,7 +38,7 @@ class MLKitScanner : Scanner {
         }
     }
 
-    override fun scanImage(ba: ByteArray, rotation: Int, width: Int, height: Int, callback: (BarcodeReading) -> Unit) {
+    override fun scanImage(ba: ByteArray, rotation: Int, width: Int, height: Int, callback: BarcodeReaderCallback) {
         val metadata = FirebaseVisionImageMetadata.Builder()
             .setWidth(width)
             .setHeight(height)
@@ -48,13 +47,17 @@ class MLKitScanner : Scanner {
             .build()
         detector.detectInImage(FirebaseVisionImage.fromByteArray(ba, metadata))
             .addOnSuccessListener { barcodes ->
-                if(barcodes.isNotEmpty()) Timber.i("Barcodes $barcodes")
-                callback(BarcodeReading(barcodes))
+                if(barcodes.isNotEmpty()) {
+                    Timber.i("Barcodes $barcodes")
+                    callback.onBarcodeRead(BarcodeReading(barcodes.first().displayValue, barcodes.first().boundingBox))
+                } else {
+                    callback.onNoBarcodesFound()
+                }
 
             }
             .addOnFailureListener {
                 Timber.e(it, "Barcode detection failure")
-                callback(BarcodeReading(emptyList()))
+                callback.onNoBarcodesFound()
             }
     }
 
