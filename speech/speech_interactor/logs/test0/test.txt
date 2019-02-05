@@ -1,0 +1,8 @@
+## THIS TEST IS GIVEN BY THE FOLLOWING PATH TO AN ACCEPTING STATE ##
+
+1. State: INIT Transition: "start"
+2. State: BEGINNING0 Transition: "yes"
+3. State: BEGINNING1 Transition: "yes"
+4. State: SHOPPING1
+
+## RESULTS: 5/5 tests completed successfully. ##
