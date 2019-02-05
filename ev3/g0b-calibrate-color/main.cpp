@@ -29,6 +29,11 @@ int main() {
     auto cs2{createConnectedDevice<color_sensor>(INPUT_2, fail)};
     cs2->set_mode(color_sensor::mode_ref_raw);
   }
+  {
+    // make clear which sensor is used
+    auto cs3{createConnectedDevice<color_sensor>(INPUT_3, fail)};
+    cs3->set_mode(color_sensor::mode_ref_raw);
+  }
   if (fail) {
     cerr << "Failed connecting to light sensors." << endl;
     return 1;

@@ -49,7 +49,7 @@ void connectEv3Devices() {
   rightColor = make_unique<evutil::ColorSensor>(INPUT_3, failed);
 
   sonar =
-      evutil::createConnectedDevice<ev3dev::ultrasonic_sensor>(INPUT_3, failed);
+      evutil::createConnectedDevice<ev3dev::ultrasonic_sensor>(INPUT_4, failed);
   sonar->set_mode(sonar->mode_us_dist_cm);
 
   if (failed) {
@@ -123,8 +123,8 @@ public:
     auto rrcol{rightColor->getRawRGB()};
     cerr << (int)lcol << " " << (int)rcol << " " << rrcol.x << " " << rrcol.y
          << " " << rrcol.z << endl;
-    constexpr int STEER_ANGLE{40};
-    constexpr int SMALL_STEER_ANGLE{20};
+    constexpr int STEER_ANGLE{45};
+    constexpr int SMALL_STEER_ANGLE{30};
     constexpr int SONAR_STOP_DISTANCE{45};
 
     if (sonar->distance_centimeters() < SONAR_STOP_DISTANCE) {
@@ -161,7 +161,7 @@ public:
         }
       }
       // Rolling average to smooth out steering
-      avgLineAngle = (avgLineAngle + 2 * lineAngle) / 3;
+      avgLineAngle = (avgLineAngle + 7 * lineAngle) / 8;
       steerDrive->runToDegree(avgLineAngle);
       leftDrive->runForever(avgLineAngle < 0 ? getForwardSpeed() / 2
                                              : getForwardSpeed());

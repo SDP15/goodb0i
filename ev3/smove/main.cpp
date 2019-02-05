@@ -30,7 +30,7 @@ public:
     leftDrive = make_unique<evutil::Drive>(OUTPUT_A, failed);
     rightDrive = make_unique<evutil::Drive>(OUTPUT_B, failed);
     steerDrive = make_unique<evutil::Drive>(OUTPUT_C, failed);
-    sonar = evutil::createConnectedDevice<ev3dev::ultrasonic_sensor>(INPUT_3,
+    sonar = evutil::createConnectedDevice<ev3dev::ultrasonic_sensor>(INPUT_4,
                                                                      failed);
     lspeed = 75;
     rspeed = 75;
