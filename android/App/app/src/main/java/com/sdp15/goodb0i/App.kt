@@ -6,6 +6,7 @@ import com.sdp15.goodb0i.data.scanner.BarcodeReader
 import com.sdp15.goodb0i.data.scanner.MLKitScanner
 import com.sdp15.goodb0i.data.store.ItemLoader
 import com.sdp15.goodb0i.data.store.RetrofitItemLoader
+import com.sdp15.goodb0i.data.store.TestDataItemLoader
 import com.sdp15.goodb0i.view.confirmation.ConfirmationViewModel
 import com.sdp15.goodb0i.view.connection.devices.DeviceListViewModel
 import com.sdp15.goodb0i.view.item.ItemViewModel
@@ -39,6 +40,8 @@ class App : Application() {
         })
     }
 
+    var shouldUseTestData = false
+
     private val modules = listOf(
         module {
             viewModel<PinViewModel>()
@@ -51,7 +54,7 @@ class App : Application() {
             viewModel<DeviceListViewModel>()
         },
         module {
-            single<ItemLoader> { RetrofitItemLoader() }
+            factory { if (shouldUseTestData) TestDataItemLoader else RetrofitItemLoader }
             single<BarcodeReader> { MLKitScanner() }
         }
     )

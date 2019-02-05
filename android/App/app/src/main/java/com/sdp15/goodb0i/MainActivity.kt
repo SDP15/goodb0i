@@ -10,6 +10,7 @@ import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.IBinder
+import android.view.KeyEvent
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -58,7 +59,17 @@ class MainActivity : AppCompatActivity() {
                 finish()
             }
         }
+    }
 
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+            // Switch application config flag
+            //TODO: Move this to a setup dialog
+            (application as App).shouldUseTestData = !(application as App).shouldUseTestData
+            Toast.makeText(this, "Using test data? ${(application as App).shouldUseTestData}", Toast.LENGTH_LONG).show()
+            return true
+        }
+        return super.onKeyDown(keyCode, event)
     }
 
     fun startBluetoothService() {

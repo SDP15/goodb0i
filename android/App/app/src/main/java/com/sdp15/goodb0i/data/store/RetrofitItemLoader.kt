@@ -9,7 +9,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Path
 
-class RetrofitItemLoader : ItemLoader {
+object RetrofitItemLoader : ItemLoader {
 
     private val retrofit = Retrofit.Builder().apply {
         client(OkHttpClient().newBuilder().build())
