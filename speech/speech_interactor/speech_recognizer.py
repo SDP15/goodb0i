@@ -88,17 +88,8 @@ class SpeechInteractor:
 
     
     def record_phrase(self, fname="phrase.raw"):
-      # We dont need the phrase just was my wee test but i changed it if its annoying i can delete it
-        # No just move it
-        # Yea, sry
-        # obtain audio from the microphone
-        # Hey Chris just adding this here to debug
-        # ok, Ciaran
-        # The code sharing thing still syncs the scrolling for some reason
 
-        # Yeah dunno when i will be turning off the old laptop 
-        # That'd be fine as well if you'd prefer that.
-        with sr.Microphone(device_index=0, sample_rate=16000) as source:
+        with sr.Microphone() as source:
             # self.recognizer.adjust_for_ambient_noise(source, duration=1)
             print('Energy threshold:', self.recognizer.energy_threshold)
             print('Listening')
@@ -109,7 +100,7 @@ class SpeechInteractor:
             speech = AudioFile(
                 audio_file=fname,
                 verbose=False,
-                # sampling_rate=16000,
+                #sampling_rate=16000,
                 buffer_size=2048,
                 no_search=False,
                 full_utt=False,
@@ -160,13 +151,11 @@ class SpeechInteractor:
         print("Multiple options detected")
         self.say("Sorry, I have heard more than one possible option. Can you repeat the correct option?")
         self.record_phrase()
-      # elif word == "n/a" and "n/a" in self.options:
-      #     print("no keyword detected")
-      #     self.react("n/a")
+
       elif word in self.options:
-        # Since n/a is in option and is the word then it shouldnt be needed
           print(word, "detected")
           self.react(word)
+
       else:
           print("no keyword detected")
           self.say(self.all_states['errorMessage'])
@@ -185,28 +174,19 @@ class SpeechInteractor:
 
     def choose_one_from_list(self, words, allow_multiple=False):
         detected_options = set(words) & (set(self.options)|universal_phrases)
+        print(words)
         if not detected_options:
-            # return None
             return "n/a"
         elif len(detected_options)==1:
             # return the single string in the set
             return list(detected_options)[0]
         else:
             return "Multiple"
-        # for word in words:
-        #     if word in self.options:
-        #         detected_options.add(word)
-        #         if len(detected_options) == 0:
-        #             return None
-        #         elif len(detected_options) == 1 or allow_multiple:
-        #             return list(detected_options)[0]
-        #         else:
-        #             return None
+
 
 
     def say(self, string):
         self.printlog("{:}\n".format(string))
-        # engine = pyttsx.init()
         self.engine.say(string)
         self.engine.runAndWait()
 

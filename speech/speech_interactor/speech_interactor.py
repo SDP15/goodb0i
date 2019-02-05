@@ -1,12 +1,14 @@
 import pyttsx3 as pyttsx
 import json
 import os
+import sys
 import datetime
 
 from pocketsphinx import LiveSpeech, get_model_path
 
 model_path = get_model_path()
 now = datetime.datetime.now()
+universal_phrases = {'repeat', 'options'}
 
 speech = LiveSpeech(
     verbose=False,
@@ -22,63 +24,81 @@ speech = LiveSpeech(
 
 class SpeechInteractor:
     def __init__(self, state_file='interactor_states.json'):
-        self.log_filename = "logs/{:}.txt".format(now.strftime("%Y-%m-%d-%H%M%S")) # file name can't contain ':'
-        print(self.log_filename)                                                   # (at least on Windows)
+        log_filename = now.strftime("%Y-%m-%d-%H%M%S")
+
+        # Log is place in folder associated with test number
+        if len(sys.argv > 1):
+            test_num = sys.argv[1]
+            self.log_filepath = "logs/{:}/{:}.txt".format(test_num, log_filename)
+        else:
+            self.log_filepath = "logs/{:}.txt".format(log_filename)
+
+        print(self.log_filepath)
         self.possible_states = json.load(open(state_file,'r'))
-        self.last_reply = "I haven't said anything useful yet."
-        self.nextState('init')
+        self.next_state('init')
         self.react("n/a")
         self.listen()
 
-    def nextState(self, state):
+    def next_state(self, state):
         self.state = state
         self.options = self.possible_states[state]
     
     def listen(self):
         for sphrase in speech:
-            phrase = str(sphrase).lower()
-            print("You said:", phrase)
-
-            # Logs the phrase that PocketSphinx has detected
-            with open(self.log_filename, 'a') as f:
-                f.write("Phrase detected: {:}\n".format(phrase))
-
-            notfound = True
-            for o in self.options:
-                if o in phrase:
-                    notfound = False
-                    print(o, "detected")
-                    self.react(o)
-
-            if "repeat" in phrase:
+            phrase = str(sphrase).lower().split()
+            word = self.find_word(phrase)
+            print("You said:", word)
+            
+            if "repeat" in word:
                 print("repeating")
-                self.say("I'll repeat. " + self.last_reply)
-            elif "options" in phrase:
-                self.listOptions()
-            elif notfound:
+                self.say(self.last_reply)
+            elif "options" in word:
+                self.list_options()
+            elif "multiple" in word:
+                print("Multiple keywords detected")
+                self.say("Sorry, I have heard more than one possible option. Can you confirm your option?")
+            elif "n/a" in word:
                 print("no keyword detected")
-                self.listOptions()
+                self.list_options()
+            else:
+                print(word, "detected")
+                self.react(word)
 
+            # Logs the word/words that PocketSphinx has detected
+            with open(self.log_filepath, 'a') as f:
+                if "multiple" in word:
+                    f.write("## Keyword detection error ##\n")
+                    f.write("Multiple keywords detected: {:}\n".format(phrase))
+                else:
+                    f.write("Keyword detected: {:}\n".format(word))
 
+    def react(self, word):
+        self.say(self.options[word]['reply'])
+        self.last_reply = self.options[word]['reply']
+        self.next_state(self.options[word]['nextState'])
 
-    def react(self, phrase):
-        self.say(self.options[phrase]['reply'])
-        self.last_reply = self.options[phrase]['reply']
-        self.nextState(self.options[phrase]['nextState'])
-
-    def listOptions(self):
+    def list_options(self):
         self.say("Your options are: %s, and repeat." 
             % ", ".join(str(o) for o in self.options))
 
+    def find_word(self, phrase):
+       valid_words = set(phrase) & (set(self.options)|universal_phrases)
+       if len(valid_words)==1:
+           return list(valid_words)[0]
+       elif not valid_words:
+           return "n/a"
+       else:
+           return "multiple"
 
     def say(self, string):
         # Logs the string that is given to the TTS engine
-        with open(self.log_filename, 'a') as f:
+        with open(self.log_filepath, 'a') as f:
             f.write("{:}\n".format(string))
     
         engine = pyttsx.init()
         engine.say(string)
         engine.runAndWait()
+
 
 if __name__ == '__main__':
     sint = SpeechInteractor()
