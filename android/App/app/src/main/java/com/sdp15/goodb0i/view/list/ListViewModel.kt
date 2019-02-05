@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import com.sdp15.goodb0i.BaseViewModel
 import com.sdp15.goodb0i.data.store.Item
 import com.sdp15.goodb0i.data.store.ItemLoader
+import com.sdp15.goodb0i.data.store.Result
 import com.sdp15.goodb0i.view.ListDiff
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -37,14 +38,19 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
         } else {
             search?.cancel()
             search = GlobalScope.launch(Dispatchers.IO) {
-                val results = loader.search(new).data
-                val merged = results.map { result ->
-                    TrolleyItem(
-                        result,
-                        currentList.firstOrNull { it.item.id == result.id }?.count ?: 0
-                    )
+                val result = loader.search(new)
+                if (result is Result.Success) {
+                    val merged = result.data.map { item ->
+                        TrolleyItem(
+                            item,
+                            currentList.firstOrNull { it.item.id == item.id }?.count ?: 0
+                        )
+                    }
+                    searchResults.postValue(merged.toList())
+                } else if (result is Result.Failure) {
+                    Timber.e(result.exception, "Search failed")
                 }
-                searchResults.postValue(merged.toList())
+
             }
         }
     }
