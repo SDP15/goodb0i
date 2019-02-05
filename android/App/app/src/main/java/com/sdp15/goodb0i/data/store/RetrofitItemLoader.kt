@@ -8,7 +8,6 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Path
-import java.lang.Exception
 
 class RetrofitItemLoader : ItemLoader {
 
@@ -19,7 +18,7 @@ class RetrofitItemLoader : ItemLoader {
         addCallAdapterFactory(CoroutineCallAdapterFactory())
     }.build()
 
-    private val api = retrofit.create(API::class.java)
+    private val api = retrofit.create(KTORAPI::class.java)
 
     override suspend fun loadItem(id: Long): Result<Item> {
         api.getItemAsync(id.toInt()).await().apply {
@@ -27,7 +26,7 @@ class RetrofitItemLoader : ItemLoader {
             return if (isSuccessful && body != null) {
                 Result.Success(body)
             } else {
-                Result.Failure(API.APIError(this))
+                Result.Failure(KTORAPI.APIError(this))
             }
         }
     }
@@ -38,7 +37,7 @@ class RetrofitItemLoader : ItemLoader {
             return if (isSuccessful && body != null) {
                 Result.Success(body)
             } else {
-                Result.Failure(API.APIError(this))
+                Result.Failure(KTORAPI.APIError(this))
             }
         }
     }
@@ -49,7 +48,7 @@ class RetrofitItemLoader : ItemLoader {
             return if (isSuccessful && body != null) {
                 Result.Success(body)
             } else {
-                Result.Failure(API.APIError(this))
+                Result.Failure(KTORAPI.APIError(this))
             }
         }
     }
@@ -60,13 +59,13 @@ class RetrofitItemLoader : ItemLoader {
             return if (isSuccessful && body != null) {
                 Result.Success(body)
             } else {
-                Result.Failure(API.APIError(this))
+                Result.Failure(KTORAPI.APIError(this))
             }
         }
     }
 }
 
-interface API{
+interface KTORAPI {
 
     @GET("/stock/{id}")
     fun getItemAsync(@Path("id") id: Int): Deferred<Response<Item>>
@@ -77,7 +76,7 @@ interface API{
     @GET("/stock/search/{query}")
     fun searchAsync(@Path("query") query: String): Deferred<Response<List<Item>>>
 
-    class APIError(val status: Int, val text: String): Exception() {
+    class APIError(val status: Int, val text: String) : Exception() {
         constructor(response: Response<*>) : this(response.code(), response.errorBody()?.string() ?: "")
 
         override val message: String?

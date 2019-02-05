@@ -4,7 +4,7 @@ import android.os.Handler
 import android.os.Message
 import java.lang.ref.WeakReference
 
-class SafeHandler(messageHandler: MessageHandler): Handler() {
+class SafeHandler(messageHandler: MessageHandler) : Handler() {
     private val messageHandler = WeakReference(messageHandler)
 
     override fun handleMessage(msg: Message) {

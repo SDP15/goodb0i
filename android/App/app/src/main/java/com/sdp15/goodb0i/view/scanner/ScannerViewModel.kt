@@ -24,7 +24,7 @@ class ScannerViewModel : BaseViewModel<ScannerViewModel.ScannerAction>(), Scanne
         if (!isRunning.get()) { // If the reader is not already running
             isRunning.set(true)
             Timber.i("Starting new scan")
-            reader.scanImage(ba, rotation, width, height, object: BarcodeReaderCallback {
+            reader.scanImage(ba, rotation, width, height, object : BarcodeReaderCallback {
                 override fun onBarcodeRead(reading: BarcodeReading) {
                     Timber.i("Barcode read $reading")
                     isRunning.set(false)

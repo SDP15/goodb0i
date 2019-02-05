@@ -64,9 +64,17 @@ class MainActivity : AppCompatActivity() {
     fun startBluetoothService() {
         val adapter = BluetoothAdapter.getDefaultAdapter()
         if (adapter?.isEnabled == true) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
                 Timber.i("No access to coarse location")
-                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION), REQUEST_COARSE_LOCATION)
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION),
+                    REQUEST_COARSE_LOCATION
+                )
             } else {
                 val intent = Intent(this, BluetoothService::class.java)
                 bindService(intent, connection, Context.BIND_AUTO_CREATE)
@@ -90,14 +98,14 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        if(isBound) unbindService(connection)
+        if (isBound) unbindService(connection)
     }
 
     override fun onSupportNavigateUp(): Boolean = findNavController(R.id.nav_host_fragment).navigateUp()
 
     private val messageHandler = SafeHandler.MergedMessageHandler()
 
-    private val connection = object: ServiceConnection {
+    private val connection = object : ServiceConnection {
         override fun onServiceDisconnected(p0: ComponentName?) {
             Timber.i("Service disconnected")
             isBound = false

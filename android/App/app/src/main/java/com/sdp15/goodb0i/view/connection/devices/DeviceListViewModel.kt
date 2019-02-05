@@ -7,7 +7,8 @@ import com.sdp15.goodb0i.data.bluetooth.DeviceListHandler
 import com.sdp15.goodb0i.view.ListDiff
 import timber.log.Timber
 
-class DeviceListViewModel : BaseViewModel<DeviceListViewModel.ConnectionAction>(), DeviceListHandler.DeviceConnectionListener {
+class DeviceListViewModel : BaseViewModel<DeviceListViewModel.ConnectionAction>(),
+    DeviceListHandler.DeviceConnectionListener {
 
     private val devices = mutableListOf<DeviceInfo>()
     val bluetoothDevices = MutableLiveData<ListDiff<DeviceInfo>>()
@@ -15,7 +16,6 @@ class DeviceListViewModel : BaseViewModel<DeviceListViewModel.ConnectionAction>(
     override fun bind() {
 
     }
-
 
 
     override fun deviceAdded(info: DeviceInfo) {
