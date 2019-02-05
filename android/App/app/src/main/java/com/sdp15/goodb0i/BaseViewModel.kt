@@ -6,8 +6,9 @@ import com.sdp15.goodb0i.data.SingleLiveData
 
 abstract class BaseViewModel<T> : ViewModel() {
 
-    val classToken = this::class
-
+    /**
+     * Navigation ids for fragments to navigate to
+     */
     val transitions = SingleLiveData<@NavigationRes Int>()
 
     val actions = SingleLiveData<T>()

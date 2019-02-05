@@ -37,7 +37,7 @@ class DeviceListFragment : BaseFragment() {
         bluetooth_recycler.adapter = adapter
         vm.bluetoothDevices.observe(this, Observer {
             if (it is ListDiff.Add) {
-                adapter.addDevice(it.item)
+                adapter.addDevice(it.added)
             }
         })
     }

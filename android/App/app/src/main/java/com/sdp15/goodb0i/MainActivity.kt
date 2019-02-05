@@ -26,7 +26,6 @@ class MainActivity : AppCompatActivity() {
     private var bluetoothService: BluetoothService? = null
     private val REQUEST_ENABLE_BT = 564
     private val REQUEST_COARSE_LOCATION = 543
-    private var isServiceBound = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,7 +42,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private var isBound = false //TODO: Will we need to use this for anything
+    private var isBound = false
 
     private fun requestEnableBluetooth() {
         startActivityForResult(Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), REQUEST_ENABLE_BT)

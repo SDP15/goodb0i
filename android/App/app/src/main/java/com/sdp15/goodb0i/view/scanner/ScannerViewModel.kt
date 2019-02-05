@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 class ScannerViewModel : BaseViewModel<ScannerViewModel.ScannerAction>(), ScannerFragment.ScannerFragmentInteractor,
     KoinComponent {
 
-    private val scanner: BarcodeReader by inject()
+    private val reader: BarcodeReader by inject()
     private val isRunning = AtomicBoolean(false)
 
 
@@ -20,12 +20,11 @@ class ScannerViewModel : BaseViewModel<ScannerViewModel.ScannerAction>(), Scanne
 
     }
 
-
     override fun onImageCaptured(ba: ByteArray, rotation: Int, width: Int, height: Int) {
-        if (!isRunning.get()) {
+        if (!isRunning.get()) { // If the reader is not already running
             isRunning.set(true)
             Timber.i("Starting new scan")
-            scanner.scanImage(ba, rotation, width, height, object: BarcodeReaderCallback {
+            reader.scanImage(ba, rotation, width, height, object: BarcodeReaderCallback {
                 override fun onBarcodeRead(reading: BarcodeReading) {
                     Timber.i("Barcode read $reading")
                     isRunning.set(false)

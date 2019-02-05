@@ -9,7 +9,6 @@ import com.sdp15.goodb0i.R
 import com.sdp15.goodb0i.data.store.Item
 import com.sdp15.goodb0i.view.ListDiff
 import kotlinx.android.synthetic.main.list_item.view.*
-import timber.log.Timber
 import kotlin.math.max
 
 class ItemAdapter(val onIncrement: (Item) -> Unit, val onDecrement: (Item) -> Unit, private val total: Boolean) :
@@ -26,21 +25,21 @@ class ItemAdapter(val onIncrement: (Item) -> Unit, val onDecrement: (Item) -> Un
                 notifyDataSetChanged()
             }
             is ListDiff.Add -> {
-                val i = diff.items.indexOf(diff.item)
+                val i = diff.items.indexOf(diff.added)
                 items = diff.items.toMutableList()
                 expanded.add(i, false)
                 notifyItemInserted(i)
             }
             is ListDiff.Remove -> {
-                val i = items.indexOf(diff.item)
+                val i = items.indexOf(diff.removed)
                 items = diff.items.toMutableList()
                 expanded.removeAt(i)
                 notifyItemRemoved(i)
             }
             is ListDiff.Update -> {
-                val index = items.indexOfFirst { it.item == diff.item.item }
+                val index = items.indexOfFirst { it.item == diff.updated.item }
                 if (index != -1) {
-                    items[index] = diff.item
+                    items[index] = diff.updated
                     notifyItemChanged(index)
                 }
             }

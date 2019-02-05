@@ -52,7 +52,7 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
     private fun computePrice() = currentList.sumByDouble { it.count * it.item.price }
 
     fun incrementItem(item: Item) {
-        Timber.i("Incrementing item ${item.name}")
+        Timber.i("Incrementing added ${item.name}")
         val i = currentList.indexOfFirst { it.item.id == item.id }
         val diff: ListDiff<TrolleyItem>
         if (i == -1) {
@@ -68,7 +68,7 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
     }
 
     fun decrementItem(item: Item) {
-        Timber.i("Decrementing item ${item.name}")
+        Timber.i("Decrementing added ${item.name}")
         val ci = currentList.firstOrNull { it.item.id == item.id }
         ci?.apply {
             count--

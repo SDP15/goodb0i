@@ -27,8 +27,9 @@ class App : Application() {
 
         Timber.plant(Timber.DebugTree())
 
-        FirebaseApp.initializeApp(this)
+        FirebaseApp.initializeApp(this) // Initialise FireBase for MLKit
 
+        // Start up dependency injection
         startKoin(this, modules, logger = object : Logger {
             override fun debug(msg: String) = Timber.d(msg)
 

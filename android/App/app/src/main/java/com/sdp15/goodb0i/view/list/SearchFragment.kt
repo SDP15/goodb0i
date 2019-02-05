@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
 import com.sdp15.goodb0i.R
 import com.sdp15.goodb0i.switchOnEmpty
@@ -38,13 +37,13 @@ class SearchFragment : Fragment() {
             if (it is ListDiff.Update) {
                 adapter.itemsChanged(it)
             } else if (it is ListDiff.Remove) {
-                // Removal in ShoppingListFragment causes an update to the same search item, if visible
-                adapter.itemsChanged(ListDiff.Update(it.items, it.item))
+                // Removal in ShoppingListFragment causes an update to the same search added, if visible
+                adapter.itemsChanged(ListDiff.Update(it.items, it.removed))
             }
         })
         floating_search_view.setOnQueryChangeListener(vm::onQueryChange)
         floating_search_view.setOnMenuItemClickListener {
-            // Only one menu item
+            // Only one menu added
             viewPager.setCurrentItem(1, true)
         }
     }

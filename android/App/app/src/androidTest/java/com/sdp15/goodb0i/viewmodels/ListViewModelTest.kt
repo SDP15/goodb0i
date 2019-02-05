@@ -2,7 +2,6 @@ package com.sdp15.goodb0i.viewmodels
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
-import com.nhaarman.mockitokotlin2.*
 import com.sdp15.goodb0i.data.store.Item
 import com.sdp15.goodb0i.data.store.TestDataItemLoader
 import com.sdp15.goodb0i.view.ListDiff
@@ -61,8 +60,8 @@ class ListViewModelTest : KoinTest {
             listObserver.onChanged(capture(listSlot))
         }
         Assert.assertTrue("ListDiff should be add", listSlot.captured is ListDiff.Add)
-        Assert.assertEquals("Same item should be returned", item, (listSlot.captured as ListDiff.Add).item.item)
-        Assert.assertEquals("Count should be 1", 1, (listSlot.captured as ListDiff.Add).item.count)
+        Assert.assertEquals("Same added should be returned", item, (listSlot.captured as ListDiff.Add).added.item)
+        Assert.assertEquals("Count should be 1", 1, (listSlot.captured as ListDiff.Add).added.count)
     }
 
     @Test
@@ -74,8 +73,8 @@ class ListViewModelTest : KoinTest {
             listObserver.onChanged(capture(listSlot))
         }
         Assert.assertTrue("ListDiff should be update", listSlot.captured is ListDiff.Update)
-        Assert.assertEquals("Same item should be returned", item, (listSlot.captured as ListDiff.Update).item.item)
-        Assert.assertEquals("Count should be 2", 2, (listSlot.captured as ListDiff.Update).item.count)
+        Assert.assertEquals("Same added should be returned", item, (listSlot.captured as ListDiff.Update).updated.item)
+        Assert.assertEquals("Count should be 2", 2, (listSlot.captured as ListDiff.Update).updated.count)
     }
 
     @Test
@@ -89,8 +88,8 @@ class ListViewModelTest : KoinTest {
             listObserver.onChanged(capture(listSlot))
         }
         Assert.assertTrue("Diff should be update", listSlot.captured is ListDiff.Update)
-        Assert.assertEquals("Item should be the same", item, (listSlot.captured as ListDiff.Update).item.item)
-        Assert.assertEquals("Quantity should be 1", 1, (listSlot.captured as ListDiff.Update).item.count)
+        Assert.assertEquals("Item should be the same", item, (listSlot.captured as ListDiff.Update).updated.item)
+        Assert.assertEquals("Quantity should be 1", 1, (listSlot.captured as ListDiff.Update).updated.count)
     }
 
     @Test
@@ -102,10 +101,10 @@ class ListViewModelTest : KoinTest {
             listObserver.onChanged(capture(listSlot))
         }
         Assert.assertTrue("Diff should be remove", listSlot.captured is ListDiff.Remove)
-        Assert.assertEquals("Item should be the same", item, (listSlot.captured as ListDiff.Remove).item.item)
+        Assert.assertEquals("Item should be the same", item, (listSlot.captured as ListDiff.Remove).removed.item)
         Assert.assertFalse(
-            "List should not contain item",
-            listSlot.captured.items.contains((listSlot.captured as ListDiff.Remove).item)
+            "List should not contain added",
+            listSlot.captured.items.contains((listSlot.captured as ListDiff.Remove).removed)
         )
     }
 
@@ -119,7 +118,7 @@ class ListViewModelTest : KoinTest {
         io.mockk.verify(exactly = 1) {
             observer.onChanged(capture(slot))
         }
-        Assert.assertEquals("Price should be price of single item", 1.23, slot.captured, 0.0002)
+        Assert.assertEquals("Price should be price of single added", 1.23, slot.captured, 0.0002)
     }
 
     @Test
