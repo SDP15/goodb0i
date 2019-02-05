@@ -14,12 +14,12 @@
 #include "util.hpp"
 
 using namespace std;
+using namespace std::chrono_literals;
 using namespace ev3dev;
 
 unique_ptr<evutil::Drive> leftDrive, rightDrive, steerDrive;
-unique_ptr<evutil::ColorSensor> leftColor, rightColor;
+unique_ptr<evutil::ColorSensor> leftColor, midColor, rightColor;
 unique_ptr<ev3dev::ultrasonic_sensor> sonar;
-unique_ptr<ev3dev::touch_sensor> wheelCalibrationSensor;
 
 ofstream sensorLog;
 
@@ -45,15 +45,12 @@ void connectEv3Devices() {
   steerDrive = make_unique<evutil::Drive>(OUTPUT_C, failed);
 
   leftColor = make_unique<evutil::ColorSensor>(INPUT_1, failed);
-  rightColor = make_unique<evutil::ColorSensor>(INPUT_2, failed);
+  midColor = make_unique<evutil::ColorSensor>(INPUT_2, failed);
+  rightColor = make_unique<evutil::ColorSensor>(INPUT_3, failed);
 
   sonar =
       evutil::createConnectedDevice<ev3dev::ultrasonic_sensor>(INPUT_3, failed);
   sonar->set_mode(sonar->mode_us_dist_cm);
-
-  wheelCalibrationSensor =
-      evutil::createConnectedDevice<ev3dev::touch_sensor>(INPUT_4, failed);
-  wheelCalibrationSensor->set_mode(wheelCalibrationSensor->mode_touch);
 
   if (failed) {
     throw runtime_error("Error initializing EV3 connections.");
@@ -86,43 +83,17 @@ private:
     // Go to extreme left
     steerDrive->overrideStopAction(motor::stop_action_coast);
     steerDrive->runForever(-10); // run at low speed not to break anything
-    this_thread::sleep_for(chrono::milliseconds{1200});
+    this_thread::sleep_for(1200ms);
     steerDrive->stop();
     log() << "end pos = " << steerDrive->getPosition() << endl;
     steerDrive->setPosition(0);
 
-    // Make sure sensor mode is set for short reaction times.
-    wheelCalibrationSensor->is_pressed(true);
-
     log() << "* Phase 2: find right *" << endl;
-    // Get min and max touch positions
-    /*int minTouchPos, maxTouchPos;
-    {
-      steerDrive->stop();
-      this_thread::yield();
-      // Keep this number high, otherwise the motor turns very poorly and leads
-      // to very inaccurate results
-      steerDrive->runForever(50);
-      // wait for it to reach the touch sensor
-      while (!wheelCalibrationSensor->is_pressed(false)) {
-      }
-      minTouchPos = steerDrive->getPosition();
-      // and then for it to not be pressed anymore
-      while (wheelCalibrationSensor->is_pressed(false)) {
-      }
-      maxTouchPos = steerDrive->getDegrees();
-    }
-    steerDrive->stop();
-    int calibratedPos{(minTouchPos + maxTouchPos) / 2};
-
-    log() << "min pos = " << minTouchPos << endl;
-    log() << "max pos = " << maxTouchPos << endl;
-    log() << "cal pos = " << calibratedPos << endl;*/
 
     steerDrive->runForever(10);
-    this_thread::sleep_for(chrono::milliseconds{2000});
+    this_thread::sleep_for(2000ms);
     steerDrive->stop();
-    log() << "r pos" << steerDrive->getPosition();
+    log() << "r pos" << steerDrive->getPosition() << endl;
     int calibratedPos{steerDrive->getPosition() / 2};
 
     // Set zero point to middle.
@@ -135,43 +106,67 @@ private:
     cout << "Steering calibrated" << endl;
   }
 
+  enum class Direction { left, right } lastLineDir;
+  int avgLineAngle{0};
+
 public:
   Robot() { calibrateSteering(); }
 
   void process() {
     // simple line follow
     leftColor->update();
+    midColor->update();
     rightColor->update();
     evutil::Color lcol{leftColor->getColor()};
+    evutil::Color mcol{midColor->getColor()};
     evutil::Color rcol{rightColor->getColor()};
     auto rrcol{rightColor->getRawRGB()};
     cerr << (int)lcol << " " << (int)rcol << " " << rrcol.x << " " << rrcol.y
          << " " << rrcol.z << endl;
     constexpr int STEER_ANGLE{40};
-    /*if (lcol == evutil::Color::turnLeft || rcol == evutil::Color::turnLeft) {
-      steerDrive->runToDegree(-40);
-      this_thread::sleep_for(chrono::milliseconds{1000});
-    }*/
-    if (sonar->distance_centimeters() < 60) {
+    constexpr int SMALL_STEER_ANGLE{20};
+    constexpr int SONAR_STOP_DISTANCE{45};
+
+    if (sonar->distance_centimeters() < SONAR_STOP_DISTANCE) {
       leftDrive->stop();
       rightDrive->stop();
     } else {
-      if ((lcol == evutil::Color::line && rcol == evutil::Color::line) ||
-          (lcol != evutil::Color::line && rcol != evutil::Color::line)) {
-        steerDrive->runToDegree(0);
-        leftDrive->runForever(getForwardSpeed());
-        rightDrive->runForever(getForwardSpeed());
-      } else if (lcol == evutil::Color::line) {
-        steerDrive->runToDegree(-STEER_ANGLE);
-        leftDrive->runForever(getForwardSpeed() / 3);
-        rightDrive->runForever(getForwardSpeed());
-        this_thread::sleep_for(chrono::milliseconds{150});
-      } else if (rcol == evutil::Color::line) {
-        steerDrive->runToDegree(STEER_ANGLE);
-        leftDrive->runForever(getForwardSpeed());
-        rightDrive->runForever(getForwardSpeed() / 3);
-        this_thread::sleep_for(chrono::milliseconds{150});
+      int lineAngle{};
+      if (mcol == evutil::Color::line) {
+        if (lcol == evutil::Color::line && rcol != evutil::Color::line) {
+          // LMr -> adjust slightly left
+          lineAngle = -SMALL_STEER_ANGLE;
+          lastLineDir = Direction::left;
+        } else if (lcol != evutil::Color::line && rcol == evutil::Color::line) {
+          // lMR -> adjust slightly right
+          lineAngle = SMALL_STEER_ANGLE;
+          lastLineDir = Direction::right;
+        } else {
+          // lMr/LMR -> going straight
+          lineAngle = 0;
+        }
+      } else {
+        if (lcol == evutil::Color::line && rcol != evutil::Color::line) {
+          // Lmr -> adjust left
+          lineAngle = -STEER_ANGLE;
+          lastLineDir = Direction::left;
+        } else if (lcol != evutil::Color::line && rcol == evutil::Color::line) {
+          // lmR -> adjust right
+          lineAngle = STEER_ANGLE;
+          lastLineDir = Direction::right;
+        } else {
+          // lmr (LmR would be a bug) -> turn to the predicted line
+          lineAngle =
+              (lastLineDir == Direction::left) ? -STEER_ANGLE : STEER_ANGLE;
+        }
       }
+      // Rolling average to smooth out steering
+      avgLineAngle = (avgLineAngle + 2 * lineAngle) / 3;
+      steerDrive->runToDegree(avgLineAngle);
+      leftDrive->runForever(avgLineAngle < 0 ? getForwardSpeed() / 2
+                                             : getForwardSpeed());
+      rightDrive->runForever(avgLineAngle > 0 ? getForwardSpeed() / 2
+                                              : getForwardSpeed());
     }
   }
 };
@@ -208,7 +203,7 @@ int main() {
     Robot robot{};
     while (!(sigintTerminate || button::back.pressed())) {
       robot.process();
-      this_thread::yield();
+      this_thread::sleep_for(15ms);
     }
     disableMotors();
     return 0;
