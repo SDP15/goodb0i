@@ -61,7 +61,7 @@ void openLogFile() {
   auto now{time(nullptr)};
   array<char, 100> logFilename;
   size_t logNameLen{strftime(logFilename.data(), logFilename.size(),
-                             "zlog-g0b-%F-%H-%M-%S.log",
+                             "logs/zlog-g0b-%F-%H-%M-%S.log",
                              localtime(&now))}; // DevSkim: ignore DS154189
   string logName{logFilename.data(), logNameLen};
   sensorLog = ofstream(logName, ios_base::out | ios_base::app);
@@ -121,8 +121,8 @@ public:
     evutil::Color mcol{midColor->getColor()};
     evutil::Color rcol{rightColor->getColor()};
     auto rrcol{rightColor->getRawRGB()};
-    cerr << (int)lcol << " " << (int)rcol << " " << rrcol.x << " " << rrcol.y
-         << " " << rrcol.z << endl;
+    // cerr << (int)lcol << " " << (int)rcol << " " << rrcol.x << " " << rrcol.y
+    //     << " " << rrcol.z << endl;
     constexpr int STEER_ANGLE{45};
     constexpr int SMALL_STEER_ANGLE{30};
     constexpr int SONAR_STOP_DISTANCE{45};
