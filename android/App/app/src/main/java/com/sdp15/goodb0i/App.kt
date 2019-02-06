@@ -2,9 +2,10 @@ package com.sdp15.goodb0i
 
 import android.app.Application
 import com.google.firebase.FirebaseApp
-import com.sdp15.goodb0i.data.scanner.MLKitScanner
 import com.sdp15.goodb0i.data.scanner.BarcodeReader
+import com.sdp15.goodb0i.data.scanner.MLKitScanner
 import com.sdp15.goodb0i.data.store.ItemLoader
+import com.sdp15.goodb0i.data.store.RetrofitItemLoader
 import com.sdp15.goodb0i.data.store.TestDataItemLoader
 import com.sdp15.goodb0i.view.confirmation.ConfirmationViewModel
 import com.sdp15.goodb0i.view.connection.devices.DeviceListViewModel
@@ -39,6 +40,8 @@ class App : Application() {
         })
     }
 
+    var shouldUseTestData = false
+
     private val modules = listOf(
         module {
             viewModel<PinViewModel>()
@@ -51,8 +54,8 @@ class App : Application() {
             viewModel<DeviceListViewModel>()
         },
         module {
-            single<ItemLoader> { TestDataItemLoader }
-            single<BarcodeReader> { MLKitScanner()}
+            factory { if (shouldUseTestData) TestDataItemLoader else RetrofitItemLoader }
+            single<BarcodeReader> { MLKitScanner() }
         }
     )
 }

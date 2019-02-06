@@ -2,7 +2,6 @@ package com.sdp15.goodb0i.view.connection
 
 import android.app.Service
 import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothClass
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
 import android.content.BroadcastReceiver
@@ -13,7 +12,6 @@ import android.os.Binder
 import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
-import androidx.annotation.IntDef
 import com.sdp15.goodb0i.BuildConfig
 import com.sdp15.goodb0i.R
 import com.sdp15.goodb0i.data.bluetooth.DeviceInfo
@@ -24,13 +22,13 @@ import java.io.OutputStream
 import java.util.*
 
 class BluetoothService : Service() {
-    
+
 
     object MessageKeys {
         const val DEVICE_INFO = "device_info"
         const val TOAST = "toast"
     }
-    
+
     object MessageCodes {
         const val CONNECTED = 0
         const val STATE_CHANGE = 1
@@ -46,7 +44,7 @@ class BluetoothService : Service() {
         const val CONNECTING = 1
         const val CONNECTED = 2
     }
-    
+
     object MessageConstants {
         const val READ = 0
         const val WRITE = 1
@@ -224,6 +222,7 @@ class BluetoothService : Service() {
         }
 
     }
+
     inner class TransferThread(private val socket: BluetoothSocket) : Thread() {
         private var inStream: InputStream = socket.inputStream
         private var outStream: OutputStream? = socket.outputStream

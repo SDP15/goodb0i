@@ -351,21 +351,21 @@ object TestDataItemLoader : ItemLoader {
         items.addAll(gson.fromJson(json, Array<Item>::class.java))
     }
 
-    override suspend fun loadItem(id: Long): Item {
-        return items.find { it.id == id }!!
+    override suspend fun loadItem(id: Long): Result<Item> {
+        return Result.Success(items.find { it.id == id }!!)
     }
 
-    override suspend fun loadCategory(category: String): PaginatedResult<Item> {
-        return PaginatedResult(items.filter { it.department == category }, 0, false)
+    override suspend fun loadCategory(category: String): Result<List<Item>> {
+        return Result.Success(items.filter { it.department == category })
     }
 
-    override suspend fun search(query: String): PaginatedResult<Item> {
-        return PaginatedResult(items.filter {
+    override suspend fun search(query: String): Result<List<Item>> {
+        return Result.Success(items.filter {
             (it.name + it.department + it.description).toLowerCase().contains(query.toLowerCase())
-        }, 0, false)
+        })
     }
 
-    override suspend fun loadAll(): List<Item> {
-        return items.toList()
+    override suspend fun loadAll(): Result<List<Item>> {
+        return Result.Success(items.toList())
     }
 }

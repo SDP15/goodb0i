@@ -1,6 +1,5 @@
 package com.sdp15.goodb0i.data.scanner
 
-import android.graphics.Bitmap
 import android.graphics.Rect
 
 interface BarcodeReader {
@@ -19,5 +18,7 @@ interface BarcodeReaderCallback {
 
 }
 
-data class BarcodeReading(val value: String?,
-                          val boundingBox: Rect? = null)
+data class BarcodeReading(
+    val value: String?,
+    val boundingBox: Rect? = null
+)

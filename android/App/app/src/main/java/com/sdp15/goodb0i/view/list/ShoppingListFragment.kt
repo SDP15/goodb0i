@@ -8,10 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.sdp15.goodb0i.R
-import com.sdp15.goodb0i.view.ListDiff
 import kotlinx.android.synthetic.main.layout_shoppinglist.*
-import org.koin.android.ext.android.getKoin
-import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 class ShoppingListFragment : Fragment() {
 

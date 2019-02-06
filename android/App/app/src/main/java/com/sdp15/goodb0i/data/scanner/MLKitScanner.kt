@@ -47,7 +47,7 @@ class MLKitScanner : BarcodeReader {
             .build()
         detector.detectInImage(FirebaseVisionImage.fromByteArray(ba, metadata))
             .addOnSuccessListener { barcodes ->
-                if(barcodes.isNotEmpty()) {
+                if (barcodes.isNotEmpty()) {
                     Timber.i("Barcodes $barcodes")
                     callback.onBarcodeRead(BarcodeReading(barcodes.first().displayValue, barcodes.first().boundingBox))
                 } else {

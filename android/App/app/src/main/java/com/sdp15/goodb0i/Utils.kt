@@ -29,11 +29,12 @@ fun EditText.watchText(action: (String) -> Unit) {
 // Assumes that the ViewSwitcher contains a RecyclerView and some other view
 // Switches to the other view when the RecyclerView is empty
 fun ViewSwitcher.switchOnEmpty(adapter: RecyclerView.Adapter<*>) {
-    adapter.registerAdapterDataObserver(object: RecyclerView.AdapterDataObserver() {
+    adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
         override fun onChanged() {
             super.onChanged()
             if ((adapter.itemCount == 0 && nextView !is RecyclerView) ||
-                (adapter.itemCount > 0 && nextView is RecyclerView)) {
+                (adapter.itemCount > 0 && nextView is RecyclerView)
+            ) {
                 showNext()
             }
         }

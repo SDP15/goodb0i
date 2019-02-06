@@ -1,6 +1,5 @@
 package com.sdp15.goodb0i.data.bluetooth
 
-import android.os.Bundle
 import android.os.Message
 import com.sdp15.goodb0i.view.connection.BluetoothService
 
@@ -8,7 +7,7 @@ import com.sdp15.goodb0i.view.connection.BluetoothService
 class DeviceListHandler(private val listener: DeviceConnectionListener) : SafeHandler.MessageHandler {
 
     override fun handleMessage(msg: Message) {
-        when(msg.what) {
+        when (msg.what) {
             BluetoothService.MessageCodes.SCANNED -> {
                 listener.scanned()
             }
