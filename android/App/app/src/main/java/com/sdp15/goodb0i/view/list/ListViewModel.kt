@@ -24,19 +24,24 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
     private val currentList = mutableListOf<TrolleyItem>()
     val list = MutableLiveData<ListDiff<TrolleyItem>>()
 
+    // Most recently retrieved search results
     private val currentSearchResults = mutableListOf<TrolleyItem>()
     private val retrievedSearchResults = MutableLiveData<List<Item>>()
+    // Exposed LiveData for full list changes, or updates to individual items
     val search = MediatorLiveData<ListDiff<TrolleyItem>>()
 
     init {
         search.addSource(list) {
+            // When an item is updated in the list, post an update to that item within the current search results
+            //TODO: Currently ItemAdapter checks if the item is currently visible. Should it be responsible for this?
             if (it is ListDiff.Update) search.postValue(ListDiff.Update(currentSearchResults, it.updated))
             if (it is ListDiff.Remove) search.postValue(ListDiff.Update(currentSearchResults, it.removed))
             // Add doesn't matter, as it is only called when we add a new item *from the search results*
         }
-        search.addSource(retrievedSearchResults) {
+        search.addSource(retrievedSearchResults) { result ->
             currentSearchResults.clear()
-            currentSearchResults.addAll(it.map { item ->
+            // Add each of the new items to the results, with their existing counts
+            currentSearchResults.addAll(result.map { item ->
                 TrolleyItem(
                     item,
                     currentList.firstOrNull { it.item.id == item.id }?.count ?: 0
@@ -51,7 +56,7 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
     override fun bind() {
     }
 
-    private var searchJob: Job? = null
+    private var searchJob: Job? = null // Ongoing search job
 
     override fun onQueryChange(old: String, new: String) {
         if (new.isEmpty()) {
@@ -63,33 +68,36 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
                 if (result is Result.Success) {
                     retrievedSearchResults.postValue(result.data)
                 } else if (result is Result.Failure) {
+                    //TODO: Handle search failure
                     Timber.e(result.exception, "Search failed")
                 }
             }
         }
     }
 
-    private fun computePrice() = currentList.sumByDouble { it.count * it.item.price }
+    private val price: Double
+        get() = currentList.sumByDouble { it.count * it.item.price }
 
     fun incrementItem(item: Item) {
         Timber.i("Incrementing added ${item.name}")
         val i = currentList.indexOfFirst { it.item.id == item.id }
         val diff: ListDiff<TrolleyItem>
-        if (i == -1) {
+        if (i == -1) { // Add item to list as it isn't there already
             val ci = TrolleyItem(item, 1)
             currentList.add(ci)
             diff = ListDiff.Add(currentList, ci)
-        } else {
+        } else { // Update count and post to update adapter
             currentList[i].count++
             diff = ListDiff.Update(currentList, currentList[i])
         }
         list.postValue(diff)
-        totalPrice.postValue(computePrice())
+        totalPrice.postValue(price)
     }
 
     fun decrementItem(item: Item) {
         Timber.i("Decrementing added ${item.name}")
         val ci = currentList.firstOrNull { it.item.id == item.id }
+        // If the item doesn't exist in the current list, the user is decrementing an item in search which is at 0
         ci?.apply {
             count--
             if (count == 0) {
@@ -98,8 +106,8 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
             } else {
                 list.postValue(ListDiff.Update(currentList, this))
             }
+            totalPrice.postValue(price)
         }
-        totalPrice.postValue(computePrice())
     }
 
     sealed class ListAction {
