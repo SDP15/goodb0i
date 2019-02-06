@@ -75,6 +75,12 @@ dependencies {
 
     testImplementation 'junit:junit:4.12'
     testImplementation 'androidx.test:core:1.1.0'
+    testImplementation 'androidx.test:core:1.1.0'
+    testImplementation "androidx.arch.core:core-testing:2.0.0"
+    testImplementation 'androidx.test:runner:1.1.1'
+    testImplementation "io.mockk:mockk:1.9"
+    testImplementation ("org.koin:koin-test:$koin_version") { exclude group: 'org.mockito' }
+
     androidTestImplementation 'androidx.test:core:1.1.0'
     androidTestImplementation "androidx.arch.core:core-testing:2.0.0"
     androidTestImplementation 'androidx.test:runner:1.1.1'
@@ -85,6 +91,7 @@ dependencies {
     })
     androidTestImplementation ("org.koin:koin-test:$koin_version") { exclude group: 'org.mockito' }
     androidTestImplementation "io.mockk:mockk-android:1.9"
+
 
 }
 

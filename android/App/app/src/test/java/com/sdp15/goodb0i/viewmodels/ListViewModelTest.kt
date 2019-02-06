@@ -73,7 +73,7 @@ class ListViewModelTest : KoinTest {
     fun testIncrementItemTwice() {
         vm.incrementItem(item)
         vm.incrementItem(item)
-        verifySequence {
+        verify(exactly = 2) {
             listObserver.onChanged(any())
             listObserver.onChanged(capture(listSlot))
         }
@@ -90,7 +90,7 @@ class ListViewModelTest : KoinTest {
         vm.incrementItem(item)
         vm.incrementItem(item)
         vm.decrementItem(item)
-        verifySequence {
+        verify(exactly = 3) {
             listObserver.onChanged(any())
             listObserver.onChanged(any())
             listObserver.onChanged(capture(listSlot))
@@ -107,7 +107,7 @@ class ListViewModelTest : KoinTest {
     fun testDecrementToRemoval() {
         vm.incrementItem(item)
         vm.decrementItem(item)
-        verifySequence {
+        verify(exactly = 2) {
             listObserver.onChanged(any())
             listObserver.onChanged(capture(listSlot))
         }
@@ -149,7 +149,7 @@ class ListViewModelTest : KoinTest {
         verify(exactly = 3) {
             priceObserver.onChanged(capture(slot))
         }
-        Assert.assertEquals("",  2 * price1 + price2, slot.captured, 0.0002)
+        Assert.assertEquals("", 2 * price1 + price2, slot.captured, 0.0002)
     }
 
 
