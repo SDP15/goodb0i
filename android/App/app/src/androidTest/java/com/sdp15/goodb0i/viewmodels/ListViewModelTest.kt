@@ -41,9 +41,6 @@ class ListViewModelTest : KoinTest {
         vm.bind()
         vm.list.observeForever(listObserver)
         vm.search.observeForever(searchObserver)
-//        vm.search.observeForever {
-//            Timber.d("Other observer called")
-//        }
     }
 
     @Test
@@ -52,7 +49,7 @@ class ListViewModelTest : KoinTest {
             Timber.i("Observed value $it")
         }
         vm.onQueryChange("", "")
-        io.mockk.verify(exactly = 1) {
+        verify {
             searchObserver.onChanged(capture(searchSlot))
         }
         Timber.i("Captured value ${searchSlot.isCaptured}")
@@ -64,7 +61,7 @@ class ListViewModelTest : KoinTest {
     fun testIncrementItem() {
 
         vm.incrementItem(item)
-        io.mockk.verify(exactly = 1) {
+        verify {
             listObserver.onChanged(capture(listSlot))
         }
         Assert.assertTrue("ListDiff should be add", listSlot.captured is ListDiff.Add)
@@ -76,9 +73,12 @@ class ListViewModelTest : KoinTest {
     fun testIncrementItemTwice() {
         vm.incrementItem(item)
         vm.incrementItem(item)
-        io.mockk.verify(exactly = 2) {
+        verifySequence {
             listObserver.onChanged(any())
             listObserver.onChanged(capture(listSlot))
+        }
+        verify {
+            searchObserver.onChanged(any())
         }
         Assert.assertTrue("ListDiff should be update", listSlot.captured is ListDiff.Update)
         Assert.assertEquals("Same added should be returned", item, (listSlot.captured as ListDiff.Update).updated.item)
@@ -90,10 +90,13 @@ class ListViewModelTest : KoinTest {
         vm.incrementItem(item)
         vm.incrementItem(item)
         vm.decrementItem(item)
-        io.mockk.verify(exactly = 3) {
+        verifySequence {
             listObserver.onChanged(any())
             listObserver.onChanged(any())
             listObserver.onChanged(capture(listSlot))
+        }
+        verify(exactly = 2) {
+            searchObserver.onChanged(any())
         }
         Assert.assertTrue("Diff should be update", listSlot.captured is ListDiff.Update)
         Assert.assertEquals("Item should be the same", item, (listSlot.captured as ListDiff.Update).updated.item)
@@ -104,7 +107,7 @@ class ListViewModelTest : KoinTest {
     fun testDecrementToRemoval() {
         vm.incrementItem(item)
         vm.decrementItem(item)
-        io.mockk.verify(exactly = 2) {
+        verifySequence {
             listObserver.onChanged(any())
             listObserver.onChanged(capture(listSlot))
         }
@@ -123,7 +126,7 @@ class ListViewModelTest : KoinTest {
         val slot = slot<Double>()
         vm.totalPrice.observeForever(observer)
         vm.incrementItem(item)
-        io.mockk.verify(exactly = 1) {
+        verify {
             observer.onChanged(capture(slot))
         }
         Assert.assertEquals("Price should be price of single added", 1.23, slot.captured, 0.0002)
@@ -137,14 +140,14 @@ class ListViewModelTest : KoinTest {
         every { item.price } answers { price1 }
         every { secondItem.price } answers { price2 }
         every { secondItem.id } answers { 2 }
-        val observer: Observer<Double> = mockk(relaxed = true)
+        val priceObserver: Observer<Double> = mockk(relaxed = true)
         val slot = slot<Double>()
-        vm.totalPrice.observeForever(observer)
+        vm.totalPrice.observeForever(priceObserver)
         vm.incrementItem(item)
         vm.incrementItem(item)
         vm.incrementItem(secondItem)
         verify(exactly = 3) {
-            observer.onChanged(capture(slot))
+            priceObserver.onChanged(capture(slot))
         }
         Assert.assertEquals("",  2 * price1 + price2, slot.captured, 0.0002)
     }
