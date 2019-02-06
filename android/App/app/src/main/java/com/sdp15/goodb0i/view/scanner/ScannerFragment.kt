@@ -4,7 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import com.otaliastudios.cameraview.Audio
 import com.otaliastudios.cameraview.Gesture
 import com.otaliastudios.cameraview.GestureAction
@@ -23,7 +25,9 @@ class ScannerFragment : Fragment() {
     }
 
     private fun bindViewModel() {
-
+        vm.reading.observe(this, Observer {
+            Toast.makeText(context, "Reading: ${it.value}", Toast.LENGTH_SHORT).show()
+        })
     }
 
     override fun onCreateView(

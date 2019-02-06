@@ -1,5 +1,6 @@
 package com.sdp15.goodb0i.view.scanner
 
+import androidx.lifecycle.MutableLiveData
 import com.sdp15.goodb0i.BaseViewModel
 import com.sdp15.goodb0i.data.scanner.BarcodeReader
 import com.sdp15.goodb0i.data.scanner.BarcodeReaderCallback
@@ -15,6 +16,8 @@ class ScannerViewModel : BaseViewModel<ScannerViewModel.ScannerAction>(), Scanne
     private val reader: BarcodeReader by inject()
     private val isRunning = AtomicBoolean(false)
 
+    private var lastReading: BarcodeReading? = null
+    val reading = MutableLiveData<BarcodeReading>()
 
     override fun bind() {
 
@@ -28,6 +31,7 @@ class ScannerViewModel : BaseViewModel<ScannerViewModel.ScannerAction>(), Scanne
                 override fun onBarcodeRead(reading: BarcodeReading) {
                     Timber.i("Barcode read $reading")
                     isRunning.set(false)
+                        this@ScannerViewModel.reading.postValue(reading)
                 }
 
                 override fun onNoBarcodesFound() = isRunning.set(false)
