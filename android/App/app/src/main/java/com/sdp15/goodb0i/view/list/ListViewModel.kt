@@ -1,5 +1,6 @@
 package com.sdp15.goodb0i.view.list
 
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import com.sdp15.goodb0i.BaseViewModel
 import com.sdp15.goodb0i.data.store.Item
@@ -23,34 +24,47 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
     private val currentList = mutableListOf<TrolleyItem>()
     val list = MutableLiveData<ListDiff<TrolleyItem>>()
 
-    val searchResults = MutableLiveData<List<TrolleyItem>>()
+    private val currentSearchResults = mutableListOf<TrolleyItem>()
+    private val retrievedSearchResults = MutableLiveData<List<Item>>()
+    val search = MediatorLiveData<ListDiff<TrolleyItem>>()
+
+    init {
+        search.addSource(list) {
+            if (it is ListDiff.Update) search.postValue(ListDiff.Update(currentSearchResults, it.updated))
+            if (it is ListDiff.Remove) search.postValue(ListDiff.Update(currentSearchResults, it.removed))
+            // Add doesn't matter, as it is only called when we add a new item *from the search results*
+        }
+        search.addSource(retrievedSearchResults) {
+            currentSearchResults.clear()
+            currentSearchResults.addAll(it.map { item ->
+                TrolleyItem(
+                    item,
+                    currentList.firstOrNull { it.item.id == item.id }?.count ?: 0
+                )
+            })
+            search.postValue(ListDiff.All(currentSearchResults))
+        }
+    }
 
     val totalPrice = MutableLiveData<Double>()
 
     override fun bind() {
     }
 
-    private var search: Job? = null
+    private var searchJob: Job? = null
 
     override fun onQueryChange(old: String, new: String) {
         if (new.isEmpty()) {
-            searchResults.postValue(emptyList())
+            retrievedSearchResults.postValue(emptyList())
         } else {
-            search?.cancel()
-            search = GlobalScope.launch(Dispatchers.IO) {
+            searchJob?.cancel()
+            searchJob = GlobalScope.launch(Dispatchers.IO) {
                 val result = loader.search(new)
                 if (result is Result.Success) {
-                    val merged = result.data.map { item ->
-                        TrolleyItem(
-                            item,
-                            currentList.firstOrNull { it.item.id == item.id }?.count ?: 0
-                        )
-                    }
-                    searchResults.postValue(merged.toList())
+                    retrievedSearchResults.postValue(result.data)
                 } else if (result is Result.Failure) {
                     Timber.e(result.exception, "Search failed")
                 }
-
             }
         }
     }

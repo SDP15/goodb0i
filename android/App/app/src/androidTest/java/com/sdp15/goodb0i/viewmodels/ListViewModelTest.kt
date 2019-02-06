@@ -14,6 +14,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.koin.test.KoinTest
 import org.koin.test.declare
+import timber.log.Timber
 
 class ListViewModelTest : KoinTest {
 
@@ -24,32 +25,39 @@ class ListViewModelTest : KoinTest {
     private lateinit var item: Item
     private lateinit var listObserver: Observer<ListDiff<TrolleyItem>>
     private lateinit var listSlot: CapturingSlot<ListDiff<TrolleyItem>>
+    private lateinit var searchObserver: Observer<ListDiff<TrolleyItem>>
+    private lateinit var searchSlot: CapturingSlot<ListDiff<TrolleyItem>>
 
     @Before
     fun setUp() {
-//        declareMock<ItemLoader> {
-//            `when`(this::search).thenReturn()
-//        }
-        //declareMock<ItemLoader>()
+
         listObserver = mockk(relaxed = true)
         item = mockk(relaxed = true)
         listSlot = io.mockk.slot()
+        searchObserver = mockk(relaxed = true)
+        searchSlot = slot()
         declare { TestDataItemLoader }
         vm = ListViewModel()
         vm.bind()
         vm.list.observeForever(listObserver)
+        vm.search.observeForever(searchObserver)
+//        vm.search.observeForever {
+//            Timber.d("Other observer called")
+//        }
     }
 
     @Test
     fun testEmptySearch() {
-        val searchObserver: Observer<List<TrolleyItem>> = mockk(relaxed = true)
-        val slot = slot<List<TrolleyItem>>()
-        vm.searchResults.observeForever(searchObserver)
+        vm.search.observeForever {
+            Timber.i("Observed value $it")
+        }
         vm.onQueryChange("", "")
         io.mockk.verify(exactly = 1) {
-            searchObserver.onChanged(capture(slot))
+            searchObserver.onChanged(capture(searchSlot))
         }
-        Assert.assertEquals("Search results should be empty", 0, slot.captured.size)
+        Timber.i("Captured value ${searchSlot.isCaptured}")
+        Assert.assertTrue("All values in search adapter should be updated", searchSlot.captured is ListDiff.All)
+        Assert.assertEquals("Search results should be empty", 0, (searchSlot.captured as ListDiff.All).items.size)
     }
 
     @Test

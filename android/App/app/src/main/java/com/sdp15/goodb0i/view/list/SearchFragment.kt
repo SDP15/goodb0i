@@ -28,19 +28,10 @@ class SearchFragment : Fragment() {
         list_recycler.adapter = adapter
         search_view_switcher.switchOnEmpty(adapter)
 
-        vm.searchResults.observe(this, Observer {
-            Timber.i("Sending results to search adapter $it")
-            adapter.itemsChanged(ListDiff.All(it))
+        vm.search.observe(this, Observer {
+            adapter.itemsChanged(it)
         })
-        vm.list.observe(this, Observer {
-            Timber.i("Observed change $it")
-            if (it is ListDiff.Update) {
-                adapter.itemsChanged(it)
-            } else if (it is ListDiff.Remove) {
-                // Removal in ShoppingListFragment causes an update to the same search added, if visible
-                adapter.itemsChanged(ListDiff.Update(it.items, it.removed))
-            }
-        })
+
         floating_search_view.setOnQueryChangeListener(vm::onQueryChange)
         floating_search_view.setOnMenuItemClickListener {
             // Only one menu added
