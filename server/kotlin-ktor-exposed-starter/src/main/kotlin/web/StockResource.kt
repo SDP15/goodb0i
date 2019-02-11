@@ -28,18 +28,19 @@ fun Route.stock(stockService: StockService) {
 
         post("/") {
             val stock = call.receive<Stock>()
-            call.respond(HttpStatusCode.Created, stockService.addStock(stock))
+            call.respond(HttpStatusCode.Created, /*stockService.addStock(stock)*/"")
         }
 
         put("/") {
             val stock = call.receive<Stock>()
-            val updated = stockService.updateStock(stock)
+            val updated = null // stockService.updateStock(stock)
             if (updated == null) call.respond(HttpStatusCode.NotFound)
-            else call.respond(HttpStatusCode.OK, updated)
+            //else call.respond(HttpStatusCode.OK, updated)
         }
 
         delete("/{id}") {
-            val removed = stockService.deleteStock(call.parameters["id"]?.toInt()!!)
+            val id = call.parameters["id"]?.toInt()!!
+            val removed = stockService.deleteStock(id)
             if (removed) call.respond(HttpStatusCode.OK)
             else call.respond(HttpStatusCode.NotFound)
         }

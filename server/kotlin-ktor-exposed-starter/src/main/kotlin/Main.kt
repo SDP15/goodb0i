@@ -11,6 +11,8 @@ import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.ktor.websocket.WebSockets
 import kotlinx.coroutines.launch
+import model.List
+import model.ListContentsTable
 import model.Stock
 import service.DatabaseFactory
 import service.StockService
@@ -34,10 +36,9 @@ fun Application.module() {
     val stockService = StockService()
     launch {
         println("Stock insert running")
-        getTestData().forEach {
-            println("Inserting $it")
-            stockService.addStock(it)
-        }
+//        getTestData().forEach {
+//            stockService.addStock(it)
+//        }
         print("Stock insert finished")
     }
 
@@ -50,6 +51,7 @@ fun Application.module() {
 
 
 private fun getTestData(): Array<Stock> {
+
     val path = System.getProperty("user.dir") + "/src/main/resources/items.json"
     val file = File(path).bufferedReader()
     val gson = Gson()
@@ -58,9 +60,9 @@ private fun getTestData(): Array<Stock> {
 
 class Main {
     companion object {
-        @JvmStatic
-        fun main(args: Array<String>) {
-            embeddedServer(Netty, 8080, watchPaths = listOf("MainKt"), module = Application::module).start()
+
+        @JvmStatic fun main(args: Array<String>) {
+            embeddedServer(Netty, port=8080, watchPaths = listOf("MainKt"), module = Application::module).start()
             val wd = System.getProperty("user.dir")
             println("Working directory $wd")
         }

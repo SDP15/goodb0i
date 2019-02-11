@@ -28,23 +28,27 @@ class StockService {
     }
 
     suspend fun getStock(id: Int): Stock? = dbQuery {
-            Stock.findById(id)
+        Stock.findById(id)
     }
 
-    suspend fun updateStock(stock: Stock): Stock? {
 
+    suspend fun search(query: String?): List<Stock> = dbQuery {
+        //        AllStock.selectAll().filter {
+//            (it[AllStock.name] + it[AllStock.description] + it[AllStock.department] + it[AllStock.superDepartment]).toLowerCase().contains(query?.toLowerCase() ?: "")
+//        }.map(AllStock::toStock)
+        emptyList()
     }
 
-    suspend fun addStock(stock: Stock): Stock {
-        Stock.new {  }
-    }
+//    suspend fun updateStock(stock: Stock): Stock? {
+//
+//    }
+//
+//    suspend fun addStock(stock: Stock): Stock {
+//    }
 
-    suspend fun deleteStock(id: Int): Boolean {
-        return dbQuery {
-            Stocks.deleteWhere { Stocks.id eq id } > 0
-        }.also {
-            if (it) onChange(ChangeType.DELETE, id)
-        }
+    suspend fun deleteStock(id: Int): Boolean = dbQuery {
+        Stocks.deleteWhere { Stocks.id eq id } > 0
     }
-
 }
+
+

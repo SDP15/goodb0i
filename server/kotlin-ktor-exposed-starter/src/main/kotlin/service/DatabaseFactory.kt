@@ -4,8 +4,8 @@ import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import model.Shelfs
-import model.Racks
+import model.ShelfRacks
+import model.Shelves
 import model.Stocks
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils.create
@@ -18,8 +18,8 @@ object DatabaseFactory {
         Database.connect(hikari())
         transaction {
             create(Stocks)
-            create(Racks)
-            create(Shelfs)
+            create(Shelves)
+            create(ShelfRacks)
         }
     }
 
