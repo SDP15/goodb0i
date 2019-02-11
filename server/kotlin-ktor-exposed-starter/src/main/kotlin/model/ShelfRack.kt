@@ -8,5 +8,5 @@ class ShelfRack(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<ShelfRack>(ShelfRacks)
 
     var capacity by ShelfRacks.capacity
-    val info by ShelfRacks.info
+    var info by ShelfRacks.info
 }

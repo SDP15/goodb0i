@@ -6,9 +6,9 @@ import org.jetbrains.exposed.dao.IntEntityClass
 
 class Shelf(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<Shelf>(Shelves)
-    val product by Shelves.product
-    val quantity by Shelves.quantity
-    val position by Shelves.position
-    val rack by Shelves.rack
+    var product by Shelves.product
+    var quantity by Shelves.quantity
+    var position by Shelves.position
+    var rack by Shelves.rack
 
 }

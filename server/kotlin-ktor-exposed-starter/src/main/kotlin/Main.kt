@@ -22,7 +22,9 @@ import model.Stock
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.sql.transactions.transaction
 import service.DatabaseFactory
+import service.ShelfService
 import service.StockService
+import web.shelves
 import web.stock
 import java.io.File
 
@@ -81,6 +83,7 @@ fun Application.module() {
     DatabaseFactory.init()
 
     val stockService = StockService()
+    val shelfService = ShelfService()
     launch {
         println("Stock insert running")
         transaction {
@@ -104,11 +107,13 @@ fun Application.module() {
 
         print("Stock insert finished")
 
+        shelfService.initDefaultShelves()
     }
 
 
     install(Routing) {
         stock(stockService)
+        shelves(shelfService)
     }
 
 }
