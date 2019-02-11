@@ -17,13 +17,25 @@ fun Route.stock(stockService: StockService) {
     route("/stock") {
 
         get("/") {
-            call.respond(stockService.getAllStock())
+            val stock = stockService.getAllStock()
+            println("Router retrieved stock $stock")
+            stock.forEach {
+
+                println("Stock item ${it}")
+            }
+            call.respond(stock)
         }
 
         get("/{id}") {
             val stock = stockService.getStock(call.parameters["id"]?.toInt()!!)
             if (stock == null) call.respond(HttpStatusCode.NotFound)
             else call.respond(stock)
+        }
+
+        get("/search/{query}") {
+            val items = stockService.search(call.parameters["query"])
+            if (items.isEmpty()) call.respond(HttpStatusCode.NotFound)
+            else call.respond(items)
         }
 
         post("/") {
@@ -49,6 +61,7 @@ fun Route.stock(stockService: StockService) {
 
     val mapper = jacksonObjectMapper().apply {
         setSerializationInclusion(JsonInclude.Include.NON_NULL)
+
     }
 
     webSocket("/updates") {

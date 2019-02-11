@@ -1,5 +1,6 @@
 package model
 
+import com.google.gson.annotations.SerializedName
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass

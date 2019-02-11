@@ -5,6 +5,7 @@ import model.ChangeType
 import model.Notification
 import model.Stock
 import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.transactions.transaction
 import service.DatabaseFactory.dbQuery
 
 class StockService {
@@ -23,7 +24,7 @@ class StockService {
         }
     }
 
-    suspend fun getAllStock(): List<Stock> = dbQuery {
+    suspend fun getAllStock(): List<Stock> = transaction {
         Stock.all().toList()
     }
 
@@ -32,11 +33,10 @@ class StockService {
     }
 
 
-    suspend fun search(query: String?): List<Stock> = dbQuery {
-        //        AllStock.selectAll().filter {
-//            (it[AllStock.name] + it[AllStock.description] + it[AllStock.department] + it[AllStock.superDepartment]).toLowerCase().contains(query?.toLowerCase() ?: "")
-//        }.map(AllStock::toStock)
-        emptyList()
+    suspend fun search(query: String?): List<Stock> = transaction {
+        Stock.all().filter {
+            (it.name + it.description + it.department).toLowerCase().contains(query?.toLowerCase() ?: "")
+        }
     }
 
 //    suspend fun updateStock(stock: Stock): Stock? {
