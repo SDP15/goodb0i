@@ -1,12 +1,13 @@
 package model
 
 import com.google.gson.annotations.SerializedName
-import org.jetbrains.exposed.sql.ResultRow
-import org.jetbrains.exposed.sql.Table
+import org.jetbrains.exposed.dao.EntityID
+import org.jetbrains.exposed.dao.IntEntity
+import org.jetbrains.exposed.dao.IntEntityClass
+import org.jetbrains.exposed.dao.IntIdTable
 
-object AllStock : Table() {
 
-    val id = integer("id").primaryKey().autoIncrement()
+object Stocks : IntIdTable() {
     val name = varchar("name", 255)
     val averageSellingUnitWeight = double("averageSellingUnitWeight")
     val contentsMeasureType = varchar("ContentsMeasureType", 20)
@@ -20,37 +21,20 @@ object AllStock : Table() {
     val unitPrice = double("unitPrice")
 
 
-    fun toStock(row: ResultRow) = Stock(
-            id = row[AllStock.id],
-            name = row[AllStock.name],
-            averageSellingUnitWeight = row[AllStock.averageSellingUnitWeight],
-            contentsMeasureType = row[AllStock.contentsMeasureType],
-            contentsQuantity = row[AllStock.contentsQuantity],
-            unitOfSale = row[AllStock.unitOfSale],
-            unitQuantity = row[AllStock.unitQuantity],
-            department = row[AllStock.department],
-            description = row[AllStock.description].split("//"),
-            price = row[AllStock.price],
-            superDepartment = row[AllStock.superDepartment],
-            unitPrice = row[AllStock.unitPrice]
-
-    )
-
-
 }
 
-data class Stock(
-        val id: Int = -1,
-        @SerializedName("name") val name: String,
-        @SerializedName("averageSellingUnitWeight") val averageSellingUnitWeight: Double,
-        @SerializedName("ContentsMeasureType") val contentsMeasureType: String,
-        @SerializedName("contentsQuantity") val contentsQuantity: Double,
-        @SerializedName("UnitOfSale") val unitOfSale: Int,
-        @SerializedName("UnitQuantity") val unitQuantity: String,
-        @SerializedName("department") val department: String,
-        @SerializedName("description") val description: List<String>,
-        @SerializedName("price") val price: Double,
-        @SerializedName("superDepartment") val superDepartment: String,
-        @SerializedName("unitPrice") val unitPrice: Double
-)
+class Stock(id: EntityID<Int>) : IntEntity(id) {
+    companion object : IntEntityClass<Stock>(Stocks)
+    var name by Stocks.name
+    var averageSellingUnitWeight by Stocks.averageSellingUnitWeight
+    var contentsMeasureType by Stocks.contentsMeasureType
+    var contentsQuantity by Stocks.contentsQuantity
+    var unitOfSale by Stocks.unitOfSale
+    var unitQuantity by Stocks.unitQuantity
+    var department by Stocks.department
+    var superDepartment by Stocks.superDepartment
+    var description by Stocks.description
+    var price by Stocks.price
+    var unitPrice by Stocks.unitPrice
+}
 

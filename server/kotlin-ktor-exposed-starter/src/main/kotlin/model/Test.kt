@@ -2,6 +2,7 @@ package model
 
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
+import kotlin.collections.List
 
 data class Item(
         @SerializedName("AverageSellingUnitWeight")
@@ -17,7 +18,7 @@ data class Item(
         @SerializedName("department")
         val department: String,
         @SerializedName("description")
-        val description: List<String>,
+        val description: kotlin.collections.List<String>,
         @SerializedName("id")
         val id: Long,
         @SerializedName("name")

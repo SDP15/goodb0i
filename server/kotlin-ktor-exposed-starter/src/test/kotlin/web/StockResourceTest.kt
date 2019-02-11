@@ -3,7 +3,6 @@ package web
 import common.ServerTest
 import io.restassured.RestAssured.*
 import io.restassured.http.ContentType
-import model.NewStock
 import model.Stock
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested

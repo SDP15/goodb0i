@@ -1,19 +1,15 @@
 package service
 
-import AllShelf.quantity
-import com.google.gson.Gson
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import model.AllStock
-import model.Stock
+import model.ShelfRacks
+import model.Shelves
+import model.Stocks
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils.create
-import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.transactions.transaction
-import java.io.BufferedReader
-import java.io.File
 
 object DatabaseFactory {
 
@@ -21,7 +17,9 @@ object DatabaseFactory {
         // Database.connect("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1", driver = "org.h2.Driver")
         Database.connect(hikari())
         transaction {
-            create(AllStock)
+            create(Stocks)
+            create(Shelves)
+            create(ShelfRacks)
         }
     }
 

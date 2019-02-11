@@ -1,7 +1,11 @@
 package service
 
-import model.*
+import model.Stocks
+import model.ChangeType
+import model.Notification
+import model.Stock
 import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.transactions.transaction
 import service.DatabaseFactory.dbQuery
 
 class StockService {
@@ -20,17 +24,15 @@ class StockService {
         }
     }
 
-    suspend fun getAllStock(): List<Stock> = dbQuery {
-        AllStock.selectAll().map(AllStock::toStock)
+    suspend fun getAllStock(): List<Stock> = transaction {
+        Stock.all().toList()
     }
 
     suspend fun getStock(id: Int): Stock? = dbQuery {
-        AllStock.select {
-            (AllStock.id eq id)
-        }.mapNotNull(AllStock::toStock)
-                .singleOrNull()
+        Stock.findById(id)
     }
 
+<<<<<<< HEAD
     suspend fun search(query: String?): List<Stock> = dbQuery {
         AllStock.selectAll().filter {
             (it[AllStock.name] + it[AllStock.description] + it[AllStock.department] + it[AllStock.superDepartment]).toLowerCase().contains(query?.toLowerCase() ?: "")
@@ -43,56 +45,25 @@ class StockService {
             addStock(stock)
         } else {
             dbQuery {
+=======
+>>>>>>> exposed_setup
 
-                AllStock.update({ AllStock.id eq id }) {
-                    //TODO: Is there a cleaner way to do this?
-                    it[name] = stock.name
-                    it[averageSellingUnitWeight] = stock.averageSellingUnitWeight
-                    it[contentsMeasureType] = stock.contentsMeasureType
-                    it[contentsQuantity] = stock.contentsQuantity
-                    it[unitOfSale] = stock.unitOfSale
-                    it[unitQuantity] = stock.unitQuantity
-                    it[department] = stock.department
-                    it[description] = stock.description.joinToString("//")
-                    it[price]= stock.price
-                    it[superDepartment] = stock.superDepartment
-                    it[unitPrice] = stock.unitPrice
-                }
-            }
-            getStock(id).also {
-                onChange(ChangeType.UPDATE, id, it)
-            }
+    suspend fun search(query: String?): List<Stock> = transaction {
+        Stock.all().filter {
+            (it.name + it.description + it.department).toLowerCase().contains(query?.toLowerCase() ?: "")
         }
     }
 
-    suspend fun addStock(stock: Stock): Stock {
-        var key = 0
-        dbQuery {
-            key = (AllStock.insert {
-                it[name] = stock.name
-                it[averageSellingUnitWeight] = stock.averageSellingUnitWeight
-                it[contentsMeasureType] = stock.contentsMeasureType
-                it[contentsQuantity] = stock.contentsQuantity
-                it[unitOfSale] = stock.unitOfSale
-                it[unitQuantity] = stock.unitQuantity
-                it[department] = stock.department
-                it[description] = stock.description.joinToString("//")
-                it[price]= stock.price
-                it[superDepartment] = stock.superDepartment
-                it[unitPrice] = stock.unitPrice
-            } get AllStock.id)!!
-        }
-        return getStock(key)!!.also {
-            onChange(ChangeType.CREATE, key, it)
-        }
-    }
+//    suspend fun updateStock(stock: Stock): Stock? {
+//
+//    }
+//
+//    suspend fun addStock(stock: Stock): Stock {
+//    }
 
-    suspend fun deleteStock(id: Int): Boolean {
-        return dbQuery {
-            AllStock.deleteWhere { AllStock.id eq id } > 0
-        }.also {
-            if (it) onChange(ChangeType.DELETE, id)
-        }
+    suspend fun deleteStock(id: Int): Boolean = dbQuery {
+        Stocks.deleteWhere { Stocks.id eq id } > 0
     }
-
 }
+
+

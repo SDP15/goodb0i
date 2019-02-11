@@ -1,14 +1,12 @@
 package model
 
-import org.jetbrains.exposed.sql.Table
+import org.jetbrains.exposed.dao.EntityID
+import org.jetbrains.exposed.dao.IntEntity
+import org.jetbrains.exposed.dao.IntEntityClass
 
+class ShelfRack(id: EntityID<Int>) : IntEntity(id) {
+    companion object : IntEntityClass<ShelfRack>(ShelfRacks)
 
-object AllShelfRacks : Table() {
-    val id = integer("id").primaryKey().autoIncrement()
-    val capacity = integer("capacity")
-    val info = varchar("info", 255)
-
+    var capacity by ShelfRacks.capacity
+    var info by ShelfRacks.info
 }
-
-
-data class ShelfRack(val id: Int,val capacity: Int, val info: String)

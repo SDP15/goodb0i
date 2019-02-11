@@ -17,7 +17,13 @@ fun Route.stock(stockService: StockService) {
     route("/stock") {
 
         get("/") {
-            call.respond(stockService.getAllStock())
+            val stock = stockService.getAllStock()
+            println("Router retrieved stock $stock")
+            stock.forEach {
+
+                println("Stock item ${it}")
+            }
+            call.respond(stock)
         }
 
         get("/search/{query}" ) {
@@ -34,20 +40,27 @@ fun Route.stock(stockService: StockService) {
             else call.respond(stock)
         }
 
+        get("/search/{query}") {
+            val items = stockService.search(call.parameters["query"])
+            if (items.isEmpty()) call.respond(HttpStatusCode.NotFound)
+            else call.respond(items)
+        }
+
         post("/") {
             val stock = call.receive<Stock>()
-            call.respond(HttpStatusCode.Created, stockService.addStock(stock))
+            call.respond(HttpStatusCode.Created, /*stockService.addStock(stock)*/"")
         }
 
         put("/") {
             val stock = call.receive<Stock>()
-            val updated = stockService.updateStock(stock)
-            if(updated == null) call.respond(HttpStatusCode.NotFound)
-            else call.respond(HttpStatusCode.OK, updated)
+            val updated = null // stockService.updateStock(stock)
+            if (updated == null) call.respond(HttpStatusCode.NotFound)
+            //else call.respond(HttpStatusCode.OK, updated)
         }
 
         delete("/{id}") {
-            val removed = stockService.deleteStock(call.parameters["id"]?.toInt()!!)
+            val id = call.parameters["id"]?.toInt()!!
+            val removed = stockService.deleteStock(id)
             if (removed) call.respond(HttpStatusCode.OK)
             else call.respond(HttpStatusCode.NotFound)
         }
@@ -56,6 +69,7 @@ fun Route.stock(stockService: StockService) {
 
     val mapper = jacksonObjectMapper().apply {
         setSerializationInclusion(JsonInclude.Include.NON_NULL)
+
     }
 
     webSocket("/updates") {
@@ -63,7 +77,7 @@ fun Route.stock(stockService: StockService) {
             stockService.addChangeListener(this.hashCode()) {
                 outgoing.send(Frame.Text(mapper.writeValueAsString(it)))
             }
-            while(true) {
+            while (true) {
                 incoming.receiveOrNull() ?: break
             }
         } finally {
