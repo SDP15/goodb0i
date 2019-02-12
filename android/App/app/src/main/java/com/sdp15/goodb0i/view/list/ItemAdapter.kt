@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.sdp15.goodb0i.R
-import com.sdp15.goodb0i.data.store.Item
+import com.sdp15.goodb0i.data.store.items.Item
 import com.sdp15.goodb0i.view.ListDiff
 import kotlinx.android.synthetic.main.list_item.view.*
 import kotlin.math.max

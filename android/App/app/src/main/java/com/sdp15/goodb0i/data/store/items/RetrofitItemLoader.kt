@@ -1,6 +1,9 @@
-package com.sdp15.goodb0i.data.store
+package com.sdp15.goodb0i.data.store.items
 
+import com.google.gson.GsonBuilder
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
+import com.sdp15.goodb0i.data.store.APIError
+import com.sdp15.goodb0i.data.store.Result
 import kotlinx.coroutines.Deferred
 import okhttp3.OkHttpClient
 import retrofit2.Response
@@ -14,11 +17,11 @@ object RetrofitItemLoader : ItemLoader {
     private val retrofit = Retrofit.Builder().apply {
         client(OkHttpClient().newBuilder().build())
         baseUrl("http://10.0.2.2:8080") // Machine localhost
-        addConverterFactory(GsonConverterFactory.create())
+        addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
         addCallAdapterFactory(CoroutineCallAdapterFactory())
     }.build()
 
-    private val api = retrofit.create(KTORAPI::class.java)
+    private val api = retrofit.create(KTORItemAPI::class.java)
 
     override suspend fun loadItem(id: String): Result<Item> {
         api.getItemAsync(id.toInt()).await().apply {
@@ -26,7 +29,7 @@ object RetrofitItemLoader : ItemLoader {
             return if (isSuccessful && body != null) {
                 Result.Success(body)
             } else {
-                Result.Failure(KTORAPI.APIError(this))
+                Result.Failure(APIError(this))
             }
         }
     }
@@ -37,7 +40,7 @@ object RetrofitItemLoader : ItemLoader {
             return if (isSuccessful && body != null) {
                 Result.Success(body)
             } else {
-                Result.Failure(KTORAPI.APIError(this))
+                Result.Failure(APIError(this))
             }
         }
     }
@@ -48,7 +51,7 @@ object RetrofitItemLoader : ItemLoader {
             return if (isSuccessful && body != null) {
                 Result.Success(body)
             } else {
-                Result.Failure(KTORAPI.APIError(this))
+                Result.Failure(APIError(this))
             }
         }
     }
@@ -59,13 +62,13 @@ object RetrofitItemLoader : ItemLoader {
             return if (isSuccessful && body != null) {
                 Result.Success(body)
             } else {
-                Result.Failure(KTORAPI.APIError(this))
+                Result.Failure(APIError(this))
             }
         }
     }
 }
 
-interface KTORAPI {
+interface KTORItemAPI {
 
     @GET("/stock/{id}")
     fun getItemAsync(@Path("id") id: Int): Deferred<Response<Item>>
@@ -75,12 +78,5 @@ interface KTORAPI {
 
     @GET("/stock/search/{query}")
     fun searchAsync(@Path("query") query: String): Deferred<Response<List<Item>>>
-
-    class APIError(private val status: Int, val text: String) : Exception() {
-        constructor(response: Response<*>) : this(response.code(), response.errorBody()?.string() ?: "")
-
-        override val message: String?
-            get() = "Status: $status. Text: $text"
-    }
 
 }

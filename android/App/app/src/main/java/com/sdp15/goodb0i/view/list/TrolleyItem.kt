@@ -1,6 +1,6 @@
 package com.sdp15.goodb0i.view.list
 
-import com.sdp15.goodb0i.data.store.Item
+import com.sdp15.goodb0i.data.store.items.Item
 
 /**
  * Model for items in the trolley. An added with a quantity

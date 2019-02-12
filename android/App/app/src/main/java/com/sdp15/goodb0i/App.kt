@@ -4,7 +4,10 @@ import android.app.Application
 import com.google.firebase.FirebaseApp
 import com.sdp15.goodb0i.data.scanner.BarcodeReader
 import com.sdp15.goodb0i.data.scanner.MLKitScanner
-import com.sdp15.goodb0i.data.store.*
+import com.sdp15.goodb0i.data.store.items.RetrofitItemLoader
+import com.sdp15.goodb0i.data.store.items.TestDataItemLoader
+import com.sdp15.goodb0i.data.store.lists.ListManager
+import com.sdp15.goodb0i.data.store.lists.RetrofitListManager
 import com.sdp15.goodb0i.view.confirmation.ConfirmationViewModel
 import com.sdp15.goodb0i.view.connection.devices.DeviceListViewModel
 import com.sdp15.goodb0i.view.item.ItemViewModel
@@ -53,7 +56,7 @@ class App : Application() {
         },
         module {
             factory { if (shouldUseTestData) TestDataItemLoader else RetrofitItemLoader }
-            single<ListLoader> { RetrofitListLoader }
+            single<ListManager> { RetrofitListManager }
             single<BarcodeReader> { MLKitScanner() }
         }
     )

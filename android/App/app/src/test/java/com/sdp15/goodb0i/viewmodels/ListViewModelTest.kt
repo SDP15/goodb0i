@@ -2,8 +2,8 @@ package com.sdp15.goodb0i.viewmodels
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
-import com.sdp15.goodb0i.data.store.Item
-import com.sdp15.goodb0i.data.store.TestDataItemLoader
+import com.sdp15.goodb0i.data.store.items.Item
+import com.sdp15.goodb0i.data.store.items.TestDataItemLoader
 import com.sdp15.goodb0i.view.ListDiff
 import com.sdp15.goodb0i.view.list.ListViewModel
 import com.sdp15.goodb0i.view.list.TrolleyItem

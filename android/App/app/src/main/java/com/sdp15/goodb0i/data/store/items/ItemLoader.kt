@@ -1,4 +1,6 @@
-package com.sdp15.goodb0i.data.store
+package com.sdp15.goodb0i.data.store.items
+
+import com.sdp15.goodb0i.data.store.Result
 
 interface ItemLoader {
 

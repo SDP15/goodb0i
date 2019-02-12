@@ -3,9 +3,9 @@ package com.sdp15.goodb0i.view.list
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import com.sdp15.goodb0i.BaseViewModel
-import com.sdp15.goodb0i.data.store.Item
-import com.sdp15.goodb0i.data.store.ItemLoader
-import com.sdp15.goodb0i.data.store.ListLoader
+import com.sdp15.goodb0i.data.store.items.Item
+import com.sdp15.goodb0i.data.store.items.ItemLoader
+import com.sdp15.goodb0i.data.store.lists.ListManager
 import com.sdp15.goodb0i.data.store.Result
 import com.sdp15.goodb0i.view.ListDiff
 import kotlinx.coroutines.Dispatchers
@@ -19,8 +19,8 @@ import timber.log.Timber
 class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.SearchFragmentInteractor,
     KoinComponent {
 
-    private val loader: ItemLoader by inject()
-    private val creator: ListLoader by inject()
+    private val itemLoader: ItemLoader by inject()
+    private val listManager: ListManager by inject()
     // The current shopping list
     private val currentList = mutableListOf<TrolleyItem>()
     val list = MutableLiveData<ListDiff<TrolleyItem>>()
@@ -60,7 +60,12 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
     fun onSaveList() {
         //TODO: Error handling
         GlobalScope.launch (Dispatchers.IO) {
-            creator.createList(currentList.map { Pair(it.item.id, it.count) })
+            val result = listManager.createList(currentList.map { Pair(it.item.id, it.count) })
+            if (result is Result.Success) {
+                listManager.loadList(result.data.toLong())
+            } else {
+                //TODO
+            }
         }
     }
 
@@ -72,7 +77,7 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
         } else {
             searchJob?.cancel()
             searchJob = GlobalScope.launch(Dispatchers.IO) {
-                val result = loader.search(new)
+                val result = itemLoader.search(new)
                 if (result is Result.Success) {
                     retrievedSearchResults.postValue(result.data)
                 } else if (result is Result.Failure) {
