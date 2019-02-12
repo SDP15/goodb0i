@@ -351,7 +351,7 @@ object TestDataItemLoader : ItemLoader {
         items.addAll(gson.fromJson(json, Array<Item>::class.java))
     }
 
-    override suspend fun loadItem(id: Long): Result<Item> {
+    override suspend fun loadItem(id: String): Result<Item> {
         return Result.Success(items.find { it.id == id }!!)
     }
 

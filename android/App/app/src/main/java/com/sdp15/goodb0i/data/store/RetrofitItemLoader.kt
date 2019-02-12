@@ -20,7 +20,7 @@ object RetrofitItemLoader : ItemLoader {
 
     private val api = retrofit.create(KTORAPI::class.java)
 
-    override suspend fun loadItem(id: Long): Result<Item> {
+    override suspend fun loadItem(id: String): Result<Item> {
         api.getItemAsync(id.toInt()).await().apply {
             val body = body()
             return if (isSuccessful && body != null) {
@@ -76,7 +76,7 @@ interface KTORAPI {
     @GET("/stock/search/{query}")
     fun searchAsync(@Path("query") query: String): Deferred<Response<List<Item>>>
 
-    class APIError(val status: Int, val text: String) : Exception() {
+    class APIError(private val status: Int, val text: String) : Exception() {
         constructor(response: Response<*>) : this(response.code(), response.errorBody()?.string() ?: "")
 
         override val message: String?

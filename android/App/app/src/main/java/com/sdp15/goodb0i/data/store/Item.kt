@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 
 data class Item(
-    @SerializedName("id") val id: Long = -1,
+    @SerializedName("id") val id: String = "",
     @SerializedName("name") val name: String,
     @SerializedName("averageSellingUnitWeight") val averageSellingUnitWeight: Double,
     @SerializedName("ContentsMeasureType") val contentsMeasureType: String,
