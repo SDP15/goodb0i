@@ -18,7 +18,7 @@ data class Item(
         @SerializedName("department")
         val department: String,
         @SerializedName("description")
-        val description: kotlin.collections.List<String>,
+        val description: List<String>,
         @SerializedName("id")
         val id: Long,
         @SerializedName("name")

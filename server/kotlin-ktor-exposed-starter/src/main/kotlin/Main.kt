@@ -1,4 +1,3 @@
-import com.fasterxml.jackson.databind.SerializationFeature
 import com.google.gson.Gson
 import com.google.gson.TypeAdapter
 import com.google.gson.annotations.SerializedName
@@ -10,18 +9,17 @@ import io.ktor.features.CallLogging
 import io.ktor.features.ContentNegotiation
 import io.ktor.features.DefaultHeaders
 import io.ktor.gson.gson
-import io.ktor.jackson.jackson
 import io.ktor.routing.Routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.ktor.websocket.WebSockets
 import kotlinx.coroutines.launch
-import model.List
-import model.ListContentsTable
 import model.Stock
-import org.jetbrains.exposed.dao.IntEntity
+import model.Stocks
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import service.DatabaseFactory
+import service.ListService
 import service.ShelfService
 import service.StockService
 import web.shelves
@@ -40,7 +38,7 @@ fun Application.module() {
                 override fun write(out: JsonWriter, value: Stock) {
                     out.beginObject()
                     out.name("id")
-                    out.value(value.id.value)
+                    out.value(value.id.value.toString())
                     out.name("name")
                     out.value(value.name)
                     out.name("superDepartment")
@@ -108,6 +106,9 @@ fun Application.module() {
         print("Stock insert finished")
 
         shelfService.initDefaultShelves()
+        transaction {
+            ListService().createList(Stock.all().limit(4).toList().map { it.id.value.toString()}, listOf(5, 4, 3, 2))
+        }
     }
 
 

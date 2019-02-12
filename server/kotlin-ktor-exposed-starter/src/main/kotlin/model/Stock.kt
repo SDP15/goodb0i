@@ -1,13 +1,11 @@
 package model
 
 import com.google.gson.annotations.SerializedName
-import org.jetbrains.exposed.dao.EntityID
-import org.jetbrains.exposed.dao.IntEntity
-import org.jetbrains.exposed.dao.IntEntityClass
-import org.jetbrains.exposed.dao.IntIdTable
+import org.jetbrains.exposed.dao.*
+import java.util.*
 
 
-object Stocks : IntIdTable() {
+object Stocks : UUIDTable() {
     val name = varchar("name", 255)
     val averageSellingUnitWeight = double("averageSellingUnitWeight")
     val contentsMeasureType = varchar("ContentsMeasureType", 20)
@@ -23,8 +21,8 @@ object Stocks : IntIdTable() {
 
 }
 
-class Stock(id: EntityID<Int>) : IntEntity(id) {
-    companion object : IntEntityClass<Stock>(Stocks)
+class Stock(id: EntityID<UUID>) : UUIDEntity(id) {
+    companion object : UUIDEntityClass<Stock>(Stocks)
     var name by Stocks.name
     var averageSellingUnitWeight by Stocks.averageSellingUnitWeight
     var contentsMeasureType by Stocks.contentsMeasureType

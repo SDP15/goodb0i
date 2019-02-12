@@ -7,6 +7,7 @@ import model.Stock
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import service.DatabaseFactory.dbQuery
+import java.util.*
 
 class StockService {
 
@@ -29,24 +30,10 @@ class StockService {
     }
 
     suspend fun getStock(id: Int): Stock? = dbQuery {
-        Stock.findById(id)
+        Stock.findById(UUID.fromString(id.toString()))
     }
 
-<<<<<<< HEAD
-    suspend fun search(query: String?): List<Stock> = dbQuery {
-        AllStock.selectAll().filter {
-            (it[AllStock.name] + it[AllStock.description] + it[AllStock.department] + it[AllStock.superDepartment]).toLowerCase().contains(query?.toLowerCase() ?: "")
-        }.map(AllStock::toStock)
-    }
 
-    suspend fun updateStock(stock: Stock): Stock? {
-        val id = stock.id
-        return if (id == -1) { //TODO: Better way of doing this
-            addStock(stock)
-        } else {
-            dbQuery {
-=======
->>>>>>> exposed_setup
 
     suspend fun search(query: String?): List<Stock> = transaction {
         Stock.all().filter {
@@ -54,14 +41,8 @@ class StockService {
         }
     }
 
-//    suspend fun updateStock(stock: Stock): Stock? {
-//
-//    }
-//
-//    suspend fun addStock(stock: Stock): Stock {
-//    }
 
-    suspend fun deleteStock(id: Int): Boolean = dbQuery {
+    suspend fun deleteStock(id: UUID): Boolean = dbQuery {
         Stocks.deleteWhere { Stocks.id eq id } > 0
     }
 }

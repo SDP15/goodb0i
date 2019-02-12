@@ -1,11 +1,10 @@
 package model
 
-import org.jetbrains.exposed.dao.EntityID
-import org.jetbrains.exposed.dao.IntEntity
-import org.jetbrains.exposed.dao.IntEntityClass
+import org.jetbrains.exposed.dao.*
+import java.util.*
 
-class Shelf(id: EntityID<Int>) : IntEntity(id) {
-    companion object : IntEntityClass<Shelf>(Shelves)
+class Shelf(id: EntityID<UUID>) : UUIDEntity(id) {
+    companion object : UUIDEntityClass<Shelf>(Shelves)
     var product by Shelves.product
     var quantity by Shelves.quantity
     var position by Shelves.position

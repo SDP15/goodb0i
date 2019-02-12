@@ -4,9 +4,7 @@ import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import model.ShelfRacks
-import model.Shelves
-import model.Stocks
+import model.*
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils.create
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -20,6 +18,8 @@ object DatabaseFactory {
             create(Stocks)
             create(Shelves)
             create(ShelfRacks)
+            create(Lists)
+            create(ListContentsTable)
         }
     }
 

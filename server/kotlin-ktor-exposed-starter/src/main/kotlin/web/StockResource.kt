@@ -58,12 +58,12 @@ fun Route.stock(stockService: StockService) {
             //else call.respond(HttpStatusCode.OK, updated)
         }
 
-        delete("/{id}") {
-            val id = call.parameters["id"]?.toInt()!!
-            val removed = stockService.deleteStock(id)
-            if (removed) call.respond(HttpStatusCode.OK)
-            else call.respond(HttpStatusCode.NotFound)
-        }
+//        delete("/{id}") {
+//            val id = call.parameters["id"]?.toInt()!!
+//            val removed = stockService.deleteStock(id)
+//            if (removed) call.respond(HttpStatusCode.OK)
+//            else call.respond(HttpStatusCode.NotFound)
+//        }
 
     }
 

@@ -35,7 +35,7 @@ class StockResourceTest: ServerTest() {
 //        val stocked = get("/stock")
 //                .then()
 //                .statusCode(200)
-//                .extract().to<List<Stock>>()
+//                .extract().to<Lists<Stock>>()
 //
 //        assertThat(stocked).hasSize(2)
 //        assertThat(stocked).extracting("name").containsExactlyInAnyOrder(stock1.name, stock2.name)
