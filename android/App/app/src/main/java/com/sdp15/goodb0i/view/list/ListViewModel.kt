@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import com.sdp15.goodb0i.BaseViewModel
 import com.sdp15.goodb0i.data.store.Item
 import com.sdp15.goodb0i.data.store.ItemLoader
+import com.sdp15.goodb0i.data.store.ListLoader
 import com.sdp15.goodb0i.data.store.Result
 import com.sdp15.goodb0i.view.ListDiff
 import kotlinx.coroutines.Dispatchers
@@ -19,7 +20,7 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
     KoinComponent {
 
     private val loader: ItemLoader by inject()
-
+    private val creator: ListLoader by inject()
     // The current shopping list
     private val currentList = mutableListOf<TrolleyItem>()
     val list = MutableLiveData<ListDiff<TrolleyItem>>()
@@ -54,6 +55,13 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
     val totalPrice = MutableLiveData<Double>()
 
     override fun bind() {
+    }
+
+    fun onSaveList() {
+        //TODO: Error handling
+        GlobalScope.launch (Dispatchers.IO) {
+            creator.createList(currentList.map { Pair(it.item.id, it.count) })
+        }
     }
 
     private var searchJob: Job? = null // Ongoing search job

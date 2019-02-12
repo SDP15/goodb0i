@@ -32,6 +32,9 @@ class ShoppingListFragment : Fragment() {
         vm.totalPrice.observe(this, Observer {
             label_total_price.text = getString(R.string.label_item_price, it)
         })
+        list_save_button.setOnClickListener {
+            vm.onSaveList()
+        }
     }
 
     override fun onCreateView(
