@@ -15,6 +15,7 @@ import org.junit.Test
 import org.koin.test.KoinTest
 import org.koin.test.declare
 import timber.log.Timber
+import java.util.*
 
 class ListViewModelTest : KoinTest {
 
@@ -139,7 +140,8 @@ class ListViewModelTest : KoinTest {
         val secondItem: Item = mockk(relaxed = true)
         every { item.price } answers { price1 }
         every { secondItem.price } answers { price2 }
-        every { secondItem.id } answers { 2 }
+        val id = UUID.randomUUID()
+        every { secondItem.id } answers { id.toString() }
         val priceObserver: Observer<Double> = mockk(relaxed = true)
         val slot = slot<Double>()
         vm.totalPrice.observeForever(priceObserver)
