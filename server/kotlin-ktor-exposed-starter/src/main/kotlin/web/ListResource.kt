@@ -28,6 +28,7 @@ fun Route.lists(listService: ListService) {
                     Pair(it.values.elementAt(0) as String, // UUID string
                             (it.values.elementAt(1) as Double).toInt())  // Quantity
                 }
+                println("Items are $flat")
                 val list = listService.createList(flat.map { it.first }, flat.map { it.second } )
                 if (list.isPresent) {
                     call.respondText(list.get().code.toString(), status = HttpStatusCode.Created)
@@ -44,7 +45,7 @@ fun Route.lists(listService: ListService) {
             } else {
                 val list = listService.loadList(code)
                 if (list.isPresent) {
-                    call.respond(HttpStatusCode.Found, list.get())
+                    call.respond(list.get())
                 } else {
                     call.respond(HttpStatusCode.NotFound)
                 }

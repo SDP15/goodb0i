@@ -4,6 +4,7 @@ import model.*
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
+import kotlin.random.Random
 
 class ListService {
 
@@ -25,7 +26,7 @@ class ListService {
                     }
             // Create the list with the ListProducts we just created
             val list = model.List.new {
-                code = 1
+                code = Random.nextLong(0,1000000)
                 time = System.currentTimeMillis()
                 products = SizedCollection(listProducts)
             }

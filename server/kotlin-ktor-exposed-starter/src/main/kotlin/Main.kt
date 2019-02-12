@@ -16,6 +16,7 @@ import io.ktor.websocket.WebSockets
 import kotlinx.coroutines.launch
 import model.List
 import model.Stock
+import model.adapters.ListTypeAdapter
 import model.adapters.StockTypeAdapter
 import org.jetbrains.exposed.sql.transactions.transaction
 import service.DatabaseFactory
@@ -36,38 +37,7 @@ fun Application.module() {
     install(ContentNegotiation) {
         gson {
             registerTypeAdapter(Stock::class.java, StockTypeAdapter)
-            registerTypeAdapter(List::class.java, object : TypeAdapter<model.List>() {
-                override fun write(out: JsonWriter, list: List) {
-                    transaction {
-                        out.beginObject()
-                        out.name("code")
-                        out.value(list.code)
-                        out.name("time")
-                        out.value(list.time)
-                        out.name("products")
-
-                        out.beginObject()
-                        println("Writing products to JSON ${list.products.map { it.product.name }}")
-                        list.products.forEachIndexed { index, listProduct ->
-                            println("Writing product with quantity ${listProduct.quantity}")
-                            out.name(index.toString())
-                            out.beginObject()
-                            out.name("quantity")
-                            out.value(listProduct.quantity)
-                            out.name("product")
-                            StockTypeAdapter.write(out, listProduct.product)
-                            out.endObject()
-                        }
-                        out.endObject()
-                        out.endObject()
-                    }
-
-                }
-
-                override fun read(`in`: JsonReader?): List {
-                    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-                }
-            })
+            registerTypeAdapter(List::class.java, ListTypeAdapter)
         }
 //        jackson {
 //            configure(SerializationFeature.INDENT_OUTPUT, true)

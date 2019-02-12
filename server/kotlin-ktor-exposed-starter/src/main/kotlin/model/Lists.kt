@@ -7,7 +7,7 @@ import java.util.*
 
 object Lists : UUIDTable() {
     val code = long("code")
-    val time = long("time")
+    val time = long("time").autoIncrement().nullable()
 }
 
 class List(id: EntityID<UUID>) : UUIDEntity(id) {
