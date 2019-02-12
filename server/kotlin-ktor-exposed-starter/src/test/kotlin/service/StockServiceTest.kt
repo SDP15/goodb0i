@@ -9,14 +9,14 @@ class StockServiceTest: ServerTest() {
 
     private val stockService = StockService()
 
-    @Test
-    fun testAddStock() = runBlocking {
-        val stock = Stock(-1, "Named item", 0.0, "", 0.0, 1, "", "", listOf(""), 0.0, "", 0.0)
-        val id = stockService.addStock(stock).id
-        val retrieved = stockService.getStock(id)
-        println("Retrieved $retrieved")
-
-    }
+//    @Test
+//    fun testAddStock() = runBlocking {
+//        val stock = Stock(-1, "Named item", 0.0, "", 0.0, 1, "", "", listOf(""), 0.0, "", 0.0)
+//        val id = stockService.addStock(stock).id
+//        val retrieved = stockService.getStock(id)
+//        println("Retrieved $retrieved")
+//
+//    }
 
 //    @Test
 //    fun testAddStock() = runBlocking {

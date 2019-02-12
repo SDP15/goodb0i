@@ -6,5 +6,9 @@ import service.ShelfService
 
 fun Route.shelves(shelfService: ShelfService) {
 
-    route("/shelves" ) {}
+    route("/shelves" ) {
+
+
+
+    }
 }

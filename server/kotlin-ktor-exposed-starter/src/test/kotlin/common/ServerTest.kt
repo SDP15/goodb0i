@@ -46,10 +46,10 @@ open class ServerTest {
         }
     }
 
-    @BeforeEach
-    fun before() = transaction {
-        Stocks.deleteAll()
-        Unit
-    }
+//    @BeforeEach
+//    fun before() = transaction {
+//        Stocks.deleteAll()
+//        Unit
+//    }
 
 }

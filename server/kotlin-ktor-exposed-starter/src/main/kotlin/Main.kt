@@ -22,6 +22,7 @@ import service.DatabaseFactory
 import service.ListService
 import service.ShelfService
 import service.StockService
+import web.lists
 import web.shelves
 import web.stock
 import java.io.File
@@ -115,6 +116,7 @@ fun Application.module() {
     install(Routing) {
         stock(stockService)
         shelves(shelfService)
+        lists(ListService())
     }
 
 }
