@@ -21,19 +21,26 @@ class ListResourceTest : ServerTest() {
         transaction {
             stock.addAll(Stock.all().toList())
         }
+
     }
 
     @Test
     fun testCreateList() {
         val testList = stock.subList(0, 4).map { Pair(it.id.value.toString(), Random.nextInt(1, 10)) }
-        given().contentType(ContentType.JSON)
+        val response = given().contentType(ContentType.JSON)
                 .body(testList)
                 .When()
                 .post("/lists/new")
                 .then()
                 .statusCode(HttpStatusCode.Created.value)
                 .extract()
+        println("Creation response ${response.headers().asList()}\n${response.to<String>()}")
+    }
 
+    @Test
+    fun testRetrieveList() {
+        testCreateList()
+        given().When().get("/lists/load/")
     }
 
 }

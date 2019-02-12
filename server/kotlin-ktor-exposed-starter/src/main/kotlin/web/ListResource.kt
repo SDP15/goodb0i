@@ -6,7 +6,9 @@ import io.ktor.features.toLogString
 import io.ktor.http.HttpStatusCode
 import io.ktor.request.receiveOrNull
 import io.ktor.response.respond
+import io.ktor.response.respondText
 import io.ktor.routing.Route
+import io.ktor.routing.get
 import io.ktor.routing.post
 import io.ktor.routing.route
 import service.ListService
@@ -26,8 +28,26 @@ fun Route.lists(listService: ListService) {
                     Pair(it.values.elementAt(0) as String, // UUID string
                             (it.values.elementAt(1) as Double).toInt())  // Quantity
                 }
-                listService.createList(flat.map { it.first }, flat.map { it.second } )
-                call.respond(HttpStatusCode.Created, "")
+                val list = listService.createList(flat.map { it.first }, flat.map { it.second } )
+                if (list.isPresent) {
+                    call.respondText(list.get().code.toString(), status = HttpStatusCode.Created)
+                } else {
+                    call.respond(HttpStatusCode.InternalServerError)
+                }
+            }
+        }
+
+        get("/load/{code}") {
+            val code = call.parameters["code"]?.toLongOrNull()
+            if (code == null) {
+                call.respond(HttpStatusCode.BadRequest)
+            } else {
+                val list = listService.loadList(code)
+                if (list.isPresent) {
+                    call.respond(HttpStatusCode.Found, list.get())
+                } else {
+                    call.respond(HttpStatusCode.NotFound)
+                }
             }
         }
 

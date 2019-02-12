@@ -14,9 +14,9 @@ import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.ktor.websocket.WebSockets
 import kotlinx.coroutines.launch
+import model.List
 import model.Stock
-import model.Stocks
-import org.jetbrains.exposed.sql.selectAll
+import model.adapters.StockTypeAdapter
 import org.jetbrains.exposed.sql.transactions.transaction
 import service.DatabaseFactory
 import service.ListService
@@ -35,41 +35,36 @@ fun Application.module() {
 
     install(ContentNegotiation) {
         gson {
-            registerTypeAdapter(Stock::class.java, object: TypeAdapter<Stock>() {
-                override fun write(out: JsonWriter, value: Stock) {
-                    out.beginObject()
-                    out.name("id")
-                    out.value(value.id.value.toString())
-                    out.name("name")
-                    out.value(value.name)
-                    out.name("superDepartment")
-                    out.value(value.superDepartment)
-                    out.name("ContentsMeasureType")
-                    out.value(value.contentsMeasureType)
-                    out.name("UnitOfSale")
-                    out.value(value.unitOfSale)
-                    out.name("description")
-                    out.beginArray()
-                    value.description.split("//").forEach {
-                        out.value(it)
+            registerTypeAdapter(Stock::class.java, StockTypeAdapter)
+            registerTypeAdapter(List::class.java, object : TypeAdapter<model.List>() {
+                override fun write(out: JsonWriter, list: List) {
+                    transaction {
+                        out.beginObject()
+                        out.name("code")
+                        out.value(list.code)
+                        out.name("time")
+                        out.value(list.time)
+                        out.name("products")
+
+                        out.beginObject()
+                        println("Writing products to JSON ${list.products.map { it.product.name }}")
+                        list.products.forEachIndexed { index, listProduct ->
+                            println("Writing product with quantity ${listProduct.quantity}")
+                            out.name(index.toString())
+                            out.beginObject()
+                            out.name("quantity")
+                            out.value(listProduct.quantity)
+                            out.name("product")
+                            StockTypeAdapter.write(out, listProduct.product)
+                            out.endObject()
+                        }
+                        out.endObject()
+                        out.endObject()
                     }
-                    out.endArray()
-                    out.name("AverageSellingUnitWeight")
-                    out.value(value.averageSellingUnitWeight)
-                    out.name("UnitQuantity")
-                    out.value(value.unitQuantity)
-                    out.name("contentsQuantity")
-                    out.value(value.contentsQuantity)
-                    out.name("department")
-                    out.value(value.department)
-                    out.name("price")
-                    out.value(value.price)
-                    out.name("unitPrice")
-                    out.value(value.unitPrice)
-                    out.endObject()
+
                 }
 
-                override fun read(`in`: JsonReader?): Stock {
+                override fun read(`in`: JsonReader?): List {
                     TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
                 }
             })
@@ -108,7 +103,7 @@ fun Application.module() {
 
         shelfService.initDefaultShelves()
         transaction {
-            ListService().createList(Stock.all().limit(4).toList().map { it.id.value.toString()}, listOf(5, 4, 3, 2))
+            ListService().createList(Stock.all().limit(4).toList().map { it.id.value.toString() }, listOf(5, 4, 3, 2))
         }
     }
 
@@ -151,8 +146,9 @@ private fun getTestData(): Array<Item> {
 class Main {
     companion object {
 
-        @JvmStatic fun main(args: Array<String>) {
-            embeddedServer(Netty, port=8080, watchPaths = listOf("MainKt"), module = Application::module).start()
+        @JvmStatic
+        fun main(args: Array<String>) {
+            embeddedServer(Netty, port = 8080, watchPaths = listOf("MainKt"), module = Application::module).start()
             val wd = System.getProperty("user.dir")
             println("Working directory $wd")
         }
