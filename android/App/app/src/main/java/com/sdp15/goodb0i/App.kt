@@ -4,6 +4,7 @@ import android.app.Application
 import com.google.firebase.FirebaseApp
 import com.sdp15.goodb0i.data.scanner.BarcodeReader
 import com.sdp15.goodb0i.data.scanner.MLKitScanner
+import com.sdp15.goodb0i.data.sockets.SocketHandler
 import com.sdp15.goodb0i.data.store.items.RetrofitItemLoader
 import com.sdp15.goodb0i.data.store.items.TestDataItemLoader
 import com.sdp15.goodb0i.data.store.lists.ListManager
@@ -58,6 +59,7 @@ class App : Application() {
             factory { if (shouldUseTestData) TestDataItemLoader else RetrofitItemLoader }
             single<ListManager> { RetrofitListManager }
             single<BarcodeReader> { MLKitScanner() }
+            single<SocketHandler> { SocketHandler() }
         }
     )
 }
