@@ -23,6 +23,7 @@ import service.DatabaseFactory
 import service.ListService
 import service.ShelfService
 import service.StockService
+import web.app
 import web.lists
 import web.shelves
 import web.stock
@@ -82,6 +83,7 @@ fun Application.module() {
         stock(stockService)
         shelves(shelfService)
         lists(ListService())
+        app()
     }
 
 }

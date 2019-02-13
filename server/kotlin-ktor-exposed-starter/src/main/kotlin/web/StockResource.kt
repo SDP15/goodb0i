@@ -76,6 +76,7 @@ fun Route.stock(stockService: StockService) {
         try {
             stockService.addChangeListener(this.hashCode()) {
                 outgoing.send(Frame.Text(mapper.writeValueAsString(it)))
+
             }
             while (true) {
                 incoming.receiveOrNull() ?: break
