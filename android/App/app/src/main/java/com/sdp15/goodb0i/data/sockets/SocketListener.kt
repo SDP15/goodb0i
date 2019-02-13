@@ -6,14 +6,14 @@ import okhttp3.WebSocketListener
 import okio.ByteString
 import timber.log.Timber
 
-class SocketListener : WebSocketListener() {
+class SocketListener(val name: String) : WebSocketListener() {
 
     private var count = 0
 
     override fun onOpen(webSocket: WebSocket, response: Response) {
         super.onOpen(webSocket, response)
         Timber.i("Socket opened $response")
-        webSocket.send("Some text from the phone")
+        webSocket.send("Some text from the phone $name")
     }
 
     override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
@@ -29,7 +29,7 @@ class SocketListener : WebSocketListener() {
     override fun onMessage(webSocket: WebSocket, text: String) {
         super.onMessage(webSocket, text)
         count++
-        Timber.i("Received message $text")
+        Timber.i("Received message $text for $name")
         webSocket.send("Some text from phone $count")
     }
 

@@ -33,7 +33,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         supportActionBar?.hide()
 
-        sh.start("http://10.0.2.2:8080/connect")
+        sh.start("http://10.0.2.2:8080/connect", "first socket")
+
+        SocketHandler().start("http://10.0.2.2:8080/connect", "second socket")
 
     }
 

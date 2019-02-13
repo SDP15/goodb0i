@@ -6,9 +6,9 @@ import timber.log.Timber
 
 class SocketHandler {
 
-    fun start(url: String) {
+    fun start(url: String, name: String) {
         val request = Request.Builder().url(url).build()
-        val listener = SocketListener()
+        val listener = SocketListener(name)
         val client = OkHttpClient()
         Timber.i("Starting websocket")
         client.newWebSocket(request, listener)
