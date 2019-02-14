@@ -1,0 +1,12 @@
+## THIS TEST IS GIVEN BY THE FOLLOWING PATH TO AN ACCEPTING STATE ##
+
+1. State: INIT Transition: "start"
+2. State: BEGINNING0 Transition: "no"
+3. State: BEGINNING2 Transition: "yes"
+4. State: TUTORIAL0 Transition: "yes"
+5. State: TUTORIAL1 Transition: "yes"
+6. State: TUTORIAL2 Transition: "yes"
+7. State: TUTORIAL3 Transition: "yes"
+8. State: SHOPPING0
+
+## RESULTS: 5/5 tests completed successfully. 3 tests had keyword detection errors. ##

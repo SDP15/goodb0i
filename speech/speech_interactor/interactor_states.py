@@ -5,10 +5,9 @@ errorMessage = "Sorry, I couldn't recognise your command."
 unconst = "That is not an option. Please try another option. To hear your options, say: options."
 
 tut1output = "Once you have selected an item, you can scan its barcode using the "\
-             "camera on your phone. Don't worry, I will help you with this. "\
+             "camera on your phone."\
              "Once you have scanned the item, I can tell you information about "\
-             "the item you have picked up. If you pick up the wrong item, "\
-             "you can try again. Does this make sense?"
+             "the item you have picked up. Does this make sense?"
 
 tut0no = "I will tell you when we have arrived at an item. "\
                "In this shop, the items will always be on your right. "\
