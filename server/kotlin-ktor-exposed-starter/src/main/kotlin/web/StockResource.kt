@@ -35,7 +35,7 @@ fun Route.stock(stockService: StockService) {
         }
 
         get("/{id}") {
-            val stock = stockService.getStock(call.parameters["id"]?.toInt()!!)
+            val stock = stockService.getStock(call.parameters["id"]!!)
             if (stock == null) call.respond(HttpStatusCode.NotFound)
             else call.respond(stock)
         }
@@ -65,24 +65,5 @@ fun Route.stock(stockService: StockService) {
 //            else call.respond(HttpStatusCode.NotFound)
 //        }
 
-    }
-
-    val mapper = jacksonObjectMapper().apply {
-        setSerializationInclusion(JsonInclude.Include.NON_NULL)
-
-    }
-
-    webSocket("/updates") {
-        try {
-            stockService.addChangeListener(this.hashCode()) {
-                outgoing.send(Frame.Text(mapper.writeValueAsString(it)))
-
-            }
-            while (true) {
-                incoming.receiveOrNull() ?: break
-            }
-        } finally {
-            stockService.removeChangeListener(this.hashCode())
-        }
     }
 }

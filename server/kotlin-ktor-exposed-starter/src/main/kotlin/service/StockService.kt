@@ -1,48 +1,29 @@
 package service
 
-import model.Stocks
-import model.ChangeType
-import model.Notification
 import model.Stock
-import org.jetbrains.exposed.sql.*
+import model.Stocks
+import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.transactions.transaction
-import service.DatabaseFactory.dbQuery
 import java.util.*
 
 class StockService {
 
-    private val listeners = mutableMapOf<Int, suspend (Notification<Stock?>) -> Unit>()
-
-    fun addChangeListener(id: Int, listener: suspend (Notification<Stock?>) -> Unit) {
-        listeners[id] = listener
-    }
-
-    fun removeChangeListener(id: Int) = listeners.remove(id)
-
-    private suspend fun onChange(type: ChangeType, id: Int, entity: Stock? = null) {
-        listeners.values.forEach {
-            it.invoke(Notification(type, id, entity))
-        }
-    }
-
-    suspend fun getAllStock(): List<Stock> = transaction {
+    fun getAllStock(): List<Stock> = transaction {
         Stock.all().toList()
     }
 
-    suspend fun getStock(id: Int): Stock? = dbQuery {
-        Stock.findById(UUID.fromString(id.toString()))
+    fun getStock(id: String): Stock? = transaction {
+        Stock.findById(UUID.fromString(id))
     }
 
-
-
-    suspend fun search(query: String?): List<Stock> = transaction {
+    fun search(query: String?): List<Stock> = transaction {
         Stock.all().filter {
-            (it.name + it.description + it.department).toLowerCase().contains(query?.toLowerCase() ?: "")
+            (it.name + it.description + it.department).toLowerCase().contains(query?.toLowerCase()
+                    ?: "")
         }
     }
 
-
-    suspend fun deleteStock(id: UUID): Boolean = dbQuery {
+    fun deleteStock(id: UUID): Boolean = transaction {
         Stocks.deleteWhere { Stocks.id eq id } > 0
     }
 }
