@@ -74,6 +74,7 @@ class SpeechInteractor:
         
     def set_up_pyttsx(self):
         self.engine = pyttsx.init()
+        self.engine.setProperty('voice', self.engine.getProperty('voices')[3].id)
         self.engine.setProperty('rate', 170)
 
     def nextState(self, state):
