@@ -5,12 +5,15 @@ import com.google.firebase.FirebaseApp
 import com.sdp15.goodb0i.data.scanner.BarcodeReader
 import com.sdp15.goodb0i.data.scanner.MLKitScanner
 import com.sdp15.goodb0i.data.sockets.SocketHandler
+import com.sdp15.goodb0i.data.store.items.ItemLoader
 import com.sdp15.goodb0i.data.store.items.RetrofitItemLoader
 import com.sdp15.goodb0i.data.store.items.TestDataItemLoader
 import com.sdp15.goodb0i.data.store.lists.ListManager
 import com.sdp15.goodb0i.data.store.lists.RetrofitListManager
 import com.sdp15.goodb0i.view.confirmation.ConfirmationViewModel
 import com.sdp15.goodb0i.view.connection.devices.DeviceListViewModel
+import com.sdp15.goodb0i.view.debug.CapturingDebugTree
+import com.sdp15.goodb0i.view.debug.Config
 import com.sdp15.goodb0i.view.item.ItemViewModel
 import com.sdp15.goodb0i.view.list.ListViewModel
 import com.sdp15.goodb0i.view.orders.OrdersViewModel
@@ -28,7 +31,7 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        Timber.plant(Timber.DebugTree())
+        Timber.plant(CapturingDebugTree)
 
         FirebaseApp.initializeApp(this) // Initialise FireBase for MLKit
 
@@ -42,8 +45,6 @@ class App : Application() {
         })
     }
 
-    var shouldUseTestData = false
-
     private val modules = listOf(
         module {
             viewModel<PinViewModel>()
@@ -56,7 +57,7 @@ class App : Application() {
             viewModel<DeviceListViewModel>()
         },
         module {
-            factory { if (shouldUseTestData) TestDataItemLoader else RetrofitItemLoader }
+            single<ItemLoader> { TestDataItemLoader.DelegateItemLoader(RetrofitItemLoader, Config::shouldUseTestData) }
             single<ListManager> { RetrofitListManager }
             single<BarcodeReader> { MLKitScanner() }
             single<SocketHandler> { SocketHandler() }

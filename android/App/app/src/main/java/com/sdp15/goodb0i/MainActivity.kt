@@ -20,6 +20,8 @@ import com.sdp15.goodb0i.data.bluetooth.SafeHandler
 import com.sdp15.goodb0i.data.sockets.SocketHandler
 import com.sdp15.goodb0i.view.BaseFragment
 import com.sdp15.goodb0i.view.connection.BluetoothService
+import com.sdp15.goodb0i.view.debug.CapturingDebugTree
+import com.sdp15.goodb0i.view.debug.Config
 import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.android.ext.android.inject
 import timber.log.Timber
@@ -33,9 +35,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         supportActionBar?.hide()
 
-        sh.start("http://10.0.2.2:8080/connect", "first socket")
+        //sh.start("http://10.0.2.2:8080/connect", "first socket")
 
-        SocketHandler().start("http://10.0.2.2:8080/connect", "second socket")
+        //SocketHandler().start("http://10.0.2.2:8080/connect", "second socket")
 
     }
 
@@ -51,10 +53,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
-            // Switch application config flag
-            //TODO: Move this to a setup dialog
-            (application as App).shouldUseTestData = !(application as App).shouldUseTestData
-            Toast.makeText(this, "Using test data? ${(application as App).shouldUseTestData}", Toast.LENGTH_LONG).show()
+            Config.showDialog(this)
             return true
         }
         return super.onKeyDown(keyCode, event)
