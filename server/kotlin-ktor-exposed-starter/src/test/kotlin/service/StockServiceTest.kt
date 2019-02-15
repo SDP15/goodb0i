@@ -1,9 +1,6 @@
 package service
 
 import common.ServerTest
-import kotlinx.coroutines.runBlocking
-import model.Stock
-import org.junit.jupiter.api.Test
 
 class StockServiceTest: ServerTest() {
 
@@ -11,8 +8,8 @@ class StockServiceTest: ServerTest() {
 
 //    @Test
 //    fun testAddStock() = runBlocking {
-//        val stock = Stock(-1, "Named item", 0.0, "", 0.0, 1, "", "", listOf(""), 0.0, "", 0.0)
-//        val id = stockService.addStock(stock).id
+//        val products = Stock(-1, "Named item", 0.0, "", 0.0, 1, "", "", listOf(""), 0.0, "", 0.0)
+//        val id = stockService.addStock(products).id
 //        val retrieved = stockService.getStock(id)
 //        println("Retrieved $retrieved")
 //
@@ -205,7 +202,7 @@ class StockServiceTest: ServerTest() {
 //        }
 //    }
 //
-//    private suspend fun addStock(stock: NewStock): Stock {
-//        return stockService.addStock(stock)
+//    private suspend fun addStock(products: NewStock): Stock {
+//        return stockService.addStock(products)
 //    }
 }

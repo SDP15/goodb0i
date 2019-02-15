@@ -7,12 +7,8 @@ import io.ktor.server.netty.Netty
 import io.restassured.RestAssured
 import io.restassured.response.ResponseBodyExtractionOptions
 import io.restassured.specification.RequestSpecification
-import model.Stocks
 import module
-import org.jetbrains.exposed.sql.deleteAll
-import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.BeforeEach
 import java.util.concurrent.TimeUnit
 
 open class ServerTest {

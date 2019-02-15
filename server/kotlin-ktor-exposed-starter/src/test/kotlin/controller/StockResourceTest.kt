@@ -1,12 +1,6 @@
-package web
+package controller
 
 import common.ServerTest
-import io.restassured.RestAssured.*
-import io.restassured.http.ContentType
-import model.Stock
-import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
 
 class StockResourceTest: ServerTest() {
 
@@ -16,7 +10,7 @@ class StockResourceTest: ServerTest() {
 //        val newStock = NewStock(null, "stock1", 12)
 //        val created = addStock(newStock)
 //
-//        val retrieved = get("/stock/{id}", created.id)
+//        val retrieved = get("/products/{id}", created.id)
 //                .then()
 //                .extract().to<Stock>()
 //
@@ -32,7 +26,7 @@ class StockResourceTest: ServerTest() {
 //        addStock(stock1)
 //        addStock(stock2)
 //
-//        val stocked = get("/stock")
+//        val stocked = get("/products")
 //                .then()
 //                .statusCode(200)
 //                .extract().to<Lists<Stock>>()
@@ -54,7 +48,7 @@ class StockResourceTest: ServerTest() {
 //                .contentType(ContentType.JSON)
 //                .body(update)
 //                .When()
-//                .put("/stock")
+//                .put("/products")
 //                .then()
 //                .statusCode(200)
 //                .extract().to<Stock>()
@@ -72,11 +66,11 @@ class StockResourceTest: ServerTest() {
 //        val created = addStock(newStock)
 //
 //        // then
-//        delete("/stock/{id}", created.id)
+//        delete("/products/{id}", created.id)
 //                .then()
 //                .statusCode(200)
 //
-//        get("/stock/{id}", created.id)
+//        get("/products/{id}", created.id)
 //                .then()
 //                .statusCode(404)
 //    }
@@ -91,33 +85,33 @@ class StockResourceTest: ServerTest() {
 //                    .contentType(ContentType.JSON)
 //                    .body(updatedStock)
 //                    .When()
-//                    .put("/stock")
+//                    .put("/products")
 //                    .then()
 //                    .statusCode(404)
 //        }
 //
 //        @Test
 //        fun testDeleteInvalidStock() {
-//            delete("/stock/{id}", "-1")
+//            delete("/products/{id}", "-1")
 //                    .then()
 //                    .statusCode(404)
 //        }
 //
 //        @Test
 //        fun testGetInvalidStock() {
-//            get("/stock/{id}", "-1")
+//            get("/products/{id}", "-1")
 //                    .then()
 //                    .statusCode(404)
 //        }
 //
 //    }
 //
-//    private fun addStock(stock: NewStock): Stock {
+//    private fun addStock(products: NewStock): Stock {
 //        return given()
 //                .contentType(ContentType.JSON)
-//                .body(stock)
+//                .body(products)
 //                .When()
-//                .post("/stock")
+//                .post("/products")
 //                .then()
 //                .statusCode(201)
 //                .extract().to()

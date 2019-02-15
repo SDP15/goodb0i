@@ -1,15 +1,15 @@
-package service
+package repository
 
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import model.Shelf
-import model.ShelfRack
-import model.Stock
 import mu.KotlinLogging
 import org.jetbrains.exposed.sql.transactions.transaction
+import repository.shelves.Shelf
+import repository.shelves.ShelfRack
+import repository.products.Product
 import java.io.File
 
 object TestDataProvider {
@@ -19,10 +19,10 @@ object TestDataProvider {
     fun insert() {
         GlobalScope.launch(Dispatchers.IO) {
 
-            kLogger.debug("Inserting test stock data")
+            kLogger.debug("Inserting test products data")
             transaction {
                 getTestData().forEach {
-                    Stock.new {
+                    Product.new {
                         name = it.name
                         averageSellingUnitWeight = it.averageSellingUnitWeight
                         contentsMeasureType = it.contentsMeasureType
@@ -36,7 +36,7 @@ object TestDataProvider {
                         unitPrice = it.unitPrice
                     }
                 }
-                kLogger.debug("Stock insert complete. ${Stock.all().count()} inserted")
+                kLogger.debug("Product insert complete. ${Product.all().count()} inserted")
             }
 
             createDefaultShelves()
@@ -58,8 +58,8 @@ object TestDataProvider {
                 })
             }
             var count = 0
-            kLogger.debug("Inserting shelves onto racks for default stock data")
-            Stock.all().forEach { stock ->
+            kLogger.debug("Inserting shelves onto racks for default products data")
+            Product.all().forEach { stock ->
                 when {
                     arrayOf("Milk", "Cheese").any { stock.department.contains(it) } -> {
                         kLogger.debug("Inserting dairy shelf for ${stock.department}")
@@ -98,7 +98,7 @@ object TestDataProvider {
                             rack = racks.first { it.info == "Fruits" }.id
                         }
                     }
-                    arrayOf("Bread", "Dough").any { stock.department.contains(it)} -> {
+                    arrayOf("Bread", "Dough").any { stock.department.contains(it) } -> {
 
                         kLogger.debug("Inserting bakery shelf for ${stock.department}")
                         Shelf.new {
@@ -117,7 +117,7 @@ object TestDataProvider {
                             rack = racks.first { it.info == "Seafood" }.id
                         }
                     }
-                    arrayOf("Cereal", "Table", "Pasta").any { stock.department.contains(it)} -> {
+                    arrayOf("Cereal", "Table", "Pasta").any { stock.department.contains(it) } -> {
                         kLogger.debug("Inserting cupoard shelf for ${stock.department}")
                         Shelf.new {
                             position = count % 3
@@ -143,7 +143,7 @@ object TestDataProvider {
 
     private fun getTestData(): Array<Item> {
         val path = System.getProperty("user.dir") + "/src/main/resources/items.json"
-        kLogger.debug("Reading test stock data from $path")
+        kLogger.debug("Reading test products data from $path")
         val file = File(path).bufferedReader()
         val gson = Gson()
         return gson.fromJson(file, Array<Item>::class.java)

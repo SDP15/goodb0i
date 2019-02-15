@@ -1,4 +1,4 @@
-package model
+package repository.shelves
 
 import org.jetbrains.exposed.dao.IntIdTable
 

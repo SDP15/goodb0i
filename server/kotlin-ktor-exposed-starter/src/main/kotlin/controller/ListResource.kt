@@ -1,4 +1,4 @@
-package web
+package controller
 
 import com.google.gson.internal.LinkedTreeMap
 import io.ktor.application.call
@@ -29,9 +29,9 @@ fun Route.lists(listService: ListService) {
                             (it.values.elementAt(1) as Double).toInt())  // Quantity
                 }
                 println("Items are $flat")
-                val list = listService.createList(flat.map { it.first }, flat.map { it.second } )
-                if (list.isPresent) {
-                    call.respondText(list.get().code.toString(), status = HttpStatusCode.Created)
+                val list = listService.createList(flat.map { it.first }, flat.map { it.second })
+                if (list != null) {
+                    call.respondText(list.code.toString(), status = HttpStatusCode.Created)
                 } else {
                     call.respond(HttpStatusCode.InternalServerError)
                 }
@@ -44,8 +44,8 @@ fun Route.lists(listService: ListService) {
                 call.respond(HttpStatusCode.BadRequest)
             } else {
                 val list = listService.loadList(code)
-                if (list.isPresent) {
-                    call.respond(list.get())
+                if (list != null) {
+                    call.respond(list)
                 } else {
                     call.respond(HttpStatusCode.NotFound)
                 }
