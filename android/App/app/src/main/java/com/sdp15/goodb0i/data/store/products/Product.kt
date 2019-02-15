@@ -1,9 +1,9 @@
-package com.sdp15.goodb0i.data.store.items
+package com.sdp15.goodb0i.data.store.products
 
 import com.google.gson.annotations.SerializedName
 
 
-data class Item(
+data class Product(
     @SerializedName("id") val id: String = "",
     @SerializedName("name") val name: String,
     @SerializedName("averageSellingUnitWeight") val averageSellingUnitWeight: Double,
@@ -20,6 +20,6 @@ data class Item(
 
 ) {
     override fun equals(other: Any?): Boolean {
-        return other is Item && other.id == id
+        return other is Product && other.id == id
     }
 }

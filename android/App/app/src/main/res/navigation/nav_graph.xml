@@ -85,9 +85,9 @@
     </fragment>
 
     <fragment android:id="@+id/item_fragment"
-        android:name="com.sdp15.goodb0i.view.item.ItemFragment"
+        android:name="com.sdp15.goodb0i.view.product.ProductFragment"
         android:label="item_fragment"
-        tools:layout="@layout/layout_item_display">
+        tools:layout="@layout/layout_product_display">
 
         <action
             android:id="@+id/action_item_fragment_to_scanner_fragment"

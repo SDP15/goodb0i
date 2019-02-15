@@ -9,7 +9,7 @@ import com.sdp15.goodb0i.R
 object Config {
 
     private val settings = mutableListOf<Pair<String, Boolean>>().apply {
-        add(Pair("Test item data", false))
+        add(Pair("Test product data", false))
     }
     private val names: Array<String>
         get() = settings.map { it.first }.toTypedArray()

@@ -1,11 +1,11 @@
 package com.sdp15.goodb0i.data.store.lists
 
 import com.google.gson.annotations.SerializedName
-import com.sdp15.goodb0i.data.store.items.Item
+import com.sdp15.goodb0i.data.store.products.Product
 
 /**
- * Item representing
+ * Product representing
  */
 data class ListItem(
-    @SerializedName("product") val item: Item,
+    @SerializedName("product") val product: Product,
     @SerializedName("quantity") val quantity: Int)
