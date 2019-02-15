@@ -5,16 +5,16 @@ import com.google.firebase.FirebaseApp
 import com.sdp15.goodb0i.data.scanner.BarcodeReader
 import com.sdp15.goodb0i.data.scanner.MLKitScanner
 import com.sdp15.goodb0i.data.sockets.SocketHandler
-import com.sdp15.goodb0i.data.store.items.ItemLoader
-import com.sdp15.goodb0i.data.store.items.RetrofitItemLoader
-import com.sdp15.goodb0i.data.store.items.TestDataItemLoader
+import com.sdp15.goodb0i.data.store.products.ProductLoader
+import com.sdp15.goodb0i.data.store.products.RetrofitProductLoader
+import com.sdp15.goodb0i.data.store.products.TestDataProductLoader
 import com.sdp15.goodb0i.data.store.lists.ListManager
 import com.sdp15.goodb0i.data.store.lists.RetrofitListManager
 import com.sdp15.goodb0i.view.confirmation.ConfirmationViewModel
 import com.sdp15.goodb0i.view.connection.devices.DeviceListViewModel
 import com.sdp15.goodb0i.view.debug.CapturingDebugTree
 import com.sdp15.goodb0i.view.debug.Config
-import com.sdp15.goodb0i.view.item.ItemViewModel
+import com.sdp15.goodb0i.view.product.ProductViewModel
 import com.sdp15.goodb0i.view.list.ListViewModel
 import com.sdp15.goodb0i.view.orders.OrdersViewModel
 import com.sdp15.goodb0i.view.pin.PinViewModel
@@ -51,13 +51,13 @@ class App : Application() {
             viewModel<ScannerViewModel>()
             viewModel<WelcomeViewModel>()
             viewModel<ConfirmationViewModel>()
-            viewModel<ItemViewModel>()
+            viewModel<ProductViewModel>()
             viewModel<OrdersViewModel>()
             viewModel<ListViewModel>()
             viewModel<DeviceListViewModel>()
         },
         module {
-            single<ItemLoader> { TestDataItemLoader.DelegateItemLoader(RetrofitItemLoader, Config::shouldUseTestData) }
+            single<ProductLoader> { TestDataProductLoader.DelegateProductLoader(RetrofitProductLoader, Config::shouldUseTestData) }
             single<ListManager> { RetrofitListManager }
             single<BarcodeReader> { MLKitScanner() }
             single<SocketHandler> { SocketHandler() }

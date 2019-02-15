@@ -6,13 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.sdp15.goodb0i.R
-import com.sdp15.goodb0i.data.store.items.Item
+import com.sdp15.goodb0i.data.store.products.Product
 import com.sdp15.goodb0i.view.ListDiff
 import kotlinx.android.synthetic.main.list_item.view.*
 import kotlin.math.max
 
-class ItemAdapter(val onIncrement: (Item) -> Unit, val onDecrement: (Item) -> Unit, private val total: Boolean) :
-    RecyclerView.Adapter<ItemAdapter.ItemViewHolder>() {
+class ProductAdapter(val onIncrement: (Product) -> Unit, val onDecrement: (Product) -> Unit, private val total: Boolean) :
+    RecyclerView.Adapter<ProductAdapter.ItemViewHolder>() {
 
     private var items: MutableList<TrolleyItem> = mutableListOf()
     private var expanded: MutableList<Boolean> = mutableListOf()
@@ -37,7 +37,7 @@ class ItemAdapter(val onIncrement: (Item) -> Unit, val onDecrement: (Item) -> Un
                 notifyItemRemoved(i)
             }
             is ListDiff.Update -> {
-                val index = items.indexOfFirst { it.item == diff.updated.item }
+                val index = items.indexOfFirst { it.product == diff.updated.product }
                 if (index != -1) {
                     items[index] = diff.updated
                     notifyItemChanged(index)
@@ -72,7 +72,7 @@ class ItemAdapter(val onIncrement: (Item) -> Unit, val onDecrement: (Item) -> Un
                 }
                 expanded[position] = !expanded[position]
             }
-            val item = items[position].item
+            val item = items[position].product
             var quantity = items[position].count
             text_item_name.text = item.name
             if (item.description.firstOrNull() != null) {
@@ -101,7 +101,7 @@ class ItemAdapter(val onIncrement: (Item) -> Unit, val onDecrement: (Item) -> Un
     }
 
     private fun getPrice(position: Int): Double {
-        val item = items[position].item
+        val item = items[position].product
         val quantity = items[position].count
         return if (total) item.price * quantity else item.price
     }

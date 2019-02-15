@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item
+    <product
         android:id="@+id/search_open_cart"
         android:icon="@drawable/ic_shopping_trolley"
         android:orderInCategory="1"

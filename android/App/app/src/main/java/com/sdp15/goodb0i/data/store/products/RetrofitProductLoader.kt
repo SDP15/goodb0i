@@ -1,4 +1,4 @@
-package com.sdp15.goodb0i.data.store.items
+package com.sdp15.goodb0i.data.store.products
 
 import com.google.gson.GsonBuilder
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
@@ -13,7 +13,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Path
 
-object RetrofitItemLoader : ItemLoader {
+object RetrofitProductLoader : ProductLoader {
 
     private val retrofit = Retrofit.Builder().apply {
         client(OkHttpClient.Builder().build())
@@ -22,39 +22,39 @@ object RetrofitItemLoader : ItemLoader {
         addCallAdapterFactory(CoroutineCallAdapterFactory())
     }.build()
 
-    private val api = retrofit.create(KTORItemAPI::class.java)
+    private val api = retrofit.create(KTORProductAPI::class.java)
 
-    override suspend fun loadItem(id: String): Result<Item> = api.getItemAsync(id).awaitCatching(
+    override suspend fun loadProduct(id: String): Result<Product> = api.getProductAsync(id).awaitCatching(
         success = { it.toResult() },
         failure = { Result.Failure(Exception(it.message)) }
     )
 
-    override suspend fun loadCategory(category: String): Result<List<Item>> = api.searchAsync(category).awaitCatching(
+    override suspend fun loadCategory(category: String): Result<List<Product>> = api.searchAsync(category).awaitCatching(
         success = { it.toResult() },
         failure = { Result.Failure(Exception(it.message)) }
     )
 
-    override suspend fun search(query: String): Result<List<Item>> = api.searchAsync(query).awaitCatching(
+    override suspend fun search(query: String): Result<List<Product>> = api.searchAsync(query).awaitCatching(
         success = { it.toResult() },
         failure = { Result.Failure(Exception(it.message)) }
     )
 
 
-    override suspend fun loadAll(): Result<List<Item>> = api.getAllAsync().awaitCatching(
+    override suspend fun loadAll(): Result<List<Product>> = api.getAllAsync().awaitCatching(
         success = { it.toResult() },
         failure = { Result.Failure(java.lang.Exception(it.message)) }
     )
 }
 
-interface KTORItemAPI {
+interface KTORProductAPI {
 
-    @GET("/stock/{id}")
-    fun getItemAsync(@Path("id") id: String): Deferred<Response<Item>>
+    @GET("/products/{id}")
+    fun getProductAsync(@Path("id") id: String): Deferred<Response<Product>>
 
-    @GET("/stock")
-    fun getAllAsync(): Deferred<Response<List<Item>>>
+    @GET("/products")
+    fun getAllAsync(): Deferred<Response<List<Product>>>
 
-    @GET("/stock/search/{query}")
-    fun searchAsync(@Path("query") query: String): Deferred<Response<List<Item>>>
+    @GET("/products/search/{query}")
+    fun searchAsync(@Path("query") query: String): Deferred<Response<List<Product>>>
 
 }

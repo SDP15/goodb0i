@@ -18,7 +18,7 @@ class ShoppingListFragment : Fragment() {
         super.onResume()
         vm = (parentFragment as ListPagingFragment).vm
         list_recycler.layoutManager = LinearLayoutManager(context)
-        val adapter = ItemAdapter(vm::incrementItem, vm::decrementItem, true)
+        val adapter = ProductAdapter(vm::incrementItem, vm::decrementItem, true)
         list_recycler.adapter = adapter
 
         vm.list.observe(this, Observer {

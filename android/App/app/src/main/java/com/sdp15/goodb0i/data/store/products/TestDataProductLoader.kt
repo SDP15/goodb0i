@@ -1,13 +1,12 @@
-package com.sdp15.goodb0i.data.store.items
+package com.sdp15.goodb0i.data.store.products
 
 import com.google.gson.Gson
 import com.sdp15.goodb0i.data.store.Result
-import com.sdp15.goodb0i.view.debug.Config
 import timber.log.Timber
 
-object TestDataItemLoader : ItemLoader {
+object TestDataProductLoader : ProductLoader {
 
-    private val items: MutableCollection<Item> = arrayListOf()
+    private val PRODUCTS: MutableCollection<Product> = arrayListOf()
 
     private val json = """[
 
@@ -351,40 +350,40 @@ object TestDataItemLoader : ItemLoader {
 
     init {
         val gson = Gson()
-        items.addAll(gson.fromJson(json, Array<Item>::class.java))
+        PRODUCTS.addAll(gson.fromJson(json, Array<Product>::class.java))
     }
 
-    override suspend fun loadItem(id: String): Result<Item> {
-        Timber.d("Returning individual item from test data")
-        return Result.Success(items.find { it.id == id }!!)
+    override suspend fun loadProduct(id: String): Result<Product> {
+        Timber.d("Returning individual product from test data")
+        return Result.Success(PRODUCTS.find { it.id == id }!!)
     }
 
-    override suspend fun loadCategory(category: String): Result<List<Item>> {
+    override suspend fun loadCategory(category: String): Result<List<Product>> {
         Timber.i("Loading category from test data")
-        return Result.Success(items.filter { it.department == category })
+        return Result.Success(PRODUCTS.filter { it.department == category })
     }
 
-    override suspend fun search(query: String): Result<List<Item>> {
+    override suspend fun search(query: String): Result<List<Product>> {
         Timber.d("Searching test data for $query")
-        return Result.Success(items.filter {
+        return Result.Success(PRODUCTS.filter {
             (it.name + it.department + it.description).toLowerCase().contains(query.toLowerCase())
         })
     }
 
-    override suspend fun loadAll(): Result<List<Item>> {
-        Timber.d("Loading all items from test data")
-        return Result.Success(items.toList())
+    override suspend fun loadAll(): Result<List<Product>> {
+        Timber.d("Loading all PRODUCTS from test data")
+        return Result.Success(PRODUCTS.toList())
     }
 
-    class DelegateItemLoader(private val other: ItemLoader, private val delegate: () -> Boolean): ItemLoader {
+    class DelegateProductLoader(private val other: ProductLoader, private val delegate: () -> Boolean): ProductLoader {
 
-        override suspend fun loadItem(id: String): Result<Item> = if (delegate()) TestDataItemLoader.loadItem(id) else other.loadItem(id)
+        override suspend fun loadProduct(id: String): Result<Product> = if (delegate()) TestDataProductLoader.loadProduct(id) else other.loadProduct(id)
 
-        override suspend fun loadCategory(category: String): Result<List<Item>> = if (delegate()) TestDataItemLoader.loadCategory(category) else other.loadCategory(category)
+        override suspend fun loadCategory(category: String): Result<List<Product>> = if (delegate()) TestDataProductLoader.loadCategory(category) else other.loadCategory(category)
 
-        override suspend fun search(query: String): Result<List<Item>> = if(delegate()) TestDataItemLoader.search(query) else other.search(query)
+        override suspend fun search(query: String): Result<List<Product>> = if(delegate()) TestDataProductLoader.search(query) else other.search(query)
 
-        override suspend fun loadAll(): Result<List<Item>> = if (delegate()) TestDataItemLoader.loadAll() else other.loadAll()
+        override suspend fun loadAll(): Result<List<Product>> = if (delegate()) TestDataProductLoader.loadAll() else other.loadAll()
     }
 
 }

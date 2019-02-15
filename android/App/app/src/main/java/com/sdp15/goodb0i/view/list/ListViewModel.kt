@@ -3,8 +3,8 @@ package com.sdp15.goodb0i.view.list
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import com.sdp15.goodb0i.BaseViewModel
-import com.sdp15.goodb0i.data.store.items.Item
-import com.sdp15.goodb0i.data.store.items.ItemLoader
+import com.sdp15.goodb0i.data.store.products.Product
+import com.sdp15.goodb0i.data.store.products.ProductLoader
 import com.sdp15.goodb0i.data.store.lists.ListManager
 import com.sdp15.goodb0i.data.store.Result
 import com.sdp15.goodb0i.view.ListDiff
@@ -19,7 +19,7 @@ import timber.log.Timber
 class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.SearchFragmentInteractor,
     KoinComponent {
 
-    private val itemLoader: ItemLoader by inject()
+    private val productLoader: ProductLoader by inject()
     private val listManager: ListManager by inject()
     // The current shopping list
     private val currentList = mutableListOf<TrolleyItem>()
@@ -27,17 +27,17 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
 
     // Most recently retrieved search results
     private val currentSearchResults = mutableListOf<TrolleyItem>()
-    private val retrievedSearchResults = MutableLiveData<List<Item>>()
+    private val retrievedSearchResults = MutableLiveData<List<Product>>()
     // Exposed LiveData for full list changes, or updates to individual items
     val search = MediatorLiveData<ListDiff<TrolleyItem>>()
 
     init {
         search.addSource(list) {
-            // When an item is updated in the list, post an update to that item within the current search results
-            //TODO: Currently ItemAdapter checks if the item is currently visible. Should it be responsible for this?
+            // When an product is updated in the list, post an update to that product within the current search results
+            //TODO: Currently ProductAdapter checks if the product is currently visible. Should it be responsible for this?
             if (it is ListDiff.Update) search.postValue(ListDiff.Update(currentSearchResults, it.updated))
             if (it is ListDiff.Remove) search.postValue(ListDiff.Update(currentSearchResults, it.removed))
-            // Add doesn't matter, as it is only called when we add a new item *from the search results*
+            // Add doesn't matter, as it is only called when we add a new product *from the search results*
         }
         search.addSource(retrievedSearchResults) { result ->
             currentSearchResults.clear()
@@ -45,7 +45,7 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
             currentSearchResults.addAll(result.map { item ->
                 TrolleyItem(
                     item,
-                    currentList.firstOrNull { it.item.id == item.id }?.count ?: 0
+                    currentList.firstOrNull { it.product.id == item.id }?.count ?: 0
                 )
             })
             search.postValue(ListDiff.All(currentSearchResults))
@@ -60,7 +60,7 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
     fun onSaveList() {
         //TODO: Error handling
         GlobalScope.launch (Dispatchers.IO) {
-            val result = listManager.createList(currentList.map { Pair(it.item.id, it.count) })
+            val result = listManager.createList(currentList.map { Pair(it.product.id, it.count) })
             if (result is Result.Success) {
                 listManager.loadList(result.data.toLong())
             } else {
@@ -77,7 +77,7 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
         } else {
             searchJob?.cancel()
             searchJob = GlobalScope.launch(Dispatchers.IO) {
-                val result = itemLoader.search(new)
+                val result = productLoader.search(new)
                 if (result is Result.Success) {
                     retrievedSearchResults.postValue(result.data)
                 } else if (result is Result.Failure) {
@@ -89,14 +89,14 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
     }
 
     private val price: Double
-        get() = currentList.sumByDouble { it.count * it.item.price }
+        get() = currentList.sumByDouble { it.count * it.product.price }
 
-    fun incrementItem(item: Item) {
-        Timber.i("Incrementing added ${item.name}")
-        val i = currentList.indexOfFirst { it.item.id == item.id }
+    fun incrementItem(product: Product) {
+        Timber.i("Incrementing added ${product.name}")
+        val i = currentList.indexOfFirst { it.product.id == product.id }
         val diff: ListDiff<TrolleyItem>
-        if (i == -1) { // Add item to list as it isn't there already
-            val ci = TrolleyItem(item, 1)
+        if (i == -1) { // Add product to list as it isn't there already
+            val ci = TrolleyItem(product, 1)
             currentList.add(ci)
             diff = ListDiff.Add(currentList, ci)
         } else { // Update count and post to update adapter
@@ -107,10 +107,10 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
         totalPrice.postValue(price)
     }
 
-    fun decrementItem(item: Item) {
-        Timber.i("Decrementing added ${item.name}")
-        val ci = currentList.firstOrNull { it.item.id == item.id }
-        // If the item doesn't exist in the current list, the user is decrementing an item in search which is at 0
+    fun decrementItem(product: Product) {
+        Timber.i("Decrementing added ${product.name}")
+        val ci = currentList.firstOrNull { it.product.id == product.id }
+        // If the product doesn't exist in the current list, the user is decrementing an product in search which is at 0
         ci?.apply {
             count--
             if (count == 0) {

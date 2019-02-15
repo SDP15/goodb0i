@@ -9,9 +9,7 @@ import androidx.lifecycle.Observer
 import androidx.viewpager.widget.ViewPager
 import com.sdp15.goodb0i.R
 import com.sdp15.goodb0i.switchOnEmpty
-import com.sdp15.goodb0i.view.ListDiff
 import kotlinx.android.synthetic.main.layout_search.*
-import timber.log.Timber
 
 class SearchFragment : Fragment() {
 
@@ -24,7 +22,7 @@ class SearchFragment : Fragment() {
         // Specified explicitly as AS likes to autocomplete, and then later decide that it actually meant a different
         // LinearLayoutManager
         list_recycler.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
-        val adapter = ItemAdapter(vm::incrementItem, vm::decrementItem, false)
+        val adapter = ProductAdapter(vm::incrementItem, vm::decrementItem, false)
         list_recycler.adapter = adapter
         search_view_switcher.switchOnEmpty(adapter)
 
