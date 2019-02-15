@@ -88,3 +88,4 @@ fun collapse(v: View) {
     a.duration = (initialHeight / v.context.resources.displayMetrics.density).toLong()
     v.startAnimation(a)
 }
+

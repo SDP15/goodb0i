@@ -2,6 +2,8 @@ package com.sdp15.goodb0i.data.store.items
 
 import com.google.gson.Gson
 import com.sdp15.goodb0i.data.store.Result
+import com.sdp15.goodb0i.view.debug.Config
+import timber.log.Timber
 
 object TestDataItemLoader : ItemLoader {
 
@@ -353,20 +355,36 @@ object TestDataItemLoader : ItemLoader {
     }
 
     override suspend fun loadItem(id: String): Result<Item> {
+        Timber.d("Returning individual item from test data")
         return Result.Success(items.find { it.id == id }!!)
     }
 
     override suspend fun loadCategory(category: String): Result<List<Item>> {
+        Timber.i("Loading category from test data")
         return Result.Success(items.filter { it.department == category })
     }
 
     override suspend fun search(query: String): Result<List<Item>> {
+        Timber.d("Searching test data for $query")
         return Result.Success(items.filter {
             (it.name + it.department + it.description).toLowerCase().contains(query.toLowerCase())
         })
     }
 
     override suspend fun loadAll(): Result<List<Item>> {
+        Timber.d("Loading all items from test data")
         return Result.Success(items.toList())
     }
+
+    class DelegateItemLoader(private val other: ItemLoader, private val delegate: () -> Boolean): ItemLoader {
+
+        override suspend fun loadItem(id: String): Result<Item> = if (delegate()) TestDataItemLoader.loadItem(id) else other.loadItem(id)
+
+        override suspend fun loadCategory(category: String): Result<List<Item>> = if (delegate()) TestDataItemLoader.loadCategory(category) else other.loadCategory(category)
+
+        override suspend fun search(query: String): Result<List<Item>> = if(delegate()) TestDataItemLoader.search(query) else other.search(query)
+
+        override suspend fun loadAll(): Result<List<Item>> = if (delegate()) TestDataItemLoader.loadAll() else other.loadAll()
+    }
+
 }
