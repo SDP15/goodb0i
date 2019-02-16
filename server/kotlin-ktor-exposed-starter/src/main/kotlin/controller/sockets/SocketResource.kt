@@ -1,11 +1,7 @@
 package controller.sockets
 
-import io.ktor.http.cio.websocket.CloseReason
 import io.ktor.http.cio.websocket.Frame
-import io.ktor.http.cio.websocket.close
 import io.ktor.routing.Route
-import io.ktor.sessions.get
-import io.ktor.sessions.sessions
 import io.ktor.util.generateNonce
 import io.ktor.websocket.webSocket
 import kotlinx.coroutines.ObsoleteCoroutinesApi

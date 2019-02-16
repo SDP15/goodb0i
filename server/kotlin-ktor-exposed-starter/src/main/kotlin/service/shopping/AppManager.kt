@@ -2,6 +2,7 @@ package service.shopping
 
 import io.ktor.http.cio.websocket.Frame
 import io.ktor.http.cio.websocket.WebSocketSession
+import kotlinx.coroutines.isActive
 import java.util.concurrent.ConcurrentHashMap
 
 class AppManager {
@@ -13,7 +14,7 @@ class AppManager {
         println("$id : $message")
         members[id]?.outgoing?.apply {
             if (!isClosedForSend) {
-                send(Frame.Text("Received ${count++}"))
+                offer(Frame.Text("Received ${count++}"))
             }
         }
     }
