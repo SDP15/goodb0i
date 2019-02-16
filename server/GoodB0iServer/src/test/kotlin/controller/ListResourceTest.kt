@@ -4,22 +4,22 @@ import common.ServerTest
 import io.ktor.http.HttpStatusCode
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
-import repository.Stock
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import repository.products.Product
 import kotlin.random.Random
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ListResourceTest : ServerTest() {
 
-    private val stock: MutableList<Stock> = mutableListOf()
+    private val stock: MutableList<Product> = mutableListOf()
 
     @BeforeAll
     fun loadStock() {
         transaction {
-            stock.addAll(Stock.all().toList())
+            stock.addAll(Product.all().toList())
         }
 
     }
@@ -30,6 +30,7 @@ class ListResourceTest : ServerTest() {
         val response = given().contentType(ContentType.JSON)
                 .body(testList)
                 .When()
+                .contentType(ContentType.JSON)
                 .post("/lists/new")
                 .then()
                 .statusCode(HttpStatusCode.Created.value)

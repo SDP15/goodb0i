@@ -2,7 +2,6 @@ import controller.lists
 import controller.shelves
 import controller.sockets.sockets
 import controller.products
-import controller.sockets.SocketSession
 import io.ktor.application.Application
 import io.ktor.application.install
 import io.ktor.features.CallLogging
@@ -12,8 +11,6 @@ import io.ktor.gson.gson
 import io.ktor.routing.Routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
-import io.ktor.sessions.Sessions
-import io.ktor.sessions.cookie
 import io.ktor.websocket.WebSockets
 import repository.DatabaseFactory
 import repository.TestDataProvider

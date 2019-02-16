@@ -5,6 +5,7 @@ import io.ktor.server.engine.ApplicationEngine
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.restassured.RestAssured
+import io.restassured.mapper.ObjectMapperType
 import io.restassured.response.ResponseBodyExtractionOptions
 import io.restassured.specification.RequestSpecification
 import module
@@ -18,7 +19,7 @@ open class ServerTest {
     }
 
     protected inline fun <reified T> ResponseBodyExtractionOptions.to(): T {
-        return this.`as`(T::class.java)
+        return this.`as`(T::class.java, ObjectMapperType.GSON)
     }
 
     companion object {
@@ -41,11 +42,5 @@ open class ServerTest {
             }
         }
     }
-
-//    @BeforeEach
-//    fun before() = transaction {
-//        Stocks.deleteAll()
-//        Unit
-//    }
 
 }

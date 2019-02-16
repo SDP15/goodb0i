@@ -8,7 +8,11 @@ import java.util.concurrent.ConcurrentHashMap
 class AppManager {
 
     private val members = ConcurrentHashMap<String, WebSocketSession>()
+    private val sessionData = ConcurrentHashMap<String, AppSession>()
     private var count = 0
+
+    //TODO: Decide what we actually need to store
+    data class AppSession(val data: String)
 
     suspend fun onMessage(id: String, message: String) {
         println("$id : $message")
@@ -31,13 +35,28 @@ class AppManager {
          */
         if (!members.contains(id)) {
             members[id] = socket
-            //TODO: Send some confirmation information (the session id)
-            //TODO: Lookup available trollies and link a trolley session with this session
+            socket.outgoing.send(joinKey(id)) // Send id back to app
+            sessionData[id] = AppSession("TEST")
         }
+    }
+
+    suspend fun rejoinApp(id: String, oldId: String) {
+        sessionData[id] = sessionData[oldId]!! //TODO: Proper data
     }
 
     suspend fun removeApp(id: String, socket: WebSocketSession) {
         members.remove(id)
+        //TODO: At some point in the future, remove the session data for the app
+    }
+
+    companion object {
+        private const val DELIM = "$"
+        private const val ID_KEY = "ID"
+
+
+        fun joinKey(id: String) = Frame.Text("$ID_KEY$DELIM$id")
+
+
     }
 
 }
