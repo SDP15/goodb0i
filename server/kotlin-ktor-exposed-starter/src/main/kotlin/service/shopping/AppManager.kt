@@ -1,14 +1,21 @@
 package service.shopping
 
+import io.ktor.http.cio.websocket.Frame
 import io.ktor.http.cio.websocket.WebSocketSession
 import java.util.concurrent.ConcurrentHashMap
 
 class AppManager {
 
     private val members = ConcurrentHashMap<String, WebSocketSession>()
+    private var count = 0
 
     suspend fun onMessage(id: String, message: String) {
-
+        println("$id : $message")
+        members[id]?.outgoing?.apply {
+            if (!isClosedForSend) {
+                send(Frame.Text("Received ${count++}"))
+            }
+        }
     }
 
     suspend fun joinApp(id: String, socket: WebSocketSession) {

@@ -1,84 +1,79 @@
 package controller.sockets
 
-import io.ktor.application.ApplicationCallPipeline
-import io.ktor.application.call
 import io.ktor.http.cio.websocket.CloseReason
 import io.ktor.http.cio.websocket.Frame
 import io.ktor.http.cio.websocket.close
 import io.ktor.routing.Route
 import io.ktor.sessions.get
 import io.ktor.sessions.sessions
-import io.ktor.sessions.set
 import io.ktor.util.generateNonce
 import io.ktor.websocket.webSocket
+import kotlinx.coroutines.ObsoleteCoroutinesApi
+import kotlinx.coroutines.channels.ClosedSendChannelException
 import kotlinx.coroutines.channels.consumeEach
 import service.shopping.AppManager
 import service.shopping.TrolleyManager
 import java.nio.charset.StandardCharsets
+import java.util.concurrent.TimeUnit
 
+@UseExperimental(ObsoleteCoroutinesApi::class)
 fun Route.sockets(trolleyManager: TrolleyManager, appManager: AppManager) {
 
-//    intercept(ApplicationCallPipeline.Features) {
-//        if (call.sessions.get<SocketSession>() == null) {
-//            call.sessions.set(SocketSession(generateNonce()))
-//        }
-//    }
+    /*
+    https://ktor.io/servers/features/websockets.html
+    - The standard WebSocket API has the following events
+        - onConnect - This happens when the webSocket body is entered
+        - onMessage - This happens in incoming.consumeEach
+        - onClose - This happens when consumeEach stops
+        - onError - This happens when an exception is thrown
+     - Each time a device connects we:
+        - Generate a unique identifier for the newly connected device
+        - Register this identifier with the respective manager
+        - Send the identifier back to the client device
+     - Each time a message is received we:
+        - Send the message and the identifier (which exists in the scope of webSocket) to the manager,
+        which decides how to route the message
+     */
+
 
     webSocket("/trolley") {
-
-        val session = call.sessions.get<SocketSession>()
-
-        if (session == null) {
-            close(CloseReason(CloseReason.Codes.VIOLATED_POLICY, "No session"))
-            return@webSocket
-        }
-        trolleyManager.joinTrolley(session.id, this)
+        
+        val nonce = generateNonce()
+        
+        trolleyManager.joinTrolley(nonce, this)
 
         try {
             incoming.consumeEach { frame ->
                 if (frame is Frame.Text) {
                     //TODO: Pass to
-                    trolleyManager.onMessage(session.id, StandardCharsets.UTF_8.decode(frame.buffer).toString())
+                    trolleyManager.onMessage(nonce, StandardCharsets.UTF_8.decode(frame.buffer).toString())
                 }
             }
         } finally {
-            trolleyManager.removeTrolley(session.id, this)
+            trolleyManager.removeTrolley(nonce, this)
         }
-//
-//        try {
-//            var count = 0
-//            while(true) {
-//                val received = incoming.receive()
-//                println("Received frame $received with buffer ${received.buffer}")
-//                if (received is Frame.Text) {
-//                    count++
-//                    val text = StandardCharsets.UTF_8.decode(received.buffer).toString()
-//                    println("Received text message $text")
-//                    outgoing.send(Frame.Text("Some text from the server $count"))
-//                    TimeUnit.SECONDS.sleep(1)
-//                }
-//            }
-//        } catch (e: Throwable) {
-//            println("Route error $e")
-//        }
     }
 
     webSocket("/app") {
-        val session = call.sessions.get<SocketSession>()
-        if (session == null) {
-            close(CloseReason(CloseReason.Codes.VIOLATED_POLICY, "No session"))
-            return@webSocket
-        }
-        appManager.joinApp(session.id, this)
+
+        val nonce = generateNonce()
+
+        appManager.joinApp(nonce, this)
         try {
             incoming.consumeEach { frame ->
                 if (frame is Frame.Text) {
                     //TODO: Pass to
-                    appManager.onMessage(session.id, StandardCharsets.UTF_8.decode(frame.buffer).toString())
+                    TimeUnit.SECONDS.sleep(1)
+                    appManager.onMessage(nonce, StandardCharsets.UTF_8.decode(frame.buffer).toString())
                 }
             }
+        } catch (e: ClosedSendChannelException) {
+            println("ClosedSendChannelException $e")
+        } catch (e: Exception) {
+            println("Other exception $e")
         } finally {
-            appManager.removeApp(session.id, this)
+            println("$nonce closed socket")
+            appManager.removeApp(nonce, this)
         }
     }
 
