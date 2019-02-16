@@ -18,6 +18,7 @@ import repository.lists.ShoppingList
 import repository.products.Product
 import repository.adapters.ListTypeAdapter
 import repository.adapters.ProductTypeAdapter
+import repository.exposedTypeAdapters
 import service.*
 import service.shopping.AppManager
 import service.shopping.TrolleyManager
@@ -30,11 +31,7 @@ fun Application.module() {
 
     // Automatic conversion according to ContentType headers
     install(ContentNegotiation) {
-        gson {
-            setPrettyPrinting()
-            registerTypeAdapter(Product::class.java, ProductTypeAdapter)
-            registerTypeAdapter(ShoppingList::class.java, ListTypeAdapter)
-        }
+        gson(block = exposedTypeAdapters())
     }
 
     DatabaseFactory.init()

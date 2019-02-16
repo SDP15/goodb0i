@@ -17,7 +17,7 @@ class ListResourceTest : ServerTest() {
     private val stock: MutableList<Product> = mutableListOf()
 
     @BeforeAll
-    fun loadStock() {
+    fun loadProducts() {
         transaction {
             stock.addAll(Product.all().toList())
         }
@@ -27,7 +27,7 @@ class ListResourceTest : ServerTest() {
     @Test
     fun testCreateList() {
         val testList = stock.subList(0, 4).map { Pair(it.id.value.toString(), Random.nextInt(1, 10)) }
-        val response = given().contentType(ContentType.JSON)
+        val response = given()
                 .body(testList)
                 .When()
                 .contentType(ContentType.JSON)
