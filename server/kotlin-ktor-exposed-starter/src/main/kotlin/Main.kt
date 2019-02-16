@@ -1,3 +1,8 @@
+import controller.lists
+import controller.shelves
+import controller.sockets.sockets
+import controller.products
+import controller.sockets.SocketSession
 import io.ktor.application.Application
 import io.ktor.application.install
 import io.ktor.features.CallLogging
@@ -7,49 +12,51 @@ import io.ktor.gson.gson
 import io.ktor.routing.Routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
+import io.ktor.sessions.Sessions
+import io.ktor.sessions.cookie
 import io.ktor.websocket.WebSockets
-import model.List
-import model.Stock
-import model.adapters.ListTypeAdapter
-import model.adapters.StockTypeAdapter
+import repository.DatabaseFactory
+import repository.TestDataProvider
+import repository.lists.ShoppingList
+import repository.products.Product
+import repository.adapters.ListTypeAdapter
+import repository.adapters.ProductTypeAdapter
 import service.*
-import web.app
-import web.lists
-import web.shelves
-import web.stock
+import service.shopping.AppManager
+import service.shopping.TrolleyManager
 
 
 fun Application.module() {
     install(DefaultHeaders)
-    install(CallLogging)
-    install(WebSockets)
+    install(CallLogging) // Log all calls
+    install(WebSockets) // Enable WebSockets
 
+    // Automatic conversion according to ContentType headers
     install(ContentNegotiation) {
         gson {
             setPrettyPrinting()
-            registerTypeAdapter(Stock::class.java, StockTypeAdapter)
-            registerTypeAdapter(List::class.java, ListTypeAdapter)
+            registerTypeAdapter(Product::class.java, ProductTypeAdapter)
+            registerTypeAdapter(ShoppingList::class.java, ListTypeAdapter)
         }
     }
 
     DatabaseFactory.init()
 
-    val stockService = StockService()
+    val productService = ProductService()
     val shelfService = ShelfService()
     val listService = ListService()
 
     TestDataProvider.insert()
 
     install(Routing) {
-        stock(stockService)
+        products(productService)
         shelves(shelfService)
         lists(listService)
-        app()
+        sockets(TrolleyManager(), AppManager())
     }
 
+
 }
-
-
 
 
 class Main {

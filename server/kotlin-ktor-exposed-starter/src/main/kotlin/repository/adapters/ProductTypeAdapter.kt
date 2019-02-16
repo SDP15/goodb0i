@@ -1,12 +1,12 @@
-package model.adapters
+package repository.adapters
 
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
-import model.Stock
+import repository.products.Product
 
-object StockTypeAdapter : TypeAdapter<Stock>() {
-    override fun write(out: JsonWriter, value: Stock) {
+object ProductTypeAdapter : TypeAdapter<Product>() {
+    override fun write(out: JsonWriter, value: Product) {
         out.beginObject()
         out.name("id")
         out.value(value.id.value.toString())
@@ -39,7 +39,7 @@ object StockTypeAdapter : TypeAdapter<Stock>() {
         out.endObject()
     }
 
-    override fun read(`in`: JsonReader?): Stock {
+    override fun read(`in`: JsonReader?): Product {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }

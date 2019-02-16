@@ -1,10 +1,10 @@
-package web
+package controller
 
 import common.ServerTest
 import io.ktor.http.HttpStatusCode
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
-import model.Stock
+import repository.Stock
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
