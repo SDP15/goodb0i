@@ -12,4 +12,5 @@ class ShoppingList(id: EntityID<UUID>) : UUIDEntity(id) {
     var code by ShoppingLists.code
     var time by ShoppingLists.time
     var products by ListEntry via ListContentsTable
+
 }

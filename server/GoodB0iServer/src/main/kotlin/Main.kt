@@ -14,10 +14,6 @@ import io.ktor.server.netty.Netty
 import io.ktor.websocket.WebSockets
 import repository.DatabaseFactory
 import repository.TestDataProvider
-import repository.lists.ShoppingList
-import repository.products.Product
-import repository.adapters.ListTypeAdapter
-import repository.adapters.ProductTypeAdapter
 import repository.exposedTypeAdapters
 import service.*
 import service.shopping.AppManager

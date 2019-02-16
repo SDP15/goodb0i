@@ -18,12 +18,18 @@ class ListService {
                 println("Beginning list creation transaction")
                 // Find all Product matching UUID strings
                 val matchingProducts = Product.find { Products.id inList ids.map(UUID::fromString) }
+
+                println("Matching product ids ${matchingProducts.map { it.id.value.toString() }}")
                 //TODO: Some sort of error if an item does not exist
                 assert(matchingProducts.count() == quantities.size)
+
+                // Re-order the received products to match the ordered list sent to us
+                val orderedProducts = ids.map { id -> matchingProducts.find { id == it.id.value.toString() }!! }
                 // Insert ListEntry rows with the quantities
                 val listProducts =
-                        matchingProducts.zip(quantities).map { (p, q) ->
+                        orderedProducts.zip(quantities).mapIndexed { i, (p, q) ->
                             ListEntry.new {
+                                index = i
                                 product = p
                                 quantity = q
                             }

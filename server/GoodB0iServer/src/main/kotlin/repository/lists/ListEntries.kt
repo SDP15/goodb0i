@@ -9,4 +9,5 @@ import repository.products.Products
 object ListEntries : IntIdTable() {
     val product = reference("product_id", Products).primaryKey()
     val quantity = integer("quantity")
+    val index = integer("index")
 }

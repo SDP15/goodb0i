@@ -1,10 +1,12 @@
 package controller
 
 import common.ServerTest
+import common.models.ShoppingList
 import io.ktor.http.HttpStatusCode
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -39,9 +41,47 @@ class ListResourceTest : ServerTest() {
     }
 
     @Test
+    fun testInvalidListCode() {
+        given()
+                .When()
+                .get("/lists/load/not_a_number")
+                .then()
+                .statusCode(HttpStatusCode.BadRequest.value)
+    }
+
+    @Test
+    fun testNonExistentCode() {
+        given()
+                .When()
+                .get("/lists/load/0")
+                .then()
+                .statusCode(HttpStatusCode.NotFound.value)
+    }
+
+    @Test
     fun testRetrieveList() {
-        testCreateList()
-        given().When().get("/lists/load/")
+        val testList = stock.subList(0, 4).map { Pair(it.id.value.toString(), Random.nextInt(1, 10)) }
+        val code = given()
+                .body(testList)
+                .When()
+                .contentType(ContentType.JSON)
+                .post("/lists/new")
+                .then()
+                .statusCode(HttpStatusCode.Created.value)
+                .extract().to<String>()
+        val list = given()
+                .When()
+                .get("/lists/load/$code")
+                .then()
+                .extract().to<ShoppingList>()
+
+        Assertions.assertEquals(code, list.code)
+        println("Test ids ${testList.map { it.first }}")
+        println("Actual ids ${list.products.map { it.product.id }}")
+        testList.zip(list.products).forEach { (test, actual) ->
+            Assertions.assertEquals(actual.product.id, test.first, "Product ids should match for")
+            Assertions.assertEquals(actual.quantity, test.second, "Quantities should match")
+        }
     }
 
 }

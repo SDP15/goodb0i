@@ -3,10 +3,12 @@ package repository.adapters
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
+import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.transactions.transaction
+import repository.lists.ListEntries
 import repository.lists.ShoppingList
 
-object ListTypeAdapter : TypeAdapter<ShoppingList>() {
+object ShoppingListTypeAdapter : TypeAdapter<ShoppingList>() {
     override fun write(out: JsonWriter, shoppingList: ShoppingList) {
         transaction {
             out.beginObject()
@@ -18,7 +20,8 @@ object ListTypeAdapter : TypeAdapter<ShoppingList>() {
 
             out.beginArray()
             println("Writing products to JSON ${shoppingList.products.map { it.product.name }}")
-            shoppingList.products.forEach { listProduct ->
+            // Order by the original user index here
+            shoppingList.products.orderBy(ListEntries.index to SortOrder.ASC).forEach { listProduct ->
                 println("Writing product with quantity ${listProduct.quantity}")
                 out.beginObject()
                 out.name("quantity")
