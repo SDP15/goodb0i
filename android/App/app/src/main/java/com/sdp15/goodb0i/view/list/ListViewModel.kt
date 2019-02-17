@@ -3,10 +3,11 @@ package com.sdp15.goodb0i.view.list
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import com.sdp15.goodb0i.BaseViewModel
+import com.sdp15.goodb0i.data.store.Result
+import com.sdp15.goodb0i.data.store.lists.ListManager
 import com.sdp15.goodb0i.data.store.products.Product
 import com.sdp15.goodb0i.data.store.products.ProductLoader
-import com.sdp15.goodb0i.data.store.lists.ListManager
-import com.sdp15.goodb0i.data.store.Result
+import com.sdp15.goodb0i.move
 import com.sdp15.goodb0i.view.ListDiff
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -59,7 +60,7 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
 
     fun onSaveList() {
         //TODO: Error handling
-        GlobalScope.launch (Dispatchers.IO) {
+        GlobalScope.launch(Dispatchers.IO) {
             val result = listManager.createList(currentList.map { Pair(it.product.id, it.count) })
             if (result is Result.Success) {
                 listManager.loadList(result.data.toLong())
@@ -123,17 +124,10 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
         }
     }
 
-    fun moveItem(from: Int, to: Int) {
-        if (from == to) return
-        val toMove = currentList[from]
-        if (to > from) {
-            currentList.add(to+1, toMove)
-            currentList.removeAt(from)
-        } else {
-            currentList.removeAt(from)
-            currentList.add(to, toMove)
+    fun moveProduct(from: Int, to: Int) {
+        if (currentList.move(from, to)) {
+            list.postValue(ListDiff.Move(currentList, currentList[to], from, to))
         }
-        list.postValue(ListDiff.Move(currentList, toMove, from, to))
     }
 
     sealed class ListAction {

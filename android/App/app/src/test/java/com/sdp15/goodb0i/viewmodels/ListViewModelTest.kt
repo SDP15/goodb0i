@@ -167,7 +167,7 @@ class ListViewModelTest : KoinTest {
     @Test
     fun testSwapItemWithSelf() {
         addTestItems(10)
-        vm.moveItem(0, 0)
+        vm.moveProduct(0, 0)
         verify {
             listObserver wasNot Called
         }
@@ -178,7 +178,7 @@ class ListViewModelTest : KoinTest {
         val products = addTestItems(10)
         val from = 3
         val to = 1
-        vm.moveItem(from, to)
+        vm.moveProduct(from, to)
         verify(exactly = 1) {
             listObserver.onChanged(capture(listSlot))
         }
@@ -193,7 +193,7 @@ class ListViewModelTest : KoinTest {
         val products = addTestItems(10)
         val from = 3
         val to = 7
-        vm.moveItem(from, to)
+        vm.moveProduct(from, to)
         verify(exactly = 1) {
             listObserver.onChanged(capture(listSlot))
         }

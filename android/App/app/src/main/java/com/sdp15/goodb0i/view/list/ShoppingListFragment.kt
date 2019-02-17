@@ -44,7 +44,7 @@ class ShoppingListFragment : Fragment() {
                 viewHolder: RecyclerView.ViewHolder,
                 target: RecyclerView.ViewHolder
             ): Boolean {
-                vm.moveItem(viewHolder.adapterPosition, target.adapterPosition)
+                vm.moveProduct(viewHolder.adapterPosition, target.adapterPosition)
 
                 return true
             }
