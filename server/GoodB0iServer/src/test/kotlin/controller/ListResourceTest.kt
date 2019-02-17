@@ -16,19 +16,19 @@ import kotlin.random.Random
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ListResourceTest : ServerTest() {
 
-    private val stock: MutableList<Product> = mutableListOf()
+    private val products: MutableList<Product> = mutableListOf()
 
     @BeforeAll
     fun loadProducts() {
         transaction {
-            stock.addAll(Product.all().toList())
+            products.addAll(Product.all().toList())
         }
 
     }
 
     @Test
     fun testCreateList() {
-        val testList = stock.subList(0, 4).map { Pair(it.id.value.toString(), Random.nextInt(1, 10)) }
+        val testList = products.subList(0, 4).map { Pair(it.id.value.toString(), Random.nextInt(1, 10)) }
         val response = given()
                 .body(testList)
                 .When()
@@ -60,7 +60,7 @@ class ListResourceTest : ServerTest() {
 
     @Test
     fun testRetrieveList() {
-        val testList = stock.subList(0, 4).map { Pair(it.id.value.toString(), Random.nextInt(1, 10)) }
+        val testList = products.subList(0, 4).map { Pair(it.id.value.toString(), Random.nextInt(1, 10)) }
         val code = given()
                 .body(testList)
                 .When()

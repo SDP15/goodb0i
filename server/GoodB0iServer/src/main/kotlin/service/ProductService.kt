@@ -23,9 +23,9 @@ class ProductService {
         }
     }
 
-    fun deleteProduct(id: UUID): Boolean = transaction {
-        Products.deleteWhere { Products.id eq id } > 0
-    }
+//    fun deleteProduct(id: UUID): Boolean = transaction {
+//        Products.deleteWhere { Products.id eq id } > 0
+//    }
 }
 
 
