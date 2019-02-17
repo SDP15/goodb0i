@@ -6,21 +6,21 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.sdp15.goodb0i.R
 import kotlinx.android.synthetic.main.layout_shoppinglist.*
 
 class ShoppingListFragment : Fragment() {
 
-    lateinit var vm: ListViewModel
+    private val vm: ListViewModel by lazy { (parentFragment as ListPagingFragment).vm }
 
     override fun onResume() {
         super.onResume()
-        vm = (parentFragment as ListPagingFragment).vm
-        list_recycler.layoutManager = LinearLayoutManager(context)
-        val adapter = ProductAdapter(vm::incrementItem, vm::decrementItem, true)
+        list_recycler.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
+        val adapter = ProductAdapter(vm::incrementItem, vm::decrementItem, true, touchHelper::startDrag)
         list_recycler.adapter = adapter
-
+        touchHelper.attachToRecyclerView(list_recycler)
         vm.list.observe(this, Observer {
             // If empty, we want to load all of the items, rather than just the last diff
             if (adapter.itemCount == 0) {
@@ -35,6 +35,23 @@ class ShoppingListFragment : Fragment() {
         list_save_button.setOnClickListener {
             vm.onSaveList()
         }
+    }
+
+    private val touchHelper = object :
+        ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                vm.moveItem(viewHolder.adapterPosition, target.adapterPosition)
+
+                return true
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
+        }) {
+
     }
 
     override fun onCreateView(

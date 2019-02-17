@@ -13,16 +13,15 @@ import kotlinx.android.synthetic.main.layout_search.*
 
 class SearchFragment : Fragment() {
 
-    lateinit var vm: ListViewModel
+    private val vm: ListViewModel by lazy { (parentFragment as ListPagingFragment).vm }
     private lateinit var viewPager: ViewPager
 
     override fun onResume() {
         super.onResume()
-        vm = (parentFragment as ListPagingFragment).vm
         // Specified explicitly as AS likes to autocomplete, and then later decide that it actually meant a different
         // LinearLayoutManager
         list_recycler.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
-        val adapter = ProductAdapter(vm::incrementItem, vm::decrementItem, false)
+        val adapter = ProductAdapter(vm::incrementItem, vm::decrementItem, false, {})
         list_recycler.adapter = adapter
         search_view_switcher.switchOnEmpty(adapter)
 

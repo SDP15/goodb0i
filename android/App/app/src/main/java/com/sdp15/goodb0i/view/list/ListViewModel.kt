@@ -123,6 +123,19 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
         }
     }
 
+    fun moveItem(from: Int, to: Int) {
+        if (from == to) return
+        val toMove = currentList[from]
+        if (to > from) {
+            currentList.add(to+1, toMove)
+            currentList.removeAt(from)
+        } else {
+            currentList.removeAt(from)
+            currentList.add(to, toMove)
+        }
+        list.postValue(ListDiff.Move(currentList, toMove, from, to))
+    }
+
     sealed class ListAction {
 
     }
