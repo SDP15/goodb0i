@@ -14,7 +14,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.koin.test.KoinTest
 import org.koin.test.declare
-import timber.log.Timber
 import java.util.*
 
 class ListViewModelTest : KoinTest {
@@ -47,13 +46,13 @@ class ListViewModelTest : KoinTest {
     @Test
     fun testEmptySearch() {
         vm.search.observeForever {
-            Timber.i("Observed value $it")
+            println("Observed value $it")
         }
         vm.onQueryChange("", "")
         verify {
             searchObserver.onChanged(capture(searchSlot))
         }
-        Timber.i("Captured value ${searchSlot.isCaptured}")
+        println("Captured value ${searchSlot.isCaptured}")
         Assert.assertTrue("All values in search adapter should be updated", searchSlot.captured is ListDiff.All)
         Assert.assertEquals("Search results should be empty", 0, (searchSlot.captured as ListDiff.All).items.size)
     }
@@ -154,5 +153,54 @@ class ListViewModelTest : KoinTest {
         Assert.assertEquals("", 2 * price1 + price2, slot.captured, 0.0002)
     }
 
+    private fun addTestItems(count: Int): List<Product> {
+        val products = (1..count).map { mockk<Product>(relaxed = true) }
+        products.forEachIndexed { index, product ->
+            every { product.id } answers { index.toString() }
+            vm.incrementItem(product)
+        }
+        vm.list.observeForever(listObserver)
+        clearMocks(listObserver)
+        return products
+    }
+
+    @Test
+    fun testSwapItemWithSelf() {
+        addTestItems(10)
+        vm.moveItem(0, 0)
+        verify {
+            listObserver wasNot Called
+        }
+    }
+
+    @Test
+    fun testSwapLowToHigh() {
+        val products = addTestItems(10)
+        val from = 3
+        val to = 1
+        vm.moveItem(from, to)
+        verify(exactly = 1) {
+            listObserver.onChanged(capture(listSlot))
+        }
+        Assert.assertTrue("Diff should be item move", listSlot.captured is ListDiff.Move)
+        val diff = listSlot.captured as ListDiff.Move
+        Assert.assertEquals(products[from], diff.moved.product)
+        Assert.assertEquals(products[from], diff.items[to].product)
+    }
+
+    @Test
+    fun testSwapHighToLow() {
+        val products = addTestItems(10)
+        val from = 3
+        val to = 7
+        vm.moveItem(from, to)
+        verify(exactly = 1) {
+            listObserver.onChanged(capture(listSlot))
+        }
+        Assert.assertTrue("Diff should be item move", listSlot.captured is ListDiff.Move)
+        val diff = listSlot.captured as ListDiff.Move
+        Assert.assertEquals(products[from], diff.moved.product)
+        Assert.assertEquals(products[from], diff.items[to].product)
+    }
 
 }
