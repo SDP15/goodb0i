@@ -21,6 +21,7 @@ class ListConfirmationFragment : BaseFragment() {
         super.onResume()
         val args = navArgs<ListConfirmationFragmentArgs>()
         Timber.i("Received args $args")
+        vm.setShoppingList(args.value.shoppingList)
         confirmation_button_edit.setOnClickListener {
             findNavController().popBackStack()
         }

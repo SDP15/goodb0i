@@ -38,7 +38,9 @@ class PinFragment : androidx.fragment.app.Fragment() {
             }
         })
         vm.actions.observe(this, Observer {
-
+            if (it is PinViewModel.PinAction.ConfirmShoppingListAction) {
+                findNavController().navigate(PinFragmentDirections.actionPinFragmentToListConfirmationFragment(it.list))
+            }
         })
     }
 
