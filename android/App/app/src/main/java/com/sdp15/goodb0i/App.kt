@@ -17,7 +17,7 @@ import com.sdp15.goodb0i.view.debug.Config
 import com.sdp15.goodb0i.view.product.ProductViewModel
 import com.sdp15.goodb0i.view.list.ListViewModel
 import com.sdp15.goodb0i.view.list.confirmation.ListConfirmationViewModel
-import com.sdp15.goodb0i.view.pin.PinViewModel
+import com.sdp15.goodb0i.view.code.CodeViewModel
 import com.sdp15.goodb0i.view.scanner.ScannerViewModel
 import com.sdp15.goodb0i.view.welcome.WelcomeViewModel
 import org.koin.android.ext.android.startKoin
@@ -47,7 +47,7 @@ class App : Application() {
 
     private val modules = listOf(
         module {
-            viewModel<PinViewModel>()
+            viewModel<CodeViewModel>()
             viewModel<ScannerViewModel>()
             viewModel<WelcomeViewModel>()
             viewModel<ItemConfirmationViewModel>()

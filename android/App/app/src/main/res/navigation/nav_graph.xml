@@ -12,7 +12,7 @@
 
         <action
             android:id="@+id/action_welcome_fragment_to_pin_fragment"
-            app:destination="@id/pin_fragment" />
+            app:destination="@id/code_fragment" />
 
         <action android:id="@+id/action_welcome_fragment_to_list_creation_fragment" app:destination="@id/list_creation_fragment"/>
 
@@ -29,13 +29,13 @@
             app:destination="@id/list_confirmation_fragment" />
     </fragment>
 
-    <fragment android:id="@+id/pin_fragment"
-        android:name="com.sdp15.goodb0i.view.pin.PinFragment"
+    <fragment android:id="@+id/code_fragment"
+        android:name="com.sdp15.goodb0i.view.code.CodeFragment"
         android:label="pin_fragment"
-        tools:layout="@layout/layout_pin_input">
+        tools:layout="@layout/layout_code_input">
 
         <action
-            android:id="@+id/action_pin_fragment_to_list_confirmation_fragment"
+            android:id="@+id/action_code_fragment_to_list_confirmation_fragment"
             app:destination="@id/list_confirmation_fragment" />
 
     </fragment>
