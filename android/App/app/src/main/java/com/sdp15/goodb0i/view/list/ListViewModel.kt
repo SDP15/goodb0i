@@ -28,14 +28,14 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
     private var existingList: ShoppingList? = null
 
     // The current shopping list
-    private val currentList = mutableListOf<TrolleyItem>()
-    val list = MutableLiveData<ListDiff<TrolleyItem>>()
+    private val currentList = mutableListOf<ListItem>()
+    val list = MutableLiveData<ListDiff<ListItem>>()
 
     // Most recently retrieved search results
-    private val currentSearchResults = mutableListOf<TrolleyItem>()
+    private val currentSearchResults = mutableListOf<ListItem>()
     private val retrievedSearchResults = MutableLiveData<List<Product>>()
     // Exposed LiveData for full list changes, or updates to individual items
-    val search = MediatorLiveData<ListDiff<TrolleyItem>>()
+    val search = MediatorLiveData<ListDiff<ListItem>>()
 
     val totalPrice = MutableLiveData<Double>()
 
@@ -51,9 +51,9 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
             currentSearchResults.clear()
             // Add each of the new items to the results, with their existing counts
             currentSearchResults.addAll(result.map { item ->
-                TrolleyItem(
+                ListItem(
                     item,
-                    currentList.firstOrNull { it.product.id == item.id }?.count ?: 0
+                    currentList.firstOrNull { it.product.id == item.id }?.quantity ?: 0
                 )
             })
             search.postValue(ListDiff.All(currentSearchResults))
@@ -66,7 +66,7 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
 
     fun setList(shoppingList: ShoppingList) {
         existingList = shoppingList
-        currentList.addAll(shoppingList.products.map { TrolleyItem(it.product, it.quantity) })
+        currentList.addAll(shoppingList.products)
         list.postValue(ListDiff.All(currentList))
     }
 
@@ -74,15 +74,13 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
         //TODO: Error handling
         GlobalScope.launch(Dispatchers.IO) {
             if (existingList == null) {
-                val result = listManager.createList(currentList.map { Pair(it.product.id, it.count) })
+                val result = listManager.createList(currentList.map { Pair(it.product.id, it.quantity) })
                 if (result is Result.Success) {
                     //actions.postValue(ListAction.ToastAction("List code ${result.data}"))
                     //listManager.loadList(result.data.toLong())
                     transitions.postValue(
                         ListPagingFragmentDirections.actionListCreationFragmentToListConfirmationFragment(
-                            ShoppingList(result.data, System.currentTimeMillis(), currentList.map {
-                                ListItem(it.product, it.count)
-                            })
+                            ShoppingList(result.data, System.currentTimeMillis(), currentList)
                         )
                     )
 
@@ -114,18 +112,18 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
     }
 
     private val price: Double
-        get() = currentList.sumByDouble { it.count * it.product.price }
+        get() = currentList.sumByDouble { it.quantity * it.product.price }
 
     fun incrementItem(product: Product) {
         Timber.i("Incrementing added ${product.name}")
         val i = currentList.indexOfFirst { it.product.id == product.id }
-        val diff: ListDiff<TrolleyItem>
+        val diff: ListDiff<ListItem>
         if (i == -1) { // Add product to list as it isn't there already
-            val ci = TrolleyItem(product, 1)
+            val ci = ListItem(product, 1)
             currentList.add(ci)
             diff = ListDiff.Add(currentList, ci)
         } else { // Update count and post to update adapter
-            currentList[i].count++
+            currentList[i].quantity++
             diff = ListDiff.Update(currentList, currentList[i])
         }
         list.postValue(diff)
@@ -137,8 +135,8 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
         val ci = currentList.firstOrNull { it.product.id == product.id }
         // If the product doesn't exist in the current list, the user is decrementing an product in search which is at 0
         ci?.apply {
-            count--
-            if (count == 0) {
+            quantity--
+            if (quantity == 0) {
                 currentList.remove(this)
                 list.postValue(ListDiff.Remove(currentList, this))
             } else {

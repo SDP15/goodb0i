@@ -4,6 +4,7 @@ import android.view.*
 import androidx.core.view.MotionEventCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.sdp15.goodb0i.R
+import com.sdp15.goodb0i.data.store.lists.ListItem
 import com.sdp15.goodb0i.data.store.products.Product
 import com.sdp15.goodb0i.move
 import com.sdp15.goodb0i.view.ListDiff
@@ -15,10 +16,10 @@ import kotlin.math.max
 class ProductAdapter(val onIncrement: (Product) -> Unit, val onDecrement: (Product) -> Unit, private val showFullList: Boolean, private val dragListener: (RecyclerView.ViewHolder) -> Unit = {}) :
     RecyclerView.Adapter<ProductAdapter.ItemViewHolder>() {
 
-    private var items: MutableList<TrolleyItem> = mutableListOf()
+    private var items: MutableList<ListItem> = mutableListOf()
     private var expanded: MutableList<Boolean> = mutableListOf()
 
-    fun itemsChanged(diff: ListDiff<TrolleyItem>) {
+    fun itemsChanged(diff: ListDiff<ListItem>) {
         when (diff) {
             is ListDiff.All -> {
                 items = diff.items.toMutableList()
@@ -84,7 +85,7 @@ class ProductAdapter(val onIncrement: (Product) -> Unit, val onDecrement: (Produ
                 true
             }
             val item = items[holder.adapterPosition].product
-            var quantity = items[holder.adapterPosition].count
+            var quantity = items[holder.adapterPosition].quantity
             text_item_name.text = item.name
             if (item.description.firstOrNull() != null) {
                 text_item_descr.text = item.description.first()
@@ -94,7 +95,7 @@ class ProductAdapter(val onIncrement: (Product) -> Unit, val onDecrement: (Produ
             text_item_quantity.text = quantity.toString()
             button_positive.setOnClickListener {
                 onIncrement(item)
-                items[holder.adapterPosition].count = ++quantity
+                items[holder.adapterPosition].quantity = ++quantity
                 text_item_quantity.text = quantity.toString()
                 tprice = getPrice(holder.adapterPosition)
                 text_item_price.text = context.getString(R.string.label_item_price, tprice)
@@ -102,7 +103,7 @@ class ProductAdapter(val onIncrement: (Product) -> Unit, val onDecrement: (Produ
             button_negative.setOnClickListener {
                 onDecrement(item)
                 quantity = max(0, quantity - 1)
-                items[holder.adapterPosition].count = quantity
+                items[holder.adapterPosition].quantity = quantity
                 text_item_quantity.text = quantity.toString()
                 tprice = getPrice(holder.adapterPosition)
                 text_item_price.text = context.getString(R.string.label_item_price, tprice)
@@ -113,7 +114,7 @@ class ProductAdapter(val onIncrement: (Product) -> Unit, val onDecrement: (Produ
 
     private fun getPrice(position: Int): Double {
         val item = items[position].product
-        val quantity = items[position].count
+        val quantity = items[position].quantity
         return if (showFullList) item.price * quantity else item.price
     }
 

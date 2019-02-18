@@ -2,11 +2,11 @@ package com.sdp15.goodb0i.viewmodels
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
+import com.sdp15.goodb0i.data.store.lists.ListItem
 import com.sdp15.goodb0i.data.store.products.Product
 import com.sdp15.goodb0i.data.store.products.TestDataProductLoader
 import com.sdp15.goodb0i.view.ListDiff
 import com.sdp15.goodb0i.view.list.ListViewModel
-import com.sdp15.goodb0i.view.list.TrolleyItem
 import io.mockk.*
 import org.junit.Assert
 import org.junit.Before
@@ -23,10 +23,10 @@ class ListViewModelTest : KoinTest {
 
     private lateinit var vm: ListViewModel
     private lateinit var product: Product
-    private lateinit var listObserver: Observer<ListDiff<TrolleyItem>>
-    private lateinit var listSlot: CapturingSlot<ListDiff<TrolleyItem>>
-    private lateinit var searchObserver: Observer<ListDiff<TrolleyItem>>
-    private lateinit var searchSlot: CapturingSlot<ListDiff<TrolleyItem>>
+    private lateinit var listObserver: Observer<ListDiff<ListItem>>
+    private lateinit var listSlot: CapturingSlot<ListDiff<ListItem>>
+    private lateinit var searchObserver: Observer<ListDiff<ListItem>>
+    private lateinit var searchSlot: CapturingSlot<ListDiff<ListItem>>
 
     @Before
     fun setUp() {
@@ -66,7 +66,7 @@ class ListViewModelTest : KoinTest {
         }
         Assert.assertTrue("ListDiff should be add", listSlot.captured is ListDiff.Add)
         Assert.assertEquals("Same added should be returned", product, (listSlot.captured as ListDiff.Add).added.product)
-        Assert.assertEquals("Count should be 1", 1, (listSlot.captured as ListDiff.Add).added.count)
+        Assert.assertEquals("Count should be 1", 1, (listSlot.captured as ListDiff.Add).added.quantity)
     }
 
     @Test
@@ -82,7 +82,7 @@ class ListViewModelTest : KoinTest {
         }
         Assert.assertTrue("ListDiff should be update", listSlot.captured is ListDiff.Update)
         Assert.assertEquals("Same added should be returned", product, (listSlot.captured as ListDiff.Update).updated.product)
-        Assert.assertEquals("Count should be 2", 2, (listSlot.captured as ListDiff.Update).updated.count)
+        Assert.assertEquals("Count should be 2", 2, (listSlot.captured as ListDiff.Update).updated.quantity)
     }
 
     @Test
@@ -100,7 +100,7 @@ class ListViewModelTest : KoinTest {
         }
         Assert.assertTrue("Diff should be update", listSlot.captured is ListDiff.Update)
         Assert.assertEquals("Product should be the same", product, (listSlot.captured as ListDiff.Update).updated.product)
-        Assert.assertEquals("Quantity should be 1", 1, (listSlot.captured as ListDiff.Update).updated.count)
+        Assert.assertEquals("Quantity should be 1", 1, (listSlot.captured as ListDiff.Update).updated.quantity)
     }
 
     @Test

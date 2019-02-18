@@ -11,4 +11,4 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 data class ListItem(
     @SerializedName("product") val product: Product,
-    @SerializedName("quantity") val quantity: Int) : Parcelable
+    @SerializedName("quantity") var quantity: Int) : Parcelable
