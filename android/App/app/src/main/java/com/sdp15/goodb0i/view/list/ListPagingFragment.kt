@@ -39,6 +39,11 @@ class ListPagingFragment : BaseFragment() {
         val vp = ViewPagerAdapter(childFragmentManager)
         list_viewpager.adapter = vp
         //list_tab_layout.setupWithViewPager(list_viewpager)
+
+    }
+
+    override fun onResume() {
+        super.onResume()
         val args = navArgs<ListPagingFragmentArgs>()
         val list = args.value.shoppingList
         if (list != null) {

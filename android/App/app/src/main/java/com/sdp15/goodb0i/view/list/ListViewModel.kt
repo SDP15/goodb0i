@@ -81,9 +81,11 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
             val result =
                 existingList?.let { listManager.updateList(it.code.toLong(), params) } ?: listManager.createList(params)
             if (result is Result.Success) {
+                val created = ShoppingList(result.data, System.currentTimeMillis(), currentList)
+                existingList = created // If go to confirmation, and then back, we are editing this existing list
                 transitions.postValue(
                     ListPagingFragmentDirections.actionListCreationFragmentToListConfirmationFragment(
-                        ShoppingList(result.data, System.currentTimeMillis(), currentList)
+                        created
                     )
                 )
             } else {
