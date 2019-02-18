@@ -31,6 +31,14 @@ class ListConfirmationFragment : BaseFragment() {
         vm.code.observe(this, Observer {
             confirmation_list_code.text = getString(R.string.label_list_code, it)
         })
+        confirmation_button_edit.setOnClickListener {
+            findNavController().navigate(
+                ListConfirmationFragmentDirections.actionListConfirmationFragmentToListCreationFragment(
+                    args.value.shoppingList
+                )
+            )
+        }
+        findNavController().currentDestination?.id
     }
 
     override fun onCreateView(

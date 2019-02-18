@@ -1,7 +1,6 @@
 package com.sdp15.goodb0i.view.welcome
 
 import com.sdp15.goodb0i.BaseViewModel
-import com.sdp15.goodb0i.R
 
 class WelcomeViewModel : BaseViewModel<WelcomeViewModel.WelcomeAction>(), WelcomeFragment.WelcomeFragmentInteractor {
 
@@ -10,11 +9,11 @@ class WelcomeViewModel : BaseViewModel<WelcomeViewModel.WelcomeAction>(), Welcom
     }
 
     override fun prepareOrder() {
-        transitions.postValue(R.id.list_creation_fragment)
+        transitions.postValue(WelcomeFragmentDirections.actionWelcomeFragmentToListCreationFragment())
     }
 
     override fun startShopping() {
-        transitions.postValue(R.id.code_fragment)
+        transitions.postValue(WelcomeFragmentDirections.actionWelcomeFragmentToCodeFragment())
     }
 
 

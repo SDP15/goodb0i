@@ -24,6 +24,9 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
 
     private val productLoader: ProductLoader by inject()
     private val listManager: ListManager by inject()
+
+    private var existingList: ShoppingList? = null
+
     // The current shopping list
     private val currentList = mutableListOf<TrolleyItem>()
     val list = MutableLiveData<ListDiff<TrolleyItem>>()
@@ -33,6 +36,8 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
     private val retrievedSearchResults = MutableLiveData<List<Product>>()
     // Exposed LiveData for full list changes, or updates to individual items
     val search = MediatorLiveData<ListDiff<TrolleyItem>>()
+
+    val totalPrice = MutableLiveData<Double>()
 
     init {
         search.addSource(list) {
@@ -55,25 +60,36 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
         }
     }
 
-    val totalPrice = MutableLiveData<Double>()
 
     override fun bind() {
+    }
+
+    fun setList(shoppingList: ShoppingList) {
+        existingList = shoppingList
+        currentList.addAll(shoppingList.products.map { TrolleyItem(it.product, it.quantity) })
+        list.postValue(ListDiff.All(currentList))
     }
 
     fun onSaveList() {
         //TODO: Error handling
         GlobalScope.launch(Dispatchers.IO) {
-            val result = listManager.createList(currentList.map { Pair(it.product.id, it.count) })
-            if (result is Result.Success) {
-                //actions.postValue(ListAction.ToastAction("List code ${result.data}"))
-                //listManager.loadList(result.data.toLong())
-                actions.postValue(ListAction.ConfirmShoppingListAction(
-                    ShoppingList(result.data, System.currentTimeMillis(), currentList.map {
-                        ListItem(it.product, it.count)
-                    })
-                ))
+            if (existingList == null) {
+                val result = listManager.createList(currentList.map { Pair(it.product.id, it.count) })
+                if (result is Result.Success) {
+                    //actions.postValue(ListAction.ToastAction("List code ${result.data}"))
+                    //listManager.loadList(result.data.toLong())
+                    transitions.postValue(
+                        ListPagingFragmentDirections.actionListCreationFragmentToListConfirmationFragment(
+                            ShoppingList(result.data, System.currentTimeMillis(), currentList.map {
+                                ListItem(it.product, it.count)
+                            })
+                        )
+                    )
+
+                } else {
+                    //TODO
+                }
             } else {
-                //TODO
             }
         }
     }
@@ -139,8 +155,7 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
     }
 
     sealed class ListAction {
-        data class ToastAction(val text: String): ListAction()
-        data class ConfirmShoppingListAction(val list: ShoppingList): ListAction()
+        data class ToastAction(val text: String) : ListAction()
     }
 
 }

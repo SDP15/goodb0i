@@ -39,11 +39,10 @@ class ShoppingListFragment : Fragment() {
         vm.actions.observe(this, Observer { action ->
             if (action is ListViewModel.ListAction.ToastAction) {
                 Toast.makeText(context, action.text, Toast.LENGTH_LONG).show()
-            } else if (action is ListViewModel.ListAction.ConfirmShoppingListAction) {
-                // Aren't auto-generated names just wonderful?
-                findNavController().navigate(ListPagingFragmentDirections.actionListCreationFragmentToListConfirmationFragment(action.list))
-
             }
+        })
+        vm.transitions.observe(this, Observer {
+            findNavController().navigate(it)
         })
         list_save_button.setOnClickListener {
             vm.onSaveList()

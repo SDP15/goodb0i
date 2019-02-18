@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
+import androidx.navigation.fragment.navArgs
 import com.sdp15.goodb0i.R
 import com.sdp15.goodb0i.view.BaseFragment
 import kotlinx.android.synthetic.main.layout_list_creation.*
@@ -38,6 +39,12 @@ class ListPagingFragment : BaseFragment() {
         val vp = ViewPagerAdapter(childFragmentManager)
         list_viewpager.adapter = vp
         //list_tab_layout.setupWithViewPager(list_viewpager)
+        val args = navArgs<ListPagingFragmentArgs>()
+        val list = args.value.shoppingList
+        if (list != null) {
+            vm.setList(list)
+            list_viewpager.currentItem = 1
+        }
     }
 
 

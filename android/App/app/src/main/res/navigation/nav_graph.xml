@@ -11,7 +11,7 @@
         tools:layout="@layout/layout_welcome">
 
         <action
-            android:id="@+id/action_welcome_fragment_to_pin_fragment"
+            android:id="@+id/action_welcome_fragment_to_code_fragment"
             app:destination="@id/code_fragment" />
 
         <action android:id="@+id/action_welcome_fragment_to_list_creation_fragment" app:destination="@id/list_creation_fragment"/>
@@ -27,11 +27,16 @@
         <action
             android:id="@+id/action_list_creation_fragment_to_list_confirmation_fragment"
             app:destination="@id/list_confirmation_fragment" />
+        <argument
+            android:name="shopping_list"
+            app:argType="com.sdp15.goodb0i.data.store.lists.ShoppingList"
+            app:nullable="true"
+            android:defaultValue="@null" />
     </fragment>
 
     <fragment android:id="@+id/code_fragment"
         android:name="com.sdp15.goodb0i.view.code.CodeFragment"
-        android:label="pin_fragment"
+        android:label="code_fragment"
         tools:layout="@layout/layout_code_input">
 
         <action
@@ -103,6 +108,9 @@
         <argument
             android:name="shopping_list"
             app:argType="com.sdp15.goodb0i.data.store.lists.ShoppingList" />
+        <action
+            android:id="@+id/action_list_confirmation_fragment_to_list_creation_fragment"
+            app:destination="@id/list_creation_fragment" />
     </fragment>
 
 
