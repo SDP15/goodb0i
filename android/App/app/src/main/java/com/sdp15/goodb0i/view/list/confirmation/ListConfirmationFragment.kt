@@ -22,8 +22,8 @@ class ListConfirmationFragment : BaseFragment() {
         val args = navArgs<ListConfirmationFragmentArgs>()
         Timber.i("Received args $args")
         vm.setShoppingList(args.value.shoppingList)
-        confirmation_button_edit.setOnClickListener {
-            findNavController().popBackStack()
+        confirmation_button_navigate.setOnClickListener {
+
         }
         vm.price.observe(this, Observer {
             confirmation_list_cost.text = getString(R.string.label_total_price, it)
@@ -32,13 +32,18 @@ class ListConfirmationFragment : BaseFragment() {
             confirmation_list_code.text = getString(R.string.label_list_code, it)
         })
         confirmation_button_edit.setOnClickListener {
-            findNavController().navigate(
-                ListConfirmationFragmentDirections.actionListConfirmationFragmentToListCreationFragment(
-                    args.value.shoppingList
+            if (baseActivity.previousFragment == R.id.list_creation_fragment) {
+                findNavController().navigateUp() // Navigate back to ListPagingFragment
+            } else {
+                findNavController().navigate(
+                    ListConfirmationFragmentDirections.actionListConfirmationFragmentToListCreationFragment(
+                        args.value.shoppingList
+                    )
                 )
-            )
+            }
+
         }
-        findNavController().currentDestination?.id
+
     }
 
     override fun onCreateView(

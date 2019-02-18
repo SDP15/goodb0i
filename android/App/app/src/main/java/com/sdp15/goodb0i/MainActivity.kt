@@ -12,6 +12,7 @@ import android.os.Bundle
 import android.os.IBinder
 import android.view.KeyEvent
 import android.widget.Toast
+import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -30,11 +31,19 @@ class MainActivity : AppCompatActivity() {
 
     private val sh: SocketHandler by inject()
 
+    @IdRes
+    var previousFragment = 0
+    private var currentFragment = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         supportActionBar?.hide()
-
+        findNavController(R.id.nav_host_fragment).addOnDestinationChangedListener { controller, destination, arguments ->
+            // Keep track of id of the previous fragment. Currently only used by ListConfirmationFragment
+            previousFragment = currentFragment
+            currentFragment = destination.id
+        }
         //sh.start("http://10.0.2.2:8080/app", "first socket")
         //SocketHandler().start("http://10.0.2.2:8080/app", "second socket")
 
