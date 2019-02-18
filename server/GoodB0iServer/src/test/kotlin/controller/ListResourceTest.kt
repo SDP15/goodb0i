@@ -26,9 +26,11 @@ class ListResourceTest : ServerTest() {
 
     }
 
+    private fun randomListBody(length: Int) = products.shuffled().take(length).map { Pair(it.id.value.toString(), Random.nextInt(1, 10)) }
+
     @Test
     fun testCreateList() {
-        val testList = products.subList(0, 4).map { Pair(it.id.value.toString(), Random.nextInt(1, 10)) }
+        val testList = randomListBody(4)
         val response = given()
                 .body(testList)
                 .When()
@@ -60,7 +62,7 @@ class ListResourceTest : ServerTest() {
 
     @Test
     fun testRetrieveList() {
-        val testList = products.subList(0, 4).map { Pair(it.id.value.toString(), Random.nextInt(1, 10)) }
+        val testList = randomListBody(4)
         val code = given()
                 .body(testList)
                 .When()
@@ -82,6 +84,31 @@ class ListResourceTest : ServerTest() {
             Assertions.assertEquals(actual.product.id, test.first, "Product ids should match for")
             Assertions.assertEquals(actual.quantity, test.second, "Quantities should match")
         }
+    }
+
+    @Test
+    fun testUpdateList() {
+        val testList = randomListBody(4).toMutableList()
+        val response = given()
+                .body(testList)
+                .When()
+                .contentType(ContentType.JSON)
+                .post("/lists/new")
+                .then()
+                .statusCode(HttpStatusCode.Created.value)
+                .extract()
+        testList.removeAt(0)
+        testList[1] = testList[1].copy(second = 3)
+        testList.addAll(randomListBody(3))
+        val update = given()
+                .body(testList)
+                .When()
+                .contentType(ContentType.JSON)
+                .post("/lists/update/${response.to<String>()}")
+                .then()
+                .statusCode(HttpStatusCode.OK.value)
+                .extract()
+
     }
 
 }

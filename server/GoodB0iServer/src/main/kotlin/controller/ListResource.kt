@@ -40,6 +40,29 @@ fun Route.lists(listService: ListService) {
             }
         }
 
+        post("/update/{code}") {
+            val code = call.parameters["code"]?.toLongOrNull()
+            if (code == null) {
+                call.respond(HttpStatusCode.BadRequest)
+            } else {
+                val ids = call.receiveOrNull<List<LinkedTreeMap<String, Any>>>()
+                if (ids == null) {
+                    call.respond(HttpStatusCode.BadRequest, "Post a list of pairs of UUID and quantity")
+                } else {
+                    val flat = ids.map {
+                        Pair(it.values.elementAt(0) as String, // UUID string
+                                (it.values.elementAt(1) as Double).toInt())  // Quantity
+                    }
+                    val list = listService.editList(code, flat.map { it.first }, flat.map { it.second })
+                    if (list != null) {
+                        call.respondText(list.code.toString(), status = HttpStatusCode.OK)
+                    } else {
+                        call.respond(HttpStatusCode.NoContent)
+                    }
+                }
+            }
+        }
+
         get("/load/{code}") {
             val code = call.parameters["code"]?.toLongOrNull()
             if (code == null) {

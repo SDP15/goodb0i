@@ -34,12 +34,20 @@ object RetrofitListManager : ListManager {
         success = { it.toResult() },
         failure = { Result.Failure(Exception(it.message))}
     )
+
+    override suspend fun updateList(code: Long, contents: List<Pair<String, Int>>): Result<String> = api.updateListAsync(code.toString(), contents).awaitCatching(
+        success = {it.toResult() },
+        failure = { Result.Failure(Exception(it.message))}
+    )
 }
 
 interface KTORListAPI {
 
     @POST("/lists/new/")
     fun createListAsync(@Body body: List<Pair<String, Int>>): Deferred<Response<String>>
+
+    @POST("/lists/update/{code}")
+    fun updateListAsync(@Path("code") code: String, @Body body: List<Pair<String, Int>>): Deferred<Response<String>>
 
     @GET("/lists/load/{code}")
     fun loadListAsync(@Path("code") code: String): Deferred<Response<ShoppingList>>

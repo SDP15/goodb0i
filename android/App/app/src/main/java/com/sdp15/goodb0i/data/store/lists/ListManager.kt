@@ -7,4 +7,6 @@ interface ListManager {
     suspend fun loadList(code: Long): Result<ShoppingList>
 
     suspend fun createList(contents: List<Pair<String, Int>>): Result<String>
+
+    suspend fun updateList(code: Long, contents: List<Pair<String, Int>>): Result<String>
 }
