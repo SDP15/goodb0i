@@ -32,7 +32,7 @@ class PinFragment : androidx.fragment.app.Fragment() {
         vm.validInput.observe(this, Observer {
             if (it.first) {
                 login_code_input.error = null
-                findNavController().navigate(R.id.device_list_fragment)
+                //findNavController().navigate(R.id.device_list_fragment)
             } else {
                 login_code_input.error = getString(it.second)
             }

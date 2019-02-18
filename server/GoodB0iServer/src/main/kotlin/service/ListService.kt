@@ -35,8 +35,9 @@ class ListService {
                             }
                         }
                 // Create the list with the ListEntries we just created
+                val generatedCode = Random.nextLong(1000000, 9999999)
                 val list = ShoppingList.new {
-                    code = Random.nextLong(0, 1000000)
+                    code = generatedCode
                     time = System.currentTimeMillis()
                     products = SizedCollection(listProducts)
                 }
@@ -46,7 +47,7 @@ class ListService {
             }
 
     fun loadList(code: Long): ShoppingList? = transaction {
-        println("Loading list for code $code")
+        println("Loading list for code $code") //
         return@transaction ShoppingList.find { ShoppingLists.code eq code }.limit(1).firstOrNull()
     }
 

@@ -40,11 +40,11 @@ open class ServerTest {
         @JvmStatic
         fun startServer() {
             if(!serverStarted) {
-                server = embeddedServer(Netty, 8080, watchPaths = listOf("Main"), module = Application::module)
+                server = embeddedServer(Netty, 8081, watchPaths = listOf("Main"), module = Application::module)
                 server.start()
                 serverStarted = true
                 RestAssured.baseURI = "http://localhost"
-                RestAssured.port = 8080
+                RestAssured.port = 8081
                 Runtime.getRuntime().addShutdownHook(Thread { server.stop(0, 0, TimeUnit.SECONDS) })
             }
         }
