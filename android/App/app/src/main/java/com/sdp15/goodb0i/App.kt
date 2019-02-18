@@ -10,13 +10,13 @@ import com.sdp15.goodb0i.data.store.products.RetrofitProductLoader
 import com.sdp15.goodb0i.data.store.products.TestDataProductLoader
 import com.sdp15.goodb0i.data.store.lists.ListManager
 import com.sdp15.goodb0i.data.store.lists.RetrofitListManager
-import com.sdp15.goodb0i.view.confirmation.ConfirmationViewModel
+import com.sdp15.goodb0i.view.confirmation.ItemConfirmationViewModel
 import com.sdp15.goodb0i.view.connection.devices.DeviceListViewModel
 import com.sdp15.goodb0i.view.debug.CapturingDebugTree
 import com.sdp15.goodb0i.view.debug.Config
 import com.sdp15.goodb0i.view.product.ProductViewModel
 import com.sdp15.goodb0i.view.list.ListViewModel
-import com.sdp15.goodb0i.view.orders.OrdersViewModel
+import com.sdp15.goodb0i.view.list.confirmation.ListConfirmationViewModel
 import com.sdp15.goodb0i.view.pin.PinViewModel
 import com.sdp15.goodb0i.view.scanner.ScannerViewModel
 import com.sdp15.goodb0i.view.welcome.WelcomeViewModel
@@ -50,9 +50,9 @@ class App : Application() {
             viewModel<PinViewModel>()
             viewModel<ScannerViewModel>()
             viewModel<WelcomeViewModel>()
-            viewModel<ConfirmationViewModel>()
+            viewModel<ItemConfirmationViewModel>()
             viewModel<ProductViewModel>()
-            viewModel<OrdersViewModel>()
+            viewModel<ListConfirmationViewModel>()
             viewModel<ListViewModel>()
             viewModel<DeviceListViewModel>()
         },

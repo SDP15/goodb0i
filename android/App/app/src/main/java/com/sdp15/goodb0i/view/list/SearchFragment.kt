@@ -42,7 +42,6 @@ class SearchFragment : Fragment() {
     ): View? {
         // Container is the ViewPager. If we ever move SearchFragment out of a ViewPager, this will crash
         viewPager = container as ViewPager
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.layout_search, container, false)
     }
 

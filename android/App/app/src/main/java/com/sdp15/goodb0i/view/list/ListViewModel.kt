@@ -4,7 +4,9 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import com.sdp15.goodb0i.BaseViewModel
 import com.sdp15.goodb0i.data.store.Result
+import com.sdp15.goodb0i.data.store.lists.ListItem
 import com.sdp15.goodb0i.data.store.lists.ListManager
+import com.sdp15.goodb0i.data.store.lists.ShoppingList
 import com.sdp15.goodb0i.data.store.products.Product
 import com.sdp15.goodb0i.data.store.products.ProductLoader
 import com.sdp15.goodb0i.move
@@ -63,8 +65,13 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
         GlobalScope.launch(Dispatchers.IO) {
             val result = listManager.createList(currentList.map { Pair(it.product.id, it.count) })
             if (result is Result.Success) {
-                actions.postValue(ListAction.ToastAction("List code ${result.data}"))
-                listManager.loadList(result.data.toLong())
+                //actions.postValue(ListAction.ToastAction("List code ${result.data}"))
+                //listManager.loadList(result.data.toLong())
+                actions.postValue(ListAction.ConfirmShoppingListAction(
+                    ShoppingList(result.data, System.currentTimeMillis(), currentList.map {
+                        ListItem(it.product, it.count)
+                    })
+                ))
             } else {
                 //TODO
             }
@@ -133,6 +140,7 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
 
     sealed class ListAction {
         data class ToastAction(val text: String): ListAction()
+        data class ConfirmShoppingListAction(val list: ShoppingList): ListAction()
     }
 
 }

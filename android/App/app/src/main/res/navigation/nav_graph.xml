@@ -24,6 +24,9 @@
         android:label="list_creation_fragment">
 
 
+        <action
+            android:id="@+id/action_list_creation_fragment_to_list_confirmation_fragment"
+            app:destination="@id/list_confirmation_fragment" />
     </fragment>
 
     <fragment android:id="@+id/pin_fragment"
@@ -31,13 +34,9 @@
         android:label="pin_fragment"
         tools:layout="@layout/layout_pin_input">
 
-
         <action
-            android:id="@+id/action_pin_fragment_to_orders_fragment"
-            app:destination="@id/orders_fragment" />
-
-        <action android:id="@+id/action_pin_fragment_to_device_list_fragment"
-            app:destination="@id/device_list_fragment"/>
+            android:id="@+id/action_pin_fragment_to_list_confirmation_fragment"
+            app:destination="@id/list_confirmation_fragment" />
 
     </fragment>
 
@@ -67,18 +66,8 @@
             app:destination="@id/confirmation_fragment" />
     </fragment>
 
-    <fragment android:id="@+id/orders_fragment"
-        android:name="com.sdp15.goodb0i.view.orders.OrdersFragment"
-        android:label="orders_fragment"
-        tools:layout="@layout/layout_your_orders">
-
-        <argument
-            android:name="pin"
-            app:argType="long" />
-    </fragment>
-
     <fragment android:id="@+id/confirmation_fragment"
-        android:name="com.sdp15.goodb0i.view.confirmation.ConfirmationFragment"
+        android:name="com.sdp15.goodb0i.view.confirmation.ItemConfirmationFragment"
         android:label="confirmation_fragment"
         tools:layout="@layout/layout_confirmation">
 
@@ -104,6 +93,16 @@
         android:name="com.sdp15.goodb0i.view.list.ShoppingListFragment"
         tools:layout="@layout/layout_shoppinglist">
 
+    </fragment>
+
+    <fragment android:id="@+id/list_confirmation_fragment" android:label="list_confirmation"
+        android:name="com.sdp15.goodb0i.view.list.confirmation.ListConfirmationFragment"
+        tools:layout="@layout/layout_list_confirmation">
+
+
+        <argument
+            android:name="shopping_list"
+            app:argType="com.sdp15.goodb0i.data.store.lists.ShoppingList" />
     </fragment>
 
 

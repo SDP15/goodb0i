@@ -11,6 +11,7 @@ import kotlin.random.Random
 
 class ListService {
 
+    //TODO: Merge the update and edit paths
 
     fun editList(existingCode: Long, ids: List<String>, quantities: List<Int>): ShoppingList? =
             transaction {
@@ -78,6 +79,7 @@ class ListService {
                 println("ShoppingList created ${list.id.value}. Code ${list.code}")
                 return@transaction list
             }
+
 
     fun loadList(code: Long): ShoppingList? = transaction {
         println("Loading list for code $code") //

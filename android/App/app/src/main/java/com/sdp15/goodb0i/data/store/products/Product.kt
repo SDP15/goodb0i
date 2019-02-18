@@ -1,8 +1,10 @@
 package com.sdp15.goodb0i.data.store.products
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import kotlinx.android.parcel.Parcelize
 
-
+@Parcelize
 data class Product(
     @SerializedName("id") val id: String = "",
     @SerializedName("name") val name: String,
@@ -18,7 +20,7 @@ data class Product(
     @SerializedName("unitPrice") val unitPrice: Double
 
 
-) {
+) : Parcelable {
     override fun equals(other: Any?): Boolean {
         return other is Product && other.id == id
     }

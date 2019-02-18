@@ -7,9 +7,12 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.navigation.NavDirections
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.sdp15.goodb0i.R
+import com.sdp15.goodb0i.view.list.confirmation.ListConfirmationFragmentArgs
 import kotlinx.android.synthetic.main.layout_shoppinglist.*
 
 class ShoppingListFragment : Fragment() {
@@ -33,9 +36,13 @@ class ShoppingListFragment : Fragment() {
         vm.totalPrice.observe(this, Observer {
             label_total_price.text = getString(R.string.label_item_price, it)
         })
-        vm.actions.observe(this, Observer {
-            if (it is ListViewModel.ListAction.ToastAction) {
-                Toast.makeText(context, it.text, Toast.LENGTH_LONG).show()
+        vm.actions.observe(this, Observer { action ->
+            if (action is ListViewModel.ListAction.ToastAction) {
+                Toast.makeText(context, action.text, Toast.LENGTH_LONG).show()
+            } else if (action is ListViewModel.ListAction.ConfirmShoppingListAction) {
+                // Aren't auto-generated names just wonderful?
+                findNavController().navigate(ListPagingFragmentDirections.actionListCreationFragmentToListConfirmationFragment(action.list))
+
             }
         })
         list_save_button.setOnClickListener {

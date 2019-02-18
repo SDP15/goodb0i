@@ -35,7 +35,6 @@
         android:layout_marginEnd="@dimen/default_horizontal_margin"
         android:layout_marginStart="@dimen/default_horizontal_margin"
         android:gravity="center"
-        android:padding="10dp"
         android:text="@string/action_prepare_order" />
 
     <androidx.appcompat.widget.AppCompatButton
@@ -48,7 +47,6 @@
         android:layout_marginEnd="@dimen/default_horizontal_margin"
         android:layout_marginStart="@dimen/default_horizontal_margin"
         android:gravity="center"
-        android:padding="10dp"
         android:textAlignment="center"
         android:text="@string/action_enter_pin"/>
 </RelativeLayout>
