@@ -12,6 +12,7 @@ import com.sdp15.goodb0i.R
 import com.sdp15.goodb0i.view.BaseFragment
 import kotlinx.android.synthetic.main.layout_list_creation.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import timber.log.Timber
 
 /**
  * Fragment hosting [SearchFragment] and [ShoppingListFragment] in a ViewPager
@@ -33,9 +34,8 @@ class ListPagingFragment : BaseFragment() {
 
     }
 
-    override fun onResume() {
-        super.onResume()
-        // Have to use childFragmentManager for nested fragments
+    override fun onStart() {
+        super.onStart()
         val vp = ViewPagerAdapter(childFragmentManager)
         list_viewpager.adapter = vp
         //list_tab_layout.setupWithViewPager(list_viewpager)
@@ -46,7 +46,6 @@ class ListPagingFragment : BaseFragment() {
             list_viewpager.currentItem = 1
         }
     }
-
 
     override fun onBackPressed(): Boolean {
         if (list_viewpager.currentItem == 1) { // Switch from list to search

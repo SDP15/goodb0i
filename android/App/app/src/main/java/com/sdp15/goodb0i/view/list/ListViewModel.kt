@@ -27,6 +27,9 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
 
     private var existingList: ShoppingList? = null
 
+    val isEditingList: Boolean
+        get() = existingList != null
+
     // The current shopping list
     private val currentList = mutableListOf<ListItem>()
     val list = MutableLiveData<ListDiff<ListItem>>()
@@ -73,21 +76,19 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
     fun onSaveList() {
         //TODO: Error handling
         GlobalScope.launch(Dispatchers.IO) {
-            if (existingList == null) {
-                val result = listManager.createList(currentList.map { Pair(it.product.id, it.quantity) })
-                if (result is Result.Success) {
-                    //actions.postValue(ListAction.ToastAction("List code ${result.data}"))
-                    //listManager.loadList(result.data.toLong())
-                    transitions.postValue(
-                        ListPagingFragmentDirections.actionListCreationFragmentToListConfirmationFragment(
-                            ShoppingList(result.data, System.currentTimeMillis(), currentList)
-                        )
+            val params = currentList.map { Pair(it.product.id, it.quantity) }
+            // Create or update a list
+            val result =
+                existingList?.let { listManager.updateList(it.code.toLong(), params) } ?: listManager.createList(params)
+            if (result is Result.Success) {
+                transitions.postValue(
+                    ListPagingFragmentDirections.actionListCreationFragmentToListConfirmationFragment(
+                        ShoppingList(result.data, System.currentTimeMillis(), currentList)
                     )
-
-                } else {
-                    //TODO
-                }
+                )
             } else {
+                //TODO
+                Timber.e("Failure: $result")
             }
         }
     }

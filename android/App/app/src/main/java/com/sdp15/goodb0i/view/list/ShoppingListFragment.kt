@@ -44,6 +44,7 @@ class ShoppingListFragment : Fragment() {
         vm.transitions.observe(this, Observer {
             findNavController().navigate(it)
         })
+        list_save_button.text = getString(if (vm.isEditingList) R.string.action_save_changes else R.string.action_save)
         list_save_button.setOnClickListener {
             vm.onSaveList()
         }

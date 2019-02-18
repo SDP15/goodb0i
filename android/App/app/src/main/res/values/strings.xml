@@ -31,6 +31,7 @@
     <string name="action_start_navigation">Start Navigation</string>
     <string name="label_shopping_list">Shopping list</string>
     <string name="action_save">Save</string>
+    <string name="action_save_changes">Save Changes</string>
     <string name="label_search">Search</string>
     <string name="label_item_price">£%1$.2f</string>
     <string name="label_total_price">Total: £%1$.2f</string>
