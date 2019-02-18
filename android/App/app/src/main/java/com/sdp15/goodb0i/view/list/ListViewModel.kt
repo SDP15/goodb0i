@@ -63,6 +63,7 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
         GlobalScope.launch(Dispatchers.IO) {
             val result = listManager.createList(currentList.map { Pair(it.product.id, it.count) })
             if (result is Result.Success) {
+                actions.postValue(ListAction.ToastAction("List code ${result.data}"))
                 listManager.loadList(result.data.toLong())
             } else {
                 //TODO
@@ -131,7 +132,7 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
     }
 
     sealed class ListAction {
-
+        data class ToastAction(val text: String): ListAction()
     }
 
 }
