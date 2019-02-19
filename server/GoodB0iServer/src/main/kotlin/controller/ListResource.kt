@@ -31,7 +31,7 @@ fun Route.lists(listService: ListService) {
                             (it.values.elementAt(1) as Double).toInt())  // Quantity
                 }
                 println("Items are $flat")
-                val list = listService.createList(flat.map { it.first }, flat.map { it.second })
+                val list = listService.createList(flat)
                 if (list != null) {
                     call.respondText(list.code.toString(), status = HttpStatusCode.Created)
                 } else {

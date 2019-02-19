@@ -55,9 +55,7 @@
     <fragment android:id="@+id/error_fragment"
         android:name="com.sdp15.goodb0i.view.error.ErrorFragment"
         android:label="error_fragment"
-        tools:layout="@layout/layout_error">
-
-    </fragment>
+        tools:layout="@layout/layout_error"/>
 
     <fragment android:id="@+id/scanner_fragment"
         android:name="com.sdp15.goodb0i.view.scanner.ScannerFragment"

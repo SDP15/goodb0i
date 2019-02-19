@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.sdp15.goodb0i.R
 import com.sdp15.goodb0i.view.BaseFragment
