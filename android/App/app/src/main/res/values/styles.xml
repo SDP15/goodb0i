@@ -51,6 +51,13 @@
         <item name="android:height">@dimen/button_height</item>
     </style>
 
+    <style name="HelpButton" parent="Base.Widget.AppCompat.Button">
+        <item name="android:background">@android:color/holo_red_dark</item>
+        <item name="android:textSize">@dimen/button_text_size</item>
+        <item name="android:textColor">@android:color/background_light</item>
+        <item name="android:height">@dimen/button_height</item>
+    </style>
+
     <style name="BorderedTextView">
         <item name="android:background">@drawable/view_border</item>
         <item name="android:padding">@dimen/textview_padding</item>

@@ -19,7 +19,6 @@
     <string name="label_assistant_coming">An Assistant is coming to you. Please Wait</string>
     <string name="content_help">help text  </string>
     <string name="label_loading">LOADING</string>
-    <string name="label_navigating_to">Navigating to</string>
     <string name="label_approaching">Approaching</string>
     <string name="action_add_to_cart">Add to cart</string>
     <string name="action_dont_add_to_art">Don\'t add</string>
@@ -39,4 +38,6 @@
     <string name="error_bluetooth_unable_to_connect">Unable to connect</string>
     <string name="error_bluetooth_connection_lost">Device connection lost</string>
     <string name="label_list_code">Code: %1$s</string>
+    <string name="label_navigating_to">Navigating To</string>
+    <string name="action_assistance">I Need Assistance</string>
 </resources>

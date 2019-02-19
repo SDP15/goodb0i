@@ -7,7 +7,7 @@
     android:orientation="vertical">
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/confirmation_title"
+        android:id="@+id/navigation_title"
         style="@style/TitleText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -17,20 +17,20 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.LinearLayoutCompat
-        android:id="@+id/confirmation_list_content"
+        android:id="@+id/navigation_info_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:background="@drawable/view_border"
         android:layout_margin="@dimen/default_horizontal_margin"
         android:padding="@dimen/textview_padding"
-        app:layout_constraintBottom_toTopOf="@+id/item_buttons_container"
+        app:layout_constraintBottom_toTopOf="@+id/navigation_help_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/item_display_item_name"
+            android:id="@+id/navigation_text_navigating"
             style="@style/BodyText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -52,7 +52,7 @@
     </androidx.appcompat.widget.LinearLayoutCompat>
 
     <androidx.appcompat.widget.LinearLayoutCompat
-        android:id="@+id/item_buttons_container"
+        android:id="@+id/navigation_help_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/default_margin_bottom"

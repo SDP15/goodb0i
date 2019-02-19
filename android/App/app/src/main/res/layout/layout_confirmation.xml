@@ -6,7 +6,7 @@
     android:orientation="vertical">
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/confirmation_title"
+        android:id="@+id/navigation_title"
         style="@style/TitleText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
