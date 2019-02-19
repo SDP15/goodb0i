@@ -13,38 +13,40 @@ class ListService {
 
     //TODO: Merge the update and edit paths
 
-    fun editList(existingCode: Long, ids: List<String>, quantities: List<Int>): ShoppingList? =
+    fun editList(existingCode: Long, list: List<Pair<String, Int>>): ShoppingList? =
             transaction {
                 val existing = ShoppingList.find { ShoppingLists.code eq existingCode }.limit(1)
                 if (existing.count() == 0) {
                     println("Didn't find existing list with existingCode $existingCode")
                     return@transaction null
                 }
-                val list = existing.first()
+                val sl = existing.first()
                 // Remove existing ListEntries
-                ListContentsTable.deleteWhere { ListContentsTable.entry inList list.products.map { it.id } }
-                ListEntries.deleteWhere { ListEntries.id inList list.products.map { it.id } }
-                val matchingProducts = Product.find { Products.id inList ids.map(UUID::fromString) }
+                ListContentsTable.deleteWhere { ListContentsTable.entry inList sl.products.map { it.id } }
+                ListEntries.deleteWhere { ListEntries.id inList sl.products.map { it.id } }
+                val matchingProducts = Product.find { Products.id inList list.map {UUID.fromString(it.first)} }
 
-                println("Matching product ids ${matchingProducts.map { it.id.value.toString() }}")
+                println("Matching product list ${matchingProducts.map { it.id.value.toString() }}")
                 //TODO: Some sort of error if an item does not exist
-                assert(matchingProducts.count() == quantities.size)
+                assert(matchingProducts.count() == list.size)
 
                 // Re-order the received products to match the ordered list sent to us
-                val orderedProducts = ids.map { id -> matchingProducts.find { id == it.id.value.toString() }!! }
+                val orderedProducts = list.map { entry ->
+                    Pair(matchingProducts.find { entry.first == it.id.value.toString() }!!, entry.second)
+                }
                 // Insert ListEntry rows with the quantities
                 val listProducts =
-                        orderedProducts.zip(quantities).mapIndexed { i, (p, q) ->
+                        orderedProducts.mapIndexed { i, (p, q) ->
                             ListEntry.new {
                                 index = i
                                 product = p
                                 quantity = q
                             }
                         }
-                list.products = SizedCollection(listProducts)
+                sl.products = SizedCollection(listProducts)
 
-                println("Updated shopping list products for ${list.code}")
-                return@transaction list
+                println("Updated shopping list products for ${sl.code}")
+                return@transaction sl
             }
 
     fun createList(ids: List<Pair<String, Int>>): ShoppingList? =

@@ -53,7 +53,7 @@ fun Route.lists(listService: ListService) {
                         Pair(it.values.elementAt(0) as String, // UUID string
                                 (it.values.elementAt(1) as Double).toInt())  // Quantity
                     }
-                    val list = listService.editList(code, flat.map { it.first }, flat.map { it.second })
+                    val list = listService.editList(code, flat)
                     if (list != null) {
                         call.respondText(list.code.toString(), status = HttpStatusCode.OK)
                     } else {
