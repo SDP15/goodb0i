@@ -26,7 +26,7 @@ class SpeechInteractor:
     def __init__(self, state_file='interactor_states.json'):
         log_filename = now.strftime("%Y-%m-%d-%H%M%S")
 
-        # Log is place in folder associated with test number
+        # Log is placed in folder associated with test number
         if len(sys.argv) > 1:
             test_num = sys.argv[1]
             self.log_filepath = "logs/{:}/{:}.txt".format(test_num, log_filename)

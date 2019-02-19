@@ -1,0 +1,11 @@
+## THIS TEST IS GIVEN BY THE FOLLOWING PATH TO AN ACCEPTING STATE ##
+
+1. State: INIT Transition: "start"
+2. State: BEGINNING0 Transition: "no"
+3. State: BEGINNING2 Transition: "no"
+4. State: LIMBO0 Transition: "shopping"
+5. State: BEGINNING1 Transition: "yes"
+6. State: SHOPPING0
+
+## RESULTS: 0/3 tests completed successfully. ##
+## Began refusing to pick up on the word "start". ##
