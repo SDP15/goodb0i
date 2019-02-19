@@ -3,7 +3,7 @@ import json
 import os
 import sys
 import datetime
-
+import subprocess as goodboi
 from pocketsphinx import LiveSpeech, get_model_path
 
 model_path = get_model_path()
@@ -27,7 +27,7 @@ class SpeechInteractor:
         log_filename = now.strftime("%Y-%m-%d-%H%M%S")
 
         # Log is place in folder associated with test number
-        if len(sys.argv > 1):
+        if len(sys.argv) > 1:
             test_num = sys.argv[1]
             self.log_filepath = "logs/{:}/{:}.txt".format(test_num, log_filename)
         else:
@@ -73,7 +73,8 @@ class SpeechInteractor:
                     f.write("Keyword detected: {:}\n".format(word))
 
     def react(self, word):
-        self.say(self.options[word]['reply'])
+        # self.say(self.options[word]['reply'])
+        self.speak_to_me(self.options[word]['reply'])
         self.last_reply = self.options[word]['reply']
         self.next_state(self.options[word]['nextState'])
 
@@ -96,9 +97,12 @@ class SpeechInteractor:
             f.write("{:}\n".format(string))
     
         engine = pyttsx.init()
+        engine.setProperty('voices', 2)
         engine.say(string)
         engine.runAndWait()
-
+    
+    def speak_to_me(self, string):
+        goodboi.run(["mimic/mimic", "-t", string, "-voice", "awb"])
 
 if __name__ == '__main__':
     sint = SpeechInteractor()

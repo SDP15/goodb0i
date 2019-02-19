@@ -1,0 +1,13 @@
+Keyword detected: start
+Keyword detected: no
+Keyword detected: yes
+Keyword detected: no
+Keyword detected: no
+Keyword detected: yes
+Keyword detected: yes
+Your options are: , and repeat.
+Keyword detected: n/a
+Your options are: , and repeat.
+Keyword detected: n/a
+Your options are: , and repeat.
+Keyword detected: n/a
