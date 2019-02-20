@@ -4,12 +4,15 @@ import android.content.Context
 import android.content.DialogInterface
 import android.view.KeyEvent
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.AppCompatEditText
 import com.sdp15.goodb0i.R
+import com.sdp15.goodb0i.data.store.RetrofitProvider
 
 object Config {
 
     private val settings = mutableListOf<Pair<String, Boolean>>().apply {
         add(Pair("Test product data", false))
+
     }
     private val names: Array<String>
         get() = settings.map { it.first }.toTypedArray()
@@ -26,11 +29,33 @@ object Config {
             ) { di, pos, value -> settings[pos] = settings[pos].copy(second=value) }
             setNeutralButton("Log"
             ) { p0, p1 -> CapturingDebugTree.showLog(context) }
+            setNegativeButton("Root", {p0, p1 ->
+                showRootConfigDialog(context)
+            })
             setOnKeyListener { p0, p1, p2 ->
                 if (p2.keyCode == KeyEvent.KEYCODE_BACK) {
                     p0?.dismiss()
                 }
                 false
+            }
+        }.show()
+    }
+
+    private fun showRootConfigDialog(context: Context) {
+        val et = AppCompatEditText(context)
+        et.setText(RetrofitProvider.root)
+        AlertDialog.Builder(context).apply {
+            setTitle("Root")
+            setView(et)
+            setCancelable(false)
+            setOnKeyListener { p0, p1, p2 ->
+                if (p2.keyCode == KeyEvent.KEYCODE_BACK) {
+                    p0?.dismiss()
+                }
+                false
+            }
+            setPositiveButton("OK") { p0, p1 ->
+                RetrofitProvider.root = et.text?.toString() ?: ""
             }
         }.show()
     }
