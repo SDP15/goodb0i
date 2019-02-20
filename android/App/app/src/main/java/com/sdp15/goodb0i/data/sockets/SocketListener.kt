@@ -9,11 +9,13 @@ import timber.log.Timber
 class SocketListener(val name: String) : WebSocketListener() {
 
     private var count = 0
+    private var start = 0L
 
     override fun onOpen(webSocket: WebSocket, response: Response) {
         super.onOpen(webSocket, response)
         Timber.i("Socket opened $response")
-        webSocket.send("Some text from the phone $name")
+        start = System.currentTimeMillis()
+        webSocket.send("$count")
     }
 
     override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
@@ -29,8 +31,12 @@ class SocketListener(val name: String) : WebSocketListener() {
     override fun onMessage(webSocket: WebSocket, text: String) {
         super.onMessage(webSocket, text)
         count++
-        Timber.i("Received message $text for $name")
-        webSocket.send("Some text from phone $count")
+
+        if (System.currentTimeMillis()- start > 5E3) {
+            Timber.i("Made $count calls")
+        } else {
+            webSocket.send("$count")
+        }
     }
 
     override fun onMessage(webSocket: WebSocket, bytes: ByteString) {

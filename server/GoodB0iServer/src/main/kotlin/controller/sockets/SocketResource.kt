@@ -1,6 +1,7 @@
 package controller.sockets
 
 import io.ktor.http.cio.websocket.Frame
+import io.ktor.http.cio.websocket.readText
 import io.ktor.routing.Route
 import io.ktor.util.generateNonce
 import io.ktor.websocket.webSocket
@@ -70,6 +71,18 @@ fun Route.sockets(trolleyManager: TrolleyManager, appManager: AppManager) {
         } finally {
             println("$nonce closed socket")
             appManager.removeApp(nonce, this)
+        }
+    }
+
+    webSocket("/ping") {
+        try {
+            incoming.consumeEach { frame ->
+                if (frame is Frame.Text) {
+                    outgoing.send(frame)
+                }
+            }
+        } catch (e: Exception) {
+            println("Ping exception $e")
         }
     }
 

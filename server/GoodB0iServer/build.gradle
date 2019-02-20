@@ -49,4 +49,6 @@ dependencies {
     testCompile "org.assertj:assertj-core:3.11.1"
     testCompile "io.rest-assured:rest-assured:3.3.0"
     testCompile "org.junit.jupiter:junit-jupiter-api:5.4.0"
+    testCompile "io.ktor:ktor-client-websocket:$ktor_version"
+    testCompile "io.ktor:ktor-client-cio:$ktor_version"
 }
