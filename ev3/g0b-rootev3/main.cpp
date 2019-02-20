@@ -1,12 +1,7 @@
-#include <array>
+#include <bits/stdc++.h>
 #include <cassert>
-#include <chrono>
 #include <cstdint>
-#include <fstream>
-#include <iostream>
-#include <memory>
 #include <signal.h>
-#include <thread>
 #include <unistd.h>
 
 #include "ev3dev.cpp"
@@ -17,7 +12,13 @@ using namespace std;
 using namespace std::chrono_literals;
 using namespace ev3dev;
 
-unique_ptr<evutil::Drive> leftDrive, rightDrive, steerDrive;
+enum DriveNumber : int {
+  DRIVE_LEFT_BACK = 0,
+  DRIVE_LEFT_FRONT,
+  DRIVE_RIGHT_BACK,
+  DRIVE_RIGHT_FRONT
+};
+array<unique_ptr<evutil::Drive>, 4> drives;
 unique_ptr<evutil::ColorSensor> leftColor, midColor, rightColor;
 unique_ptr<ev3dev::ultrasonic_sensor> sonar;
 
@@ -31,18 +32,17 @@ ostream &log() {
   size_t timeStrLen{strftime(timeStr.data(), timeStr.size(), "%T ",
                              localtime(&now))}; // DevSkim: ignore DS154189
   sensorLog.write(timeStr.data(), timeStrLen);
-  // return sensorLog;
-  return cerr;
+  return sensorLog;
 }
 
 void connectEv3Devices() {
   bool failed{false};
-  leftDrive = make_unique<evutil::Drive>(OUTPUT_A, failed);
-  rightDrive = make_unique<evutil::Drive>(OUTPUT_B, failed);
-  leftDrive->setReversed();
-  rightDrive->setReversed();
-
-  steerDrive = make_unique<evutil::Drive>(OUTPUT_C, failed);
+  drives[DRIVE_LEFT_BACK] = make_unique<evutil::Drive>(OUTPUT_A, failed);
+  drives[DRIVE_LEFT_FRONT] = make_unique<evutil::Drive>(OUTPUT_B, failed);
+  drives[DRIVE_RIGHT_BACK] = make_unique<evutil::Drive>(OUTPUT_C, failed);
+  drives[DRIVE_RIGHT_FRONT] = make_unique<evutil::Drive>(OUTPUT_D, failed);
+  drives[DRIVE_LEFT_BACK]->setReversed();
+  drives[DRIVE_RIGHT_BACK]->setReversed();
 
   leftColor = make_unique<evutil::ColorSensor>(INPUT_1, failed);
   midColor = make_unique<evutil::ColorSensor>(INPUT_2, failed);
@@ -70,56 +70,150 @@ void openLogFile() {
   }
 }
 
-class Robot {
+class SteeringSubsystem {
+public:
+  struct Command {
+    enum class CommandType {
+      allStop,
+      setSpeed,
+      setTurnAngle,
+      saveAndHalt,
+      resume
+    } type;
+
+    int speed{100};
+    /// 0 means forever
+    int milliseconds{0};
+    int newTurnAngle{0};
+  };
+
+  deque<Command> commands;
+
+  void pushCommand(Command cmd) { commands.push_front(cmd); }
+
+  void pushCommandToFront(Command cmd) { commands.push_front(cmd); }
+
 private:
-  int getForwardSpeed() { return 20; }
+  int forwardBaseSpeed{70};
+  int currentTurnAngle{0}, currentSpeed{0};
 
-  void calibrateSteering() {
-    cout << "Calibrating steering..." << endl;
-    log() << "** STEERING CALIBRATION **" << endl;
-    log() << "* Phase 1: find left *" << endl;
-    log() << "start pos = " << steerDrive->getPosition() << endl;
+  array<int, 4> currentMotorSpeeds{{0, 0, 0, 0}},
+      savedMotorSpeeds{{0, 0, 0, 0}}, targetMotorSpeeds{{0, 0, 0, 0}};
+  /// Time remaining before the next command is popped off the queue
+  int remainingWaitMs{0};
+  chrono::steady_clock::time_point lastWaitUpdate, lastCmdTime;
 
-    // Go to extreme left
-    steerDrive->overrideStopAction(motor::stop_action_coast);
-    steerDrive->runForever(-10); // run at low speed not to break anything
-    this_thread::sleep_for(1200ms);
-    steerDrive->stop();
-    log() << "end pos = " << steerDrive->getPosition() << endl;
-    steerDrive->setPosition(0);
+  /// TurnAngle goes from -100 to 100
+  void setTargetSpeedsClassic(int speedPercent, int turnAngle) {
+    int bspeed{forwardBaseSpeed * speedPercent / 100};
+    int lspeed{bspeed};
+    int rspeed{bspeed};
+    if (turnAngle < 0) {
+      // left turn
+      turnAngle = 100 + turnAngle;
+      lspeed = lspeed * turnAngle / 100;
+    } else if (turnAngle > 0) {
+      turnAngle = 100 - turnAngle;
+      rspeed = rspeed * turnAngle / 100;
+    }
 
-    log() << "* Phase 2: find right *" << endl;
-
-    steerDrive->runForever(10);
-    this_thread::sleep_for(2000ms);
-    steerDrive->stop();
-    log() << "r pos" << steerDrive->getPosition() << endl;
-    int calibratedPos{steerDrive->getPosition() / 2};
-
-    // Set zero point to middle.
-    steerDrive->setPosition(steerDrive->getPosition() - calibratedPos);
-    steerDrive->resetStopAction();
-    // Center wheels
-    steerDrive->runToPosition(0);
-    steerDrive->waitUntilIdle();
-    log() << "** Wheels calibrated **" << endl;
-    cout << "Steering calibrated" << endl;
+    targetMotorSpeeds[DRIVE_LEFT_BACK] = lspeed;
+    targetMotorSpeeds[DRIVE_LEFT_FRONT] = lspeed;
+    targetMotorSpeeds[DRIVE_RIGHT_BACK] = rspeed;
+    targetMotorSpeeds[DRIVE_RIGHT_FRONT] = rspeed;
   }
 
-  enum class Direction { left, right } lastLineDir;
-  int avgLineAngle{0};
+  void setTargetSpeedsPivot(int speedPercent, bool turnRight) {
+    int bspeed{forwardBaseSpeed * speedPercent / 100};
+    targetMotorSpeeds[DRIVE_LEFT_BACK] = turnRight ? bspeed : -bspeed;
+    targetMotorSpeeds[DRIVE_LEFT_FRONT] = turnRight ? bspeed : -bspeed;
+    targetMotorSpeeds[DRIVE_RIGHT_BACK] = turnRight ? -bspeed : bspeed;
+    targetMotorSpeeds[DRIVE_RIGHT_FRONT] = turnRight ? -bspeed : bspeed;
+  }
 
 public:
-  Robot() { calibrateSteering(); }
+  SteeringSubsystem() {
+    lastWaitUpdate = chrono::steady_clock::now();
+    lastCmdTime = lastWaitUpdate;
+  }
 
   void process() {
-    // simple line follow
+    // process command
+    auto newWaitUpdate{chrono::steady_clock::now()};
+    auto deltaTime{chrono::duration_cast<chrono::milliseconds>(newWaitUpdate -
+                                                               lastCmdTime)};
+    lastWaitUpdate = newWaitUpdate;
+    if (deltaTime.count() >= remainingWaitMs) {
+      // process next command(s)
+      remainingWaitMs = 0;
+      while (!commands.empty()) {
+        Command next{commands.front()};
+        commands.pop_front();
+
+        switch (next.type) {
+        case Command::CommandType::allStop: {
+          for (int &sp : targetMotorSpeeds) {
+            sp = 0;
+          }
+        } break;
+        case Command::CommandType::setSpeed: {
+          currentSpeed = next.speed;
+          setTargetSpeedsClassic(currentSpeed, currentTurnAngle);
+        } break;
+        case Command::CommandType::setTurnAngle: {
+          currentTurnAngle = next.newTurnAngle;
+          setTargetSpeedsClassic(currentSpeed, currentTurnAngle);
+        } break;
+        case Command::CommandType::saveAndHalt: {
+          savedMotorSpeeds = targetMotorSpeeds;
+          setTargetSpeedsClassic(0, 0);
+        } break;
+        case Command::CommandType::resume: {
+          targetMotorSpeeds = savedMotorSpeeds;
+        } break;
+        }
+
+        if (next.milliseconds > 0) {
+          remainingWaitMs = next.milliseconds;
+          lastCmdTime = chrono::steady_clock::now();
+          break;
+        }
+      }
+    }
+    // push updates to motors
+    for (int m = 0; m < drives.size(); ++m) {
+      auto targetSpeed{targetMotorSpeeds[m]};
+      if (currentMotorSpeeds[m] != targetSpeed) {
+        currentMotorSpeeds[m] = targetSpeed;
+        if (targetSpeed == 0) {
+          drives[m]->stop();
+        } else {
+          drives[m]->runForever(targetSpeed);
+        }
+      }
+    }
+  }
+};
+
+class LineFollowSubsystem {
+private:
+  enum class Direction { left, right } lastLineDir;
+  int avgLineAngle{0};
+  SteeringSubsystem *sysSteering;
+
+public:
+  LineFollowSubsystem(SteeringSubsystem *sysSteering) {
+    this->sysSteering = sysSteering;
+  }
+
+  void process() {
     leftColor->update();
     midColor->update();
     rightColor->update();
     evutil::Color lcol{leftColor->getColor()};
     evutil::Color mcol{midColor->getColor()};
     evutil::Color rcol{rightColor->getColor()};
+
     auto rrcol{rightColor->getRawRGB()};
     // cerr << (int)lcol << " " << (int)rcol << " " << rrcol.x << " " << rrcol.y
     //     << " " << rrcol.z << endl;
@@ -128,8 +222,7 @@ public:
     constexpr int SONAR_STOP_DISTANCE{45};
 
     if (sonar->distance_centimeters() < SONAR_STOP_DISTANCE) {
-      leftDrive->stop();
-      rightDrive->stop();
+      // ALL STOP
     } else {
       int lineAngle{};
       if (mcol == evutil::Color::line) {
@@ -162,20 +255,37 @@ public:
       }
       // Rolling average to smooth out steering
       avgLineAngle = (avgLineAngle + 7 * lineAngle) / 8;
-      steerDrive->runToDegree(avgLineAngle);
-      leftDrive->runForever(avgLineAngle < 0 ? getForwardSpeed() / 2
-                                             : getForwardSpeed());
-      rightDrive->runForever(avgLineAngle > 0 ? getForwardSpeed() / 2
-                                              : getForwardSpeed());
+      // steerDrive->runToDegree(avgLineAngle);
+      // leftDrive->runForever(avgLineAngle < 0 ? getForwardSpeed() / 2
+      //                                       : getForwardSpeed());
+      // rightDrive->runForever(avgLineAngle > 0 ? getForwardSpeed() / 2
+      //                                        : getForwardSpeed());
     }
+  }
+};
+
+class Robot {
+private:
+  SteeringSubsystem sysSteering;
+  LineFollowSubsystem sysLine;
+
+public:
+  Robot() : sysSteering(), sysLine(&sysSteering) {
+    sysSteering.pushCommand(
+        {SteeringSubsystem::Command::CommandType::setSpeed, 100, 1000, 0});
+    sysSteering.pushCommand(
+        {SteeringSubsystem::Command::CommandType::setTurnAngle, 0, 3000, 80});
+  }
+
+  void process() {
+    sysSteering.process();
+    // sysLine.process();
   }
 };
 
 /// Emergency motor disablement
 void disableMotors() {
-  array<evutil::Drive *, 3> motors{
-      {leftDrive.get(), rightDrive.get(), steerDrive.get()}};
-  for (auto &drive : motors) {
+  for (auto &drive : drives) {
     if (drive && drive->getMotor() && drive->getMotor()->connected()) {
       drive->overrideStopAction(motor::stop_action_coast);
       drive->stop();
