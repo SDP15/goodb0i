@@ -7,14 +7,15 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.viewpager.widget.ViewPager
+import com.arlib.floatingsearchview.FloatingSearchView
 import com.sdp15.goodb0i.R
 import com.sdp15.goodb0i.switchOnEmpty
+import kotlinx.android.synthetic.main.layout_list_creation.*
 import kotlinx.android.synthetic.main.layout_search.*
 
 class SearchFragment : Fragment() {
 
     private val vm: ListViewModel by lazy { (parentFragment as ListPagingFragment).vm }
-    private lateinit var viewPager: ViewPager
 
     override fun onResume() {
         super.onResume()
@@ -28,12 +29,8 @@ class SearchFragment : Fragment() {
         vm.search.observe(this, Observer {
             adapter.itemsChanged(it)
         })
-
-        floating_search_view.setOnQueryChangeListener(vm::onQueryChange)
-        floating_search_view.setOnMenuItemClickListener {
-            // Only one menu added
-            viewPager.setCurrentItem(1, true)
-        }
+        val fsv = parentFragment!!.view!!.findViewById<FloatingSearchView>(R.id.floating_search_view)
+        fsv.setOnQueryChangeListener(vm::onQueryChange)
     }
 
     override fun onCreateView(
@@ -41,7 +38,6 @@ class SearchFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Container is the ViewPager. If we ever move SearchFragment out of a ViewPager, this will crash
-        viewPager = container as ViewPager
         return inflater.inflate(R.layout.layout_search, container, false)
     }
 

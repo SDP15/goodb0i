@@ -42,8 +42,7 @@ fun Route.sockets(trolleyManager: TrolleyManager, appManager: AppManager) {
         try {
             incoming.consumeEach { frame ->
                 if (frame is Frame.Text) {
-                    //TODO: Pass to
-                    trolleyManager.onMessage(nonce, StandardCharsets.UTF_8.decode(frame.buffer).toString())
+                    trolleyManager.onMessage(nonce, frame.readText())
                 }
             }
         } finally {

@@ -1,57 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+<ViewSwitcher xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/search_view_switcher"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/list_recycler"
+        tools:listitem="@layout/list_item"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/parent_view"
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/list_empty_text"
+        style="@style/TitleSubText"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fitsSystemWindows="true"
-        tools:context=".MainActivity">
+        android:gravity="center"
+        android:text="@string/label_no_items_found" />
 
-        <com.arlib.floatingsearchview.FloatingSearchView
-            android:id="@+id/floating_search_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:floatingSearch_close_search_on_keyboard_dismiss="true"
-            app:floatingSearch_leftActionMode="noLeftAction"
-            app:floatingSearch_menu="@menu/menu_search"
-            app:floatingSearch_searchBarMarginLeft="@dimen/search_view_inset"
-            app:floatingSearch_searchBarMarginRight="@dimen/search_view_inset"
-            app:floatingSearch_searchBarMarginTop="@dimen/search_view_inset"
-            app:floatingSearch_searchHint="Search..."
-            app:floatingSearch_showSearchKey="false"
-            app:floatingSearch_suggestionsListAnimDuration="250" />
-
-        <ViewSwitcher
-            android:id="@+id/search_view_switcher"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="72dp">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/list_recycler"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                tools:listitem="@layout/list_item" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/list_empty_text"
-                style="@style/TitleSubText"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:text="@string/label_no_items_found" />
-
-        </ViewSwitcher>
-
-    </RelativeLayout>
-
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</ViewSwitcher>

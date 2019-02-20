@@ -7,13 +7,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.viewpager.widget.ViewPager
 import com.sdp15.goodb0i.R
 import com.sdp15.goodb0i.view.BaseFragment
 import kotlinx.android.synthetic.main.layout_list_creation.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import timber.log.Timber
 
 /**
  * Fragment hosting [SearchFragment] and [ShoppingListFragment] in a ViewPager
@@ -51,6 +50,26 @@ class ListPagingFragment : BaseFragment() {
             vm.setList(list)
             list_viewpager.currentItem = 1
         }
+        floating_search_view.setOnMenuItemClickListener {
+            list_viewpager.apply {
+                setCurrentItem(if(currentItem == 1) 0 else 1, true)
+            }
+        }
+        list_viewpager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+            override fun onPageScrollStateChanged(state: Int) {
+
+            }
+
+            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+            }
+
+            override fun onPageSelected(position: Int) {
+                if (position == 1) {
+                    floating_search_view.clearSearchFocus()
+                }
+                floating_search_view.inflateOverflowMenu(if (list_viewpager.currentItem == 0) R.menu.menu_search else R.menu.menu_shopping)
+            }
+        })
     }
 
     override fun onBackPressed(): Boolean {
