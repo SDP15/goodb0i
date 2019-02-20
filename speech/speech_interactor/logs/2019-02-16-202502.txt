@@ -1,0 +1,18 @@
+Hello there, in order to use good boy, please say: start.
+Your options are: start, n/a, and repeat.
+Keyword detected: n/a
+Hello, my name is Iona Trolley. Have you ever used good boy before?
+Keyword detected: start
+Would you like to do a quick tutorial?
+Keyword detected: no
+Sorry, I have heard more than one possible option. Can you confirm your option?
+## Keyword detection error ##
+Multiple keywords detected: ['yes', 'no']
+Perfect. Today I will be guiding you around the shop. You can give me a list of items or simply browse the shop. Would you like more information about this service?
+Keyword detected: yes
+Sorry, I have heard more than one possible option. Can you confirm your option?
+## Keyword detection error ##
+Multiple keywords detected: ['yes', 'no']
+I am a shopping trolley that follows a route around the shop to help you pick up items. To give me a list simply attach your smartphone and send me the list... I will tell you when we have arrived at an item. In this shop, the items will always be on your right. I will then tell you what item you have arrived at, and what shelf the item is on. Would you like an example?
+Keyword detected: yes
+Once you have selected an item, you can scan its barcode using the camera on your phone.Once you have scanned the item, I can tell you information about the item you have picked up. Does this make sense?
