@@ -13,11 +13,14 @@ class TrolleyManager {
     }
 
     suspend fun onMessage(id: String, message: String) {
+        println("Trolley $id sent $message")
+        members[id]?.send(Frame.Text(message + " returned"))
         //TODO Decide where to route the message
     }
 
     suspend fun joinTrolley(id: String, socket: WebSocketSession) {
         if (!members.contains(id)) {
+            println("Trolley joined $id")
             members[id] = socket
             //TODO: Send some confirmation information
         }
