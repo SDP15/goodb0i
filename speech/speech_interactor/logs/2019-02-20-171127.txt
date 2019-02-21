@@ -1,0 +1,7 @@
+Your options are: start, n/a, and repeat.
+Keyword detected: n/a
+Keyword detected: start
+Keyword detected: yes
+Keyword detected: yes
+Your options are: arrived, and repeat.
+Keyword detected: n/a

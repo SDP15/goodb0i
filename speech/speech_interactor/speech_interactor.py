@@ -3,12 +3,15 @@ import json
 import os
 import sys
 import datetime
-
+import subprocess as goodboi
 from pocketsphinx import LiveSpeech, get_model_path
+
 
 model_path = get_model_path()
 now = datetime.datetime.now()
 universal_phrases = {'repeat', 'options'}
+
+shoppingList = {"Cheese", "apples", "potatoes"}
 
 speech = LiveSpeech(
     verbose=False,
@@ -23,7 +26,7 @@ speech = LiveSpeech(
 )
 
 class SpeechInteractor:
-    def __init__(self, state_file='interactor_states.json'):
+    def __init__(self, state_file='interactor_states.json', list_file = 'example_list.json'):
         log_filename = now.strftime("%Y-%m-%d-%H%M%S")
 
         # Log is placed in folder associated with test number
@@ -35,20 +38,34 @@ class SpeechInteractor:
 
         print(self.log_filepath)
         self.possible_states = json.load(open(state_file,'r'))
+        self.stuff = json.load(open(list_file, 'r'))
+        for tings in self.stuff['products'][1]['product']:
+            print(tings)
         self.next_state('init')
         self.react("n/a")
         self.listen()
 
     def next_state(self, state):
+        print(state)
         self.state = state
         self.options = self.possible_states[state]
+        if "shopping0" in self.state:
+            action = input("Please enter arrived.  ")
+            if "arrived" in action:
+                item = shoppingList.pop()
+                self.arrived("bread", "middle")   
+        if "arrival" in self.state:
+            action = input("Please enter scanned.  ")
+            if "scanned" in action: 
+                item = shoppingList.pop()
+                self.scanned("bread")
     
     def listen(self):
         for sphrase in speech:
             phrase = str(sphrase).lower().split()
             word = self.find_word(phrase)
             print("You said:", word)
-            
+
             if "repeat" in word:
                 print("repeating")
                 self.say(self.last_reply)
@@ -71,9 +88,11 @@ class SpeechInteractor:
                     f.write("Multiple keywords detected: {:}\n".format(phrase))
                 else:
                     f.write("Keyword detected: {:}\n".format(word))
+                        
 
     def react(self, word):
-        self.say(self.options[word]['reply'])
+        # self.say(self.options[word]['reply'])
+        self.speak_to_me(self.options[word]['reply'])
         self.last_reply = self.options[word]['reply']
         self.next_state(self.options[word]['nextState'])
 
@@ -96,9 +115,26 @@ class SpeechInteractor:
             f.write("{:}\n".format(string))
     
         engine = pyttsx.init()
+        engine.setProperty('voices', 2)
         engine.say(string)
         engine.runAndWait()
+    
+    def speak_to_me(self, string):
+        goodboi.run(["mimic/mimic", "-t", string, "-voice", "awb"])
 
+    def arrived(self, item, shelf):
+        response = self.options['arrived']['reply'] + item + self.options['arrived']['second'] + shelf + self.options['arrived']['prompt']
+        self.speak_to_me(response)
+        self.last_reply = response
+        self.next_state(self.options['arrived']['nextState'])
 
+    def scanned(self, item):
+        response = self.options['scanned']['reply'] + item + self.options['scanned']['prompt']
+        self.speak_to_me(response)
+        self.last_reply = response
+        self.next_state(self.options['scanned']['nextState'])
+
+    def getItem(self):
+        item = self.stuff['products']['id']
 if __name__ == '__main__':
     sint = SpeechInteractor()

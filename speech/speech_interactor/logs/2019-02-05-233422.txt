@@ -1,0 +1,7 @@
+Hello there, in order to use good boy, please say: start.
+Your options are: start, n/a, and repeat.
+Keyword detected: n/a
+Sorry, I have heard more than one possible option. Can you confirm your option?
+## Keyword detection error ##
+Multiple keywords detected: ['start', 'repeat']
+Hello, my name is Iona Trolley. Have you ever used good boy before?

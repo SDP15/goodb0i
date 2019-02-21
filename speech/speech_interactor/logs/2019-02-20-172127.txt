@@ -1,0 +1,20 @@
+Your options are: start, n/a, and repeat.
+Keyword detected: n/a
+Keyword detected: start
+Keyword detected: yes
+Keyword detected: yes
+Keyword detected: n/a
+Your options are: scanned, and repeat.
+Keyword detected: n/a
+Your options are: scanned, and repeat.
+Keyword detected: n/a
+Your options are: scanned, and repeat.
+Keyword detected: n/a
+Your options are: scanned, and repeat.
+Keyword detected: n/a
+Your options are: scanned, and repeat.
+Keyword detected: n/a
+Your options are: scanned, and repeat.
+Keyword detected: n/a
+Your options are: scanned, and repeat.
+Keyword detected: n/a
