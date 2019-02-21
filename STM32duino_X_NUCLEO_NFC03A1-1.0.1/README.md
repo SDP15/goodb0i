@@ -1,6 +1,10 @@
 # NFC reading
 
-The `src` folder contains all the necessary source files to read and write on NFC tags. They should therefore not be altered unless it's necessary. The `examples` folder contains two files: `X_NUCLEO_...HelloWorld.ino` and `X_NUCLEO_...write.ino`. The first one was provided by the original documentation from STMicroelectronics (the maker of the NFC reader and tags). What it does is detect the tags and send a message through USB (Serial) to the Raspberry PI. There's a file on the PI called `test_serial.py` that should be run simultaneously to the Arduino code, which receives messages from the Arduino and prints them on the console. 
+The `src` folder contains all the necessary source files to read and write on NFC tags. They should therefore not be altered unless it's necessary. The `examples` folder contains two files: `X_NUCLEO_...HelloWorld.ino` and `X_NUCLEO_...write.ino`. The first one was provided by the original documentation from STMicroelectronics (the maker of the NFC reader and tags). What it does is detect the tags and send a message through USB (Serial) to the Raspberry PI. There's a file on the PI called `test_serial.py` that should be run simultaneously to the Arduino code, which receives messages from the Arduino and prints them on the console. Python 3 is required so just run: 
+```
+>> python3 test_serial.py
+```
+as soon as you're logged into the PI. 
 
 ## How to use the files
 
@@ -8,7 +12,7 @@ Right now our tags are of type 4A, I therefore commented out the code for all th
 ```
 >> arduino
 ```
-on the terminal. Don't forget to update the libraries in the menu `Sketch > Include Libraries'. 
+on the terminal. Don't forget to update the libraries in the menu `Sketch > Include Libraries`. 
 
 ## What needs to be done
 
