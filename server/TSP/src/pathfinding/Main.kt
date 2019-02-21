@@ -1,3 +1,6 @@
+package pathfinding
+
+import pathfinding.Graph2.Companion.graph
 import java.util.*
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet
@@ -5,6 +8,19 @@ import kotlin.collections.HashSet
 class Main {
 
     init {
+
+        graph<String> {
+            val cost = 5
+            "ENTRANCE" to "FRUITS" cost cost
+            "FRUITS" to "VEGETABLES" cost cost
+            "VEGETABLES" toFrom  "VEG_CORNER" cost 2* cost
+            "VEG_CORNER" toFrom  "DAIRY_CORNER" cost 2*cost
+            "DAIRY_CORNER" to "DAIRY" cost cost
+            "DAIRY" to listOf("BAKERY", "SEAFOOD") costs listOf(cost, 2*cost)
+            "BAKERY" toFrom "MEAT" cost 2*cost
+            "BAKERY" to "CORNER" cost cost
+        }
+
         val graph = Graph(mutableListOf(), mutableMapOf())
         graph.nodes.addAll(
             (1..13).map { Node(it) }
