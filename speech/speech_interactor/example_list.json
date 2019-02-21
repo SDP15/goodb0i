@@ -1,0 +1,46 @@
+{
+  "code": 3823275,
+  "time": 1550682363202,
+  "products": [
+    {
+      "quantity": 3,
+      "product": {
+        "id": "2cf7303d-20c1-4a27-8c68-d3134cb76048",
+        "name": "British Whole Milk 3.408L, 6 Pints",
+        "superDepartment": "Fresh Food",
+        "ContentsMeasureType": "L",
+        "UnitOfSale": 1,
+        "description": [
+          "Pasteurised standardised homogenised whole milk.",
+          "From British Farms. Supporting our trusted dairy farmers Fair For Farmers Guarantee: We Promise every farmer is paid fairly for every pint of milk, every pint is 100% British and every cow is well cared for For more information go to www.tescoplc.com/little helps plan/"
+        ],
+        "AverageSellingUnitWeight": 2.083,
+        "UnitQuantity": "LITRE",
+        "contentsQuantity": 0.0,
+        "department": "Milk, Butter \u0026 Eggs",
+        "price": 1.5,
+        "unitPrice": 0.0
+      }
+    },
+    {
+      "quantity": 2,
+      "product": {
+        "id": "ba6d45cd-2561-42a0-8425-dc693df51ecd",
+        "name": "Grated 30% Reduced Fat Mature Cheese 250G",
+        "superDepartment": "Fresh Food",
+        "ContentsMeasureType": "G",
+        "UnitOfSale": 1,
+        "description": [
+          "Medium fat hard mature cheese.",
+          "Rich \u0026 Versatile Hand selected by our cheesemakers for taste"
+        ],
+        "AverageSellingUnitWeight": 0.256,
+        "UnitQuantity": "KG",
+        "contentsQuantity": 0.0,
+        "department": "Cheese",
+        "price": 1.9,
+        "unitPrice": 0.0
+      }
+    }
+  ]
+}

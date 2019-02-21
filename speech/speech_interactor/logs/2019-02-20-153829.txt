@@ -1,0 +1,8 @@
+Keyword detected: start
+Keyword detected: no
+Keyword detected: yes
+Keyword detected: yes
+Keyword detected: yes
+Keyword detected: no
+Your options are: yes, no, and repeat.
+Keyword detected: options
