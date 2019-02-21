@@ -1,7 +1,7 @@
 package pathfinding
 
 
-class Graph2<ID> : Collection<Graph2.Vertex<ID>> {
+class Graph<ID> : Collection<Graph.Vertex<ID>> {
     private val nodes: MutableSet<Node<ID>> = mutableSetOf()
     private val edges: MutableMap<Node<ID>, MutableSet<Edge<ID>>> = hashMapOf()
 
@@ -26,8 +26,8 @@ class Graph2<ID> : Collection<Graph2.Vertex<ID>> {
 
     companion object {
 
-        fun <ID> graph(init: Graph2<ID>.() -> Unit): Graph2<ID> {
-            val graph = Graph2<ID>()
+        fun <ID> graph(init: Graph<ID>.() -> Unit): Graph<ID> {
+            val graph = Graph<ID>()
             graph.init()
             return graph
         }
@@ -35,6 +35,7 @@ class Graph2<ID> : Collection<Graph2.Vertex<ID>> {
     }
 
     data class UnweightedEdge<ID>(val from: ID, val to: ID, var bidirectional: Boolean = false)
+
 
 
     infix fun ID.to(ids: Collection<ID>) = ids.map { UnweightedEdge(this, it) }
@@ -111,6 +112,10 @@ class Graph2<ID> : Collection<Graph2.Vertex<ID>> {
     operator fun get(id: ID) = edges[Node(id)]
 
     operator fun get(node: Node<ID>) = edges[node]
+
+    override fun toString(): String {
+        return "Graph(${nodes.map { "$it : ${edges[it]}\n" }})"
+    }
 
     data class Vertex<ID>(val node: Node<ID>, val edges: Set<Edge<ID>>)
 

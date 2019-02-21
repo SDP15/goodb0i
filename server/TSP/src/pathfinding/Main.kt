@@ -1,6 +1,6 @@
 package pathfinding
 
-import pathfinding.Graph2.Companion.graph
+import pathfinding.Graph.Companion.graph
 import java.util.*
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet
@@ -9,7 +9,7 @@ class Main {
 
     init {
 
-        graph<String> {
+        val graph = graph<String> {
             val cost = 5
             "ENTRANCE" to "FRUITS" cost cost
             "FRUITS" to "VEGETABLES" cost cost
@@ -17,72 +17,76 @@ class Main {
             "VEG_CORNER" toFrom  "DAIRY_CORNER" cost 2*cost
             "DAIRY_CORNER" to "DAIRY" cost cost
             "DAIRY" to listOf("BAKERY", "SEAFOOD") costs listOf(cost, 2*cost)
-            "BAKERY" toFrom "MEAT" cost 2*cost
-            "BAKERY" to "CORNER" cost cost
+            "BAKERY" to listOf("MEAT", "BOTTOM_CORNER") costs listOf(cost, 2*cost)
+            "BOTTOM_CORNER" to "TILLS" cost 2*cost
+            "BOTTOM_CORNER" to  "MEAT" cost cost
+            "MEAT" to "SEAFOOD" cost cost
+            "MEAT" to "BAKERY" cost 2*cost
+            "SEAFOOD" to "SEAFOOD_CORNER" cost cost
+            "SEAFOOD" to "DAIRY" cost 2*cost
+            "SEAFOOD_CORNER" to "FOOD_CUPBOARD_CORNER" cost cost
+            "FOOD_CUPBOARD_CORNER" to "FOOD_CUPBOARD" cost cost
+            "FOOD_CUPBOARD" to "SWEETS" cost cost
+            "SWEETS" to "TILLS" cost cost
         }
+        println("Constructed graph $graph")
 
-        val graph = Graph(mutableListOf(), mutableMapOf())
-        graph.nodes.addAll(
-            (1..13).map { Node(it) }
-        )
-        graph.apply {
-            addEdge(1, 4, 13)
-            addEdge(1, 5, 7)
-            addEdge(1, 6, 19)
-            addEdge(2, 4, 12)
-            addEdge(3, 4, 11)
-            addEdge(3, 6, 19)
-            addEdge(3, 7, 10)
-            addEdge(4, 1, 13)
-            addEdge(4, 2, 12)
-            addEdge(4, 3, 11)
-            addEdge(4, 6, 6)
-            addEdge(5, 1, 7)
-            addEdge(5, 6, 20)
-            addEdge(5, 8, 20)
-            addEdge(5, 10, 40)
-            addEdge(6, 1, 19)
-            addEdge(6, 3, 19)
-            addEdge(6, 4, 6)
-            addEdge(6, 5, 20)
-            addEdge(6, 7, 20)
-            addEdge(6, 8, 11)
-            addEdge(6, 9, 11)
-            addEdge(6, 11, 22)
-            addEdge(7, 3, 10)
-            addEdge(7, 6, 20)
-            addEdge(7, 9, 20)
-            addEdge(7, 12, 40)
-            addEdge(8, 5, 20)
-            addEdge(8, 6, 11)
-            addEdge(8, 10, 15)
-            addEdge(8, 11, 9)
-            addEdge(9, 6, 13)
-            addEdge(9, 7, 20)
-            addEdge(9, 11, 8)
-            addEdge(9, 12, 11)
-            addEdge(10, 5, 40)
-            addEdge(10, 8, 15)
-            addEdge(10, 11, 5)
-            addEdge(10, 13, 6)
-            //A1B2C3D4E5F6G7H8I9J10K11L12M13
-            addEdge(11, 6, 22)
-            addEdge(11, 8, 9)
-            addEdge(11, 9, 8)
-            addEdge(11, 10, 5)
-            addEdge(11, 12, 6)
-            addEdge(11, 13, 12)
-            addEdge(12, 9, 11)
-            addEdge(12, 7, 40)
-            addEdge(12, 11, 6)
-            addEdge(12, 13, 9)
-            addEdge(13, 10, 6)
-            addEdge(13, 11, 12)
-            addEdge(13, 12, 9)
+        val other = graph<Int> {
+            edge(1, 4, 13)
+            edge(1, 5, 7)
+            edge(1, 6, 19)
+            edge(2, 4, 12)
+            edge(3, 4, 11)
+            edge(3, 6, 19)
+            edge(3, 7, 10)
+            edge(4, 1, 13)
+            edge(4, 2, 12)
+            edge(4, 3, 11)
+            edge(4, 6, 6)
+            edge(5, 1, 7)
+            edge(5, 6, 20)
+            edge(5, 8, 20)
+            edge(5, 10, 40)
+            edge(6, 1, 19)
+            edge(6, 3, 19)
+            edge(6, 4, 6)
+            edge(6, 5, 20)
+            edge(6, 7, 20)
+            edge(6, 8, 11)
+            edge(6, 9, 11)
+            edge(6, 11, 22)
+            edge(7, 3, 10)
+            edge(7, 6, 20)
+            edge(7, 9, 20)
+            edge(7, 12, 40)
+            edge(8, 5, 20)
+            edge(8, 6, 11)
+            edge(8, 10, 15)
+            edge(8, 11, 9)
+            edge(9, 6, 13)
+            edge(9, 7, 20)
+            edge(9, 11, 8)
+            edge(9, 12, 11)
+            edge(10, 5, 40)
+            edge(10, 8, 15)
+            edge(10, 11, 5)
+            edge(10, 13, 6)
+            edge(11, 6, 22)
+            edge(11, 8, 9)
+            edge(11, 9, 8)
+            edge(11, 10, 5)
+            edge(11, 12, 6)
+            edge(11, 13, 12)
+            edge(12, 9, 11)
+            edge(12, 7, 40)
+            edge(12, 11, 6)
+            edge(12, 13, 9)
+            edge(13, 10, 6)
+            edge(13, 11, 12)
+            edge(13, 12, 9)
         }
-        println("Nodes ${graph.nodes}")
-        println("Edges ${graph.edges.values}")
-        val path = simpleSolver(graph, listOf(Node(2), Node(5), Node(13)))
+        val path = simpleSolver(other, listOf(Graph.Node(2), Graph.Node(5), Graph.Node(13)))
+        println("Path $path")
     }
 
     companion object {
@@ -93,17 +97,17 @@ class Main {
         }
     }
 
-    fun simpleSolver(graph: Graph, waypoints: List<Node>) {
+    fun<ID> simpleSolver(graph: Graph<ID>, waypoints: List<Graph.Node<ID>>) {
         val jumps = waypoints.zip(waypoints.subList(1, waypoints.size))
         println("Jumps $jumps")
         val path = jumps.map { path(it.first, it.second, graph) }
         println("Jumping path $path")
     }
 
-    fun path(source: Node, sink: Node, graph: Graph): List<Node> {
+    fun<ID> path(source: Graph.Node<ID>, sink: Graph.Node<ID>, graph: Graph<ID>): List<Graph.Node<ID>> {
         println("Finding path from $source to $sink")
         val previous = dijkstras(source, graph)
-        val path = mutableListOf<Node>()
+        val path = mutableListOf<Graph.Node<ID>>()
         var current = sink
         while (current != source) {
             path.add(0, current)
@@ -114,20 +118,20 @@ class Main {
         return path
     }
 
-    fun dijkstras(source: Node, graph: Graph): HashMap<Node, Node> {
-        val distances = HashMap<Node, Int>()
-        val previous = HashMap<Node, Node>()
-        val Q = HashSet<Node>()
-        graph.nodes.forEach { node ->
-            distances[node] = 100000
-            Q.add(node)
+    fun<ID> dijkstras(source: Graph.Node<ID>, graph: Graph<ID>): HashMap<Graph.Node<ID>, Graph.Node<ID>> {
+        val distances = HashMap<Graph.Node<ID>, Int>()
+        val previous = HashMap<Graph.Node<ID>, Graph.Node<ID>>()
+        val Q = HashSet<Graph.Node<ID>>()
+        graph.forEach {  vertex ->
+            distances[vertex.node] = 100000
+            Q.add(vertex.node)
         }
         distances[source] = 0
         while (Q.isNotEmpty()) {
             val min = Q.minBy { distances[it]!! }!!
             //println("Min node $min")
             Q.remove(min)
-            graph.edges[min]?.forEach { edge ->
+            graph[min]?.forEach { edge ->
                 //println("Checking edge $edge")
                 val alt = distances[min]!! + edge.cost
                 if (alt < distances[edge.to]!!) {
@@ -141,88 +145,60 @@ class Main {
         return previous
     }
 
+//
+//    fun prims(graph: Graph) {
+//        val costs = HashMap<Node, Edge>()
+//        val notIncluded = graph.nodes
+//        val forest = Graph(mutableListOf(), mutableMapOf())
+//        val initial = notIncluded.first() // Chosen at random
+//        addCosts(initial, costs, graph)
+//        notIncluded.remove(initial)
+//        while (notIncluded.isNotEmpty()) {
+//            // Choose minimum cost from available edges
+//            val minCost = costs.minBy {
+//                it.value.cost
+//            }!!
+//            //Remove it and add the node to the forest
+//            costs.remove(minCost.key)
+//            forest.nodes.add(minCost.key)
+//
+//            // Add the edge from the previous forest to the new node
+//            val from = minCost.value.from
+//            if (forest.edges.containsKey(from)) {
+//                forest.edges[from]?.add(minCost.value)
+//            } else {
+//                forest.edges[from] = mutableSetOf(minCost.value)
+//
+//                //Add any new outgoing edges to costs
+//                addCosts(minCost.key, costs, graph)
+//            }
+//        }
+//    }
+//
+//    private fun addCosts(node: Node, costs: MutableMap<Node, Edge>, graph: Graph) {
+//        // For each edge from the node outwards, if there is no existing cost to its neighbour,
+//        // or the existing cost is higher, add the edge to costs
+//        graph.edges[node]?.forEach { edge ->
+//            if (!costs.containsKey(edge.to) || costs[edge.to]?.cost ?: 0 > edge.cost) {
+//                costs[edge.to] = edge
+//            }
+//        }
+//    }
+//
+//    fun findTour(graph: Graph) {
+//        val tour = Stack<Node>()
+//        findTourR(graph.nodes.first(), graph, tour)
+//    }
+//
+//    private fun findTourR(node: Node, graph: Graph, tour: Stack<Node>) {
+//        graph.edges[node]?.forEach {
+//            //TODO: Concurrent modification exception
+//            graph.edges[node]?.remove(it)
+//            findTourR(it.to, graph, tour)
+//        }
+//        tour.push(node)
+//    }
 
-    fun prims(graph: Graph) {
-        val costs = HashMap<Node, Edge>()
-        val notIncluded = graph.nodes
-        val forest = Graph(mutableListOf(), mutableMapOf())
-        val initial = notIncluded.first() // Chosen at random
-        addCosts(initial, costs, graph)
-        notIncluded.remove(initial)
-        while (notIncluded.isNotEmpty()) {
-            // Choose minimum cost from available edges
-            val minCost = costs.minBy {
-                it.value.cost
-            }!!
-            //Remove it and add the node to the forest
-            costs.remove(minCost.key)
-            forest.nodes.add(minCost.key)
-
-            // Add the edge from the previous forest to the new node
-            val from = minCost.value.from
-            if (forest.edges.containsKey(from)) {
-                forest.edges[from]?.add(minCost.value)
-            } else {
-                forest.edges[from] = mutableSetOf(minCost.value)
-
-                //Add any new outgoing edges to costs
-                addCosts(minCost.key, costs, graph)
-            }
-        }
-    }
-
-    private fun addCosts(node: Node, costs: MutableMap<Node, Edge>, graph: Graph) {
-        // For each edge from the node outwards, if there is no existing cost to its neighbour,
-        // or the existing cost is higher, add the edge to costs
-        graph.edges[node]?.forEach { edge ->
-            if (!costs.containsKey(edge.to) || costs[edge.to]?.cost ?: 0 > edge.cost) {
-                costs[edge.to] = edge
-            }
-        }
-    }
-
-    fun findTour(graph: Graph) {
-        val tour = Stack<Node>()
-        findTourR(graph.nodes.first(), graph, tour)
-    }
-
-    private fun findTourR(node: Node, graph: Graph, tour: Stack<Node>) {
-        graph.edges[node]?.forEach {
-            //TODO: Concurrent modification exception
-            graph.edges[node]?.remove(it)
-            findTourR(it.to, graph, tour)
-        }
-        tour.push(node)
-    }
-
-
-}
-
-data class Graph(val nodes: MutableList<Node>, val edges: MutableMap<Node, MutableSet<Edge>>) {
-
-    fun addEdge(idFrom: Int, idTo: Int, cost: Int, reverse: Boolean = true) {
-        val from = Node(idFrom)
-        val to = Node(idTo)
-        val edge = Edge(cost, to, from)
-        if (edges.containsKey(from)) {
-            edges[from]?.add(edge)
-        } else {
-            edges[from] = mutableSetOf(edge)
-        }
-        if (reverse) {
-            if (edges.containsKey(to)) {
-                edges[to]?.add(edge.reverse())
-            } else {
-                edges[to] = mutableSetOf(edge.reverse())
-            }
-        }
-    }
 
 }
 
-data class Node(val id: Int)
-
-data class Edge(val cost: Int, val to: Node, val from: Node) {
-
-    fun reverse() = Edge(cost, from, to)
-}
