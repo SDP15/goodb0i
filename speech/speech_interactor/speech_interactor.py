@@ -11,7 +11,6 @@ model_path = get_model_path()
 now = datetime.datetime.now()
 universal_phrases = {'repeat', 'options'}
 
-shoppingList = {"Cheese", "apples", "potatoes"}
 
 speech = LiveSpeech(
     verbose=False,
@@ -38,9 +37,7 @@ class SpeechInteractor:
 
         print(self.log_filepath)
         self.possible_states = json.load(open(state_file,'r'))
-        self.stuff = json.load(open(list_file, 'r'))
-        for tings in self.stuff['products'][1]['product']:
-            print(tings)
+        self.getShoppingList(list_file)
         self.next_state('init')
         self.react("n/a")
         self.listen()
@@ -52,13 +49,14 @@ class SpeechInteractor:
         if "shopping0" in self.state:
             action = input("Please enter arrived.  ")
             if "arrived" in action:
-                item = shoppingList.pop()
-                self.arrived("bread", "middle")   
+                item = self.orderedList[self.listPointer]
+                self.arrived(item, "middle")   
         if "arrival" in self.state:
             action = input("Please enter scanned.  ")
             if "scanned" in action: 
-                item = shoppingList.pop()
-                self.scanned("bread")
+                item = self.orderedList[self.listPointer]
+                self.scanned(item)
+        
     
     def listen(self):
         for sphrase in speech:
@@ -92,9 +90,14 @@ class SpeechInteractor:
 
     def react(self, word):
         # self.say(self.options[word]['reply'])
-        self.speak_to_me(self.options[word]['reply'])
-        self.last_reply = self.options[word]['reply']
-        self.next_state(self.options[word]['nextState'])
+        if "cart" in self.state and word == "yes":
+            self.cart()
+        elif "identify" in self.state and word == "yes":
+            self.describe_item()
+        else:
+            self.speak_to_me(self.options[word]['reply'])
+            self.last_reply = self.options[word]['reply']
+            self.next_state(self.options[word]['nextState'])
 
     def list_options(self):
         self.say("Your options are: %s, and repeat." 
@@ -134,7 +137,41 @@ class SpeechInteractor:
         self.last_reply = response
         self.next_state(self.options['scanned']['nextState'])
 
-    def getItem(self):
-        item = self.stuff['products']['id']
+    def cart(self):
+        currentItem = self.orderedList[self.listPointer]
+        quantity = self.shoppingList[currentItem]
+        self.shoppingList[currentItem] = quantity-1
+        if quantity > 1:
+            nextState = 'nextState_quantity+'
+            response = self.options['yes']['reply_quantity+'] + str(quantity) + self.options['yes']['prompt']
+        else:
+            nextState = 'nextState_quantity0'
+            response = self.options['yes']['reply_quantity0']
+            self.listPointer = self.listPointer + 1
+        
+        self.speak_to_me(response)
+        self.last_reply = response
+        self.next_state(self.options['yes'][nextState])
+
+    def describe_item(self):
+        for tings in self.stuff['products']:
+            if tings['product']['name'] == self.orderedList[self.listPointer]:
+                response = self.options['yes']['price'] + str(tings['product']['price']) + self.options['no']['reply']
+        self.speak_to_me(response)
+        self.last_reply = response
+        self.next_state(self.options['no']['nextState'])
+    
+        
+    def getShoppingList(self, list_file):
+        self.stuff = json.load(open(list_file, 'r'))
+        self.listPointer = 0
+        self.shoppingList = {}
+        self.orderedList = []
+        for tings in self.stuff['products']:
+            self.shoppingList.update({tings['product']['name']:tings['quantity']})
+            self.orderedList.append(tings['product']['name'])
+        print(self.shoppingList)
+
+
 if __name__ == '__main__':
     sint = SpeechInteractor()

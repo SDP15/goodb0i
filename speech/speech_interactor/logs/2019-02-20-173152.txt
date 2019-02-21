@@ -1,9 +1,0 @@
-Keyword detected: start
-Keyword detected: yes
-Keyword detected: yes
-Keyword detected: no
-Keyword detected: yes
-Keyword detected: no
-Keyword detected: yes
-Keyword detected: no
-Keyword detected: yes

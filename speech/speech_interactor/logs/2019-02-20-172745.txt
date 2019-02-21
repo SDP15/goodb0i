@@ -1,9 +1,0 @@
-Keyword detected: start
-Keyword detected: yes
-Keyword detected: yes
-Your options are: scanned, and repeat.
-Keyword detected: n/a
-Your options are: scanned, and repeat.
-Keyword detected: n/a
-Your options are: scanned, and repeat.
-Keyword detected: n/a

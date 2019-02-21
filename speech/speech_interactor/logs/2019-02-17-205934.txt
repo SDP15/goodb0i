@@ -1,8 +1,0 @@
-Keyword detected: start
-Keyword detected: no
-Keyword detected: no
-Your options are: shopping, tutorial, and repeat.
-Keyword detected: n/a
-Keyword detected: shopping
-Keyword detected: no
-Keyword detected: yes
