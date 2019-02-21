@@ -27,15 +27,22 @@ speech = LiveSpeech(
 class SpeechInteractor:
     def __init__(self, state_file='interactor_states.json', list_file = 'example_list.json'):
         log_filename = now.strftime("%Y-%m-%d-%H%M%S")
+        self.logging = False
+
+        # Conversation is logged if -log is specified in cmd line
+        if len(sys.argv) > 1 and "-log" in sys.argv[1]:
+            self.logging = True
 
         # Log is placed in folder associated with test number
-        if len(sys.argv) > 1:
-            test_num = sys.argv[1]
+        if len(sys.argv) > 2:
+            test_num = sys.argv[2]
             self.log_filepath = "logs/{:}/{:}.txt".format(test_num, log_filename)
         else:
             self.log_filepath = "logs/{:}.txt".format(log_filename)
 
-        print(self.log_filepath)
+        if self.logging is True:
+            print("Conversation is being logged in: {:}".format(self.log_filepath))
+
         self.possible_states = json.load(open(state_file,'r'))
         self.getShoppingList(list_file)
         self.next_state('init')
@@ -80,12 +87,13 @@ class SpeechInteractor:
                 self.react(word)
 
             # Logs the word/words that PocketSphinx has detected
-            with open(self.log_filepath, 'a') as f:
-                if "multiple" in word:
-                    f.write("## Keyword detection error ##\n")
-                    f.write("Multiple keywords detected: {:}\n".format(phrase))
-                else:
-                    f.write("Keyword detected: {:}\n".format(word))
+            if self.logging is True:
+                with open(self.log_filepath, 'a') as f:
+                    if "multiple" in word:
+                        f.write("## Keyword detection error ##\n")
+                        f.write("Multiple keywords detected: {:}\n".format(phrase))
+                    else:
+                        f.write("Keyword detected: {:}\n".format(word))
                         
 
     def react(self, word):
@@ -114,8 +122,9 @@ class SpeechInteractor:
 
     def say(self, string):
         # Logs the string that is given to the TTS engine
-        with open(self.log_filepath, 'a') as f:
-            f.write("{:}\n".format(string))
+        if self.logging is True:
+            with open(self.log_filepath, 'a') as f:
+                f.write("{:}\n".format(string))
     
         engine = pyttsx.init()
         engine.setProperty('voices', 2)
@@ -123,6 +132,11 @@ class SpeechInteractor:
         engine.runAndWait()
     
     def speak_to_me(self, string):
+        # Logs the string that is given to the TTS engine
+        if self.logging is True:
+            with open(self.log_filepath, 'a') as f:
+                f.write("{:}\n".format(string))
+                    
         goodboi.run(["mimic/mimic", "-t", string, "-voice", "awb"])
 
     def arrived(self, item, shelf):
