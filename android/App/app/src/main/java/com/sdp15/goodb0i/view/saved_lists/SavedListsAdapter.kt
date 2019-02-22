@@ -8,7 +8,7 @@ import com.sdp15.goodb0i.R
 import com.sdp15.goodb0i.data.store.lists.ShoppingList
 import kotlinx.android.synthetic.main.list_order.view.*
 
-class SavedListsAdapter : RecyclerView.Adapter<SavedListsAdapter.SavedListViewHolder>() {
+class SavedListsAdapter(val onClick: (ShoppingList) -> Unit) : RecyclerView.Adapter<SavedListsAdapter.SavedListViewHolder>() {
 
     private val lists = mutableListOf<ShoppingList>()
 
@@ -27,6 +27,9 @@ class SavedListsAdapter : RecyclerView.Adapter<SavedListsAdapter.SavedListViewHo
         holder.itemView.text_list_code.text = lists[position].code.toString()
         holder.itemView.text_list_price.text = holder.itemView.context.getString(R.string.label_total_price,
             lists[position].products.sumByDouble { it.quantity * it.product.price })
+        holder.itemView.setOnClickListener {
+            onClick(lists[position])
+        }
     }
 
     class SavedListViewHolder(view: View) : RecyclerView.ViewHolder(view)

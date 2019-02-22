@@ -20,7 +20,7 @@
             app:destination="@id/list_creation_fragment" />
         <action
             android:id="@+id/action_welcome_fragment_to_view_shopping_list"
-            app:destination="@id/view_shopping_list" />
+            app:destination="@id/saved_lists_fragment" />
         <action
             android:id="@+id/action_welcome_fragment_to_code_fragment"
             app:destination="@id/code_fragment" />
@@ -28,14 +28,13 @@
     </fragment>
 
     <fragment
-        android:id="@+id/view_shopping_list"
+        android:id="@+id/saved_lists_fragment"
         android:name="com.sdp15.goodb0i.view.saved_lists.SavedListsFragment"
-        android:label="view_shopping_list"
+        android:label="saved_lists_fragment"
         tools:layout="@layout/layout_stored_lists">
-
         <action
-            android:id="@+id/action_view_shopping_list_to_list_creation_fragment"
-            app:destination="@id/list_creation_fragment" />
+            android:id="@+id/action_view_shopping_list_to_list_confirmation_fragment"
+            app:destination="@id/list_confirmation_fragment" />
     </fragment>
 
     <fragment
