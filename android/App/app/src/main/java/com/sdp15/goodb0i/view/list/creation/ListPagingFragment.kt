@@ -21,7 +21,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  */
 class ListPagingFragment : BaseFragment() {
 
-    val vm: ListViewModel by viewModel()
+    private val vm: ListViewModel by viewModel()
     private var shouldCloseOnBack = true
 
     override fun onCreateView(

@@ -10,10 +10,11 @@ import com.arlib.floatingsearchview.FloatingSearchView
 import com.sdp15.goodb0i.R
 import com.sdp15.goodb0i.switchOnEmpty
 import kotlinx.android.synthetic.main.layout_search.*
+import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 class SearchFragment : Fragment() {
 
-    private val vm: ListViewModel by lazy { (parentFragment as ListPagingFragment).vm }
+    private val vm: ListViewModel by sharedViewModel(from = { parentFragment!! })
 
     override fun onResume() {
         super.onResume()

@@ -11,10 +11,11 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.sdp15.goodb0i.R
 import kotlinx.android.synthetic.main.layout_shoppinglist.*
+import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 class ShoppingListFragment : Fragment() {
 
-    private val vm: ListViewModel by lazy { (parentFragment as ListPagingFragment).vm }
+    private val vm: ListViewModel by sharedViewModel(from = { parentFragment!! })
 
     override fun onResume() {
         super.onResume()
