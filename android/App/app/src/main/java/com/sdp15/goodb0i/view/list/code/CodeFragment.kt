@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.sdp15.goodb0i.R
-import com.sdp15.goodb0i.view.code.CodeFragmentDirections
 import com.sdp15.goodb0i.watchText
 import kotlinx.android.synthetic.main.layout_code_input.*
 import org.koin.androidx.viewmodel.ext.android.viewModel

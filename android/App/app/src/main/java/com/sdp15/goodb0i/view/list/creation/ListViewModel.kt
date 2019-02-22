@@ -12,7 +12,6 @@ import com.sdp15.goodb0i.data.store.products.Product
 import com.sdp15.goodb0i.data.store.products.ProductLoader
 import com.sdp15.goodb0i.move
 import com.sdp15.goodb0i.view.ListDiff
-import com.sdp15.goodb0i.view.list.ListPagingFragmentDirections
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
