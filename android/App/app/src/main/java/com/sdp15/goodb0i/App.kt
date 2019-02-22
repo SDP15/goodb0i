@@ -3,9 +3,9 @@ package com.sdp15.goodb0i
 import android.app.Application
 import androidx.room.Room
 import com.google.firebase.FirebaseApp
-import com.sdp15.goodb0i.data.scanner.BarcodeReader
-import com.sdp15.goodb0i.data.scanner.MLKitScanner
-import com.sdp15.goodb0i.data.sockets.SocketHandler
+import com.sdp15.goodb0i.data.navigation.scanner.BarcodeReader
+import com.sdp15.goodb0i.data.navigation.scanner.MLKitScanner
+import com.sdp15.goodb0i.data.navigation.sockets.SocketHandler
 import com.sdp15.goodb0i.data.store.RoomDB
 import com.sdp15.goodb0i.data.store.lists.ListManager
 import com.sdp15.goodb0i.data.store.lists.RetrofitListManager

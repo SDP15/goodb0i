@@ -6,7 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.collection.CircularIntArray
 import androidx.navigation.findNavController
 import com.sdp15.goodb0i.R
-import com.sdp15.goodb0i.data.sockets.SocketHandler
+import com.sdp15.goodb0i.data.navigation.sockets.SocketHandler
 import com.sdp15.goodb0i.view.debug.Config
 import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.android.ext.android.inject

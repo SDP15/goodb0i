@@ -1,4 +1,4 @@
-package com.sdp15.goodb0i.data.sockets
+package com.sdp15.goodb0i.data.navigation.sockets
 
 import okhttp3.Response
 import okhttp3.WebSocket

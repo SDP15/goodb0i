@@ -10,6 +10,9 @@ class ListConfirmationViewModel : BaseViewModel<Any>() {
 
     }
 
+
+
+    //TODO: Replace with LiveData<ShoppingList> and abstract some formatter
     val price = MutableLiveData<Double>()
     val code = MutableLiveData<Long>()
     val time = MutableLiveData<Long>()

@@ -1,4 +1,4 @@
-package com.sdp15.goodb0i.data.scanner
+package com.sdp15.goodb0i.data.navigation.scanner
 
 import android.hardware.camera2.CameraAccessException
 import android.os.Build
@@ -49,7 +49,12 @@ class MLKitScanner : BarcodeReader {
             .addOnSuccessListener { barcodes ->
                 if (barcodes.isNotEmpty()) {
                     Timber.i("Barcodes $barcodes")
-                    callback.onBarcodeRead(BarcodeReading(barcodes.first().displayValue, barcodes.first().boundingBox))
+                    callback.onBarcodeRead(
+                        BarcodeReading(
+                            barcodes.first().displayValue,
+                            barcodes.first().boundingBox
+                        )
+                    )
                 } else {
                     callback.onNoBarcodesFound()
                 }

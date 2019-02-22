@@ -2,9 +2,9 @@ package com.sdp15.goodb0i.view.navigation.scanner
 
 import androidx.lifecycle.MutableLiveData
 import com.sdp15.goodb0i.view.BaseViewModel
-import com.sdp15.goodb0i.data.scanner.BarcodeReader
-import com.sdp15.goodb0i.data.scanner.BarcodeReaderCallback
-import com.sdp15.goodb0i.data.scanner.BarcodeReading
+import com.sdp15.goodb0i.data.navigation.scanner.BarcodeReader
+import com.sdp15.goodb0i.data.navigation.scanner.BarcodeReaderCallback
+import com.sdp15.goodb0i.data.navigation.scanner.BarcodeReading
 import org.koin.standalone.inject
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
@@ -26,7 +26,8 @@ class ScannerViewModel : BaseViewModel<ScannerViewModel.ScannerAction>(),
         if (!isRunning.get()) { // If the reader is not already running
             isRunning.set(true)
             Timber.i("Starting new scan")
-            reader.scanImage(ba, rotation, width, height, object : BarcodeReaderCallback {
+            reader.scanImage(ba, rotation, width, height, object :
+                BarcodeReaderCallback {
                 override fun onBarcodeRead(reading: BarcodeReading) {
                     Timber.i("Barcode read $reading")
                     isRunning.set(false)

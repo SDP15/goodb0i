@@ -1,4 +1,4 @@
-package com.sdp15.goodb0i.data.scanner
+package com.sdp15.goodb0i.data.navigation.scanner
 
 import android.graphics.Rect
 
