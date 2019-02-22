@@ -1,7 +1,11 @@
 package com.sdp15.goodb0i.view.list
 
+import android.content.Context
+import android.content.SharedPreferences
+import android.util.Log
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import com.sdp15.goodb0i.AppPreferences
 import com.sdp15.goodb0i.BaseViewModel
 import com.sdp15.goodb0i.data.store.Result
 import com.sdp15.goodb0i.data.store.lists.ListItem
@@ -42,6 +46,7 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
 
     val totalPrice = MutableLiveData<Double>()
 
+
     init {
         search.addSource(list) {
             // When an product is updated in the list, post an update to that product within the current search results
@@ -49,6 +54,7 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
             if (it is ListDiff.Update) search.postValue(ListDiff.Update(currentSearchResults, it.updated))
             if (it is ListDiff.Remove) search.postValue(ListDiff.Update(currentSearchResults, it.removed))
             // Add doesn't matter, as it is only called when we add a new product *from the search results*
+
         }
         search.addSource(retrievedSearchResults) { result ->
             currentSearchResults.clear()
@@ -88,6 +94,10 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
                         created
                     )
                 )
+                //saved the order number in shared preferences
+                AppPreferences.addOrder("38042")
+                Timber.v("Preferences so far: "+AppPreferences.getOrders().toString())
+
             } else {
                 //TODO
                 Timber.e("Failure: $result")
