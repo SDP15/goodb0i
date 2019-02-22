@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.KeyEvent
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.collection.CircularIntArray
 import androidx.navigation.findNavController
 import com.sdp15.goodb0i.data.sockets.SocketHandler
 import com.sdp15.goodb0i.view.BaseFragment
@@ -15,8 +16,8 @@ class MainActivity : AppCompatActivity() {
 
     private val sh: SocketHandler by inject()
 
-    @IdRes
-    var previousFragment = 0
+    val fragmentHistory = CircularIntArray(10)
+
     private var currentFragment = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,7 +26,7 @@ class MainActivity : AppCompatActivity() {
         supportActionBar?.hide()
         findNavController(R.id.nav_host_fragment).addOnDestinationChangedListener { controller, destination, arguments ->
             // Keep track of id of the previous fragment. Currently only used by ListConfirmationFragment
-            previousFragment = currentFragment
+            fragmentHistory.addFirst(currentFragment)
             currentFragment = destination.id
         }
         //sh.start("http://10.0.2.2:8080/ping", "first socket")

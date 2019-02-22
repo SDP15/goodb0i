@@ -7,6 +7,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
+import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.viewpager.widget.ViewPager
 import com.sdp15.goodb0i.R
@@ -68,6 +70,13 @@ class ListPagingFragment : BaseFragment() {
                     floating_search_view.clearSearchFocus()
                 }
                 floating_search_view.inflateOverflowMenu(if (list_viewpager.currentItem == 0) R.menu.menu_search else R.menu.menu_shopping)
+            }
+        })
+        vm.transitions.observe(this, Observer {
+            if (baseActivity.fragmentHistory.first == R.id.list_confirmation_fragment && baseActivity.fragmentHistory[1] != R.id.list_creation_fragment) {
+                findNavController().navigateUp()
+            } else {
+                findNavController().navigate(it)
             }
         })
     }

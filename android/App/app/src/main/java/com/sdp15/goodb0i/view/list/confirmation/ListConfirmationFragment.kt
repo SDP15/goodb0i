@@ -32,7 +32,9 @@ class ListConfirmationFragment : BaseFragment() {
             confirmation_list_code.text = getString(R.string.label_list_code, it)
         })
         confirmation_button_edit.setOnClickListener {
-            if (baseActivity.previousFragment == R.id.list_creation_fragment) {
+            // If we have come from editing a fragment, but not from previous confirmation
+            if (baseActivity.fragmentHistory.first == R.id.list_creation_fragment &&
+                baseActivity.fragmentHistory[1] != R.id.list_confirmation_fragment) {
                 findNavController().navigateUp() // Navigate back to ListPagingFragment
             } else {
                 findNavController().navigate(
@@ -41,9 +43,7 @@ class ListConfirmationFragment : BaseFragment() {
                     )
                 )
             }
-
         }
-
     }
 
     override fun onCreateView(
