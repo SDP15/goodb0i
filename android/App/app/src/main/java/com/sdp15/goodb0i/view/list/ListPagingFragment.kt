@@ -22,6 +22,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class ListPagingFragment : BaseFragment() {
 
     val vm: ListViewModel by viewModel()
+    private var shouldCloseOnBack = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -51,6 +52,7 @@ class ListPagingFragment : BaseFragment() {
         if (list != null) {
             vm.setList(list)
             list_viewpager.currentItem = 1
+            shouldCloseOnBack = true
         }
         floating_search_view.setOnMenuItemClickListener {
             list_viewpager.apply {
@@ -66,6 +68,7 @@ class ListPagingFragment : BaseFragment() {
             }
 
             override fun onPageSelected(position: Int) {
+                shouldCloseOnBack = position == 0
                 if (position == 1) {
                     floating_search_view.clearSearchFocus()
                 }
@@ -82,7 +85,7 @@ class ListPagingFragment : BaseFragment() {
     }
 
     override fun onBackPressed(): Boolean {
-        if (list_viewpager.currentItem == 1) { // Switch from list to search
+        if (!shouldCloseOnBack) {
             list_viewpager.setCurrentItem(0, true)
             return true
         }
