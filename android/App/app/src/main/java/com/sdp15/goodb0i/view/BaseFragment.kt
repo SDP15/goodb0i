@@ -1,7 +1,6 @@
 package com.sdp15.goodb0i.view
 
 import androidx.fragment.app.Fragment
-import com.sdp15.goodb0i.MainActivity
 
 abstract class BaseFragment : Fragment() {
 

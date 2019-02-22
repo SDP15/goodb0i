@@ -1,4 +1,4 @@
-package com.sdp15.goodb0i.view.list
+package com.sdp15.goodb0i.view.list.creation
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,6 +13,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.viewpager.widget.ViewPager
 import com.sdp15.goodb0i.R
 import com.sdp15.goodb0i.view.BaseFragment
+import com.sdp15.goodb0i.view.list.ListPagingFragmentArgs
 import kotlinx.android.synthetic.main.layout_list_creation.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 

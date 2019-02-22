@@ -1,4 +1,4 @@
-package com.sdp15.goodb0i.view.scanner
+package com.sdp15.goodb0i.view.navigation.scanner
 
 import android.os.Bundle
 import android.view.LayoutInflater

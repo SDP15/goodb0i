@@ -16,7 +16,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name="com.sdp15.goodb0i.MainActivity">
+        <activity android:name="com.sdp15.goodb0i.view.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

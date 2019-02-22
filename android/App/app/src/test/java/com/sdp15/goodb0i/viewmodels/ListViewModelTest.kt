@@ -6,7 +6,7 @@ import com.sdp15.goodb0i.data.store.lists.ListItem
 import com.sdp15.goodb0i.data.store.products.Product
 import com.sdp15.goodb0i.data.store.products.TestDataProductLoader
 import com.sdp15.goodb0i.view.ListDiff
-import com.sdp15.goodb0i.view.list.ListViewModel
+import com.sdp15.goodb0i.view.list.creation.ListViewModel
 import io.mockk.*
 import org.junit.Assert
 import org.junit.Before

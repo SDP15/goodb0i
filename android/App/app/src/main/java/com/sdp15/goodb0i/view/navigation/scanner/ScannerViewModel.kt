@@ -1,7 +1,7 @@
-package com.sdp15.goodb0i.view.scanner
+package com.sdp15.goodb0i.view.navigation.scanner
 
 import androidx.lifecycle.MutableLiveData
-import com.sdp15.goodb0i.BaseViewModel
+import com.sdp15.goodb0i.view.BaseViewModel
 import com.sdp15.goodb0i.data.scanner.BarcodeReader
 import com.sdp15.goodb0i.data.scanner.BarcodeReaderCallback
 import com.sdp15.goodb0i.data.scanner.BarcodeReading
@@ -9,7 +9,8 @@ import org.koin.standalone.inject
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
 
-class ScannerViewModel : BaseViewModel<ScannerViewModel.ScannerAction>(), ScannerFragment.ScannerFragmentInteractor {
+class ScannerViewModel : BaseViewModel<ScannerViewModel.ScannerAction>(),
+    ScannerFragment.ScannerFragmentInteractor {
 
     private val reader: BarcodeReader by inject()
     private val isRunning = AtomicBoolean(false)

@@ -1,8 +1,8 @@
-package com.sdp15.goodb0i.view.list
+package com.sdp15.goodb0i.view.list.creation
 
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import com.sdp15.goodb0i.BaseViewModel
+import com.sdp15.goodb0i.view.BaseViewModel
 import com.sdp15.goodb0i.data.store.Result
 import com.sdp15.goodb0i.data.store.lists.ListItem
 import com.sdp15.goodb0i.data.store.lists.ListManager
@@ -12,6 +12,7 @@ import com.sdp15.goodb0i.data.store.products.Product
 import com.sdp15.goodb0i.data.store.products.ProductLoader
 import com.sdp15.goodb0i.move
 import com.sdp15.goodb0i.view.ListDiff
+import com.sdp15.goodb0i.view.list.ListPagingFragmentDirections
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
@@ -19,7 +20,8 @@ import kotlinx.coroutines.launch
 import org.koin.standalone.inject
 import timber.log.Timber
 
-class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.SearchFragmentInteractor {
+class ListViewModel : BaseViewModel<ListViewModel.ListAction>(),
+    SearchFragment.SearchFragmentInteractor {
 
     private val productLoader: ProductLoader by inject()
     private val listManager: ListManager by inject()

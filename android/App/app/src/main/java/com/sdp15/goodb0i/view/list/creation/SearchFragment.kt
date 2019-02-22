@@ -1,4 +1,4 @@
-package com.sdp15.goodb0i.view.list
+package com.sdp15.goodb0i.view.list.creation
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -20,7 +20,8 @@ class SearchFragment : Fragment() {
         // Specified explicitly as AS likes to autocomplete, and then later decide that it actually meant a different
         // LinearLayoutManager
         list_recycler.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
-        val adapter = ProductAdapter(vm::incrementItem, vm::decrementItem, false) {}
+        val adapter =
+            ProductAdapter(vm::incrementItem, vm::decrementItem, false) {}
         list_recycler.adapter = adapter
         search_view_switcher.switchOnEmpty(adapter)
 

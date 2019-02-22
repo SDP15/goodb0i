@@ -1,13 +1,12 @@
-package com.sdp15.goodb0i
+package com.sdp15.goodb0i.view
 
 import android.os.Bundle
 import android.view.KeyEvent
-import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.collection.CircularIntArray
 import androidx.navigation.findNavController
+import com.sdp15.goodb0i.R
 import com.sdp15.goodb0i.data.sockets.SocketHandler
-import com.sdp15.goodb0i.view.BaseFragment
 import com.sdp15.goodb0i.view.debug.Config
 import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.android.ext.android.inject

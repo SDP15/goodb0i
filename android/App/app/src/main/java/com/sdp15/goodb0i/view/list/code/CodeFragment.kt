@@ -1,4 +1,4 @@
-package com.sdp15.goodb0i.view.code
+package com.sdp15.goodb0i.view.list.code
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.sdp15.goodb0i.R
+import com.sdp15.goodb0i.view.code.CodeFragmentDirections
 import com.sdp15.goodb0i.watchText
 import kotlinx.android.synthetic.main.layout_code_input.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -39,7 +40,11 @@ class CodeFragment : androidx.fragment.app.Fragment() {
         })
         vm.actions.observe(this, Observer {
             if (it is CodeViewModel.CodeAction.ConfirmShoppingListAction) {
-                findNavController().navigate(CodeFragmentDirections.actionCodeFragmentToListConfirmationFragment(it.list))
+                findNavController().navigate(
+                    CodeFragmentDirections.actionCodeFragmentToListConfirmationFragment(
+                        it.list
+                    )
+                )
             }
         })
     }

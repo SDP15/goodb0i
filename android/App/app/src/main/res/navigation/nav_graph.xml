@@ -29,7 +29,7 @@
 
     <fragment
         android:id="@+id/saved_lists_fragment"
-        android:name="com.sdp15.goodb0i.view.saved_lists.SavedListsFragment"
+        android:name="com.sdp15.goodb0i.view.list.saved.SavedListsFragment"
         android:label="saved_lists_fragment"
         tools:layout="@layout/layout_stored_lists">
         <action
@@ -39,7 +39,7 @@
 
     <fragment
         android:id="@+id/list_creation_fragment"
-        android:name="com.sdp15.goodb0i.view.list.ListPagingFragment"
+        android:name="com.sdp15.goodb0i.view.list.creation.ListPagingFragment"
         android:label="list_creation_fragment">
 
 
@@ -55,7 +55,7 @@
 
     <fragment
         android:id="@+id/code_fragment"
-        android:name="com.sdp15.goodb0i.view.code.CodeFragment"
+        android:name="com.sdp15.goodb0i.view.list.code.CodeFragment"
         android:label="code_fragment"
         tools:layout="@layout/layout_code_input">
 
@@ -68,7 +68,7 @@
 
     <fragment
         android:id="@+id/scanner_fragment"
-        android:name="com.sdp15.goodb0i.view.scanner.ScannerFragment"
+        android:name="com.sdp15.goodb0i.view.navigation.scanner.ScannerFragment"
         android:label="scanner_fragment"
         tools:layout="@layout/layout_scanner">
 
@@ -79,7 +79,7 @@
 
     <fragment
         android:id="@+id/confirmation_fragment"
-        android:name="com.sdp15.goodb0i.view.confirmation.ItemConfirmationFragment"
+        android:name="com.sdp15.goodb0i.view.navigation.confirmation.ItemConfirmationFragment"
         android:label="confirmation_fragment"
         tools:layout="@layout/layout_confirmation">
 
@@ -87,7 +87,7 @@
 
     <fragment
         android:id="@+id/item_fragment"
-        android:name="com.sdp15.goodb0i.view.product.ProductFragment"
+        android:name="com.sdp15.goodb0i.view.navigation.product.ProductFragment"
         android:label="item_fragment"
         tools:layout="@layout/layout_product_display">
 
@@ -98,7 +98,7 @@
 
     <fragment
         android:id="@+id/search_fragment"
-        android:name="com.sdp15.goodb0i.view.list.SearchFragment"
+        android:name="com.sdp15.goodb0i.view.list.creation.SearchFragment"
         android:label="search_fragment"
         tools:layout="@layout/layout_search">
 
@@ -106,7 +106,7 @@
 
     <fragment
         android:id="@+id/list_fragment"
-        android:name="com.sdp15.goodb0i.view.list.ShoppingListFragment"
+        android:name="com.sdp15.goodb0i.view.list.creation.ShoppingListFragment"
         android:label="search_fragment"
         tools:layout="@layout/layout_shoppinglist">
 

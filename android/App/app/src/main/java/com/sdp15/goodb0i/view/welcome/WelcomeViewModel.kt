@@ -1,6 +1,6 @@
 package com.sdp15.goodb0i.view.welcome
 
-import com.sdp15.goodb0i.BaseViewModel
+import com.sdp15.goodb0i.view.BaseViewModel
 
 class WelcomeViewModel : BaseViewModel<Any>(), WelcomeFragment.WelcomeFragmentInteractor {
 

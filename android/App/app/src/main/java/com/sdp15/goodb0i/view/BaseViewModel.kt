@@ -1,4 +1,4 @@
-package com.sdp15.goodb0i
+package com.sdp15.goodb0i.view
 
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavDirections

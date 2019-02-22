@@ -1,7 +1,7 @@
 package com.sdp15.goodb0i.view.list.confirmation
 
 import androidx.lifecycle.MutableLiveData
-import com.sdp15.goodb0i.BaseViewModel
+import com.sdp15.goodb0i.view.BaseViewModel
 import com.sdp15.goodb0i.data.store.lists.ShoppingList
 
 class ListConfirmationViewModel : BaseViewModel<Any>() {

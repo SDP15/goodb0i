@@ -1,4 +1,4 @@
-package com.sdp15.goodb0i.view.saved_lists
+package com.sdp15.goodb0i.view.list.saved
 
 import android.os.Bundle
 import android.view.LayoutInflater

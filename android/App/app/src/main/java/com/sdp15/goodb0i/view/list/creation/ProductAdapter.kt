@@ -1,4 +1,4 @@
-package com.sdp15.goodb0i.view.list
+package com.sdp15.goodb0i.view.list.creation
 
 import android.view.LayoutInflater
 import android.view.MotionEvent

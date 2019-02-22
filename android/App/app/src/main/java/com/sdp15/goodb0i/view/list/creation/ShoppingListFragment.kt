@@ -1,4 +1,4 @@
-package com.sdp15.goodb0i.view.list
+package com.sdp15.goodb0i.view.list.creation
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.sdp15.goodb0i.R
@@ -20,7 +19,12 @@ class ShoppingListFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         list_recycler.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
-        val adapter = ProductAdapter(vm::incrementItem, vm::decrementItem, true, touchHelper::startDrag)
+        val adapter = ProductAdapter(
+            vm::incrementItem,
+            vm::decrementItem,
+            true,
+            touchHelper::startDrag
+        )
         list_recycler.adapter = adapter
         touchHelper.attachToRecyclerView(list_recycler)
         vm.list.observe(this, Observer {
