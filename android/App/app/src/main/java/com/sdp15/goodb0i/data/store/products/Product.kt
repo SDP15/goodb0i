@@ -26,4 +26,8 @@ data class Product(
     override fun equals(other: Any?): Boolean {
         return other is Product && other.id == id
     }
+
+    override fun hashCode(): Int {
+        return id.hashCode()
+    }
 }

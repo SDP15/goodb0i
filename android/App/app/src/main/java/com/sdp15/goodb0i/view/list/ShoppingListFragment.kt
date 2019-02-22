@@ -10,7 +10,6 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import com.sdp15.goodb0i.AppPreferences
 import com.sdp15.goodb0i.R
 import kotlinx.android.synthetic.main.layout_shoppinglist.*
 
@@ -46,7 +45,6 @@ class ShoppingListFragment : Fragment() {
         list_save_button.text = getString(if (vm.isEditingList) R.string.action_save_changes else R.string.action_save)
         list_save_button.setOnClickListener {
             vm.onSaveList()
-            AppPreferences.init(this.requireContext())
         }
     }
 

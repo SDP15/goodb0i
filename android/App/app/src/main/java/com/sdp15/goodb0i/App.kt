@@ -16,7 +16,6 @@ import com.sdp15.goodb0i.data.store.products.RetrofitProductLoader
 import com.sdp15.goodb0i.data.store.products.TestDataProductLoader
 import com.sdp15.goodb0i.view.code.CodeViewModel
 import com.sdp15.goodb0i.view.confirmation.ItemConfirmationViewModel
-import com.sdp15.goodb0i.view.connection.devices.DeviceListViewModel
 import com.sdp15.goodb0i.view.debug.CapturingDebugTree
 import com.sdp15.goodb0i.view.debug.Config
 import com.sdp15.goodb0i.view.list.ListViewModel
@@ -59,7 +58,6 @@ class App : Application() {
             viewModel<ProductViewModel>()
             viewModel<ListConfirmationViewModel>()
             viewModel<ListViewModel>()
-            viewModel<DeviceListViewModel>()
             viewModel<SavedListsViewModel>()
         },
         module {

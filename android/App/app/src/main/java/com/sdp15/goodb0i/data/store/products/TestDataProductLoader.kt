@@ -8,7 +8,7 @@ object TestDataProductLoader : ProductLoader {
 
     private val PRODUCTS: MutableCollection<Product> = arrayListOf()
 
-    private val json = """[
+    private const val json = """[
 
       {
         "superDepartment": "Fresh Food",

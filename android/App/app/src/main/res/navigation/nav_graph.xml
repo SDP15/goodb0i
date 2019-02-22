@@ -39,8 +39,8 @@
     </fragment>
 
     <fragment
-        android:name="com.sdp15.goodb0i.view.list.ListPagingFragment"
         android:id="@+id/list_creation_fragment"
+        android:name="com.sdp15.goodb0i.view.list.ListPagingFragment"
         android:label="list_creation_fragment">
 
 
@@ -49,9 +49,9 @@
             app:destination="@id/list_confirmation_fragment" />
         <argument
             android:name="shopping_list"
+            android:defaultValue="@null"
             app:argType="com.sdp15.goodb0i.data.store.lists.ShoppingList"
-            app:nullable="true"
-            android:defaultValue="@null" />
+            app:nullable="true" />
     </fragment>
 
     <fragment
@@ -66,19 +66,6 @@
 
     </fragment>
 
-    <fragment
-        android:id="@+id/device_list_fragment"
-        android:name="com.sdp15.goodb0i.view.connection.devices.DeviceListFragment"
-        android:label="device_list_fragment"
-        tools:layout="@layout/layout_bluetooth">
-
-    </fragment>
-
-    <fragment
-        android:id="@+id/error_fragment"
-        android:name="com.sdp15.goodb0i.view.error.ErrorFragment"
-        android:label="error_fragment"
-        tools:layout="@layout/layout_error" />
 
     <fragment
         android:id="@+id/scanner_fragment"
@@ -86,9 +73,6 @@
         android:label="scanner_fragment"
         tools:layout="@layout/layout_scanner">
 
-        <action
-            android:id="@+id/error"
-            app:destination="@+id/error_fragment" />
         <action
             android:id="@+id/action_scanner_fragment_to_confirmation_fragment"
             app:destination="@id/confirmation_fragment" />
@@ -115,24 +99,24 @@
 
     <fragment
         android:id="@+id/search_fragment"
-        android:label="search_fragment"
         android:name="com.sdp15.goodb0i.view.list.SearchFragment"
+        android:label="search_fragment"
         tools:layout="@layout/layout_search">
 
     </fragment>
 
     <fragment
         android:id="@+id/list_fragment"
-        android:label="search_fragment"
         android:name="com.sdp15.goodb0i.view.list.ShoppingListFragment"
+        android:label="search_fragment"
         tools:layout="@layout/layout_shoppinglist">
 
     </fragment>
 
     <fragment
         android:id="@+id/list_confirmation_fragment"
-        android:label="list_confirmation"
         android:name="com.sdp15.goodb0i.view.list.confirmation.ListConfirmationFragment"
+        android:label="list_confirmation"
         tools:layout="@layout/layout_list_confirmation">
 
 

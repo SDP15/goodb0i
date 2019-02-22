@@ -8,7 +8,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class RoomShoppingListStore(val dao: ListDAO) : ShoppingListStore {
+class RoomShoppingListStore(private val dao: ListDAO) : ShoppingListStore {
 
     override suspend fun storeList(list: ShoppingList) {
         Timber.i("Storing list $list")

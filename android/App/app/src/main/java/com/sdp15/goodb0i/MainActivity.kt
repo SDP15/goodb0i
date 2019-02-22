@@ -5,7 +5,6 @@ import android.view.KeyEvent
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
-import com.sdp15.goodb0i.data.bluetooth.SafeHandler
 import com.sdp15.goodb0i.data.sockets.SocketHandler
 import com.sdp15.goodb0i.view.BaseFragment
 import com.sdp15.goodb0i.view.debug.Config
@@ -52,24 +51,8 @@ class MainActivity : AppCompatActivity() {
         return super.onKeyDown(keyCode, event)
     }
 
-    fun startBluetoothService() {
-
-    }
-
-    fun startSearch() {
-    }
-
-    fun addMessageHandler(handler: SafeHandler.MessageHandler) {
-        messageHandler.addHandler(handler)
-    }
-
-    fun removeMessageHandler(handler: SafeHandler.MessageHandler) {
-        messageHandler.removeHandler(handler)
-    }
-
     override fun onSupportNavigateUp(): Boolean = findNavController(R.id.nav_host_fragment).navigateUp()
 
-    private val messageHandler = SafeHandler.MergedMessageHandler()
 
 
 }
