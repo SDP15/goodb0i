@@ -37,7 +37,7 @@
     <string name="label_no_items_found">No items found</string>
     <string name="error_bluetooth_unable_to_connect">Unable to connect</string>
     <string name="error_bluetooth_connection_lost">Device connection lost</string>
-    <string name="label_list_code">Code: %1$s</string>
+    <string name="label_list_code">Code: %1$d</string>
     <string name="label_navigating_to">Navigating To</string>
     <string name="action_assistance">I Need Assistance</string>
 </resources>

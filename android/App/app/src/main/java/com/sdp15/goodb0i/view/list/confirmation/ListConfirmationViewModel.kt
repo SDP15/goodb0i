@@ -11,7 +11,7 @@ class ListConfirmationViewModel : BaseViewModel<Any>() {
     }
 
     val price = MutableLiveData<Double>()
-    val code = MutableLiveData<String>()
+    val code = MutableLiveData<Long>()
     val time = MutableLiveData<Long>()
 
     fun setShoppingList(list: ShoppingList) {

@@ -1,12 +1,14 @@
 package com.sdp15.goodb0i.data.store.products
 
 import android.os.Parcelable
+import androidx.room.Entity
 import com.google.gson.annotations.SerializedName
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
+@Entity
 data class Product(
-    @SerializedName("id") val id: String = "",
+    @SerializedName("id") val id: String,
     @SerializedName("name") val name: String,
     @SerializedName("averageSellingUnitWeight") val averageSellingUnitWeight: Double,
     @SerializedName("ContentsMeasureType") val contentsMeasureType: String,

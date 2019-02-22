@@ -43,7 +43,7 @@ class SavedListsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_saved_lists, container, false)
+        return inflater.inflate(R.layout.layout_stored_lists, container, false)
     }
 
     // TODO: Rename method, update argument and hook method into UI event

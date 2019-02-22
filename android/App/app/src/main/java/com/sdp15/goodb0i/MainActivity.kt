@@ -44,7 +44,7 @@ class MainActivity : AppCompatActivity() {
             previousFragment = currentFragment
             currentFragment = destination.id
         }
-        sh.start("http://10.0.2.2:8080/ping", "first socket")
+        //sh.start("http://10.0.2.2:8080/ping", "first socket")
         //SocketHandler().start("http://10.0.2.2:8080/app", "second socket")
 
     }

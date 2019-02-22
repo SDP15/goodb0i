@@ -7,6 +7,7 @@ import com.sdp15.goodb0i.data.store.Result
 import com.sdp15.goodb0i.data.store.lists.ListItem
 import com.sdp15.goodb0i.data.store.lists.ListManager
 import com.sdp15.goodb0i.data.store.lists.ShoppingList
+import com.sdp15.goodb0i.data.store.lists.cache.ShoppingListStore
 import com.sdp15.goodb0i.data.store.products.Product
 import com.sdp15.goodb0i.data.store.products.ProductLoader
 import com.sdp15.goodb0i.move
@@ -24,6 +25,7 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
 
     private val productLoader: ProductLoader by inject()
     private val listManager: ListManager by inject()
+    private val listStore: ShoppingListStore by inject()
 
     private var existingList: ShoppingList? = null
 
@@ -79,15 +81,16 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
             val params = currentList.map { Pair(it.product.id, it.quantity) }
             // Create or update a list
             val result =
-                existingList?.let { listManager.updateList(it.code.toLong(), params) } ?: listManager.createList(params)
+                existingList?.let { listManager.updateList(it.code, params) } ?: listManager.createList(params)
             if (result is Result.Success) {
-                val created = ShoppingList(result.data, System.currentTimeMillis(), currentList)
+                val created = ShoppingList(result.data.toLong(), System.currentTimeMillis(), currentList)
                 existingList = created // If go to confirmation, and then back, we are editing this existing list
                 transitions.postValue(
                     ListPagingFragmentDirections.actionListCreationFragmentToListConfirmationFragment(
                         created
                     )
                 )
+                listStore.storeList(created)
             } else {
                 //TODO
                 Timber.e("Failure: $result")

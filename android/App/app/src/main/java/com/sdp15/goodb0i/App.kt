@@ -1,23 +1,27 @@
 package com.sdp15.goodb0i
 
 import android.app.Application
+import androidx.room.Room
 import com.google.firebase.FirebaseApp
 import com.sdp15.goodb0i.data.scanner.BarcodeReader
 import com.sdp15.goodb0i.data.scanner.MLKitScanner
 import com.sdp15.goodb0i.data.sockets.SocketHandler
+import com.sdp15.goodb0i.data.store.RoomDB
+import com.sdp15.goodb0i.data.store.lists.ListManager
+import com.sdp15.goodb0i.data.store.lists.RetrofitListManager
+import com.sdp15.goodb0i.data.store.lists.cache.RoomShoppingListStore
+import com.sdp15.goodb0i.data.store.lists.cache.ShoppingListStore
 import com.sdp15.goodb0i.data.store.products.ProductLoader
 import com.sdp15.goodb0i.data.store.products.RetrofitProductLoader
 import com.sdp15.goodb0i.data.store.products.TestDataProductLoader
-import com.sdp15.goodb0i.data.store.lists.ListManager
-import com.sdp15.goodb0i.data.store.lists.RetrofitListManager
+import com.sdp15.goodb0i.view.code.CodeViewModel
 import com.sdp15.goodb0i.view.confirmation.ItemConfirmationViewModel
 import com.sdp15.goodb0i.view.connection.devices.DeviceListViewModel
 import com.sdp15.goodb0i.view.debug.CapturingDebugTree
 import com.sdp15.goodb0i.view.debug.Config
-import com.sdp15.goodb0i.view.product.ProductViewModel
 import com.sdp15.goodb0i.view.list.ListViewModel
 import com.sdp15.goodb0i.view.list.confirmation.ListConfirmationViewModel
-import com.sdp15.goodb0i.view.code.CodeViewModel
+import com.sdp15.goodb0i.view.product.ProductViewModel
 import com.sdp15.goodb0i.view.scanner.ScannerViewModel
 import com.sdp15.goodb0i.view.welcome.WelcomeViewModel
 import org.koin.android.ext.android.startKoin
@@ -57,10 +61,25 @@ class App : Application() {
             viewModel<DeviceListViewModel>()
         },
         module {
-            single<ProductLoader> { TestDataProductLoader.DelegateProductLoader(RetrofitProductLoader, Config::shouldUseTestData) }
+            single<ProductLoader> {
+                TestDataProductLoader.DelegateProductLoader(
+                    RetrofitProductLoader,
+                    Config::shouldUseTestData
+                )
+            }
             single<ListManager> { RetrofitListManager }
             single<BarcodeReader> { MLKitScanner() }
             single<SocketHandler> { SocketHandler() }
+            // If we ever need another DAO, move the database creation out of this provider
+            single<ShoppingListStore> {
+                RoomShoppingListStore(
+                    Room.databaseBuilder(
+                        applicationContext,
+                        RoomDB::class.java,
+                        "db"
+                    ).build().listDAO()
+                )
+            }
         }
     )
 }
