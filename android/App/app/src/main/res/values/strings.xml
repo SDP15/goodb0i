@@ -41,4 +41,5 @@
     <string name="label_list_code">Code: %1$d</string>
     <string name="label_navigating_to">Navigating To</string>
     <string name="action_assistance">I Need Assistance</string>
+    <string name="label_list_item_info">%1$d * %2$s</string>
 </resources>
