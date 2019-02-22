@@ -25,6 +25,8 @@ class SavedListsAdapter : RecyclerView.Adapter<SavedListsAdapter.SavedListViewHo
 
     override fun onBindViewHolder(holder: SavedListViewHolder, position: Int) {
         holder.itemView.text_list_code.text = lists[position].code.toString()
+        holder.itemView.text_list_price.text = holder.itemView.context.getString(R.string.label_total_price,
+            lists[position].products.sumByDouble { it.quantity * it.product.price })
     }
 
     class SavedListViewHolder(view: View) : RecyclerView.ViewHolder(view)
