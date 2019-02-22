@@ -38,7 +38,7 @@
         android:text="@string/action_prepare_order" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/button_enter_pin"
+        android:id="@+id/button_start_shopping"
         android:layout_width="match_parent"
         android:layout_height="@dimen/button_height"
         android:layout_alignParentBottom="true"
@@ -48,5 +48,5 @@
         android:layout_marginStart="@dimen/default_horizontal_margin"
         android:gravity="center"
         android:textAlignment="center"
-        android:text="@string/action_enter_pin"/>
+        android:text="@string/action_start_navigation"/>
 </RelativeLayout>

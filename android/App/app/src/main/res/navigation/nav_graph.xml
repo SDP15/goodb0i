@@ -10,14 +10,22 @@
         android:label="welcome_fragment"
         tools:layout="@layout/layout_welcome">
 
-        <action
-            android:id="@+id/action_welcome_fragment_to_code_fragment"
-            app:destination="@id/code_fragment" />
+        <!--<action-->
+            <!--android:id="@+id/action_welcome_fragment_to_list_viewer_fragment"-->
+            <!--app:destination="@id/view_shopping_list" />-->
 
         <action android:id="@+id/action_welcome_fragment_to_list_creation_fragment" app:destination="@id/list_creation_fragment"/>
+        <action android:id="@+id/action_welcome_fragment_to_view_shopping_list"
+                app:destination="@id/view_shopping_list"/>
 
     </fragment>
 
+    <fragment android:id="@+id/view_shopping_list"
+              android:name="com.sdp15.goodb0i.view.saved_lists.SavedListsFragment"
+              android:label="view_shopping_list"
+              tools:layout="@layout/layout_stored_lists">
+
+    </fragment>
 
     <fragment android:name="com.sdp15.goodb0i.view.list.ListPagingFragment"
         android:id="@+id/list_creation_fragment"

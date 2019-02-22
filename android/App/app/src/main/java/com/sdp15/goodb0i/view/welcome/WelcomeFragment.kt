@@ -23,7 +23,7 @@ class WelcomeFragment : Fragment() {
         button_prepare_order.setOnClickListener {
             vm.prepareOrder()
         }
-        button_enter_pin.setOnClickListener {
+        button_start_shopping.setOnClickListener {
             vm.startShopping()
         }
         vm.bind()

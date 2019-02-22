@@ -13,7 +13,7 @@ class WelcomeViewModel : BaseViewModel<WelcomeViewModel.WelcomeAction>(), Welcom
     }
 
     override fun startShopping() {
-        transitions.postValue(WelcomeFragmentDirections.actionWelcomeFragmentToCodeFragment())
+        transitions.postValue(WelcomeFragmentDirections.actionWelcomeFragmentToViewShoppingList())
     }
 
 
