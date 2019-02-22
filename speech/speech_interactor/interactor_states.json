@@ -72,11 +72,11 @@
             "reply_quantity+": "You have ", "prompt": " more of this item on your list. Would you like to add these to your cart?",
              "nextState_quantity+": "scan"},
         "no":
-            {"reply": "Please return the item. Do you want to scan another item?"}},
+            {"reply": "Please return the item. Do you want to scan another item?", "nextState": "scan"}},
              
     "continue": 
         {"yes": 
-            {"reply": "Okay lets go and find the ", "nextState": "shopping"},
+            {"reply": "Okay lets go and find the ", "nextState": "shopping0"},
         "no": 
             {
               "reply": "Do you want to scan more items?", "nextState": "scan"}},

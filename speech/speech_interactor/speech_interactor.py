@@ -49,16 +49,22 @@ class SpeechInteractor:
         self.react("n/a")
         self.listen()
 
+
     def next_state(self, state):
         print(state)
         self.state = state
         self.options = self.possible_states[state]
+
+        #These states require other forms of input which is not speech. Wait for the user to input a given text
         if "shopping0" in self.state:
+            #replace this with info from the nfc reader.
             action = input("Please enter arrived.  ")
             if "arrived" in action:
                 item = self.orderedList[self.listPointer]
-                self.arrived(item, "middle")   
+                self.arrived(item, "middle")  
+
         if "arrival" in self.state:
+            #replace for barcode scanner info.
             action = input("Please enter scanned.  ")
             if "scanned" in action: 
                 item = self.orderedList[self.listPointer]
@@ -175,7 +181,7 @@ class SpeechInteractor:
         self.last_reply = response
         self.next_state(self.options['no']['nextState'])
     
-        
+    #Retrieves all the items and quantities on the shopping list.
     def getShoppingList(self, list_file):
         self.stuff = json.load(open(list_file, 'r'))
         self.listPointer = 0
