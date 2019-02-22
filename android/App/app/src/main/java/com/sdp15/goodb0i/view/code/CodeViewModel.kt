@@ -10,11 +10,10 @@ import com.sdp15.goodb0i.data.store.lists.ShoppingList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.koin.standalone.KoinComponent
 import org.koin.standalone.inject
 import timber.log.Timber
 
-class CodeViewModel : BaseViewModel<CodeViewModel.CodeAction>(), CodeFragment.PinInteractor, KoinComponent {
+class CodeViewModel : BaseViewModel<CodeViewModel.CodeAction>(), CodeFragment.PinInteractor {
 
     private val listManager: ListManager by inject()
 

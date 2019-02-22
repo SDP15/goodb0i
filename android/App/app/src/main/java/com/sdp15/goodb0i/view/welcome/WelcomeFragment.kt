@@ -23,14 +23,15 @@ class WelcomeFragment : Fragment() {
         button_prepare_order.setOnClickListener {
             vm.prepareOrder()
         }
-        button_enter_pin.setOnClickListener {
-            vm.startShopping()
+        button_enter_code.setOnClickListener {
+            vm.enterCode()
+        }
+        button_view_lists.setOnClickListener {
+            vm.viewLists()
         }
         vm.bind()
         vm.transitions.observe(this, Observer {
             findNavController().navigate(it)
-        })
-        vm.actions.observe(this, Observer {
         })
     }
 
@@ -45,7 +46,9 @@ class WelcomeFragment : Fragment() {
 
         fun prepareOrder()
 
-        fun startShopping()
+        fun enterCode()
+
+        fun viewLists()
 
     }
 

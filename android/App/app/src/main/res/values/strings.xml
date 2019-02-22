@@ -10,7 +10,8 @@
     <string name="welcome_header">Welcome to</string>
     <string name="action_prepare_order">PREPARE YOUR ORDER</string>
     <string name="action_start_shopping">START SHOPPING</string>
-    <string name="action_enter_pin">ENTER PIN</string>
+    <string name="action_view_lists">VIEW LISTS</string>
+    <string name="action_enter_code">ENTER CODE</string>
     <string name="label_order_saved">Your Order Has Been Saved</string>
     <string name="label_your_orders">Your Orders</string>
     <string name="label_your_order">Your Order</string>

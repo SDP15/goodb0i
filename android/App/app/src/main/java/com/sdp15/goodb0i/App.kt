@@ -22,6 +22,7 @@ import com.sdp15.goodb0i.view.debug.Config
 import com.sdp15.goodb0i.view.list.ListViewModel
 import com.sdp15.goodb0i.view.list.confirmation.ListConfirmationViewModel
 import com.sdp15.goodb0i.view.product.ProductViewModel
+import com.sdp15.goodb0i.view.saved_lists.SavedListsViewModel
 import com.sdp15.goodb0i.view.scanner.ScannerViewModel
 import com.sdp15.goodb0i.view.welcome.WelcomeViewModel
 import org.koin.android.ext.android.startKoin
@@ -59,6 +60,7 @@ class App : Application() {
             viewModel<ListConfirmationViewModel>()
             viewModel<ListViewModel>()
             viewModel<DeviceListViewModel>()
+            viewModel<SavedListsViewModel>()
         },
         module {
             single<ProductLoader> {
