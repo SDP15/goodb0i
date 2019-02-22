@@ -1,6 +1,5 @@
 package com.sdp15.goodb0i.data.store.lists.cache
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy

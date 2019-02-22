@@ -8,7 +8,7 @@ class SavedListsViewModel : BaseViewModel<Any>() {
 
     private val listStore: ShoppingListStore by inject()
 
-    val lists= listStore.loadLists()
+    val lists = listStore.loadLists()
 
     override fun bind() {
     }

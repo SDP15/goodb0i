@@ -1,8 +1,8 @@
 package com.sdp15.goodb0i.data.store.lists
 
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
-import com.sdp15.goodb0i.data.store.awaitCatching
 import com.sdp15.goodb0i.data.store.Result
+import com.sdp15.goodb0i.data.store.awaitCatching
 import com.sdp15.goodb0i.data.store.toResult
 import kotlinx.coroutines.Deferred
 import okhttp3.OkHttpClient
@@ -26,19 +26,21 @@ object RetrofitListManager : ListManager {
     private val api = retrofit.create(KTORListAPI::class.java)
 
     override suspend fun loadList(code: Long): Result<ShoppingList> = api.loadListAsync(code.toString()).awaitCatching(
-        success =  { it.toResult() },
-        failure = { Result.Failure(Exception(it.message))}
-    )
-
-    override suspend fun createList(contents: List<Pair<String, Int>>): Result<String> = api.createListAsync(contents).awaitCatching(
         success = { it.toResult() },
-        failure = { Result.Failure(Exception(it.message))}
+        failure = { Result.Failure(Exception(it.message)) }
     )
 
-    override suspend fun updateList(code: Long, contents: List<Pair<String, Int>>): Result<String> = api.updateListAsync(code.toString(), contents).awaitCatching(
-        success = {it.toResult() },
-        failure = { Result.Failure(Exception(it.message))}
-    )
+    override suspend fun createList(contents: List<Pair<String, Int>>): Result<String> =
+        api.createListAsync(contents).awaitCatching(
+            success = { it.toResult() },
+            failure = { Result.Failure(Exception(it.message)) }
+        )
+
+    override suspend fun updateList(code: Long, contents: List<Pair<String, Int>>): Result<String> =
+        api.updateListAsync(code.toString(), contents).awaitCatching(
+            success = { it.toResult() },
+            failure = { Result.Failure(Exception(it.message)) }
+        )
 }
 
 interface KTORListAPI {

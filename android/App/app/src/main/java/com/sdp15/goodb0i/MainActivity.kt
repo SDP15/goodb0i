@@ -1,31 +1,16 @@
 package com.sdp15.goodb0i
 
-import android.Manifest
-import android.app.Activity
-import android.bluetooth.BluetoothAdapter
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
-import android.content.pm.PackageManager
 import android.os.Bundle
-import android.os.IBinder
 import android.view.KeyEvent
-import android.widget.Toast
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.navigation.findNavController
 import com.sdp15.goodb0i.data.bluetooth.SafeHandler
 import com.sdp15.goodb0i.data.sockets.SocketHandler
 import com.sdp15.goodb0i.view.BaseFragment
-import com.sdp15.goodb0i.view.connection.BluetoothService
-import com.sdp15.goodb0i.view.debug.CapturingDebugTree
 import com.sdp15.goodb0i.view.debug.Config
 import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.android.ext.android.inject
-import timber.log.Timber
 
 class MainActivity : AppCompatActivity() {
 

@@ -1,12 +1,11 @@
 package com.sdp15.goodb0i.view.saved_lists
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-
 import com.sdp15.goodb0i.R
 import com.sdp15.goodb0i.switchOnEmpty
 import kotlinx.android.synthetic.main.layout_stored_lists.*

@@ -4,7 +4,7 @@ import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.sdp15.goodb0i.data.store.lists.ListItem
 
-class ListItemTypeConverter{
+class ListItemTypeConverter {
 
     @TypeConverter
     fun listItemsToString(list: List<ListItem>): String {

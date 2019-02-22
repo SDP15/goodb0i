@@ -18,7 +18,7 @@ class RoomShoppingListStore(val dao: ListDAO) : ShoppingListStore {
     private val list = MutableLiveData<List<ShoppingList>>()
 
     override fun loadLists(): LiveData<List<ShoppingList>> {
-        GlobalScope.launch (Dispatchers.IO) {
+        GlobalScope.launch(Dispatchers.IO) {
             list.postValue(dao.loadAll())
         }
         return list

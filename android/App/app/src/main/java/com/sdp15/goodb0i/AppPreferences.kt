@@ -3,7 +3,6 @@ package com.sdp15.goodb0i
 import android.content.Context
 import android.content.SharedPreferences
 import timber.log.Timber
-import java.util.ArrayList
 
 object AppPreferences {
     private const val NAME = "goodboi.prefs"
@@ -27,15 +26,15 @@ object AppPreferences {
         editor.apply()
     }
 
-    fun addOrder(code: String){
+    fun addOrder(code: String) {
         val editor = preferences!!.edit()
-        val value= preferences.getString("ordersIds",null)+","+code
-        editor.putString("ordersIds",value)
+        val value = preferences.getString("ordersIds", null) + "," + code
+        editor.putString("ordersIds", value)
         editor.apply()
         Timber.v("Prefereces Added")
     }
 
-    fun getOrders():List<String>{
+    fun getOrders(): List<String> {
 
         val orders = preferences.getString("ordersIds", null) ?: return emptyList()
         return orders.split(",")

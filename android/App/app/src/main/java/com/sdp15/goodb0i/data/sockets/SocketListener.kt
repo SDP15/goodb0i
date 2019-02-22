@@ -32,7 +32,7 @@ class SocketListener(val name: String) : WebSocketListener() {
         super.onMessage(webSocket, text)
         count++
 
-        if (System.currentTimeMillis()- start > 5E3) {
+        if (System.currentTimeMillis() - start > 5E3) {
             Timber.i("Made $count calls")
         } else {
             webSocket.send("$count")

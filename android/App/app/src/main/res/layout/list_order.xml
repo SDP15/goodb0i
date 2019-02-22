@@ -56,5 +56,4 @@
         tools:text="Item 1\nItem 2\nItem 3" />
 
 
-
 </androidx.constraintlayout.widget.ConstraintLayout>

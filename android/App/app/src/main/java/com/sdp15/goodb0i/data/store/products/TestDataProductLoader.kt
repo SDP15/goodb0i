@@ -375,15 +375,19 @@ object TestDataProductLoader : ProductLoader {
         return Result.Success(PRODUCTS.toList())
     }
 
-    class DelegateProductLoader(private val other: ProductLoader, private val delegate: () -> Boolean): ProductLoader {
+    class DelegateProductLoader(private val other: ProductLoader, private val delegate: () -> Boolean) : ProductLoader {
 
-        override suspend fun loadProduct(id: String): Result<Product> = if (delegate()) TestDataProductLoader.loadProduct(id) else other.loadProduct(id)
+        override suspend fun loadProduct(id: String): Result<Product> =
+            if (delegate()) TestDataProductLoader.loadProduct(id) else other.loadProduct(id)
 
-        override suspend fun loadCategory(category: String): Result<List<Product>> = if (delegate()) TestDataProductLoader.loadCategory(category) else other.loadCategory(category)
+        override suspend fun loadCategory(category: String): Result<List<Product>> =
+            if (delegate()) TestDataProductLoader.loadCategory(category) else other.loadCategory(category)
 
-        override suspend fun search(query: String): Result<List<Product>> = if(delegate()) TestDataProductLoader.search(query) else other.search(query)
+        override suspend fun search(query: String): Result<List<Product>> =
+            if (delegate()) TestDataProductLoader.search(query) else other.search(query)
 
-        override suspend fun loadAll(): Result<List<Product>> = if (delegate()) TestDataProductLoader.loadAll() else other.loadAll()
+        override suspend fun loadAll(): Result<List<Product>> =
+            if (delegate()) TestDataProductLoader.loadAll() else other.loadAll()
     }
 
 }

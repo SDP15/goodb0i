@@ -29,7 +29,7 @@ class ScannerViewModel : BaseViewModel<ScannerViewModel.ScannerAction>(), Scanne
                 override fun onBarcodeRead(reading: BarcodeReading) {
                     Timber.i("Barcode read $reading")
                     isRunning.set(false)
-                        this@ScannerViewModel.reading.postValue(reading)
+                    this@ScannerViewModel.reading.postValue(reading)
                 }
 
                 override fun onNoBarcodesFound() = isRunning.set(false)

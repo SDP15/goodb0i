@@ -5,35 +5,41 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/welcome_fragment">
 
-    <fragment android:id="@+id/welcome_fragment"
+    <fragment
+        android:id="@+id/welcome_fragment"
         android:name="com.sdp15.goodb0i.view.welcome.WelcomeFragment"
         android:label="welcome_fragment"
         tools:layout="@layout/layout_welcome">
 
         <!--<action-->
-            <!--android:id="@+id/action_welcome_fragment_to_list_viewer_fragment"-->
-            <!--app:destination="@id/view_shopping_list" />-->
+        <!--android:id="@+id/action_welcome_fragment_to_list_viewer_fragment"-->
+        <!--app:destination="@id/view_shopping_list" />-->
 
-        <action android:id="@+id/action_welcome_fragment_to_list_creation_fragment" app:destination="@id/list_creation_fragment"/>
-        <action android:id="@+id/action_welcome_fragment_to_view_shopping_list"
-                app:destination="@id/view_shopping_list"/>
+        <action
+            android:id="@+id/action_welcome_fragment_to_list_creation_fragment"
+            app:destination="@id/list_creation_fragment" />
+        <action
+            android:id="@+id/action_welcome_fragment_to_view_shopping_list"
+            app:destination="@id/view_shopping_list" />
         <action
             android:id="@+id/action_welcome_fragment_to_code_fragment"
             app:destination="@id/code_fragment" />
 
     </fragment>
 
-    <fragment android:id="@+id/view_shopping_list"
-              android:name="com.sdp15.goodb0i.view.saved_lists.SavedListsFragment"
-              android:label="view_shopping_list"
-              tools:layout="@layout/layout_stored_lists">
+    <fragment
+        android:id="@+id/view_shopping_list"
+        android:name="com.sdp15.goodb0i.view.saved_lists.SavedListsFragment"
+        android:label="view_shopping_list"
+        tools:layout="@layout/layout_stored_lists">
 
         <action
             android:id="@+id/action_view_shopping_list_to_list_creation_fragment"
             app:destination="@id/list_creation_fragment" />
     </fragment>
 
-    <fragment android:name="com.sdp15.goodb0i.view.list.ListPagingFragment"
+    <fragment
+        android:name="com.sdp15.goodb0i.view.list.ListPagingFragment"
         android:id="@+id/list_creation_fragment"
         android:label="list_creation_fragment">
 
@@ -48,7 +54,8 @@
             android:defaultValue="@null" />
     </fragment>
 
-    <fragment android:id="@+id/code_fragment"
+    <fragment
+        android:id="@+id/code_fragment"
         android:name="com.sdp15.goodb0i.view.code.CodeFragment"
         android:label="code_fragment"
         tools:layout="@layout/layout_code_input">
@@ -59,38 +66,44 @@
 
     </fragment>
 
-    <fragment android:id="@+id/device_list_fragment"
+    <fragment
+        android:id="@+id/device_list_fragment"
         android:name="com.sdp15.goodb0i.view.connection.devices.DeviceListFragment"
         android:label="device_list_fragment"
         tools:layout="@layout/layout_bluetooth">
 
     </fragment>
 
-    <fragment android:id="@+id/error_fragment"
+    <fragment
+        android:id="@+id/error_fragment"
         android:name="com.sdp15.goodb0i.view.error.ErrorFragment"
         android:label="error_fragment"
-        tools:layout="@layout/layout_error"/>
+        tools:layout="@layout/layout_error" />
 
-    <fragment android:id="@+id/scanner_fragment"
+    <fragment
+        android:id="@+id/scanner_fragment"
         android:name="com.sdp15.goodb0i.view.scanner.ScannerFragment"
         android:label="scanner_fragment"
         tools:layout="@layout/layout_scanner">
 
-        <action android:id="@+id/error"
-                app:destination="@+id/error_fragment"/>
+        <action
+            android:id="@+id/error"
+            app:destination="@+id/error_fragment" />
         <action
             android:id="@+id/action_scanner_fragment_to_confirmation_fragment"
             app:destination="@id/confirmation_fragment" />
     </fragment>
 
-    <fragment android:id="@+id/confirmation_fragment"
+    <fragment
+        android:id="@+id/confirmation_fragment"
         android:name="com.sdp15.goodb0i.view.confirmation.ItemConfirmationFragment"
         android:label="confirmation_fragment"
         tools:layout="@layout/layout_confirmation">
 
     </fragment>
 
-    <fragment android:id="@+id/item_fragment"
+    <fragment
+        android:id="@+id/item_fragment"
         android:name="com.sdp15.goodb0i.view.product.ProductFragment"
         android:label="item_fragment"
         tools:layout="@layout/layout_product_display">
@@ -100,19 +113,25 @@
             app:destination="@id/scanner_fragment" />
     </fragment>
 
-    <fragment android:id="@+id/search_fragment" android:label="search_fragment"
+    <fragment
+        android:id="@+id/search_fragment"
+        android:label="search_fragment"
         android:name="com.sdp15.goodb0i.view.list.SearchFragment"
         tools:layout="@layout/layout_search">
 
     </fragment>
 
-    <fragment android:id="@+id/list_fragment" android:label="search_fragment"
+    <fragment
+        android:id="@+id/list_fragment"
+        android:label="search_fragment"
         android:name="com.sdp15.goodb0i.view.list.ShoppingListFragment"
         tools:layout="@layout/layout_shoppinglist">
 
     </fragment>
 
-    <fragment android:id="@+id/list_confirmation_fragment" android:label="list_confirmation"
+    <fragment
+        android:id="@+id/list_confirmation_fragment"
+        android:label="list_confirmation"
         android:name="com.sdp15.goodb0i.view.list.confirmation.ListConfirmationFragment"
         tools:layout="@layout/layout_list_confirmation">
 

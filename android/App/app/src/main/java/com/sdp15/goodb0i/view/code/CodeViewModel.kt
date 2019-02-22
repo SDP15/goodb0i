@@ -41,7 +41,7 @@ class CodeViewModel : BaseViewModel<CodeViewModel.CodeAction>(), CodeFragment.Pi
     }
 
     sealed class CodeAction {
-        data class ConfirmShoppingListAction(val list: ShoppingList): CodeAction()
+        data class ConfirmShoppingListAction(val list: ShoppingList) : CodeAction()
     }
 
 }

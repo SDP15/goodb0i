@@ -27,6 +27,7 @@
 
 
     </androidx.recyclerview.widget.RecyclerView>
+
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/label_total_price"
         android:layout_width="match_parent"
@@ -35,7 +36,7 @@
         android:layout_marginBottom="5dp"
         android:textAlignment="center"
         android:textSize="40sp"
-        tools:text="£123.45"/>
+        tools:text="£123.45" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/list_save_button"

@@ -1,11 +1,7 @@
 package com.sdp15.goodb0i.view.list
 
-import android.content.Context
-import android.content.SharedPreferences
-import android.util.Log
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import com.sdp15.goodb0i.AppPreferences
 import com.sdp15.goodb0i.BaseViewModel
 import com.sdp15.goodb0i.data.store.Result
 import com.sdp15.goodb0i.data.store.lists.ListItem

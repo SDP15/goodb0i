@@ -52,7 +52,7 @@ class ListPagingFragment : BaseFragment() {
         }
         floating_search_view.setOnMenuItemClickListener {
             list_viewpager.apply {
-                setCurrentItem(if(currentItem == 1) 0 else 1, true)
+                setCurrentItem(if (currentItem == 1) 0 else 1, true)
             }
         }
         list_viewpager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {

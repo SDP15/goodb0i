@@ -6,11 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.viewpager.widget.ViewPager
 import com.arlib.floatingsearchview.FloatingSearchView
 import com.sdp15.goodb0i.R
 import com.sdp15.goodb0i.switchOnEmpty
-import kotlinx.android.synthetic.main.layout_list_creation.*
 import kotlinx.android.synthetic.main.layout_search.*
 
 class SearchFragment : Fragment() {

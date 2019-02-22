@@ -5,7 +5,7 @@ import kotlinx.coroutines.Deferred
 import retrofit2.Response
 import timber.log.Timber
 
-suspend fun<T, U> Deferred<T>.awaitCatching(success: (T) -> U, failure: (Throwable) -> U): U {
+suspend fun <T, U> Deferred<T>.awaitCatching(success: (T) -> U, failure: (Throwable) -> U): U {
     return try {
         success(await())
     } catch (t: Throwable) {
@@ -13,7 +13,7 @@ suspend fun<T, U> Deferred<T>.awaitCatching(success: (T) -> U, failure: (Throwab
     }
 }
 
-fun<T : Any> Response<T>.toResult(log: Boolean = BuildConfig.DEBUG): Result<T> {
+fun <T : Any> Response<T>.toResult(log: Boolean = BuildConfig.DEBUG): Result<T> {
     val body = body()
     return if (isSuccessful && body != null) {
         if (log) Timber.i("Successful response. Body: $body")

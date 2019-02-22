@@ -1,6 +1,9 @@
 package com.sdp15.goodb0i.view.list
 
-import android.view.*
+import android.view.LayoutInflater
+import android.view.MotionEvent
+import android.view.View
+import android.view.ViewGroup
 import androidx.core.view.MotionEventCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.sdp15.goodb0i.R
@@ -9,11 +12,14 @@ import com.sdp15.goodb0i.data.store.products.Product
 import com.sdp15.goodb0i.move
 import com.sdp15.goodb0i.view.ListDiff
 import kotlinx.android.synthetic.main.list_item.view.*
-import timber.log.Timber
-import kotlin.math.exp
 import kotlin.math.max
 
-class ProductAdapter(val onIncrement: (Product) -> Unit, val onDecrement: (Product) -> Unit, private val showFullList: Boolean, private val dragListener: (RecyclerView.ViewHolder) -> Unit = {}) :
+class ProductAdapter(
+    val onIncrement: (Product) -> Unit,
+    val onDecrement: (Product) -> Unit,
+    private val showFullList: Boolean,
+    private val dragListener: (RecyclerView.ViewHolder) -> Unit = {}
+) :
     RecyclerView.Adapter<ProductAdapter.ItemViewHolder>() {
 
     private var items: MutableList<ListItem> = mutableListOf()
@@ -52,7 +58,6 @@ class ProductAdapter(val onIncrement: (Product) -> Unit, val onDecrement: (Produ
             }
         }
     }
-
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {

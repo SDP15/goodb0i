@@ -2,8 +2,8 @@ package com.sdp15.goodb0i.data.store.products
 
 import com.google.gson.GsonBuilder
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
-import com.sdp15.goodb0i.data.store.awaitCatching
 import com.sdp15.goodb0i.data.store.Result
+import com.sdp15.goodb0i.data.store.awaitCatching
 import com.sdp15.goodb0i.data.store.toResult
 import kotlinx.coroutines.Deferred
 import okhttp3.OkHttpClient
@@ -29,10 +29,11 @@ object RetrofitProductLoader : ProductLoader {
         failure = { Result.Failure(Exception(it.message)) }
     )
 
-    override suspend fun loadCategory(category: String): Result<List<Product>> = api.searchAsync(category).awaitCatching(
-        success = { it.toResult() },
-        failure = { Result.Failure(Exception(it.message)) }
-    )
+    override suspend fun loadCategory(category: String): Result<List<Product>> =
+        api.searchAsync(category).awaitCatching(
+            success = { it.toResult() },
+            failure = { Result.Failure(Exception(it.message)) }
+        )
 
     override suspend fun search(query: String): Result<List<Product>> = api.searchAsync(query).awaitCatching(
         success = { it.toResult() },

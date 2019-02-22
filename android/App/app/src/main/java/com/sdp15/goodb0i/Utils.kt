@@ -89,11 +89,11 @@ fun collapse(v: View) {
     v.startAnimation(a)
 }
 
-fun<T> MutableList<T>.move(from: Int, to: Int): Boolean {
+fun <T> MutableList<T>.move(from: Int, to: Int): Boolean {
     if (from == to) return false
     val moving = this[from]
     if (to > from) {
-        add(to+1, moving)
+        add(to + 1, moving)
         removeAt(from)
     } else {
         removeAt(from)
