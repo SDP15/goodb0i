@@ -73,6 +73,7 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(), SearchFragment.
         existingList = shoppingList
         currentList.addAll(shoppingList.products)
         list.postValue(ListDiff.All(currentList))
+        totalPrice.postValue(price)
     }
 
     fun onSaveList() {
