@@ -1,9 +1,7 @@
 package service
 
-import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.transactions.transaction
 import repository.products.Product
-import repository.products.Products
 import java.util.*
 
 class ProductService {
