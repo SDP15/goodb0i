@@ -3,27 +3,74 @@ package com.sdp15.goodb0i.data.navigation.sockets
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.sdp15.goodb0i.data.navigation.Message
+import com.sdp15.goodb0i.data.navigation.ShoppingSessionManager
+import com.sdp15.goodb0i.data.store.RetrofitProvider
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
-class SessionManager(private val sh: SocketHandler<Message>) {
+class SessionManager(private val sh: SocketHandler<Message.IncomingMessage, Message.OutgoingMessage>) : ShoppingSessionManager {
 
-    private val incomingMessages = MutableLiveData<Message>()
-    val incoming: LiveData<Message>
+    private val incomingMessages = MutableLiveData<Message.IncomingMessage>()
+    val incoming: LiveData<Message.IncomingMessage>
         get() = incomingMessages
 
+    private var uid: String = ""
+
     init {
-        sh.connectionState.observeForever {
-
+        sh.connectionState.observeForever { state ->
+            if (state == SocketHandler.SocketState.ErrorDisconnect) {
+                attemptReconnection()
+            }
         }
-        sh.incomingMessages.observeForever {
+        sh.incomingMessages.observeForever { message ->
+            var consume = false
+            when (message) {
+                is Message.IncomingMessage.Connected -> {
+                    uid = message.id
+                }
+                is Message.IncomingMessage.ReachedPoint -> {
 
+                }
+            }
+            if (!consume) incomingMessages.postValue(message)
         }
     }
 
     fun start() {
         if (!sh.isConnected) {
-            sh.start("")
+            sh.start(RetrofitProvider.root + "/app")
         }
     }
 
+    fun stop() {
+        uid = ""
+        sh.stop()
+    }
 
+    override fun codeScanned(code: String) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun productAccepted(id: Long) {
+        sh.sendMessage(Message.OutgoingMessage.ProductAccepted(id))
+    }
+
+    override fun productRejected(id: Long) {
+        sh.sendMessage(Message.OutgoingMessage.ProductRejected(id))
+    }
+
+    override fun requestAssistance() {
+        sh.sendMessage(Message.OutgoingMessage.RequestHelp)
+    }
+
+    private fun attemptReconnection() {
+        GlobalScope.launch {
+            //TODO: Break after some number of reconnection attempts
+            while (!sh.isConnected) {
+                sh.sendMessage(Message.OutgoingMessage.Reconnect(uid))
+                delay(1000)
+            }
+        }
+    }
 }

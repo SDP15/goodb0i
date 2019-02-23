@@ -7,7 +7,7 @@ import okio.ByteString
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
 
-class SocketHandler<T>(private val transform: SocketMessageTransformer<T>) {
+class SocketHandler<IN, OUT>(private val transform: SocketMessageTransformer<IN, OUT>) {
 
     private val connected = AtomicBoolean(false)
     val isConnected: Boolean
@@ -32,7 +32,6 @@ class SocketHandler<T>(private val transform: SocketMessageTransformer<T>) {
     }
 
     private inner class SocketListener : WebSocketListener() {
-
 
         override fun onOpen(webSocket: WebSocket, response: Response) {
             super.onOpen(webSocket, response)
@@ -63,13 +62,18 @@ class SocketHandler<T>(private val transform: SocketMessageTransformer<T>) {
         override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
             super.onClosed(webSocket, code, reason)
             connected.set(false)
+            if (code in listOf(1000, 1001)) {
+                state.postValue(SocketState.Disconnected)
+            } else {
+                state.postValue(SocketState.ErrorDisconnect)
+            }
             Timber.i("Socket closed")
         }
     }
 
-    private val messages = MutableLiveData<T>()
+    private val messages = MutableLiveData<IN>()
 
-    val incomingMessages: LiveData<T>
+    val incomingMessages: LiveData<IN>
         get() = messages
 
     private val state = MutableLiveData<SocketState>()
@@ -77,20 +81,20 @@ class SocketHandler<T>(private val transform: SocketMessageTransformer<T>) {
     val connectionState: LiveData<SocketState>
         get() = state
 
-    fun sendMessage(message: T) {
+    fun sendMessage(message: OUT) {
         socket?.send(transform.transformOutgoing(message))
     }
 
-    interface SocketMessageTransformer<T> {
+    interface SocketMessageTransformer<IN, OUT> {
 
-        fun transformIncoming(message: String): T
+        fun transformIncoming(message: String): IN
 
-        fun transformOutgoing(message: T): String
+        fun transformOutgoing(message: OUT): String
 
     }
 
     enum class SocketState {
-        Connected, Disconnected, AttemptingReconnect
+        Connected, Disconnected, ErrorDisconnect
     }
 
 }

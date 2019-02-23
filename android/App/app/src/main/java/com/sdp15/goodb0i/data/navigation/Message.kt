@@ -14,7 +14,7 @@ sealed class Message {
         /**
          *  Connected to trolley
          */
-        class TrolleyConnected() : IncomingMessage()
+        object TrolleyConnected : IncomingMessage()
 
         /**
          *  Trolley has reached a tag
@@ -45,7 +45,13 @@ sealed class Message {
          */
         data class ProductScanned(val id: String) : OutgoingMessage()
 
+        data class ProductAccepted(val id: Long) : OutgoingMessage()
+
+        data class ProductRejected(val id: Long) : OutgoingMessage()
+
         data class Stop(val reason: StopReason) : OutgoingMessage()
+
+        object RequestHelp : OutgoingMessage()
 
         enum class StopReason(val code: Int) {
             HelpRequest(1)
@@ -53,13 +59,13 @@ sealed class Message {
 
     }
 
-    object Transformer : SocketHandler.SocketMessageTransformer<Message> {
+    object Transformer : SocketHandler.SocketMessageTransformer<IncomingMessage, OutgoingMessage> {
 
-        override fun transformIncoming(message: String): Message {
+        override fun transformIncoming(message: String): IncomingMessage {
             TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
         }
 
-        override fun transformOutgoing(message: Message): String {
+        override fun transformOutgoing(message: OutgoingMessage): String {
             TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
         }
     }
