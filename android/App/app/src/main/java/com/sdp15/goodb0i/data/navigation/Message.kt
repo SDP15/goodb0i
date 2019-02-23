@@ -31,6 +31,8 @@ sealed class Message {
             LINEAR, TURN
         }
 
+        data class InvalidMessage(val message: String) : IncomingMessage()
+
     }
 
     sealed class OutgoingMessage : Message() {
@@ -61,12 +63,27 @@ sealed class Message {
 
     object Transformer : SocketHandler.SocketMessageTransformer<IncomingMessage, OutgoingMessage> {
 
+        private const val delim = "&" // Unused UTF-8 character
+
         override fun transformIncoming(message: String): IncomingMessage {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            val type = message.substringBefore(delim)
+            return when (type) {
+                "ID" -> IncomingMessage.Connected(message.substringAfter(delim))
+                "TC" -> IncomingMessage.TrolleyConnected
+                "P" -> IncomingMessage.ReachedPoint(message.substringAfter(delim))
+                else -> IncomingMessage.InvalidMessage(message)
+            }
         }
 
         override fun transformOutgoing(message: OutgoingMessage): String {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            return when (message) {
+                is OutgoingMessage.Reconnect -> "RC$delim${message.oldId}"
+                is OutgoingMessage.ProductScanned -> "PC$delim${message.id}"
+                is OutgoingMessage.ProductAccepted -> "PA$delim${message.id}"
+                is OutgoingMessage.ProductRejected -> "PR$delim${message.id}"
+                is OutgoingMessage.RequestHelp -> "RH$delim"
+                else -> "INVLD$delim"
+            }
         }
     }
 
