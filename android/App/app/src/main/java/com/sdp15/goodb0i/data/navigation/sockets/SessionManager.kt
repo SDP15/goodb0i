@@ -4,7 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.sdp15.goodb0i.data.navigation.Message
 import com.sdp15.goodb0i.data.navigation.ShoppingSessionManager
+import com.sdp15.goodb0i.data.navigation.ShoppingSessionState
 import com.sdp15.goodb0i.data.store.RetrofitProvider
+import com.sdp15.goodb0i.data.store.lists.ListItem
 import com.sdp15.goodb0i.data.store.lists.ShoppingList
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -13,15 +15,25 @@ import kotlinx.coroutines.launch
 class SessionManager(private val sh: SocketHandler<Message.IncomingMessage, Message.OutgoingMessage>) : ShoppingSessionManager<Message.IncomingMessage> {
 
     private val incomingMessages = MutableLiveData<Message.IncomingMessage>()
-    override val incoming: LiveData<Message.IncomingMessage>
-        get() = incomingMessages
+    override val incoming: LiveData<Message.IncomingMessage> = incomingMessages
 
     private var uid: String = ""
+
+    private var shoppingList: ShoppingList? = null
+
+    private val currentListProduct = MutableLiveData<ListItem>()
+    override val currentProduct: LiveData<ListItem> = currentListProduct
+
+    private val sessionState = MutableLiveData<ShoppingSessionState>().apply {
+        postValue(ShoppingSessionState.NoSession)
+    }
+    override val state: LiveData<ShoppingSessionState> = sessionState
 
     init {
         //TODO: Handle disconnecting observers
         sh.connectionState.observeForever { state ->
             if (state == SocketHandler.SocketState.ErrorDisconnect) {
+                sessionState.postValue(ShoppingSessionState.Disconnected)
                 attemptReconnection()
             }
         }
@@ -30,6 +42,13 @@ class SessionManager(private val sh: SocketHandler<Message.IncomingMessage, Mess
             when (message) {
                 is Message.IncomingMessage.Connected -> {
                     uid = message.id
+                    sessionState.postValue(ShoppingSessionState.NegotiatingTrolley)
+                }
+                is Message.IncomingMessage.TrolleyConnected -> {
+                    sessionState.postValue(ShoppingSessionState.Connected)
+                }
+                is Message.IncomingMessage.RouteCalculated -> {
+
                 }
                 is Message.IncomingMessage.ReachedPoint -> {
 
@@ -41,6 +60,8 @@ class SessionManager(private val sh: SocketHandler<Message.IncomingMessage, Mess
 
     override fun startSession(list: ShoppingList) {
         if (!sh.isConnected) {
+            shoppingList = list
+            sessionState.postValue(ShoppingSessionState.Connecting)
             sh.start(RetrofitProvider.root + "/app")
         }
     }
@@ -49,6 +70,8 @@ class SessionManager(private val sh: SocketHandler<Message.IncomingMessage, Mess
         uid = ""
         sh.stop()
     }
+
+
 
     override fun codeScanned(code: String) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.

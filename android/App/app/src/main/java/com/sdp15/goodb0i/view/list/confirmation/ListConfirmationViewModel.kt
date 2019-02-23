@@ -4,10 +4,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.sdp15.goodb0i.data.navigation.Message
 import com.sdp15.goodb0i.data.navigation.ShoppingSessionManager
+import com.sdp15.goodb0i.data.navigation.ShoppingSessionState
 import com.sdp15.goodb0i.view.BaseViewModel
 import com.sdp15.goodb0i.data.store.lists.ShoppingList
 import org.koin.standalone.inject
-import timber.log.Timber
 
 class ListConfirmationViewModel : BaseViewModel<Any>() {
 
@@ -34,25 +34,30 @@ class ListConfirmationViewModel : BaseViewModel<Any>() {
 
     }
 
-    private val initialConnectionObserver = Observer<Message.IncomingMessage> { message ->
-        when (message) {
-            is Message.IncomingMessage.TrolleyConnected -> {
+    private val connectionObserver = Observer<ShoppingSessionState> { state ->
+        when (state) {
+            //TODO: Post more information to fragment
+            ShoppingSessionState.Connecting -> {
+
+            }
+            ShoppingSessionState.NegotiatingTrolley -> {
+
+            }
+            ShoppingSessionState.Connected -> {
                 transitions.postValue(ListConfirmationFragmentDirections.actionListConfirmationFragmentToNavigatingToFragment())
                 //TODO: Should we remove the observer here?
             }
-            else -> {
-                Timber.i("Received message $message")
-            }
         }
+
     }
 
     fun startNavigation() {
-        sm.incoming.observeForever(initialConnectionObserver)
+        sm.state.observeForever(connectionObserver)
         sm.startSession(sl)
     }
 
     override fun onCleared() {
         super.onCleared()
-        sm.incoming.removeObserver(initialConnectionObserver)
+        sm.state.removeObserver(connectionObserver)
     }
 }

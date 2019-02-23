@@ -72,6 +72,10 @@ sealed class Message {
             return when (type) {
                 "ID" -> IncomingMessage.Connected(message.substringAfter(delim))
                 "TC" -> IncomingMessage.TrolleyConnected
+                "RC" -> {
+                    val route = Route.fromString(message.substringAfter(delim))
+                    if (route != null) IncomingMessage.RouteCalculated(route) else IncomingMessage.InvalidMessage(message)
+                }
                 "P" -> IncomingMessage.ReachedPoint(message.substringAfter(delim))
                 else -> IncomingMessage.InvalidMessage(message)
             }

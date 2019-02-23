@@ -3,8 +3,11 @@ package com.sdp15.goodb0i
 import android.app.Application
 import androidx.room.Room
 import com.google.firebase.FirebaseApp
+import com.sdp15.goodb0i.data.navigation.Message
+import com.sdp15.goodb0i.data.navigation.ShoppingSessionManager
 import com.sdp15.goodb0i.data.navigation.scanner.BarcodeReader
 import com.sdp15.goodb0i.data.navigation.scanner.MLKitScanner
+import com.sdp15.goodb0i.data.navigation.sockets.SessionManager
 import com.sdp15.goodb0i.data.navigation.sockets.SocketHandler
 import com.sdp15.goodb0i.data.store.RoomDB
 import com.sdp15.goodb0i.data.store.lists.ListManager
@@ -22,6 +25,7 @@ import com.sdp15.goodb0i.view.list.creation.ListViewModel
 import com.sdp15.goodb0i.view.list.confirmation.ListConfirmationViewModel
 import com.sdp15.goodb0i.view.navigation.product.ProductViewModel
 import com.sdp15.goodb0i.view.list.saved.SavedListsViewModel
+import com.sdp15.goodb0i.view.navigation.moving.NavigatingToViewModel
 import com.sdp15.goodb0i.view.navigation.scanner.ScannerViewModel
 import com.sdp15.goodb0i.view.welcome.WelcomeViewModel
 import org.koin.android.ext.android.startKoin
@@ -59,6 +63,7 @@ class App : Application() {
             viewModel<ListConfirmationViewModel>()
             viewModel<ListViewModel>()
             viewModel<SavedListsViewModel>()
+            viewModel<NavigatingToViewModel>()
         },
         module {
             single<ProductLoader> {
@@ -79,6 +84,9 @@ class App : Application() {
                         "db"
                     ).build().listDAO()
                 )
+            }
+            single<ShoppingSessionManager<Message.IncomingMessage>> {
+                SessionManager(SocketHandler(transform = Message.Transformer))
             }
         }
     )
