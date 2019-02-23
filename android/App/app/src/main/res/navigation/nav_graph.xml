@@ -40,7 +40,8 @@
     <fragment
         android:id="@+id/list_creation_fragment"
         android:name="com.sdp15.goodb0i.view.list.creation.ListPagingFragment"
-        android:label="list_creation_fragment">
+        android:label="list_creation_fragment"
+        tools:layout="@layout/layout_shoppinglist">
 
 
         <action
@@ -97,27 +98,10 @@
     </fragment>
 
     <fragment
-        android:id="@+id/search_fragment"
-        android:name="com.sdp15.goodb0i.view.list.creation.SearchFragment"
-        android:label="search_fragment"
-        tools:layout="@layout/layout_search">
-
-    </fragment>
-
-    <fragment
-        android:id="@+id/list_fragment"
-        android:name="com.sdp15.goodb0i.view.list.creation.ShoppingListFragment"
-        android:label="search_fragment"
-        tools:layout="@layout/layout_shoppinglist">
-
-    </fragment>
-
-    <fragment
         android:id="@+id/list_confirmation_fragment"
         android:name="com.sdp15.goodb0i.view.list.confirmation.ListConfirmationFragment"
         android:label="list_confirmation"
         tools:layout="@layout/layout_list_confirmation">
-
 
         <argument
             android:name="shopping_list"
@@ -125,6 +109,19 @@
         <action
             android:id="@+id/action_list_confirmation_fragment_to_list_creation_fragment"
             app:destination="@id/list_creation_fragment" />
+        <action
+            android:id="@+id/action_list_confirmation_fragment_to_navigatingToFragment"
+            app:launchSingleTop="true"
+            app:destination="@id/navigatingToFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/navigatingToFragment"
+        android:name="com.sdp15.goodb0i.view.navigation.moving.NavigatingToFragment"
+        android:label="NavigatingToFragment"
+        tools:layout="@layout/layout_navigating_to">
+        <action
+            android:id="@+id/action_navigatingToFragment_to_item_fragment"
+            app:destination="@id/item_fragment" />
     </fragment>
 
 

@@ -34,7 +34,8 @@ class ListConfirmationFragment : BaseFragment() {
         confirmation_button_edit.setOnClickListener {
             // If we have come from editing a fragment, but not from previous confirmation
             if (baseActivity.fragmentHistory.first == R.id.list_creation_fragment &&
-                baseActivity.fragmentHistory[1] != R.id.list_confirmation_fragment) {
+                baseActivity.fragmentHistory[1] != R.id.list_confirmation_fragment
+            ) {
                 findNavController().navigateUp() // Navigate back to ListPagingFragment
             } else {
                 findNavController().navigate(
@@ -44,13 +45,15 @@ class ListConfirmationFragment : BaseFragment() {
                 )
             }
         }
+        confirmation_button_navigate.setOnClickListener {
+            vm.startNavigation()
+        }
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Container is the ViewPager. If we ever move SearchFragment out of a ViewPager, this will crash
         return inflater.inflate(R.layout.layout_list_confirmation, container, false)
     }
 

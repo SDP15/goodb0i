@@ -5,14 +5,15 @@ import androidx.lifecycle.MutableLiveData
 import com.sdp15.goodb0i.data.navigation.Message
 import com.sdp15.goodb0i.data.navigation.ShoppingSessionManager
 import com.sdp15.goodb0i.data.store.RetrofitProvider
+import com.sdp15.goodb0i.data.store.lists.ShoppingList
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class SessionManager(private val sh: SocketHandler<Message.IncomingMessage, Message.OutgoingMessage>) : ShoppingSessionManager {
+class SessionManager(private val sh: SocketHandler<Message.IncomingMessage, Message.OutgoingMessage>) : ShoppingSessionManager<Message.IncomingMessage> {
 
     private val incomingMessages = MutableLiveData<Message.IncomingMessage>()
-    val incoming: LiveData<Message.IncomingMessage>
+    override val incoming: LiveData<Message.IncomingMessage>
         get() = incomingMessages
 
     private var uid: String = ""
@@ -37,13 +38,13 @@ class SessionManager(private val sh: SocketHandler<Message.IncomingMessage, Mess
         }
     }
 
-    fun start() {
+    override fun startSession(list: ShoppingList) {
         if (!sh.isConnected) {
             sh.start(RetrofitProvider.root + "/app")
         }
     }
 
-    fun stop() {
+    override fun endSession() {
         uid = ""
         sh.stop()
     }
