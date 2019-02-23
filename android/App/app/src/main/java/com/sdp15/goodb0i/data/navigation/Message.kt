@@ -76,7 +76,7 @@ sealed class Message {
                     val route = Route.fromString(message.substringAfter(delim))
                     if (route != null) IncomingMessage.RouteCalculated(route) else IncomingMessage.InvalidMessage(message)
                 }
-                "P" -> IncomingMessage.ReachedPoint(message.substringAfter(delim))
+                "PT" -> IncomingMessage.ReachedPoint(message.substringAfter(delim))
                 else -> IncomingMessage.InvalidMessage(message)
             }
         }

@@ -17,15 +17,15 @@ import com.sdp15.goodb0i.data.store.lists.cache.ShoppingListStore
 import com.sdp15.goodb0i.data.store.products.ProductLoader
 import com.sdp15.goodb0i.data.store.products.RetrofitProductLoader
 import com.sdp15.goodb0i.data.store.products.TestDataProductLoader
-import com.sdp15.goodb0i.view.list.code.CodeViewModel
-import com.sdp15.goodb0i.view.navigation.confirmation.ItemConfirmationViewModel
 import com.sdp15.goodb0i.view.debug.CapturingDebugTree
 import com.sdp15.goodb0i.view.debug.Config
-import com.sdp15.goodb0i.view.list.creation.ListViewModel
+import com.sdp15.goodb0i.view.list.code.CodeViewModel
 import com.sdp15.goodb0i.view.list.confirmation.ListConfirmationViewModel
-import com.sdp15.goodb0i.view.navigation.product.ProductViewModel
+import com.sdp15.goodb0i.view.list.creation.ListViewModel
 import com.sdp15.goodb0i.view.list.saved.SavedListsViewModel
+import com.sdp15.goodb0i.view.navigation.confirmation.ItemConfirmationViewModel
 import com.sdp15.goodb0i.view.navigation.moving.NavigatingToViewModel
+import com.sdp15.goodb0i.view.navigation.product.ProductViewModel
 import com.sdp15.goodb0i.view.navigation.scanner.ScannerViewModel
 import com.sdp15.goodb0i.view.welcome.WelcomeViewModel
 import org.koin.android.ext.android.startKoin
@@ -86,7 +86,7 @@ class App : Application() {
                 )
             }
             single<ShoppingSessionManager<Message.IncomingMessage>> {
-                SessionManager(SocketHandler(transform = Message.Transformer))
+                SessionManager(SocketHandler(transform = Message.Transformer), get())
             }
         }
     )

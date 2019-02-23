@@ -8,11 +8,15 @@ import com.sdp15.goodb0i.data.navigation.ShoppingSessionState
 import com.sdp15.goodb0i.data.store.RetrofitProvider
 import com.sdp15.goodb0i.data.store.lists.ListItem
 import com.sdp15.goodb0i.data.store.lists.ShoppingList
+import com.sdp15.goodb0i.data.store.products.ProductLoader
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class SessionManager(private val sh: SocketHandler<Message.IncomingMessage, Message.OutgoingMessage>) : ShoppingSessionManager<Message.IncomingMessage> {
+class SessionManager(
+    private val sh: SocketHandler<Message.IncomingMessage, Message.OutgoingMessage>,
+    private val productLoader: ProductLoader
+) : ShoppingSessionManager<Message.IncomingMessage> {
 
     private val incomingMessages = MutableLiveData<Message.IncomingMessage>()
     override val incoming: LiveData<Message.IncomingMessage> = incomingMessages
@@ -74,7 +78,7 @@ class SessionManager(private val sh: SocketHandler<Message.IncomingMessage, Mess
 
 
     override fun codeScanned(code: String) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        sh.sendMessage(Message.OutgoingMessage.ProductScanned(code))
     }
 
     override fun productAccepted(id: Long) {
