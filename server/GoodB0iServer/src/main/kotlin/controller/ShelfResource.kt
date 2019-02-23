@@ -13,7 +13,6 @@ fun Route.shelves(shelfService: ShelfService) {
     route("/shelves") {
 
         get("/{id}") {
-            println("Loading products for shelf ${call.parameters}")
             val products = shelfService.getProductForShelfRack(call.parameters["id"]!!.toInt())
             call.respond(if (products.isNotEmpty()) products else HttpStatusCode.NotFound)
         }

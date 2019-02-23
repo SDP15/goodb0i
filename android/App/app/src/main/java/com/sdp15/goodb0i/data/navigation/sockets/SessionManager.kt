@@ -6,9 +6,11 @@ import com.sdp15.goodb0i.data.navigation.Message
 import com.sdp15.goodb0i.data.navigation.Route
 import com.sdp15.goodb0i.data.navigation.ShoppingSessionManager
 import com.sdp15.goodb0i.data.navigation.ShoppingSessionState
+import com.sdp15.goodb0i.data.store.Result
 import com.sdp15.goodb0i.data.store.RetrofitProvider
 import com.sdp15.goodb0i.data.store.lists.ListItem
 import com.sdp15.goodb0i.data.store.lists.ShoppingList
+import com.sdp15.goodb0i.data.store.products.Product
 import com.sdp15.goodb0i.data.store.products.ProductLoader
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -28,6 +30,9 @@ class SessionManager(
 
     private val currentListProduct = MutableLiveData<ListItem>()
     override val currentProduct: LiveData<ListItem> = currentListProduct
+
+    private val lastScannedProduct = MutableLiveData<Product>()
+    override val scannedProduct: LiveData<Product> = lastScannedProduct
 
     private val sessionState = MutableLiveData<ShoppingSessionState>().apply {
         postValue(ShoppingSessionState.NoSession)
@@ -85,16 +90,30 @@ class SessionManager(
         return false
     }
 
-    override fun codeScanned(code: String) {
+    override suspend fun checkScannedCode(code: String): Product? {
         sh.sendMessage(Message.OutgoingMessage.ProductScanned(code))
+
+        var product = shoppingList.products.firstOrNull { item -> item.product.id == code }?.product
+        if (product == null) {
+            val fromServer = productLoader.loadProduct(code)
+            if (fromServer is Result.Success) {
+                product = fromServer.data
+            }
+        }
+        if (product != null) lastScannedProduct.postValue(product)
+
+
+        //TODO: Check against cached products for the current shelf
+
+        return product
     }
 
-    override fun productAccepted(id: Long) {
-        sh.sendMessage(Message.OutgoingMessage.ProductAccepted(id))
+    override fun productAccepted() {
+        sh.sendMessage(Message.OutgoingMessage.ProductAccepted(lastScannedProduct.value!!.id))
     }
 
-    override fun productRejected(id: Long) {
-        sh.sendMessage(Message.OutgoingMessage.ProductRejected(id))
+    override fun productRejected() {
+        sh.sendMessage(Message.OutgoingMessage.ProductRejected(lastScannedProduct.value!!.id))
     }
 
     override fun requestAssistance() {

@@ -49,9 +49,9 @@ sealed class Message {
          */
         data class ProductScanned(val id: String) : OutgoingMessage()
 
-        data class ProductAccepted(val id: Long) : OutgoingMessage()
+        data class ProductAccepted(val id: String) : OutgoingMessage()
 
-        data class ProductRejected(val id: Long) : OutgoingMessage()
+        data class ProductRejected(val id: String) : OutgoingMessage()
 
         data class Stop(val reason: StopReason) : OutgoingMessage()
 

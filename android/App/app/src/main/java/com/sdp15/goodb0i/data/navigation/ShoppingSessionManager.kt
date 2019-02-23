@@ -3,6 +3,7 @@ package com.sdp15.goodb0i.data.navigation
 import androidx.lifecycle.LiveData
 import com.sdp15.goodb0i.data.store.lists.ListItem
 import com.sdp15.goodb0i.data.store.lists.ShoppingList
+import com.sdp15.goodb0i.data.store.products.Product
 
 interface ShoppingSessionManager<IN> {
 
@@ -10,19 +11,19 @@ interface ShoppingSessionManager<IN> {
 
     val currentProduct: LiveData<ListItem>
 
+    val scannedProduct: LiveData<Product>
+
     val state: LiveData<ShoppingSessionState>
 
     fun startSession(list: ShoppingList)
 
     fun endSession()
 
+    suspend fun checkScannedCode(code: String): Product?
 
+    fun productAccepted()
 
-    fun codeScanned(code: String)
-
-    fun productAccepted(id: Long)
-
-    fun productRejected(id: Long)
+    fun productRejected()
 
     fun requestAssistance()
 
