@@ -7,6 +7,7 @@ import com.sdp15.goodb0i.data.navigation.ShoppingSessionManager
 import com.sdp15.goodb0i.view.BaseViewModel
 import com.sdp15.goodb0i.data.store.lists.ShoppingList
 import org.koin.standalone.inject
+import timber.log.Timber
 
 class ListConfirmationViewModel : BaseViewModel<Any>() {
 
@@ -38,6 +39,9 @@ class ListConfirmationViewModel : BaseViewModel<Any>() {
             is Message.IncomingMessage.TrolleyConnected -> {
                 transitions.postValue(ListConfirmationFragmentDirections.actionListConfirmationFragmentToNavigatingToFragment())
                 //TODO: Should we remove the observer here?
+            }
+            else -> {
+                Timber.i("Received message $message")
             }
         }
     }

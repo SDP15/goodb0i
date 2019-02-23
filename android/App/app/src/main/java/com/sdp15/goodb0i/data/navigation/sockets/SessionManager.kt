@@ -19,6 +19,7 @@ class SessionManager(private val sh: SocketHandler<Message.IncomingMessage, Mess
     private var uid: String = ""
 
     init {
+        //TODO: Handle disconnecting observers
         sh.connectionState.observeForever { state ->
             if (state == SocketHandler.SocketState.ErrorDisconnect) {
                 attemptReconnection()

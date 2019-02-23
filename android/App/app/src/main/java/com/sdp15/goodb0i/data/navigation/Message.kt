@@ -16,6 +16,8 @@ sealed class Message {
          */
         object TrolleyConnected : IncomingMessage()
 
+        data class RouteCalculated(val route: Route) : IncomingMessage()
+
         /**
          *  Trolley has reached a tag
          *  TODO: More information
