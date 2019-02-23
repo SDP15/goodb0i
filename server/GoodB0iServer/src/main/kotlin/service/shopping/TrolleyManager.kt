@@ -14,7 +14,7 @@ class TrolleyManager {
 
     suspend fun onMessage(id: String, message: String) {
         println("Trolley $id sent $message")
-        members[id]?.send(Frame.Text(message + " returned"))
+        members[id]?.send(Frame.Text(message + " returnedh"))
         //TODO Decide where to route the message
     }
 

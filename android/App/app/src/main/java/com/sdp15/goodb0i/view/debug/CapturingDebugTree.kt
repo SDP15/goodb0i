@@ -21,7 +21,7 @@ object CapturingDebugTree : Timber.DebugTree() {
         AlertDialog.Builder(context).apply {
             setTitle("Log")
             setMessage(builder.toString())
-            setCancelable(true)
+            setCancelable(false)
             setOnKeyListener { p0, p1, p2 ->
                 if (p2.keyCode == KeyEvent.KEYCODE_BACK) {
                     p0?.dismiss()

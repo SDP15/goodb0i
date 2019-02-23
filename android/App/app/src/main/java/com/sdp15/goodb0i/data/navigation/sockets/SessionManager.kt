@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.sdp15.goodb0i.data.navigation.Message
 
-class SessionManager(val sh: SocketHandler<Message>) {
+class SessionManager(private val sh: SocketHandler<Message>) {
 
     private val incomingMessages = MutableLiveData<Message>()
     val incoming: LiveData<Message>
