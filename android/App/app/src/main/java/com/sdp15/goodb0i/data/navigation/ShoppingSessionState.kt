@@ -13,4 +13,14 @@ sealed class ShoppingSessionState {
 
     object Connected : ShoppingSessionState()
 
+    data class MovingTo(val point: String) : ShoppingSessionState()
+
+    data class Scanning(val item: String) : ShoppingSessionState()
+
+    object MovingToEnd : ShoppingSessionState()
+
+    object Checkout : ShoppingSessionState()
+
+    object AwaitingHelp : ShoppingSessionState()
+
 }

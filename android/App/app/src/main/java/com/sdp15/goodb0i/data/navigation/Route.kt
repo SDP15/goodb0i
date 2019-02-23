@@ -1,6 +1,10 @@
 package com.sdp15.goodb0i.data.navigation
 
-class Route private constructor(private val points: List<RoutePoint>) : Collection<Route.RoutePoint> by points {
+class Route private constructor(
+    points: List<RoutePoint>,
+    private val routePoints: List<RoutePoint> = mutableListOf(RoutePoint.Start) + points + mutableListOf(RoutePoint.End)
+) : Collection<Route.RoutePoint> by routePoints {
+
 
     companion object {
 
@@ -34,6 +38,8 @@ class Route private constructor(private val points: List<RoutePoint>) : Collecti
 
     sealed class RoutePoint(val id: String) {
 
+        object Start : RoutePoint("start")
+
         class Pass(id: String) : RoutePoint(id)
 
         class TurnRight(id: String) : RoutePoint(id)
@@ -43,6 +49,8 @@ class Route private constructor(private val points: List<RoutePoint>) : Collecti
         class Product(id: String, productId: String) : RoutePoint(id)
 
         class Stop(id: String) : RoutePoint(id)
+
+        object End : RoutePoint("end")
 
     }
 
