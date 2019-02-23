@@ -30,7 +30,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/product_text_navigating"
+            android:id="@+id/product_text_name"
             style="@style/BodyText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -39,13 +39,13 @@
             tools:text="Fresh Milk 1L" />
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/item_display_shelf_contents"
+            android:id="@+id/product_display_shelf_contents"
             style="@style/BodyText.SubText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/default_horizontal_margin"
 
-            tools:text="On your right.\n\nTop Shelf: 1 Pint\nSecond Shelf: 2 Pints\nThird Shelf from Top: 1 Litre\nRepeat\t\tScan" />
+            tools:text="On your right.\n\nTop Shelf: 1 Pint\nSecond Shelf: 2 Pints\nThird Shelf from Top: 1 Litre" />
 
 
     </androidx.appcompat.widget.LinearLayoutCompat>

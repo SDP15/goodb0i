@@ -24,7 +24,7 @@ class Route private constructor(
                     "stop" -> points.add(RoutePoint.Stop(id))
                     else -> {
                         if (type.length == 36) { //UUID string is always 36 characters
-                            points.add(RoutePoint.Product(id, type))
+                            points.add(RoutePoint.EntryCollectionPoint(id, type))
                         } else {
                             return null
                         }
@@ -46,7 +46,7 @@ class Route private constructor(
 
         class TurnLeft(id: String) : RoutePoint(id)
 
-        class Product(id: String, productId: String) : RoutePoint(id)
+        class EntryCollectionPoint(id: String, productId: String) : RoutePoint(id)
 
         class Stop(id: String) : RoutePoint(id)
 

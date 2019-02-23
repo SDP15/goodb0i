@@ -8,7 +8,7 @@ import com.sdp15.goodb0i.data.store.products.Product
 import kotlinx.android.parcel.Parcelize
 
 /**
- * Product representing
+ * Item in shopping list
  */
 @Parcelize
 @Entity
