@@ -10,10 +10,10 @@ import com.sdp15.goodb0i.data.navigation.scanner.MLKitScanner
 import com.sdp15.goodb0i.data.navigation.sockets.SessionManager
 import com.sdp15.goodb0i.data.navigation.sockets.SocketHandler
 import com.sdp15.goodb0i.data.store.RoomDB
+import com.sdp15.goodb0i.data.store.cache.RoomShoppingListStore
+import com.sdp15.goodb0i.data.store.cache.ShoppingListStore
 import com.sdp15.goodb0i.data.store.lists.ListManager
 import com.sdp15.goodb0i.data.store.lists.RetrofitListManager
-import com.sdp15.goodb0i.data.store.lists.cache.RoomShoppingListStore
-import com.sdp15.goodb0i.data.store.lists.cache.ShoppingListStore
 import com.sdp15.goodb0i.data.store.products.ProductLoader
 import com.sdp15.goodb0i.data.store.products.RetrofitProductLoader
 import com.sdp15.goodb0i.data.store.products.TestDataProductLoader

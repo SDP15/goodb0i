@@ -1,4 +1,4 @@
-package com.sdp15.goodb0i.data.store.lists.cache
+package com.sdp15.goodb0i.data.store.cache
 
 import androidx.room.Dao
 import androidx.room.Insert

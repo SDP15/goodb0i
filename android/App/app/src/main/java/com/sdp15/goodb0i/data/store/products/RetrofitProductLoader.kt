@@ -1,7 +1,5 @@
 package com.sdp15.goodb0i.data.store.products
 
-import com.google.gson.GsonBuilder
-import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.sdp15.goodb0i.data.store.Result
 import com.sdp15.goodb0i.data.store.RetrofitProvider
 import com.sdp15.goodb0i.data.store.awaitCatching
@@ -28,11 +26,16 @@ object RetrofitProductLoader : ProductLoader {
             failure = { Result.Failure(Exception(it.message)) }
         )
 
+    override suspend fun loadProductsForShelfRack(shelfId: Int): Result<List<Product>> =
+        api.getProductsForShelfRackAsync(shelfId).awaitCatching(
+            success = { it.toResult() },
+            failure = { Result.Failure(Exception(it.message)) }
+        )
+
     override suspend fun search(query: String): Result<List<Product>> = api.searchAsync(query).awaitCatching(
         success = { it.toResult() },
         failure = { Result.Failure(Exception(it.message)) }
     )
-
 
     override suspend fun loadAll(): Result<List<Product>> = api.getAllAsync().awaitCatching(
         success = { it.toResult() },
@@ -50,5 +53,8 @@ interface KTORProductAPI {
 
     @GET("/products/search/{query}")
     fun searchAsync(@Path("query") query: String): Deferred<Response<List<Product>>>
+
+    @GET("/shelves/{id}")
+    fun getProductsForShelfRackAsync(@Path("id") id: Int): Deferred<Response<List<Product>>>
 
 }

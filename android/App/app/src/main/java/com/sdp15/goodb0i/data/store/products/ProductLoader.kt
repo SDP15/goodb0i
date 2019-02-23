@@ -8,6 +8,8 @@ interface ProductLoader {
 
     suspend fun loadCategory(category: String): Result<List<Product>>
 
+    suspend fun loadProductsForShelfRack(shelfId: Int): Result<List<Product>>
+
     suspend fun search(query: String): Result<List<Product>>
 
     suspend fun loadAll(): Result<List<Product>>

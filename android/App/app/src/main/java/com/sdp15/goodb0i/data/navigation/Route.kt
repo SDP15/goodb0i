@@ -34,6 +34,8 @@ class Route private constructor(
             return Route(points)
         }
 
+        fun emptyRoute() = Route(emptyList())
+
     }
 
     sealed class RoutePoint(val id: String) {
@@ -46,7 +48,7 @@ class Route private constructor(
 
         class TurnLeft(id: String) : RoutePoint(id)
 
-        class EntryCollectionPoint(id: String, productId: String) : RoutePoint(id)
+        class EntryCollectionPoint(id: String, val productId: String) : RoutePoint(id)
 
         class Stop(id: String) : RoutePoint(id)
 

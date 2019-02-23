@@ -3,6 +3,7 @@ package com.sdp15.goodb0i.data.navigation.sockets
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.sdp15.goodb0i.data.navigation.Message
+import com.sdp15.goodb0i.data.navigation.Route
 import com.sdp15.goodb0i.data.navigation.ShoppingSessionManager
 import com.sdp15.goodb0i.data.navigation.ShoppingSessionState
 import com.sdp15.goodb0i.data.store.RetrofitProvider
@@ -22,8 +23,8 @@ class SessionManager(
     override val incoming: LiveData<Message.IncomingMessage> = incomingMessages
 
     private var uid: String = ""
-
-    private var shoppingList: ShoppingList? = null
+    private var route: Route = Route.emptyRoute()
+    private var shoppingList: ShoppingList = ShoppingList.emptyList()
 
     private val currentListProduct = MutableLiveData<ListItem>()
     override val currentProduct: LiveData<ListItem> = currentListProduct
@@ -52,10 +53,10 @@ class SessionManager(
                     sessionState.postValue(ShoppingSessionState.Connected)
                 }
                 is Message.IncomingMessage.RouteCalculated -> {
-
+                    route = message.route
                 }
                 is Message.IncomingMessage.ReachedPoint -> {
-
+                    consume = reachedPoint(message.id)
                 }
             }
             if (!consume) incomingMessages.postValue(message)
@@ -75,7 +76,14 @@ class SessionManager(
         sh.stop()
     }
 
-
+    private fun reachedPoint(id: String): Boolean {
+        val point = route.first { rp -> rp.id == id }
+        if (point is Route.RoutePoint.EntryCollectionPoint) {
+            sessionState.postValue(ShoppingSessionState.Scanning(point))
+            return true
+        }
+        return false
+    }
 
     override fun codeScanned(code: String) {
         sh.sendMessage(Message.OutgoingMessage.ProductScanned(code))

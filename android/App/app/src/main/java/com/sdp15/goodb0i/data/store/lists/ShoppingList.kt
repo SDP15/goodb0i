@@ -12,4 +12,10 @@ data class ShoppingList(
     @PrimaryKey @SerializedName("code") var code: Long,
     @SerializedName("time") val time: Long,
     @SerializedName("products") val products: List<ListItem>
-) : Parcelable
+) : Parcelable {
+
+    companion object {
+        fun emptyList() = ShoppingList(0, 0, kotlin.collections.emptyList())
+    }
+
+}

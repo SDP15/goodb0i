@@ -1,8 +1,8 @@
 package com.sdp15.goodb0i.view.list.saved
 
-import com.sdp15.goodb0i.view.BaseViewModel
+import com.sdp15.goodb0i.data.store.cache.ShoppingListStore
 import com.sdp15.goodb0i.data.store.lists.ShoppingList
-import com.sdp15.goodb0i.data.store.lists.cache.ShoppingListStore
+import com.sdp15.goodb0i.view.BaseViewModel
 import org.koin.standalone.inject
 
 class SavedListsViewModel : BaseViewModel<Any>() {

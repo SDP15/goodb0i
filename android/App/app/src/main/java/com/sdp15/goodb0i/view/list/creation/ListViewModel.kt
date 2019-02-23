@@ -2,15 +2,15 @@ package com.sdp15.goodb0i.view.list.creation
 
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import com.sdp15.goodb0i.view.BaseViewModel
 import com.sdp15.goodb0i.data.store.Result
+import com.sdp15.goodb0i.data.store.cache.ShoppingListStore
 import com.sdp15.goodb0i.data.store.lists.ListItem
 import com.sdp15.goodb0i.data.store.lists.ListManager
 import com.sdp15.goodb0i.data.store.lists.ShoppingList
-import com.sdp15.goodb0i.data.store.lists.cache.ShoppingListStore
 import com.sdp15.goodb0i.data.store.products.Product
 import com.sdp15.goodb0i.data.store.products.ProductLoader
 import com.sdp15.goodb0i.move
+import com.sdp15.goodb0i.view.BaseViewModel
 import com.sdp15.goodb0i.view.ListDiff
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope

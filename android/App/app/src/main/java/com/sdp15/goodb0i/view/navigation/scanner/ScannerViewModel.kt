@@ -6,6 +6,7 @@ import com.sdp15.goodb0i.data.navigation.ShoppingSessionManager
 import com.sdp15.goodb0i.data.navigation.scanner.BarcodeReader
 import com.sdp15.goodb0i.data.navigation.scanner.BarcodeReaderCallback
 import com.sdp15.goodb0i.data.navigation.scanner.BarcodeReading
+import com.sdp15.goodb0i.data.store.products.ProductLoader
 import com.sdp15.goodb0i.view.BaseViewModel
 import org.koin.standalone.inject
 import timber.log.Timber
@@ -15,6 +16,7 @@ class ScannerViewModel : BaseViewModel<Any>(),
     ScannerFragment.ScannerFragmentInteractor {
 
     private val sm: ShoppingSessionManager<Message.IncomingMessage> by inject()
+    private val productLoader: ProductLoader by inject()
 
     private val reader: BarcodeReader by inject()
     private val isRunning = AtomicBoolean(false)
@@ -23,6 +25,10 @@ class ScannerViewModel : BaseViewModel<Any>(),
     val reading = MutableLiveData<BarcodeReading>()
 
     override fun bind() {
+    }
+
+    private fun onRead() {
+
     }
 
     override fun onImageCaptured(ba: ByteArray, rotation: Int, width: Int, height: Int) {

@@ -375,6 +375,11 @@ object TestDataProductLoader : ProductLoader {
         return Result.Success(PRODUCTS.toList())
     }
 
+    override suspend fun loadProductsForShelfRack(shelfId: Int): Result<List<Product>> {
+        //TODO: Add test data for shelf categories
+        return Result.Success(listOf())
+    }
+
     class DelegateProductLoader(private val other: ProductLoader, private val delegate: () -> Boolean) : ProductLoader {
 
         override suspend fun loadProduct(id: String): Result<Product> =
@@ -388,6 +393,11 @@ object TestDataProductLoader : ProductLoader {
 
         override suspend fun loadAll(): Result<List<Product>> =
             if (delegate()) TestDataProductLoader.loadAll() else other.loadAll()
+
+        override suspend fun loadProductsForShelfRack(shelfId: Int): Result<List<Product>> =
+            if (delegate()) TestDataProductLoader.loadProductsForShelfRack(shelfId) else other.loadProductsForShelfRack(
+                shelfId
+            )
     }
 
 }
