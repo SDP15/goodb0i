@@ -10,18 +10,24 @@ import java.util.concurrent.atomic.AtomicBoolean
 class SocketHandler<T>(private val transform: SocketMessageTransformer<T>) {
 
     private val connected = AtomicBoolean(false)
+    val isConnected: Boolean
+        get() = connected.get()
+    private var socket: WebSocket? = null
 
-    fun start(url: String, name: String) {
+    fun start(url: String) {
         val request = Request.Builder().url(url).build()
-        val listener = SocketListener(name)
         val client = OkHttpClient()
         Timber.i("Starting websocket")
-        client.newWebSocket(request, listener)
+        socket = client.newWebSocket(request, SocketListener())
     }
 
-    fun stop() {}
+    fun stop() {
+        //https://github.com/Luka967/websocket-close-codes
+        socket?.close(1000, null)
+    }
 
     private fun onMessageReceived(message: String) {
+        Timber.i("Message received $message")
         messages.postValue(transform.transformIncoming(message))
     }
 
@@ -31,6 +37,7 @@ class SocketHandler<T>(private val transform: SocketMessageTransformer<T>) {
         override fun onOpen(webSocket: WebSocket, response: Response) {
             super.onOpen(webSocket, response)
             connected.set(true)
+            Timber.i("Socket opened")
         }
 
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
@@ -56,6 +63,7 @@ class SocketHandler<T>(private val transform: SocketMessageTransformer<T>) {
         override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
             super.onClosed(webSocket, code, reason)
             connected.set(false)
+            Timber.i("Socket closed")
         }
     }
 
@@ -70,7 +78,7 @@ class SocketHandler<T>(private val transform: SocketMessageTransformer<T>) {
         get() = state
 
     fun sendMessage(message: T) {
-
+        socket?.send(transform.transformOutgoing(message))
     }
 
     interface SocketMessageTransformer<T> {

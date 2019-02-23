@@ -13,7 +13,7 @@ import org.koin.android.ext.android.inject
 
 class MainActivity : AppCompatActivity() {
 
-    private val sh: SocketHandler by inject()
+    //private val sh: SocketHandler by inject()
 
     val fragmentHistory = CircularIntArray(10)
 

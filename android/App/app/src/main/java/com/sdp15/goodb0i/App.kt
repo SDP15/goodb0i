@@ -69,7 +69,7 @@ class App : Application() {
             }
             single<ListManager> { RetrofitListManager }
             single<BarcodeReader> { MLKitScanner() }
-            single<SocketHandler> { SocketHandler() }
+            //single<SocketHandler> { SocketHandler() }
             // If we ever need another DAO, move the database creation out of this provider
             single<ShoppingListStore> {
                 RoomShoppingListStore(
