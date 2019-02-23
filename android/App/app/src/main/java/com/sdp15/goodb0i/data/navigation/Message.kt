@@ -1,5 +1,7 @@
 package com.sdp15.goodb0i.data.navigation
 
+import com.sdp15.goodb0i.data.navigation.sockets.SocketHandler
+
 sealed class Message {
 
     sealed class IncomingMessage : Message() {
@@ -49,6 +51,17 @@ sealed class Message {
             HelpRequest(1)
         }
 
+    }
+
+    object Transformer : SocketHandler.SocketMessageTransformer<Message> {
+
+        override fun transformIncoming(message: String): Message {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+
+        override fun transformOutgoing(message: Message): String {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
     }
 
 }
