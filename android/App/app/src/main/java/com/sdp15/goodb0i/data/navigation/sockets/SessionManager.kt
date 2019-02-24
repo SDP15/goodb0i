@@ -30,6 +30,7 @@ class SessionManager(
 
     private var uid: String = ""
     private var route: Route = Route.emptyRoute()
+    private var index = 0
     private var shoppingList: ShoppingList = ShoppingList.emptyList()
 
     private val incomingMessages = MutableLiveData<Message.IncomingMessage>()
@@ -93,10 +94,14 @@ class SessionManager(
       If we have reached a shelf, consume the message and switch to scanning state
      */
     private fun reachedPoint(id: String): Boolean {
-        val point = route.first { rp -> rp.id == id }
+        val pointIndex = route.indexOfFirst { rp -> rp.id == id }
+        val point = route.getOrNull(pointIndex)
         if (point is Route.RoutePoint.EntryCollectionPoint) {
+            index = pointIndex
             sessionState.postValue(ShoppingSessionState.Scanning(point))
             return true
+        } else if (point is Route.RoutePoint.Pass || point is Route.RoutePoint.TurnLeft || point is Route.RoutePoint.TurnRight) {
+            index = pointIndex
         }
         return false
     }
@@ -116,7 +121,10 @@ class SessionManager(
                 product = fromServer.data
             }
         }
-        if (product != null) lastScannedProduct.postValue(product)
+        if (product != null) {
+            lastScannedProduct.postValue(product)
+            sessionState.postValue(ShoppingSessionState.Confirming(product))
+        }
 
         return product
     }

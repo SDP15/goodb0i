@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import com.sdp15.goodb0i.data.navigation.Message
 import com.sdp15.goodb0i.data.navigation.ShoppingSessionManager
+import com.sdp15.goodb0i.data.navigation.ShoppingSessionState
 import com.sdp15.goodb0i.data.store.products.Product
 import com.sdp15.goodb0i.view.BaseViewModel
 import org.koin.standalone.inject
@@ -15,7 +16,16 @@ class ItemConfirmationViewModel : BaseViewModel<Any>() {
     val scannedProduct: LiveData<Product> = sm.scannedProduct
 
     override fun bind() {
+        sm.state.observeForever(sessionStateObserver)
         sm.incoming.observeForever(trolleyMessageListener)
+    }
+
+    private val sessionStateObserver = Observer<ShoppingSessionState> { state ->
+        if (state is ShoppingSessionState.NavigatingTo) {
+            // Scan accepted, there is another product or tills to go to
+        } else if (state is ShoppingSessionState.Scanning) {
+            // Either scan rejected, or item on the same ShelfRack
+        }
     }
 
     private val trolleyMessageListener = Observer<Message.IncomingMessage> { message ->
@@ -43,6 +53,7 @@ class ItemConfirmationViewModel : BaseViewModel<Any>() {
 
     override fun onCleared() {
         super.onCleared()
+        sm.state.observeForever(sessionStateObserver)
         sm.incoming.removeObserver(trolleyMessageListener)
     }
 }

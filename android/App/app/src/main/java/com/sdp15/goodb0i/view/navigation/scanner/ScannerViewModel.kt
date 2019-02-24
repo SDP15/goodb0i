@@ -7,7 +7,6 @@ import com.sdp15.goodb0i.data.navigation.scanner.BarcodeReader
 import com.sdp15.goodb0i.data.navigation.scanner.BarcodeReaderCallback
 import com.sdp15.goodb0i.data.navigation.scanner.BarcodeReading
 import com.sdp15.goodb0i.view.BaseViewModel
-import com.sdp15.goodb0i.view.scanner.ScannerFragmentDirections
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch

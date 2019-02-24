@@ -6,7 +6,7 @@ package com.sdp15.goodb0i.data.navigation
 class Route private constructor(
     points: List<RoutePoint>,
     private val routePoints: List<RoutePoint> = mutableListOf(RoutePoint.Start) + points + mutableListOf(RoutePoint.End)
-) : Collection<Route.RoutePoint> by routePoints {
+) : List<Route.RoutePoint> by routePoints {
 
 
     companion object {

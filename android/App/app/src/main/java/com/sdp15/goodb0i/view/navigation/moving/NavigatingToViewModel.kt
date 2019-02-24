@@ -22,7 +22,7 @@ class NavigatingToViewModel : BaseViewModel<Any>() {
     }
 
     private val stateObserver = Observer<ShoppingSessionState> { state ->
-        if (state is ShoppingSessionState.MovingTo) {
+        if (state is ShoppingSessionState.NavigatingTo) {
             if (state.from is Route.RoutePoint.EntryCollectionPoint) {
                 transitions.postValue(NavigatingToFragmentDirections.actionNavigatingToFragmentToItemFragment())
             } else {
