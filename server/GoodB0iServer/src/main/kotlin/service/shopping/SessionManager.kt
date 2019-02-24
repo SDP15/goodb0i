@@ -11,14 +11,20 @@ class SessionManager {
     private val sessions = ConcurrentHashMap<String, Session>()
     private val outs = ConcurrentHashMap<String, QueuedMessageSender>()
 
-    fun createSession(id: String, appSocket: WebSocketSession, trolleySession: WebSocketSession) {
+    fun createSession(id: String, appSocket: WebSocketSession, trolleySession: WebSocketSession): Session {
         val appOut = QueuedMessageSender(appSocket)
         outs[id] = appOut
-        sessions[id] =
-                Session(
-                        appOut,
-                        SimpleMessageSender(trolleySession)
-                )
+        val session = Session(
+                appOut,
+                SimpleMessageSender(trolleySession)
+        )
+        sessions[id] = session
+        return session
+    }
+
+    fun closeSession(id: String) {
+        //TODO: Cleanup session data
+        sessions.remove(id)
     }
 
     fun updateAppSocket(id: String, newId: String, newSocket: WebSocketSession) {

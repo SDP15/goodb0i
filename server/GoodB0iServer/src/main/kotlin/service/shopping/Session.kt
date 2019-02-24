@@ -2,22 +2,26 @@ package service.shopping
 
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 
 class Session(
         val appOut: SessionManager.AppMessageSender,
         val trolleyOut: SessionManager.TrolleyMessageSender
-) : TrolleyManager.TrolleyMessageListener {
+) : IncomingMessageListener {
 
     private val isPhoneConnected = AtomicBoolean(false)
-
-
-    override fun onTrolleyMessage(message: String) {
+    override fun onAppMessage(message: String) {
 
     }
 
-    //override fun onConnectivityChange(isConnected: Boolean) = isPhoneConnected.set(isConnected)
+    override fun onConnectivityChange(isConnected: Boolean) {
+    }
+
+    override fun onTrolleyMessage(message: String) {
+    }
+
+
+//override fun onConnectivityChange(isConnected: Boolean) = isPhoneConnected.set(isConnected)
 
 
     private fun sendToBoth(message: String) {

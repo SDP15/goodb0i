@@ -1,6 +1,8 @@
 package controller.sockets
 
+import io.ktor.http.cio.websocket.CloseReason
 import io.ktor.http.cio.websocket.Frame
+import io.ktor.http.cio.websocket.close
 import io.ktor.http.cio.websocket.readText
 import io.ktor.routing.Route
 import io.ktor.util.generateNonce
@@ -9,12 +11,13 @@ import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.channels.ClosedSendChannelException
 import kotlinx.coroutines.channels.consumeEach
 import service.shopping.AppManager
+import service.shopping.SessionManager
 import service.shopping.TrolleyManager
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.TimeUnit
 
 @UseExperimental(ObsoleteCoroutinesApi::class)
-fun Route.sockets(trolleyManager: TrolleyManager, appManager: AppManager) {
+fun Route.sockets(sessionManager: SessionManager, trolleyManager: TrolleyManager, appManager: AppManager) {
 
     /*
     https://ktor.io/servers/features/websockets.html
@@ -36,7 +39,7 @@ fun Route.sockets(trolleyManager: TrolleyManager, appManager: AppManager) {
     webSocket("/trolley") {
         
         val nonce = generateNonce()
-        
+
         trolleyManager.joinTrolley(nonce, this)
 
         try {
@@ -51,24 +54,35 @@ fun Route.sockets(trolleyManager: TrolleyManager, appManager: AppManager) {
     }
 
     webSocket("/app") {
+        val trolley = trolleyManager.assignAvailableTrolley()
+        if (trolley != null) {
+            val nonce = generateNonce()
+            appManager.joinApp(nonce, this)
 
-        val nonce = generateNonce()
-
-        appManager.joinApp(nonce, this)
-        try {
-            incoming.consumeEach { frame ->
-                if (frame is Frame.Text) {
-                    appManager.onMessage(nonce, frame.readText())
+            val session = sessionManager.createSession(nonce, this, trolley.second)
+            appManager.addMessageListener(nonce, session)
+            trolleyManager.addMessageListener(trolley.first, session)
+            try {
+                incoming.consumeEach { frame ->
+                    if (frame is Frame.Text) {
+                        appManager.onMessage(nonce, frame.readText())
+                    }
                 }
+            } catch (e: ClosedSendChannelException) {
+                println("ClosedSendChannelException $e")
+            } catch (e: Exception) {
+                println("Other exception $e")
+            } finally {
+                println("$nonce closed socket")
+                sessionManager.closeSession(nonce)
+                appManager.removeApp(nonce, this)
             }
-        } catch (e: ClosedSendChannelException) {
-            println("ClosedSendChannelException $e")
-        } catch (e: Exception) {
-            println("Other exception $e")
-        } finally {
-            println("$nonce closed socket")
-            appManager.removeApp(nonce, this)
+        } else {
+            outgoing.send(Frame.Text("NT&"))
+            close(CloseReason(CloseReason.Codes.TRY_AGAIN_LATER, "No available trolleys"))
         }
+
+
     }
 
     webSocket("/ping") {

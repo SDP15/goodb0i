@@ -8,14 +8,16 @@ class AppManager {
 
     private val members = ConcurrentHashMap<String, WebSocketSession>()
     private val listeners = ConcurrentHashMap<String, IncomingMessageListener>()
-    private val sessionData = ConcurrentHashMap<String, AppSession>()
     private var count = 0
 
-    //TODO: Decide what we actually need to store
-    data class AppSession(val data: String)
+
+    fun addMessageListener(id: String, listener: IncomingMessageListener) {
+        listeners[id] = listener
+    }
 
     suspend fun onMessage(id: String, message: String) {
         println("$id : $message")
+        listeners[id]?.onAppMessage(message)
 
     }
 
@@ -32,12 +34,11 @@ class AppManager {
         if (!members.contains(id)) {
             members[id] = socket
             socket.outgoing.send(joinKey(id)) // Send id back to app
-            sessionData[id] = AppSession("TEST")
         }
     }
 
     suspend fun rejoinApp(id: String, oldId: String) {
-        sessionData[id] = sessionData[oldId]!! //TODO: Proper data
+
     }
 
     suspend fun removeApp(id: String, socket: WebSocketSession) {
