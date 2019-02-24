@@ -66,7 +66,7 @@ object TestDataProvider {
                         Shelf.new {
                             position = count % 3
                             quantity = 5
-                            product = stock.id
+                            product = stock
                             rack = racks.first { it.info == "Dairy" }.id
                         }
 
@@ -76,7 +76,7 @@ object TestDataProvider {
                         Shelf.new {
                             position = count % 3
                             quantity = 5
-                            product = stock.id
+                            product = stock
                             rack = racks.first { it.info == "Meat" }.id
                         }
                     }
@@ -85,7 +85,7 @@ object TestDataProvider {
                         Shelf.new {
                             position = count % 3
                             quantity = 5
-                            product = stock.id
+                            product = stock
                             rack = racks.first { it.info == "Vegetables" }.id
                         }
                     }
@@ -94,7 +94,7 @@ object TestDataProvider {
                         Shelf.new {
                             position = count % 3
                             quantity = 5
-                            product = stock.id
+                            product = stock
                             rack = racks.first { it.info == "Fruits" }.id
                         }
                     }
@@ -104,7 +104,7 @@ object TestDataProvider {
                         Shelf.new {
                             position = count % 3
                             quantity = 5
-                            product = stock.id
+                            product = stock
                             rack = racks.first { it.info == "Bakery" }.id
                         }
                     }
@@ -113,7 +113,7 @@ object TestDataProvider {
                         Shelf.new {
                             position = count % 3
                             quantity = 5
-                            product = stock.id
+                            product = stock
                             rack = racks.first { it.info == "Seafood" }.id
                         }
                     }
@@ -122,7 +122,7 @@ object TestDataProvider {
                         Shelf.new {
                             position = count % 3
                             quantity = 5
-                            product = stock.id
+                            product = stock
                             rack = racks.first { it.info == "Food cupboard" }.id
                         }
                     }
@@ -131,7 +131,7 @@ object TestDataProvider {
                         Shelf.new {
                             position = count % 3
                             quantity = 5
-                            product = stock.id
+                            product = stock
                             rack = racks.first { it.info == "Sweets" }.id
                         }
                     }
