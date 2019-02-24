@@ -6,10 +6,14 @@
 
 
     <com.otaliastudios.cameraview.CameraView
-        android:id="@+id/camera_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:adjustViewBounds="true"
-        android:keepScreenOn="true" />
+            android:id="@+id/camera_view"
+            android:layout_width="match_parent"
+            android:layout_height="603dp"
+            android:adjustViewBounds="true"
+            android:keepScreenOn="true"/>
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="136dp" android:id="@+id/msg_txt" android:text="@string/scan_items_msg"
+            android:textAlignment="center" android:textSize="30sp"/>
 
 </LinearLayout>
