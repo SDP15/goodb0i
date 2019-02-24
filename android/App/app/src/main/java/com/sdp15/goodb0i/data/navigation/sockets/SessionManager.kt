@@ -101,9 +101,19 @@ class SessionManager(
             sessionState.postValue(ShoppingSessionState.Scanning(point))
             return true
         } else if (point is Route.RoutePoint.Pass || point is Route.RoutePoint.TurnLeft || point is Route.RoutePoint.TurnRight) {
-            index = pointIndex
+            // We don't want to change state if a tag scan is triggered while we are scanning
+            // TODO: Make sure the Trolley scanning code doesn't post tags twice sequentially
+            if (sessionState.value !is ShoppingSessionState.Scanning && sessionState.value !is ShoppingSessionState.Confirming) {
+                index = pointIndex
+                // We should already be in a NavigatingTo state at this point
+                sessionState.postValue(ShoppingSessionState.NavigatingTo(route[index - 1], route[index]))
+            }
         }
         return false
+    }
+
+    private fun postMovingState() {
+        sessionState.postValue(ShoppingSessionState.NavigatingTo(route[index], route[index + 1]))
     }
 
     /*
@@ -131,10 +141,19 @@ class SessionManager(
 
     override fun productAccepted() {
         sh.sendMessage(Message.OutgoingMessage.ProductAccepted(lastScannedProduct.value!!.id))
+        //TODO: Move to next Either Scanning or NavigatingTo state
+        val next = route[index + 1]
+        if (next is Route.RoutePoint.EntryCollectionPoint) {
+            sessionState.postValue(ShoppingSessionState.Scanning(next))
+        } else {
+            //TODO: End state
+            postMovingState()
+        }
     }
 
     override fun productRejected() {
         sh.sendMessage(Message.OutgoingMessage.ProductRejected(lastScannedProduct.value!!.id))
+        sessionState.postValue(ShoppingSessionState.Scanning(route[index] as Route.RoutePoint.EntryCollectionPoint))
     }
 
     override fun requestAssistance() {

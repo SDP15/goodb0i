@@ -84,6 +84,13 @@
         android:label="confirmation_fragment"
         tools:layout="@layout/layout_confirmation">
 
+        <action android:id="@+id/action_confirmation_fragment_to_scanner_fragment"
+                app:destination="@id/scanner_fragment" app:popUpTo="@+id/scanner_fragment"/>
+        <action android:id="@+id/action_confirmation_fragment_to_item_fragment" app:destination="@id/item_fragment"
+                app:popUpTo="@+id/item_fragment"/>
+        <action android:id="@+id/action_confirmation_fragment_to_navigatingToFragment"
+                app:destination="@id/navigatingToFragment" app:popUpToInclusive="false"
+                app:popUpTo="@+id/navigatingToFragment"/>
     </fragment>
 
     <fragment
