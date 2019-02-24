@@ -1,5 +1,8 @@
 package com.sdp15.goodb0i.data.navigation
 
+/*
+ * A route is a list of RoutePoints
+ */
 class Route private constructor(
     points: List<RoutePoint>,
     private val routePoints: List<RoutePoint> = mutableListOf(RoutePoint.Start) + points + mutableListOf(RoutePoint.End)
@@ -40,18 +43,23 @@ class Route private constructor(
 
     sealed class RoutePoint(val id: String) {
 
+        // Constant start point
         object Start : RoutePoint("start")
 
+        // A point to be passed through (only used to ensure that we are still on track)
         class Pass(id: String) : RoutePoint(id)
 
         class TurnRight(id: String) : RoutePoint(id)
 
         class TurnLeft(id: String) : RoutePoint(id)
 
+        // A shelf at which we should stop to collect a product
         class EntryCollectionPoint(id: String, val productId: String) : RoutePoint(id)
 
+        // A point at which to stop
         class Stop(id: String) : RoutePoint(id)
 
+        // Constant end point
         object End : RoutePoint("end")
 
     }

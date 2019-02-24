@@ -2,6 +2,9 @@ package com.sdp15.goodb0i.data.navigation
 
 import com.sdp15.goodb0i.data.store.lists.ListItem
 
+/*
+ * The current state of the session
+ */
 sealed class ShoppingSessionState {
 
     // Prior to session start
@@ -27,6 +30,7 @@ sealed class ShoppingSessionState {
       */
     data class Scanning(val item: Route.RoutePoint.EntryCollectionPoint) : ShoppingSessionState()
 
+    // User is being asked to confirm an item
     data class Confirming(val item: ListItem) : ShoppingSessionState()
 
     // Reached end route point

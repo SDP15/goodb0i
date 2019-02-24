@@ -2,6 +2,9 @@ package com.sdp15.goodb0i.data.navigation
 
 import com.sdp15.goodb0i.data.navigation.sockets.SocketHandler
 
+/*
+ Incoming and Outgoing messages with the server
+ */
 sealed class Message {
 
     sealed class IncomingMessage : Message() {
@@ -33,6 +36,9 @@ sealed class Message {
             LINEAR, TURN
         }
 
+        /*
+         Message string couldn't be parsed
+         */
         data class InvalidMessage(val message: String) : IncomingMessage()
 
     }
@@ -49,10 +55,19 @@ sealed class Message {
          */
         data class ProductScanned(val id: String) : OutgoingMessage()
 
+        /*
+         * User has accepted the product
+         */
         data class ProductAccepted(val id: String) : OutgoingMessage()
 
+        /*
+         * User has rejected the product
+         */
         data class ProductRejected(val id: String) : OutgoingMessage()
 
+        /*
+         * Request stopping the trolley
+         */
         data class Stop(val reason: StopReason) : OutgoingMessage()
 
         object RequestHelp : OutgoingMessage()

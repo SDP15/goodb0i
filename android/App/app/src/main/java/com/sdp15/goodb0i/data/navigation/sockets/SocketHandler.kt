@@ -7,13 +7,18 @@ import okio.ByteString
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
 
+/*
+ Handles messages in and out of a WebSocket
+ */
 class SocketHandler<IN, OUT>(private val transform: SocketMessageTransformer<IN, OUT>) {
 
+    // For direct thread-safe access to the current socket state
     private val connected = AtomicBoolean(false)
     val isConnected: Boolean
         get() = connected.get()
     private var socket: WebSocket? = null
 
+    // Open the socket
     fun start(url: String) {
         val request = Request.Builder().url(url).build()
         val client = OkHttpClient()
@@ -31,6 +36,9 @@ class SocketHandler<IN, OUT>(private val transform: SocketMessageTransformer<IN,
         messages.postValue(transform.transformIncoming(message))
     }
 
+    /*
+    Privately implements OKHTTP3 WebSocketListener
+     */
     private inner class SocketListener : WebSocketListener() {
 
         override fun onOpen(webSocket: WebSocket, response: Response) {
@@ -42,6 +50,7 @@ class SocketHandler<IN, OUT>(private val transform: SocketMessageTransformer<IN,
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
             super.onFailure(webSocket, t, response)
             Timber.e(t, "Socket failure")
+            state.postValue(SocketState.ErrorDisconnect)
         }
 
         override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
@@ -62,7 +71,8 @@ class SocketHandler<IN, OUT>(private val transform: SocketMessageTransformer<IN,
         override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
             super.onClosed(webSocket, code, reason)
             connected.set(false)
-            if (code in listOf(1000, 1001)) {
+            // See here https://github.com/Luka967/websocket-close-codes
+            if (code in 1000..1001) {
                 state.postValue(SocketState.Disconnected)
             } else {
                 state.postValue(SocketState.ErrorDisconnect)
@@ -85,6 +95,9 @@ class SocketHandler<IN, OUT>(private val transform: SocketMessageTransformer<IN,
         socket?.send(transform.transformOutgoing(message))
     }
 
+    /**
+     * Responsible for transforming WebSocket text frames to and from more usable types
+     */
     interface SocketMessageTransformer<IN, OUT> {
 
         fun transformIncoming(message: String): IN
@@ -93,8 +106,13 @@ class SocketHandler<IN, OUT>(private val transform: SocketMessageTransformer<IN,
 
     }
 
+    /*
+    TODO: This could do with some more included information to allow for better error handling
+     */
     enum class SocketState {
-        Connected, Disconnected, ErrorDisconnect
+        Connected,  // Connection open
+        Disconnected, // Connection not open
+        ErrorDisconnect // Connection not open due to an error
     }
 
 }
