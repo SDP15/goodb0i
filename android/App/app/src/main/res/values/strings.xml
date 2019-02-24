@@ -3,9 +3,6 @@
 
     <string name="title_login">Enter list code</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-
     <string name="error_invalid_code_format">Invalid code format</string>
     <string name="welcome_header">Welcome to</string>
     <string name="action_prepare_order">PREPARE YOUR ORDER</string>

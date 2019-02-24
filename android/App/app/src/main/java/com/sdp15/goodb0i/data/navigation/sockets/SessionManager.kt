@@ -135,7 +135,6 @@ class SessionManager(
             lastScannedProduct.postValue(product)
             sessionState.postValue(ShoppingSessionState.Confirming(product))
         }
-
         return product
     }
 

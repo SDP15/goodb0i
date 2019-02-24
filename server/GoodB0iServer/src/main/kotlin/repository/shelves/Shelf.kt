@@ -8,7 +8,6 @@ import java.util.*
 
 class Shelf(id: EntityID<UUID>) : UUIDEntity(id) {
     companion object : UUIDEntityClass<Shelf>(Shelves)
-
     var product by Product referencedOn Shelves.product
     var quantity by Shelves.quantity
     var position by Shelves.position
