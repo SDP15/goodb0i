@@ -1,3 +1,0 @@
-Keyword detected: start
-Keyword detected: no
-Your options are: yes, no, and repeat.
