@@ -9,4 +9,6 @@ interface ShoppingListStore {
 
     fun loadLists(): LiveData<List<ShoppingList>>
 
+    suspend fun deleteList(list: ShoppingList)
+
 }

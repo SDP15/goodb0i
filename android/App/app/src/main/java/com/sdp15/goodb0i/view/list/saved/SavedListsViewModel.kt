@@ -12,6 +12,7 @@ class SavedListsViewModel : BaseViewModel<Any>() {
     val lists = listStore.loadLists()
 
     override fun bind() {
+
     }
 
     fun open(list: ShoppingList) {

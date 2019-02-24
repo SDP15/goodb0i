@@ -1,5 +1,6 @@
 package com.sdp15.goodb0i.view.list.saved
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,7 +8,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import androidx.room.Room
 import com.sdp15.goodb0i.R
+import com.sdp15.goodb0i.data.store.RoomDB
 import com.sdp15.goodb0i.switchOnEmpty
 import kotlinx.android.synthetic.main.layout_stored_lists.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -23,6 +26,8 @@ class SavedListsFragment : Fragment() {
     ): View? {
         return inflater.inflate(R.layout.layout_stored_lists, container, false)
     }
+
+
 
     override fun onResume() {
         super.onResume()

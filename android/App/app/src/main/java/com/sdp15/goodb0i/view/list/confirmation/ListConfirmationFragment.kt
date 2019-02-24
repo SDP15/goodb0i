@@ -57,4 +57,11 @@ class ListConfirmationFragment : BaseFragment() {
         return inflater.inflate(R.layout.layout_list_confirmation, container, false)
     }
 
+    override fun onBackPressed(): Boolean {
+        if(baseActivity.fragmentHistory.first==R.id.list_creation_fragment) {
+            findNavController().popBackStack(R.id.welcome_fragment, false)
+            return true
+        }
+        return false
+    }
 }

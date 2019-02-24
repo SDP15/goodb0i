@@ -5,14 +5,23 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.sdp15.goodb0i.R
+import com.sdp15.goodb0i.data.store.cache.ListDAO
+import com.sdp15.goodb0i.data.store.cache.ShoppingListStore
 import com.sdp15.goodb0i.data.store.lists.ShoppingList
+import kotlinx.android.synthetic.main.list_order.*
 import kotlinx.android.synthetic.main.list_order.view.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import org.koin.standalone.KoinComponent
+import org.koin.standalone.inject
+import timber.log.Timber
 import kotlin.math.min
 
-class SavedListsAdapter(val onClick: (ShoppingList) -> Unit) : RecyclerView.Adapter<SavedListsAdapter.SavedListViewHolder>() {
+class SavedListsAdapter(val onClick: (ShoppingList) -> Unit) : RecyclerView.Adapter<SavedListsAdapter.SavedListViewHolder>(), KoinComponent {
 
     private val lists = mutableListOf<ShoppingList>()
-
+    private val listStore: ShoppingListStore by inject()
     fun setItems(items: Collection<ShoppingList>) {
         lists.clear()
         lists.addAll(items)
@@ -23,6 +32,13 @@ class SavedListsAdapter(val onClick: (ShoppingList) -> Unit) : RecyclerView.Adap
         SavedListViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_order, parent, false))
 
     override fun getItemCount(): Int = lists.size
+
+    suspend fun deleteList(pos: Int){
+        listStore.deleteList(lists[pos])
+        lists.removeAt(pos)
+        //need to update the screen
+    }
+
 
     override fun onBindViewHolder(holder: SavedListViewHolder, position: Int) {
         val sl = lists[position]
@@ -36,7 +52,15 @@ class SavedListsAdapter(val onClick: (ShoppingList) -> Unit) : RecyclerView.Adap
             setOnClickListener {
                 onClick(sl)
             }
+            delete_order_btn.setOnClickListener(){
+                GlobalScope.launch(Dispatchers.IO){
+                    deleteList(sl)
+                   }
+
+            }
         }
+
+
     }
 
     class SavedListViewHolder(view: View) : RecyclerView.ViewHolder(view)

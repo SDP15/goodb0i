@@ -55,5 +55,14 @@
         app:layout_constraintWidth_percent="0.8"
         tools:text="Item 1\nItem 2\nItem 3" />
 
+    <androidx.appcompat.widget.AppCompatButton
+            android:text="@string/label_delete_order"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:id="@+id/delete_order_btn"
+            android:textSize="20sp" app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" app:layout_constraintHorizontal_bias="0.0"
+            android:layout_marginTop="20dp" app:layout_constraintTop_toBottomOf="@+id/text_list_preview"/>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

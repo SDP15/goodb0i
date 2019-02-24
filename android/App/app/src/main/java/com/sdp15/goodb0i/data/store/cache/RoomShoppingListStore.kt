@@ -14,6 +14,10 @@ class RoomShoppingListStore(private val dao: ListDAO) : ShoppingListStore {
         Timber.i("Storing list $list")
         dao.insert(list)
     }
+    override suspend fun deleteList(list: ShoppingList){
+        Timber.i("Deleting list $list")
+        dao.delete(list)
+    }
 
     private val list = MutableLiveData<List<ShoppingList>>()
 
@@ -23,4 +27,6 @@ class RoomShoppingListStore(private val dao: ListDAO) : ShoppingListStore {
         }
         return list
     }
+
+
 }
