@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 class Session(
         val appOut: SessionManager.AppMessageSender,
         val trolleyOut: SessionManager.TrolleyMessageSender
-) : TrolleyManager.TrolleyMessageListener, AppManager.AppMessageListener {
+) : TrolleyManager.TrolleyMessageListener {
 
     private val isPhoneConnected = AtomicBoolean(false)
 
@@ -17,11 +17,7 @@ class Session(
 
     }
 
-    override fun onAppMessage(message: String) {
-
-    }
-
-    override fun onConnectivityChange(isConnected: Boolean) = isPhoneConnected.set(isConnected)
+    //override fun onConnectivityChange(isConnected: Boolean) = isPhoneConnected.set(isConnected)
 
 
     private fun sendToBoth(message: String) {
