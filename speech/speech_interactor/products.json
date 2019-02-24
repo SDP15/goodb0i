@@ -1,0 +1,409 @@
+[
+  {
+    "id": "452a908a-6f46-415b-9023-8cc2f023a31f",
+    "name": "British Whole Milk 3.408L, 6 Pints",
+    "superDepartment": "Fresh Food",
+    "ContentsMeasureType": "L",
+    "UnitOfSale": 1,
+    "description": [
+      "Pasteurised standardised homogenised whole milk.",
+      "From British Farms. Supporting our trusted dairy farmers Fair For Farmers Guarantee: We Promise every farmer is paid fairly for every pint of milk, every pint is 100% British and every cow is well cared for For more information go to www.tescoplc.com/little helps plan/"
+    ],
+    "AverageSellingUnitWeight": 2.083,
+    "UnitQuantity": "LITRE",
+    "contentsQuantity": 0.0,
+    "department": "Milk, Butter \u0026 Eggs",
+    "price": 1.5,
+    "unitPrice": 0.0
+  },
+  {
+    "id": "fe1c26e1-5832-447b-a0d0-ee1bc234dbfc",
+    "name": "Grated 30% Reduced Fat Mature Cheese 250G",
+    "superDepartment": "Fresh Food",
+    "ContentsMeasureType": "G",
+    "UnitOfSale": 1,
+    "description": [
+      "Medium fat hard mature cheese.",
+      "Rich \u0026 Versatile Hand selected by our cheesemakers for taste"
+    ],
+    "AverageSellingUnitWeight": 0.256,
+    "UnitQuantity": "KG",
+    "contentsQuantity": 0.0,
+    "department": "Cheese",
+    "price": 1.9,
+    "unitPrice": 0.0
+  },
+  {
+    "id": "ce789118-0d1f-4426-ad04-872f852793a3",
+    "name": "Lurpak Unsalted Block Butter 250G",
+    "superDepartment": "Fresh Food",
+    "ContentsMeasureType": "G",
+    "UnitOfSale": 1,
+    "description": [
+      "Unsalted Butter."
+    ],
+    "AverageSellingUnitWeight": 0.263,
+    "UnitQuantity": "KG",
+    "contentsQuantity": 0.0,
+    "department": "Milk, Butter \u0026 Eggs",
+    "price": 2.0,
+    "unitPrice": 0.0
+  },
+  {
+    "id": "4e724dc9-0b40-4a7d-9d67-d3a8353879c1",
+    "name": "British Chicken Breast Portions 650G",
+    "superDepartment": "Fresh Food",
+    "ContentsMeasureType": "G",
+    "UnitOfSale": 1,
+    "description": [
+      "Fresh Class A skinless chicken breast fillet portions.",
+      "From Trusted Farms Fed on a wholegrain diet for a succulent texture"
+    ],
+    "AverageSellingUnitWeight": 0.746,
+    "UnitQuantity": "KG",
+    "contentsQuantity": 0.0,
+    "department": "Fresh Meat \u0026 Poultry",
+    "price": 3.8,
+    "unitPrice": 0.0
+  },
+  {
+    "id": "4eba0e0c-658f-44c0-b804-33487009d9f7",
+    "name": "8 Pork Loin Steaks 1.08Kg",
+    "superDepartment": "Fresh Food",
+    "ContentsMeasureType": "G",
+    "UnitOfSale": 1,
+    "description": [
+      "Boneless pork loin steaks.",
+      "From trusted farms. Working with selected farmers that we trust, to ensure high welfare standards and consistent quality."
+    ],
+    "AverageSellingUnitWeight": 1.26,
+    "UnitQuantity": "KG",
+    "contentsQuantity": 0.0,
+    "department": "Fresh Meat \u0026 Poultry",
+    "price": 5.0,
+    "unitPrice": 0.0
+  },
+  {
+    "id": "e1cfb128-7806-4157-9bca-7faf0a89ef7b",
+    "name": "Boswell Farms Beef Mince 500G 20% Fat",
+    "superDepartment": "Fresh Food",
+    "ContentsMeasureType": "G",
+    "UnitOfSale": 1,
+    "description": [
+      "Typical percentage fat content under 20% Typical percentage collagen/ meat protein ratio under 17% For UK Market Only",
+      "BOSWELL FARMS BEEF MINCE 20% FAT"
+    ],
+    "AverageSellingUnitWeight": 0.591,
+    "UnitQuantity": "KG",
+    "contentsQuantity": 0.0,
+    "department": "Fresh Meat \u0026 Poultry",
+    "price": 1.49,
+    "unitPrice": 0.0
+  },
+  {
+    "id": "911b9f8c-7372-418b-b966-65467aa2edfa",
+    "name": "Sweet Vine Ripened Tomatoes 230G",
+    "superDepartment": "Fresh Food",
+    "ContentsMeasureType": "G",
+    "UnitOfSale": 1,
+    "description": [
+      "Sweet vine ripened tomatoes",
+      "Sweet vine ripened tomatoes"
+    ],
+    "AverageSellingUnitWeight": 0.292,
+    "UnitQuantity": "KG",
+    "contentsQuantity": 0.0,
+    "department": "Fresh Salad \u0026 Dips",
+    "price": 1.0,
+    "unitPrice": 0.0
+  },
+  {
+    "id": "ef81e29c-4487-40b9-be1f-d68a61de6f03",
+    "name": "Bunched Carrots Bag",
+    "superDepartment": "Fresh Food",
+    "ContentsMeasureType": "SNGL",
+    "UnitOfSale": 1,
+    "description": [
+      "Crunchy and sweet, perfect for roasting",
+      "Bunched in the field by hand ~ High in Vitamin A"
+    ],
+    "AverageSellingUnitWeight": 0.733,
+    "UnitQuantity": "EACH",
+    "contentsQuantity": 0.0,
+    "department": "Fresh Vegetables",
+    "price": 1.5,
+    "unitPrice": 0.0
+  },
+  {
+    "id": "7c625f20-9828-4d3e-ae68-adfaf639f345",
+    "name": "Broccoli Florets 240G",
+    "superDepartment": "Fresh Food",
+    "ContentsMeasureType": "G",
+    "UnitOfSale": 1,
+    "description": [
+      "Broccoli.",
+      "Crunchy and full of flavour"
+    ],
+    "AverageSellingUnitWeight": 0.305,
+    "UnitQuantity": "KG",
+    "contentsQuantity": 0.0,
+    "department": "Fresh Vegetables",
+    "price": 1.3,
+    "unitPrice": 0.0
+  },
+  {
+    "id": "adc64b39-b274-4c17-96df-947207d3592d",
+    "name": "Organic Small Bananas 6 Pack",
+    "superDepartment": "Fresh Food",
+    "ContentsMeasureType": "SNGL",
+    "UnitOfSale": 1,
+    "description": [
+      "Small Bananas",
+      "Probably yellow"
+    ],
+    "AverageSellingUnitWeight": 0.891,
+    "UnitQuantity": "EACH",
+    "contentsQuantity": 0.0,
+    "department": "Fresh Fruit",
+    "price": 1.39,
+    "unitPrice": 0.0
+  },
+  {
+    "id": "21d24ae3-6d3f-499f-be3c-b5c4497ab2f1",
+    "name": "Jaffa Red Oranges Minimum 5 Pack",
+    "superDepartment": "Fresh Food",
+    "ContentsMeasureType": "SNGL",
+    "UnitOfSale": 1,
+    "description": [
+      "Oranges.",
+      "Jaffa Reds/Pink"
+    ],
+    "AverageSellingUnitWeight": 0.933,
+    "UnitQuantity": "EACH",
+    "contentsQuantity": 0.0,
+    "department": "Fresh Fruit",
+    "price": 2.25,
+    "unitPrice": 0.0
+  },
+  {
+    "id": "0e694c17-f551-4f8e-b001-7d14f4fbdacf",
+    "name": "Red Seedless Grapes 500G",
+    "superDepartment": "Fresh Food",
+    "ContentsMeasureType": "KG",
+    "UnitOfSale": 1,
+    "description": [
+      "Jack\u0027s Red Seedless Grapes",
+      "Jack\u0027s Red Seedless Grapes"
+    ],
+    "AverageSellingUnitWeight": 0.52,
+    "UnitQuantity": "KG",
+    "contentsQuantity": 0.0,
+    "department": "Fresh Fruit",
+    "price": 2.0,
+    "unitPrice": 0.0
+  },
+  {
+    "id": "57f60f82-6577-43be-966a-68aace6d28c9",
+    "name": "New York Bakery Plain Bagels 5 Pack",
+    "superDepartment": "Bakery",
+    "ContentsMeasureType": "SNGL",
+    "UnitOfSale": 1,
+    "description": [
+      "5 Plain Bagels",
+      "For all the latest news and recipe ideas join our Facebook community at www.facebook.com/newyorkbakery"
+    ],
+    "AverageSellingUnitWeight": 0.462,
+    "UnitQuantity": "EACH",
+    "contentsQuantity": 0.0,
+    "department": "Bread \u0026 Rolls",
+    "price": 1.6,
+    "unitPrice": 0.0
+  },
+  {
+    "id": "0719e057-9071-4e4c-aeb0-b9045173e21f",
+    "name": "Stay Fresh White Medium Bread 800G",
+    "superDepartment": "Bakery",
+    "ContentsMeasureType": "G",
+    "UnitOfSale": 1,
+    "description": [
+      "Medium sliced white bread.",
+      "Baked to stay fresh for longer"
+    ],
+    "AverageSellingUnitWeight": 121.367,
+    "UnitQuantity": "100G",
+    "contentsQuantity": 0.0,
+    "department": "Bread \u0026 Rolls",
+    "price": 0.7,
+    "unitPrice": 0.0
+  },
+  {
+    "id": "41e383d4-1898-4cf6-a8f6-8015172f50c1",
+    "name": "Weetabix Apricot And Oat Breakfast Muffin 4 Pack",
+    "superDepartment": "Bakery",
+    "ContentsMeasureType": "SNGL",
+    "UnitOfSale": 1,
+    "description": [
+      "4 Muffins with dried apricots, oats and poppy seeds and topped with wholegrain wheat flakes"
+    ],
+    "AverageSellingUnitWeight": 0.631,
+    "UnitQuantity": "EACH",
+    "contentsQuantity": 0.0,
+    "department": "Doughnuts, Cookies \u0026 Muffins",
+    "price": 1.8,
+    "unitPrice": 0.0
+  },
+  {
+    "id": "34bf4a9d-71cc-4d4b-824d-bdcee065006b",
+    "name": "Smoked Salmon 240G",
+    "superDepartment": "Fresh Food",
+    "ContentsMeasureType": "G",
+    "UnitOfSale": 1,
+    "description": [
+      "Smoked salmon (Salmo salar) slices, defrosted.",
+      "READY TO EAT Smoked Salmon Slices. Gently smoked with oak and beechwood for a delicately mild flavour. Our Smoked Salmon is farmed in waters off the coast of Norway or Scotland. Cured to lock in succulence, then gently kiln smoked using smouldering oak for robustness and beechwood for a subtle sweetness. Finally it is left to mature to allow the flavour to develop before slicing."
+    ],
+    "AverageSellingUnitWeight": 0.247,
+    "UnitQuantity": "100G",
+    "contentsQuantity": 0.0,
+    "department": "Chilled Fish \u0026 Seafood",
+    "price": 6.4,
+    "unitPrice": 0.0
+  },
+  {
+    "id": "7fe537be-af3d-4148-8508-44c413790db5",
+    "name": "4 Breaded Cod Fillets 500G",
+    "superDepartment": "Frozen Food",
+    "ContentsMeasureType": "KG",
+    "UnitOfSale": 1,
+    "description": [
+      "4 Skinless and boneless cod (Gadus morhua) fillets, formed from pieces of 100% Cod fillet coated in breadcrumbs.",
+      "Formed from 100% cod fillet coated in crispy breadcrumbs"
+    ],
+    "AverageSellingUnitWeight": 0.546,
+    "UnitQuantity": "KG",
+    "contentsQuantity": 0.0,
+    "department": "Frozen Fish \u0026 Seafood",
+    "price": 2.75,
+    "unitPrice": 0.0
+  },
+  {
+    "id": "99dda305-a301-424f-8976-c1d86f960782",
+    "name": "Finest Cooked Jumbo King Prawns 150G",
+    "superDepartment": "Fresh Food",
+    "ContentsMeasureType": "G",
+    "UnitOfSale": 1,
+    "description": [
+      "Cooked and peeled king prawns (Litopenaeus vannamei), defrosted.",
+      "Tesco finest* Jumbo King Prawns Juicy and plump warm water prawns. Gently cooked to enhance their naturally sweet flavour. Why not try: Adding to a risotto with peas, finish with Parmesan and fresh parsley. Responsibly sourcing our seafood is important to us, which is why Tesco fish experts work with responsibly managed farms and fisheries to continually improve their high standards of quality, welfare and sustainability."
+    ],
+    "AverageSellingUnitWeight": 0.2,
+    "UnitQuantity": "KG",
+    "contentsQuantity": 0.0,
+    "department": "Chilled Fish \u0026 Seafood",
+    "price": 3.75,
+    "unitPrice": 0.0
+  },
+  {
+    "id": "7f71e865-5548-4438-a0c2-df3604f706a3",
+    "name": "Kelloggs All Bran Cereal 500G",
+    "superDepartment": "Food Cupboard",
+    "ContentsMeasureType": "G",
+    "UnitOfSale": 1,
+    "description": [
+      "High-fibre wheat bran cereal",
+      "Have a look at our websites for lots of tasty recipes",
+      "Visit our website for delicious recipes \u0026 information www.allbran.co.uk",
+      "Enjoy as part of a varied and balanced diet and a healthy lifestyle."
+    ],
+    "AverageSellingUnitWeight": 0.466,
+    "UnitQuantity": "100G",
+    "contentsQuantity": 0.0,
+    "department": "Cereals",
+    "price": 2.4,
+    "unitPrice": 0.0
+  },
+  {
+    "id": "d00df3c2-cbb4-4ffb-ab5d-9b9e3a26e019",
+    "name": "Everyday Value Tomato Ketchup 550G",
+    "superDepartment": "Food Cupboard",
+    "ContentsMeasureType": "G",
+    "UnitOfSale": 1,
+    "description": [
+      "Tomato ketchup.",
+      "Tasted and approved by customers"
+    ],
+    "AverageSellingUnitWeight": 0.599,
+    "UnitQuantity": "100G",
+    "contentsQuantity": 0.0,
+    "department": "Table Sauces, Marinades \u0026 Dressings",
+    "price": 0.42,
+    "unitPrice": 0.0
+  },
+  {
+    "id": "91ea9547-cc32-4755-985e-466c380aa097",
+    "name": "Napolina Fusilli Pasta 500G",
+    "superDepartment": "Food Cupboard",
+    "ContentsMeasureType": "G",
+    "UnitOfSale": 1,
+    "description": [
+      "Fusilli"
+    ],
+    "AverageSellingUnitWeight": 0.54,
+    "UnitQuantity": "KG",
+    "contentsQuantity": 0.0,
+    "department": "Dried Pasta, Rice, Noodles \u0026 Cous Cous",
+    "price": 0.64,
+    "unitPrice": 0.0
+  },
+  {
+    "id": "8c44e46f-7c83-49f1-9033-5bc6bddf1064",
+    "name": "Galaxy Chocolate Multipack 4 X42g",
+    "superDepartment": "Food Cupboard",
+    "ContentsMeasureType": "G",
+    "UnitOfSale": 1,
+    "description": [
+      "Milk chocolate"
+    ],
+    "AverageSellingUnitWeight": 0.203,
+    "UnitQuantity": "100G",
+    "contentsQuantity": 0.0,
+    "department": "Chocolate",
+    "price": 1.5,
+    "unitPrice": 0.0
+  },
+  {
+    "id": "09c23f1a-3ead-43ac-8ac1-31ac1dba7bad",
+    "name": "Haribo Jelly Babies 180G",
+    "superDepartment": "Food Cupboard",
+    "ContentsMeasureType": "G",
+    "UnitOfSale": 1,
+    "description": [
+      "Fruit Flavour Gums",
+      "Visit our website www.haribo.com"
+    ],
+    "AverageSellingUnitWeight": 0.216,
+    "UnitQuantity": "100G",
+    "contentsQuantity": 0.0,
+    "department": "Sweets, Mints \u0026 Chewing Gum",
+    "price": 1.0,
+    "unitPrice": 0.0
+  },
+  {
+    "id": "6059c4c3-3ef3-4459-b243-44e265523339",
+    "name": "Metcalfes Skinny Cinema Sweet Popcorn 70 G",
+    "superDepartment": "Food Cupboard",
+    "ContentsMeasureType": "G",
+    "UnitOfSale": 1,
+    "description": [
+      "Cinema sweet style popped corn with sugar and sweeteners.",
+      "Tweet me before you eat me",
+      "#popitlikeitsmetcalfes"
+    ],
+    "AverageSellingUnitWeight": 0.076,
+    "UnitQuantity": "100G",
+    "contentsQuantity": 0.0,
+    "department": "Crisps, Snacks \u0026 Popcorn",
+    "price": 1.6,
+    "unitPrice": 0.0
+  }
+]
