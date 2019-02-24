@@ -14,4 +14,5 @@ interface ListDAO {
 
     @Delete
     suspend fun delete(list: ShoppingList)
+
 }

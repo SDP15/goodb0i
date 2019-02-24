@@ -54,7 +54,7 @@ class SavedListsAdapter(val onClick: (ShoppingList) -> Unit) : RecyclerView.Adap
             }
             delete_order_btn.setOnClickListener(){
                 GlobalScope.launch(Dispatchers.IO){
-                    deleteList(sl)
+                    deleteList(position)
                    }
 
             }

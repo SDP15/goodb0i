@@ -6,7 +6,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import mu.KotlinLogging
+import org.jetbrains.exposed.sql.SizedCollection
+import org.jetbrains.exposed.sql.SizedIterable
 import org.jetbrains.exposed.sql.transactions.transaction
+import repository.adapters.ShoppingListTypeAdapter
+import repository.lists.ListEntry
+import repository.lists.ShoppingList
 import repository.shelves.Shelf
 import repository.shelves.ShelfRack
 import repository.products.Product
@@ -40,6 +45,7 @@ object TestDataProvider {
             }
 
             createDefaultShelves()
+            createTestList()
         }
     }
 
@@ -137,6 +143,22 @@ object TestDataProvider {
                     }
                 }
                 count++
+            }
+        }
+    }
+
+    private fun createTestList() {
+        transaction {
+            ShoppingList.new {
+                code = 1234567
+                time = System.currentTimeMillis()
+                products = SizedCollection(Product.all().take(10).mapIndexed { i, p ->
+                    ListEntry.new {
+                        index = i
+                        product = p
+                        quantity = i+1
+                    }
+                })
             }
         }
     }

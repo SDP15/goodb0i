@@ -7,15 +7,21 @@ import java.util.concurrent.ConcurrentHashMap
 class TrolleyManager {
 
     private val members = ConcurrentHashMap<String, WebSocketSession>()
+    private val listeners = ConcurrentHashMap<String, IncomingMessageListener>()
 
-    suspend fun sendMessage(id: String, message: String) {
-        members[id]?.outgoing?.send(Frame.Text(message))
+    fun addMessageListener(id: String, listener: IncomingMessageListener) {
+        listeners[id] = listener
+    }
+
+
+    fun assignAvailableTrolley(): Pair<String, WebSocketSession>? {
+        //TODO: Actually track assigned trolleys
+        return members.entries.first().toPair()
     }
 
     suspend fun onMessage(id: String, message: String) {
         println("Trolley $id sent $message")
-        members[id]?.send(Frame.Text(message + " returnedh"))
-        //TODO Decide where to route the message
+        listeners[id]?.onTrolleyMessage(message)
     }
 
     suspend fun joinTrolley(id: String, socket: WebSocketSession) {
@@ -29,5 +35,11 @@ class TrolleyManager {
     suspend fun removeTrolley(id: String, socket: WebSocketSession) {
         members.remove(id)
     }
+
+    fun setTrolleyMessageListener(id: String, listener: IncomingMessageListener) {
+        listeners[id] = listener
+    }
+
+    fun removeTrolleyMessageListener(id: String) = listeners.remove(id)
 
 }
