@@ -1,9 +1,6 @@
 package com.sdp15.goodb0i.data.store.cache
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.sdp15.goodb0i.data.store.lists.ShoppingList
 
 @Dao
@@ -14,5 +11,9 @@ interface ListDAO {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(list: ShoppingList)
+
+    @Delete
+    suspend fun delete(list: ShoppingList)
+
 
 }

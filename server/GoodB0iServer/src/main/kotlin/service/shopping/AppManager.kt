@@ -2,12 +2,12 @@ package service.shopping
 
 import io.ktor.http.cio.websocket.Frame
 import io.ktor.http.cio.websocket.WebSocketSession
-import kotlinx.coroutines.isActive
 import java.util.concurrent.ConcurrentHashMap
 
 class AppManager {
 
     private val members = ConcurrentHashMap<String, WebSocketSession>()
+    private val listeners = ConcurrentHashMap<String, IncomingMessageListener>()
     private val sessionData = ConcurrentHashMap<String, AppSession>()
     private var count = 0
 
@@ -16,11 +16,7 @@ class AppManager {
 
     suspend fun onMessage(id: String, message: String) {
         println("$id : $message")
-        members[id]?.outgoing?.apply {
-            if (!isClosedForSend) {
-                offer(Frame.Text("Received ${count++}"))
-            }
-        }
+
     }
 
     suspend fun joinApp(id: String, socket: WebSocketSession) {

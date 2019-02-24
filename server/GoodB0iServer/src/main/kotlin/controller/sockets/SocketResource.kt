@@ -20,7 +20,7 @@ fun Route.sockets(trolleyManager: TrolleyManager, appManager: AppManager) {
     https://ktor.io/servers/features/websockets.html
     - The standard WebSocket API has the following events
         - onConnect - This happens when the webSocket body is entered
-        - onMessage - This happens in incoming.consumeEach
+        - onTrolleyMessage - This happens in incoming.consumeEach
         - onClose - This happens when consumeEach stops
         - onError - This happens when an exception is thrown
      - Each time a device connects we:
