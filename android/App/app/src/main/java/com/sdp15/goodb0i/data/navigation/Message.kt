@@ -36,6 +36,11 @@ sealed class Message {
             LINEAR, TURN
         }
 
+
+        object TrolleyAcceptedProduct : IncomingMessage()
+
+        object TrolleyRejectedProduct : IncomingMessage()
+
         /*
          Message string couldn't be parsed
          */

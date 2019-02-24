@@ -7,6 +7,7 @@ import com.sdp15.goodb0i.data.navigation.scanner.BarcodeReader
 import com.sdp15.goodb0i.data.navigation.scanner.BarcodeReaderCallback
 import com.sdp15.goodb0i.data.navigation.scanner.BarcodeReading
 import com.sdp15.goodb0i.view.BaseViewModel
+import com.sdp15.goodb0i.view.scanner.ScannerFragmentDirections
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -25,9 +26,12 @@ class ScannerViewModel : BaseViewModel<Any>(),
     val reading = MutableLiveData<BarcodeReading>()
 
     override fun bind() {
+        // Restart scanning on bind
+        isRunning.set(false)
     }
 
     private fun onRead(code: String) {
+        isRunning.set(true)
         GlobalScope.launch(Dispatchers.IO) {
             val product = sm.checkScannedCode(code)
             if (product != null) {
