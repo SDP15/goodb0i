@@ -154,8 +154,9 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(),
         }
     }
 
+    // Move a product on drag-and-drop
     fun moveProduct(from: Int, to: Int) {
-        if (currentList.move(from, to)) {
+        if (currentList.move(from, to)) { // Has the item actually moved (from != to)
             list.postValue(ListDiff.Move(currentList, currentList[to], from, to))
         }
     }

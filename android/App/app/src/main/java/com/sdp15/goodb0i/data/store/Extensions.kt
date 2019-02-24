@@ -5,6 +5,9 @@ import kotlinx.coroutines.Deferred
 import retrofit2.Response
 import timber.log.Timber
 
+/*
+ * Awaits a deferred result, catching any errors
+ */
 suspend fun <T, U> Deferred<T>.awaitCatching(success: (T) -> U, failure: (Throwable) -> U): U {
     return try {
         success(await())
@@ -12,7 +15,9 @@ suspend fun <T, U> Deferred<T>.awaitCatching(success: (T) -> U, failure: (Throwa
         failure(t)
     }
 }
-
+/*
+ * Convert a Retrofit2 HTTP Response to a Result
+ */
 fun <T : Any> Response<T>.toResult(log: Boolean = BuildConfig.DEBUG): Result<T> {
     val body = body()
     return if (isSuccessful && body != null) {

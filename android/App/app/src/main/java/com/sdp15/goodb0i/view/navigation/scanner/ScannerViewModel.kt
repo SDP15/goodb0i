@@ -31,7 +31,6 @@ class ScannerViewModel : BaseViewModel<Any>(),
         GlobalScope.launch(Dispatchers.IO) {
             val product = sm.checkScannedCode(code)
             if (product != null) {
-                // TODO: Do something with scanned product
                 transitions.postValue(ScannerFragmentDirections.actionScannerFragmentToConfirmationFragment())
             }
         }

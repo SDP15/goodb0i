@@ -7,9 +7,13 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import timber.log.Timber
 
+/*
+ * Dirty static store which allows us to switch out the base URL
+ * TODO: Implement something in the build script to switch out the base url depending on build type
+ */
 object RetrofitProvider {
 
-    var root = "http://10.0.2.2:8080"
+    var root = "http://10.0.2.2:8080" // Machine localhost
         set(value) {
             field = value
             retrofit = build()
@@ -18,7 +22,7 @@ object RetrofitProvider {
     private fun build() : Retrofit =
         Retrofit.Builder().apply {
             client(OkHttpClient().newBuilder().build())
-            baseUrl(root) // Machine localhost
+            baseUrl(root)
             addConverterFactory(GsonConverterFactory.create())
             addCallAdapterFactory(CoroutineCallAdapterFactory())
         }.build()
