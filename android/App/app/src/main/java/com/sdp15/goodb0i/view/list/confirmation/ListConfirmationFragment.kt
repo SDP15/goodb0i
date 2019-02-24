@@ -22,7 +22,7 @@ class ListConfirmationFragment : BaseFragment() {
         val args = navArgs<ListConfirmationFragmentArgs>()
         Timber.i("Received args $args")
         vm.setShoppingList(args.value.shoppingList)
-        confirmation_button_navigate.setOnClickListener {
+        confirmation_button_Pay.setOnClickListener {
 
         }
         vm.price.observe(this, Observer {
@@ -45,7 +45,7 @@ class ListConfirmationFragment : BaseFragment() {
                 )
             }
         }
-        confirmation_button_navigate.setOnClickListener {
+        confirmation_button_Pay.setOnClickListener {
             vm.startNavigation()
         }
     }
