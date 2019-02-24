@@ -50,13 +50,19 @@ class AppManager {
     }
 
     companion object {
-        private const val DELIM = "$"
+        private const val DELIM = "&"
         private const val ID_KEY = "ID"
-
+        private const val TROLLEY_CONNECTED_KEY = "TC"
+        private const val REACHED_POINT_KEY = "PT"
+        private const val ROUTE_CALCULATED_KEY = "RC"
 
         fun joinKey(id: String) = Frame.Text("$ID_KEY$DELIM$id")
 
+        fun trolleyConnected() = Frame.Text("$TROLLEY_CONNECTED_KEY$DELIM")
 
+        fun reachedPoint(point: String) = Frame.Text("$REACHED_POINT_KEY$DELIM$point")
+
+        fun calculatedRoute(route: String) = Frame.Text("$ROUTE_CALCULATED_KEY$DELIM$route")
     }
 
 }

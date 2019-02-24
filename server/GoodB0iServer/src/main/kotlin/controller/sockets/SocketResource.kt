@@ -58,9 +58,7 @@ fun Route.sockets(trolleyManager: TrolleyManager, appManager: AppManager) {
         try {
             incoming.consumeEach { frame ->
                 if (frame is Frame.Text) {
-                    //TODO: Pass to
-                    TimeUnit.SECONDS.sleep(1)
-                    appManager.onMessage(nonce, StandardCharsets.UTF_8.decode(frame.buffer).toString())
+                    appManager.onMessage(nonce, frame.readText())
                 }
             }
         } catch (e: ClosedSendChannelException) {
