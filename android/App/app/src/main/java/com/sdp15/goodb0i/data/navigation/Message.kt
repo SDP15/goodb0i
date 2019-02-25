@@ -104,11 +104,11 @@ sealed class Message {
         override fun transformOutgoing(message: OutgoingMessage): String {
             return when (message) {
                 is OutgoingMessage.Reconnect -> "RC$delim${message.oldId}"
-                is OutgoingMessage.ProductScanned -> "PC$delim${message.id}"
+                is OutgoingMessage.ProductScanned -> "PS$delim${message.id}"
                 is OutgoingMessage.ProductAccepted -> "PA$delim${message.id}"
                 is OutgoingMessage.ProductRejected -> "PR$delim${message.id}"
                 is OutgoingMessage.RequestHelp -> "RH$delim"
-                else -> "INVLD$delim"
+                is OutgoingMessage.Stop -> "SP$delim${message.reason.code}"
             }
         }
     }

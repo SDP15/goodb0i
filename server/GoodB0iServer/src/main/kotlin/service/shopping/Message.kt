@@ -12,15 +12,28 @@ sealed class Message {
 
             data class ReachedPoint(val id: String) : FromTrolley()
 
+            data class InvalidMessage(val message: String) : FromTrolley()
         }
 
         sealed class FromApp : IncomingMessage() {
+
+            data class Reconnect(val oldId: String) : FromApp()
+
+            object ProductScanned : FromApp()
 
             object AppRejectedProduct : FromApp()
 
             object AppAcceptedProduct : FromApp()
 
+            object RequestHelp : FromApp()
+
+            object RequestStop : FromApp()
+
+            data class InvalidMessage(val message: String) : FromApp()
+
         }
+
+
     }
 
     sealed class OutgoingMessage : Message() {
@@ -48,9 +61,27 @@ sealed class Message {
 
         private const val delim = "&" // Unused UTF-8 character
 
-        fun messageFromString(message: String): IncomingMessage {
+        fun messageFromAppString(message: String): IncomingMessage.FromApp {
+            val type = message.substringBefore(delim)
+            return when (type) {
+                "RC" -> IncomingMessage.FromApp.Reconnect(message.substringAfter(delim))
+                "PS" -> IncomingMessage.FromApp.ProductScanned
+                "PA" -> IncomingMessage.FromApp.AppAcceptedProduct
+                "PR" -> IncomingMessage.FromApp.AppRejectedProduct
+                "RH" -> IncomingMessage.FromApp.RequestHelp
+                "SP" -> IncomingMessage.FromApp.RequestStop
+                else -> IncomingMessage.FromApp.InvalidMessage(message)
+            }
+        }
 
-            return TODO()
+        fun messageFromTrolleyString(message: String): IncomingMessage.FromTrolley {
+            val type = message.substringBefore(delim)
+            return when (type) {
+                "RP" -> IncomingMessage.FromTrolley.ReachedPoint(message.substringAfter(delim))
+                "PA" -> IncomingMessage.FromTrolley.TrolleyAcceptedProduct
+                "PR" -> IncomingMessage.FromTrolley.TrolleyRejectedProduct
+                else -> IncomingMessage.FromTrolley.InvalidMessage(message)
+            }
         }
 
         fun messageToString(message: OutgoingMessage): String {
