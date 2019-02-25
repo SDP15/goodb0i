@@ -1,0 +1,69 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.DayNight.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <!-- CameraView TextureView will crash if we set a drawable background.
+            A color doesn't need to be a drawable anyway, so we just set colorBackground
+         -->
+        <item name="android:colorBackground">@color/darkBackground</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:buttonStyle">@style/RoundedButton</item>
+    </style>
+
+    <style name="TitleText" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">@android:color/primary_text_dark</item>
+        <item name="android:textSize">@dimen/title_text_size</item>
+        <item name="android:layout_marginTop">@dimen/title_top_margin</item>
+    </style>
+
+    <style name="TitleSubText" parent="TitleText">
+        <item name="android:layout_marginTop">0dp</item>
+        <item name="android:textColor">@color/colorAccent</item>
+    </style>
+
+    <style name="BodyText" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textColor">@android:color/primary_text_dark</item>
+        <item name="android:textSize">@dimen/body_textsize</item>
+    </style>
+
+    <style name="BodyText.SubText" parent="BodyText">
+        <item name="android:textSize">@dimen/body_subtext_size</item>
+    </style>
+
+    <style name="RoundedButton" parent="Base.Widget.AppCompat.Button">
+        <item name="android:background">@drawable/main_buttons</item>
+        <item name="android:textSize">@dimen/button_text_size</item>
+        <item name="android:textColor">@android:color/background_light</item>
+        <item name="android:height">80dp</item>
+        <item name="android:padding">10dp</item>
+    </style>
+
+    <style name="BorderedButton" parent="Base.Widget.AppCompat.Button">
+        <item name="android:background">@drawable/view_border</item>
+        <item name="android:textSize">@dimen/button_text_size</item>
+        <item name="android:textColor">@android:color/background_light</item>
+        <item name="android:layout_marginStart">@dimen/button_horizontal_margin</item>
+        <item name="android:layout_marginEnd">@dimen/button_horizontal_margin</item>
+        <item name="android:height">@dimen/button_height</item>
+    </style>
+
+    <style name="HelpButton" parent="Base.Widget.AppCompat.Button">
+        <item name="android:background">@android:color/holo_red_dark</item>
+        <item name="android:textSize">@dimen/button_text_size</item>
+        <item name="android:textColor">@android:color/background_light</item>
+        <item name="android:height">@dimen/button_height</item>
+    </style>
+
+    <style name="BorderedTextView">
+        <item name="android:background">@drawable/view_border</item>
+        <item name="android:padding">@dimen/textview_padding</item>
+        <item name="android:textSize">@dimen/textview_textsize</item>
+        <item name="android:textColor">@color/colorWhite</item>
+    </style>
+
+
+</resources>

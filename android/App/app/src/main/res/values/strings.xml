@@ -1,0 +1,46 @@
+<resources>
+    <string name="app_name">GoodB0i</string>
+
+    <string name="title_login">Enter list code</string>
+
+    <string name="error_invalid_code_format">Invalid code format</string>
+    <string name="welcome_header">Welcome to</string>
+    <string name="action_prepare_order">PREPARE YOUR ORDER</string>
+    <string name="action_start_shopping">START SHOPPING</string>
+    <string name="action_view_lists">VIEW LISTS</string>
+    <string name="action_enter_code">ENTER CODE</string>
+    <string name="label_order_saved">Your Order Has Been Saved</string>
+    <string name="label_your_orders">Your Orders</string>
+    <string name="label_your_order">Your Order</string>
+    <string name="prompt_order_number">Please enter your order number</string>
+    <string name="label_help">Help Information</string>
+    <string name="label_assistant_coming">An Assistant is coming to you. Please Wait</string>
+    <string name="content_help">help text  </string>
+    <string name="label_loading">LOADING</string>
+    <string name="label_approaching">Approaching</string>
+    <string name="action_add_to_cart">Add to cart</string>
+    <string name="action_dont_add_to_art">Don\'t add</string>
+    <string name="goodboi">@string/app_name</string>
+    <string name="action_view_shopping_list">View Shopping List</string>
+    <string name="action_repeat">Repeat</string>
+    <string name="action_scan">Scan</string>
+    <string name="action_edit_list">Edit Shopping List</string>
+    <string name="action_start_navigation">Start Navigation</string>
+    <string name="label_shopping_list">Shopping list</string>
+    <string name="action_save">Save</string>
+    <string name="action_save_changes">Save Changes</string>
+    <string name="label_search">Search</string>
+    <string name="label_item_price">£%1$.2f</string>
+    <string name="label_total_price">Total: £%1$.2f</string>
+    <string name="label_no_items_found">No items found</string>
+    <string name="error_bluetooth_unable_to_connect">Unable to connect</string>
+    <string name="error_bluetooth_connection_lost">Device connection lost</string>
+    <string name="label_list_code">Code: %1$d</string>
+    <string name="label_navigating_to">Navigating To</string>
+    <string name="action_assistance">I Need Assistance</string>
+    <string name="label_list_item_info">%1$d * %2$s</string>
+    <string name="scan_items_msg">Please Scan the Item </string>
+    <string name="label_checkout">Checkout</string>
+    <string name="label_pay">Pay</string>
+    <string name="label_delete_order"> Delete the Order</string>
+</resources>
