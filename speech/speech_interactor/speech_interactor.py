@@ -217,7 +217,7 @@ class SpeechInteractor:
                     pence = cost * 100
                     total = str(int(pence)) + " pence"
         response = self.options['yes']['price'] + total + self.options['no']['reply'] 
-        self.speak_to_me(response)
+        self.say(response)
         self.last_reply = response
         self.next_state(self.options['no']['nextState'])
     
@@ -240,7 +240,7 @@ class SpeechInteractor:
         self.list_pointer = self.list_pointer + 1
         next_product = self.ordered_list[self.list_pointer]
         response = self.options['yes']['reply'] + next_product
-        self.speak_to_me(response)
+        self.say(response)
         self.last_reply = response
         self.next_state(self.options['yes']['nextState'])
         
