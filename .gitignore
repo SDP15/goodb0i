@@ -96,4 +96,7 @@ $RECYCLE.BIN/
 # iPython
 .ipynb_checkpoints
 
+# Python
+__pycache__
+
 # End of https://www.gitignore.io/api/c++,linux,windows,visualstudiocode
