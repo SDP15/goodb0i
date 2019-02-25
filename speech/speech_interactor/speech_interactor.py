@@ -7,6 +7,8 @@ import datetime
 import subprocess as goodboi
 from pocketsphinx import LiveSpeech, get_model_path
 
+import websocket
+from socket_control import on_message, on_error, on_open, on_close
 
 model_path = get_model_path()
 now = datetime.datetime.now()
@@ -27,6 +29,7 @@ speech = LiveSpeech(
 
 class SpeechInteractor:
     def __init__(self, state_file='interactor_states.json', list_file = 'example_list.json'):
+        initialise_socket()
         log_filename = now.strftime("%Y-%m-%d-%H%M%S")
         self.logging = False
 
@@ -194,6 +197,8 @@ class SpeechInteractor:
     
     #Retrieves all the items and quantities on the shopping list.
     def getShoppingList(self, list_file):
+        sp.run(['wget','-O', 'list.json', 'http://129.215.2.55:8080/lists/load/1234567'])
+        print(open('list.json','r').read())
         self.stuff = json.load(open(list_file, 'r'))
         self.listPointer = 0
         self.shoppingList = {}
@@ -212,6 +217,15 @@ class SpeechInteractor:
         self.speak_to_me(response)
         self.last_reply = response
         self.next_state(self.options['yes']['nextState'])
+        
+def initialise_socket():
+    websocket.enableTrace(True)
+    ws = websocket.WebSocketApp("ws://129.215.2.55:8080/trolley",
+                              on_message = on_message,
+                              on_error = on_error,
+                              on_close = on_close)
+    ws.on_open = on_open
+    ws.run_forever()
 
 
 if __name__ == '__main__':
