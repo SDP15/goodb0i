@@ -2,6 +2,7 @@ import pyttsx3 as pyttsx
 import json
 import os
 import sys
+import math
 import datetime
 import subprocess as goodboi
 from pocketsphinx import LiveSpeech, get_model_path
@@ -108,6 +109,8 @@ class SpeechInteractor:
             self.cart()
         elif "identify" in self.state and word == "yes":
             self.describe_item()
+        elif "continue" in self.state and word == "yes":
+            self.continueShopping()
         else:
             self.speak_to_me(self.options[word]['reply'])
             self.last_reply = self.options[word]['reply']
@@ -163,11 +166,11 @@ class SpeechInteractor:
         self.shoppingList[currentItem] = quantity-1
         if quantity > 1:
             nextState = 'nextState_quantity+'
-            response = self.options['yes']['reply_quantity+'] + str(quantity) + self.options['yes']['prompt']
+            response = self.options['yes']['reply_quantity+'] + str(quantity-1) + self.options['yes']['prompt']
         else:
             nextState = 'nextState_quantity0'
             response = self.options['yes']['reply_quantity0']
-            self.listPointer = self.listPointer + 1
+            # self.listPointer = self.listPointer + 1
         
         self.speak_to_me(response)
         self.last_reply = response
@@ -176,7 +179,15 @@ class SpeechInteractor:
     def describe_item(self):
         for tings in self.stuff['products']:
             if tings['product']['name'] == self.orderedList[self.listPointer]:
-                response = self.options['yes']['price'] + str(tings['product']['price']) + self.options['no']['reply']
+                cost = tings['product']['price']
+                if cost >= 1:
+                    pounds = math.floor(cost)
+                    pence = math.floor((cost - pounds) * 100) 
+                    total = str(pounds) + " pounds and " + str(int(pence)) + " pence"
+                else:
+                    pence = cost * 100
+                    total = str(int(pence)) + " pence"
+        response = self.options['yes']['price'] + total + self.options['no']['reply'] 
         self.speak_to_me(response)
         self.last_reply = response
         self.next_state(self.options['no']['nextState'])
@@ -191,6 +202,16 @@ class SpeechInteractor:
             self.shoppingList.update({tings['product']['name']:tings['quantity']})
             self.orderedList.append(tings['product']['name'])
         print(self.shoppingList)
+
+    
+
+    def continueShopping(self):
+        self.listPointer = self.listPointer + 1
+        nextProduct = self.orderedList[self.listPointer]
+        response = self.options['yes']['reply'] + nextProduct
+        self.speak_to_me(response)
+        self.last_reply = response
+        self.next_state(self.options['yes']['nextState'])
 
 
 if __name__ == '__main__':
