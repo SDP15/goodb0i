@@ -101,7 +101,7 @@ public:
   bool queueEmpty() { return commands.empty(); }
 
 private:
-  int forwardBaseSpeed{70};
+  int forwardBaseSpeed{60};
   int currentTurnAngle{0}, currentSpeed{0};
 
   array<int, 4> currentMotorSpeeds{{0, 0, 0, 0}},
@@ -215,6 +215,8 @@ private:
   SteeringSubsystem *sysSteering;
 
 public:
+  bool turningOn{true};
+
   LineFollowSubsystem(SteeringSubsystem *sysSteering) {
     this->sysSteering = sysSteering;
   }
@@ -236,9 +238,19 @@ public:
 
     if (sonar->distance_centimeters() < SONAR_STOP_DISTANCE) {
       stopped = true;
-    } else {
+    } else if (sysSteering->queueEmpty()) {
       stopped = false;
       int lineAngle{};
+      if (mcol == evutil::Color::turnRight ||
+          lcol == evutil::Color::turnRight ||
+          rcol == evutil::Color::turnRight) {
+        cerr << "Starting turn" << endl;
+        sysSteering->pushCommand(
+            {SteeringSubsystem::Command::CommandType::setTurnAngle, 0,
+             turningOn ? 2000 : 1000, turningOn ? STEER_ANGLE : 0});
+        lastLineDir = Direction::left;
+        return;
+      }
       if (mcol == evutil::Color::line) {
         if (lcol == evutil::Color::line && rcol != evutil::Color::line) {
           // LMr -> adjust slightly left
@@ -279,11 +291,11 @@ public:
               {SteeringSubsystem::Command::CommandType::resume});
         }
       } else {
-        if (sysSteering->queueEmpty()) {
-          sysSteering->pushCommand(
-              {SteeringSubsystem::Command::CommandType::setTurnAngle, 0, 0,
-               avgLineAngle});
-        }
+        sysSteering->pushCommand(
+            {SteeringSubsystem::Command::CommandType::setTurnAngle, 0, 0,
+             avgLineAngle});
+        sysSteering->pushCommand(
+            {SteeringSubsystem::Command::CommandType::setSpeed, 100, 0, 0});
       }
     }
   }
@@ -294,7 +306,7 @@ private:
   SteeringSubsystem sysSteering;
   LineFollowSubsystem sysLine;
 
-  bool halted{false};
+  bool halted{true};
   mutex accessMutex;
   int socketFd{-1};
 
@@ -322,19 +334,23 @@ private:
         continue;
       }
       lock_guard<mutex> _l{accessMutex};
+      // Implemented TCP commands
       if (strncmp(rbuf, "stop", rlen) == 0) {
         if (!halted) {
           halted = true;
           sysSteering.pushCommandToFront(
               {SteeringSubsystem::Command::CommandType::saveAndHalt});
         }
-      }
-      if (strncmp(rbuf, "start", rlen) == 0) {
+      } else if (strncmp(rbuf, "start", rlen) == 0) {
         if (halted) {
           halted = false;
           sysSteering.pushCommandToFront(
               {SteeringSubsystem::Command::CommandType::resume});
         }
+      } else if (strncmp(rbuf, "right", rlen) == 0) {
+        sysLine.turningOn = true;
+      } else if (strncmp(rbuf, "straight", rlen) == 0) {
+        sysLine.turningOn = false;
       }
     }
 
@@ -346,10 +362,6 @@ private:
 
 public:
   Robot() : sysSteering(), sysLine(&sysSteering) {
-    sysSteering.pushCommand(
-        {SteeringSubsystem::Command::CommandType::setSpeed, 100, 1000, 0});
-    sysSteering.pushCommand(
-        {SteeringSubsystem::Command::CommandType::setTurnAngle, 0, 3000, 80});
     // Start up server
     {
       socketFd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -390,6 +402,11 @@ public:
     sysSteering.process();
     if (!halted) {
       sysLine.process();
+    } else {
+      /*midColor->update();
+      cerr << midColor->getRawHSV().x << ", " << midColor->getRawHSV().y << ", "
+           << midColor->getRawHSV().z << endl;
+      this_thread::sleep_for(70ms);*/
     }
   }
 };
@@ -424,7 +441,7 @@ int main() {
     Robot robot{};
     while (!(sigintTerminate || button::back.pressed())) {
       robot.process();
-      this_thread::sleep_for(15ms);
+      this_thread::sleep_for(8ms);
     }
     disableMotors();
     return 0;

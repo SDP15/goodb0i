@@ -44,6 +44,8 @@ int main() {
          << endl;
     string cmd;
     cin >> cmd;
+    auto rgb = cs1.getRawRGB();
+    cout << rgb.x << " " << rgb.y << " " << rgb.z << endl;
     cs1.update();
     if (cmd == "save") {
       ColorCalibration::saveToFile();
@@ -51,15 +53,15 @@ int main() {
     } else if (cmd == "cancel") {
       break;
     } else if (cmd == "bg") {
-      ColorCalibration::bg = cs1.getRawRGB();
+      ColorCalibration::bg = rgb;
     } else if (cmd == "line") {
-      ColorCalibration::line = cs1.getRawRGB();
+      ColorCalibration::line = rgb;
     } else if (cmd == "turnLeft") {
-      ColorCalibration::turnLeft = cs1.getRawRGB();
+      ColorCalibration::turnLeft = rgb;
     } else if (cmd == "turnRight") {
-      ColorCalibration::turnRight = cs1.getRawRGB();
+      ColorCalibration::turnRight = rgb;
     } else if (cmd == "turnBoth") {
-      ColorCalibration::turnBoth = cs1.getRawRGB();
+      ColorCalibration::turnBoth = rgb;
     } else {
       cout << "Unknown command" << endl;
     }

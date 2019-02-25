@@ -17,7 +17,8 @@
         "ratio": "cpp",
         "type_traits": "cpp",
         "tuple": "cpp",
-        "utility": "cpp"
+        "utility": "cpp",
+        "thread": "cpp"
     },
     "C_Cpp.default.includePath": [
         "ev3/util",

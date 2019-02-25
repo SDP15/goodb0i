@@ -21,8 +21,8 @@ std::unique_ptr<T> createConnectedDevice(ev3dev::address_type addr,
   return dev;
 }
 
-enum class Color { bg, line, turnLeft, turnRight, turnBoth };
-static const Color Colors[]{Color::bg, Color::line, Color::turnLeft};
+enum class Color { bg, line, turnLeft, turnRight, turnBoth, count };
+static const Color Colors[]{Color::bg, Color::line, Color::turnRight};
 
 namespace ColorCalibration {
 static constexpr const char *const CAL_FILE = "zcal-color.cfg";
@@ -69,10 +69,15 @@ class ColorSensor {
 private:
   std::unique_ptr<ev3dev::color_sensor> sensor;
   glm::ivec3 currentRaw;
-  Color currentColor;
+  std::array<Color, 4> currentColors;
+  int currentColorPtr{0};
+  Color stableColor{Color::bg};
 
 public:
   inline ColorSensor(ev3dev::address_type sensor_addr, bool &failFlag) {
+    for (auto &c : currentColors) {
+      c = Color::bg;
+    }
     sensor = createConnectedDevice<ev3dev::color_sensor>(sensor_addr, failFlag);
     sensor->set_mode(sensor->mode_rgb_raw);
     update();
@@ -84,44 +89,51 @@ public:
     currentRaw.y = std::get<1>(vals);
     currentRaw.z = std::get<2>(vals);
 
-    float minDist = 999999999;
-    Color minColor = Color::bg;
-
     glm::vec3 crgb{currentRaw};
     crgb.x /= (float)ColorCalibration::bg.x;
     crgb.y /= (float)ColorCalibration::bg.y;
     crgb.z /= (float)ColorCalibration::bg.z;
     glm::vec3 chsv{hsvColor(crgb)};
 
-    if (chsv.z < 0.2) {
-      currentColor = Color::line;
-      return;
-    } else if (chsv.z > 0.8 && chsv.y < 0.3) {
+    Color currentColor{Color::bg};
+
+    if (crgb.x < 0.02 && crgb.y < 0.02 && crgb.z < 0.02) { // in air
+      // HSV 240, 1, 0.00689655
       currentColor = Color::bg;
-      return;
+    } else if (chsv.y < 0.4) { // Low saturation = background
+      // HSV 70.0459, 0.315693, 0.221719
+      currentColor = Color::bg;
+    } else if (chsv.x > 20 && chsv.x < 80 && chsv.y > 0.5 &&
+               chsv.z > 0.5) { // Yellow line
+      // HSV 46.3742, 0.832707, 1.01
+      currentColor = Color::line;
+    } else if (chsv.x > 90 && chsv.x < 140 && chsv.z < 0.4) { // Green marker
+      // HSV 115.071, 0.54898, 0.221719
+      currentColor = Color::turnRight;
     }
 
-    // Closest color in euclidean rgb space.
-    for (auto cmpColor : Colors) {
-      float dist{0};
-      glm::vec3 xrgb{ColorCalibration::getRGBForColor(cmpColor)};
-      xrgb.x /= (float)ColorCalibration::bg.x;
-      xrgb.y /= (float)ColorCalibration::bg.y;
-      xrgb.z /= (float)ColorCalibration::bg.z;
-      glm::vec3 xhsv{hsvColor(xrgb)};
-      glm::ivec3 dt = chsv - xhsv;
-      dist = dt.x * dt.x + dt.y * dt.y + dt.z * dt.z;
-      if (dist < minDist) {
-        minDist = dist;
-        minColor = cmpColor;
-      }
-    }
-    currentColor = minColor;
+    currentColors[currentColorPtr] = currentColor;
+    currentColorPtr = (currentColorPtr + 1) % currentColors.size();
+
+    int counts[(int)Color::count];
+    std::fill(std::begin(counts), std::end(counts), 0);
+    std::for_each(currentColors.begin(), currentColors.end(),
+                  [&counts](const Color &c) { ++counts[(int)c]; });
+    auto mxe = std::max_element(std::begin(counts), std::end(counts));
+    stableColor = (Color)(mxe - counts);
   }
 
   inline glm::ivec3 getRawRGB() { return currentRaw; }
 
-  inline Color getColor() { return currentColor; }
+  inline glm::vec3 getRawHSV() {
+    glm::vec3 crgb{currentRaw};
+    crgb.x /= (float)ColorCalibration::bg.x;
+    crgb.y /= (float)ColorCalibration::bg.y;
+    crgb.z /= (float)ColorCalibration::bg.z;
+    return hsvColor(crgb);
+  }
+
+  inline Color getColor() { return stableColor; }
 };
 
 class Drive {
