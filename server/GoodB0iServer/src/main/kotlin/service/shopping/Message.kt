@@ -56,15 +56,14 @@ sealed class Message {
     }
 
 
-
     object Transformer {
 
-        private const val delim = "&" // Unused UTF-8 character
+        private const val DELIM = "&" // Unused UTF-8 character
 
         fun messageFromAppString(message: String): IncomingMessage.FromApp {
-            val type = message.substringBefore(delim)
+            val type = message.substringBefore(DELIM)
             return when (type) {
-                "RC" -> IncomingMessage.FromApp.Reconnect(message.substringAfter(delim))
+                "RC" -> IncomingMessage.FromApp.Reconnect(message.substringAfter(DELIM))
                 "PS" -> IncomingMessage.FromApp.ProductScanned
                 "PA" -> IncomingMessage.FromApp.AppAcceptedProduct
                 "PR" -> IncomingMessage.FromApp.AppRejectedProduct
@@ -75,20 +74,22 @@ sealed class Message {
         }
 
         fun messageFromTrolleyString(message: String): IncomingMessage.FromTrolley {
-            val type = message.substringBefore(delim)
+            val type = message.substringBefore(DELIM)
             return when (type) {
-                "RP" -> IncomingMessage.FromTrolley.ReachedPoint(message.substringAfter(delim))
+                "RP" -> IncomingMessage.FromTrolley.ReachedPoint(message.substringAfter(DELIM))
                 "PA" -> IncomingMessage.FromTrolley.TrolleyAcceptedProduct
                 "PR" -> IncomingMessage.FromTrolley.TrolleyRejectedProduct
                 else -> IncomingMessage.FromTrolley.InvalidMessage(message)
             }
         }
 
-        fun messageToString(message: OutgoingMessage): String {
-            return ""
+        fun messageToString(message: OutgoingMessage): String = when (message) {
+            is OutgoingMessage.ToApp.ReachedPoint -> "RP$DELIM${message.point}"
+            is OutgoingMessage.ToApp.TrolleyAcceptedProduct -> "TA"
+            is OutgoingMessage.ToApp.TrolleyRejectedProduct -> "TR"
+            is OutgoingMessage.ToTrolley.AppAcceptedProduct -> "AA"
+            is OutgoingMessage.ToTrolley.AppRejectedProduct -> "AR"
         }
-
-
     }
 
 }
