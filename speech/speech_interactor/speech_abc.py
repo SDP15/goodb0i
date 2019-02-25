@@ -37,7 +37,7 @@ def on_close(ws):
 
 def on_open(ws):
     def run(*args):
-        sp.run(['wget','-O', 'products.json', 'http://129.215.2.55:8080/products'])
+        sp.run(['wget','-O', 'products.json', 'http://127.0.0.1:8080/lists/load/1234567'])
         print(open('products.json','r').read())
         print("listening")
         for phrase in lsp:
@@ -52,7 +52,7 @@ def on_open(ws):
 
 if __name__ == "__main__":
     websocket.enableTrace(True)
-    ws = websocket.WebSocketApp("ws://129.215.2.55:8080/trolley",
+    ws = websocket.WebSocketApp("ws://127.0.0.1:8080/trolley",
                               on_message = on_message,
                               on_error = on_error,
                               on_close = on_close)

@@ -180,6 +180,7 @@ class SpeechInteractor:
         for tings in self.stuff['products']:
             if tings['product']['name'] == self.orderedList[self.listPointer]:
                 cost = tings['product']['price']
+                # Format the output to tell the user the price in pounds and pence.
                 if cost >= 1:
                     pounds = math.floor(cost)
                     pence = math.floor((cost - pounds) * 100) 
@@ -205,6 +206,8 @@ class SpeechInteractor:
 
     
 
+    # Sets the current item to the next item on the list and informs the user what item they are
+    # going to collect next.
     def continueShopping(self):
         self.listPointer = self.listPointer + 1
         nextProduct = self.orderedList[self.listPointer]
