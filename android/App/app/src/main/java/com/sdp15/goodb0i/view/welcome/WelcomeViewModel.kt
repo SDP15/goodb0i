@@ -13,8 +13,8 @@ class WelcomeViewModel : BaseViewModel<Any>(), WelcomeFragment.WelcomeFragmentIn
     }
 
     override fun enterCode() {
-        transitions.postValue(WelcomeFragmentDirections.actionWelcomeFragmentToScannerFragment())
-        //transitions.postValue(WelcomeFragmentDirections.actionWelcomeFragmentToCodeFragment())
+        //transitions.postValue(WelcomeFragmentDirections.actionWelcomeFragmentToScannerFragment())
+        transitions.postValue(WelcomeFragmentDirections.actionWelcomeFragmentToCodeFragment())
     }
 
     override fun viewLists() {

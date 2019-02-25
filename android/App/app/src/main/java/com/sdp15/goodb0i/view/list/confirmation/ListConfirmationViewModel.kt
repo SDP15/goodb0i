@@ -34,30 +34,5 @@ class ListConfirmationViewModel : BaseViewModel<Any>() {
 
     }
 
-    private val connectionObserver = Observer<ShoppingSessionState> { state ->
-        when (state) {
-            //TODO: Post more information to fragment
-            ShoppingSessionState.Connecting -> {
 
-            }
-            ShoppingSessionState.NegotiatingTrolley -> {
-
-            }
-            ShoppingSessionState.Connected -> {
-                transitions.postValue(ListConfirmationFragmentDirections.actionListConfirmationFragmentToNavigatingToFragment())
-                //TODO: Should we remove the observer here?
-            }
-        }
-
-    }
-
-    fun startNavigation() {
-        sm.state.observeForever(connectionObserver)
-        sm.startSession(sl)
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        sm.state.removeObserver(connectionObserver)
-    }
 }
