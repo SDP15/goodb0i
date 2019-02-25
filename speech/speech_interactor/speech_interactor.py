@@ -5,15 +5,14 @@ import sys
 import math
 import datetime
 import subprocess as sp
+import serial
 from pocketsphinx import LiveSpeech, get_model_path
 
-import websocket
 from socket_control import on_message, on_error, on_open, on_close, send_message
 
 model_path = get_model_path()
 now = datetime.datetime.now()
 universal_phrases = {'repeat', 'options'}
-
 
 speech = LiveSpeech(
     verbose=False,
@@ -27,9 +26,10 @@ speech = LiveSpeech(
     kws='kws.list',
 )
 
+
 class SpeechInteractor:
     def __init__(self, state_file='interactor_states.json', list_file = 'list.json'):
-        initialise_socket()
+        #initialise_socket()
         log_filename = now.strftime("%Y-%m-%d-%H%M%S")
         self.logging = False
 
@@ -47,10 +47,16 @@ class SpeechInteractor:
         if self.logging is True:
             print("Conversation is being logged in: {:}".format(self.log_filepath))
 
+        self.current_location = ""
         self.possible_states = json.load(open(state_file,'r'))
-        self.getShoppingList(list_file)
+        self.get_shopping_list(list_file)
         self.next_state('init')
         self.react("n/a")
+
+        # Uncomment the code below to test out NFC tag reading
+        # state = input("Please enter shopping0. ")
+        # self.next_state(state)
+
         self.listen()
 
 
@@ -61,17 +67,34 @@ class SpeechInteractor:
 
         #These states require other forms of input which is not speech. Wait for the user to input a given text
         if "shopping0" in self.state:
-            #replace this with info from the nfc reader.
-            action = input("Please enter arrived.  ")
-            if "arrived" in action:
-                item = self.orderedList[self.listPointer]
-                self.arrived(item, "middle")  
+            ser = serial.Serial('/dev/ttyACM0', 9600)
+
+            # Uncomment line below once NFC tags have item strings on them
+            #next_item = self.ordered_list[self.list_pointer]
+
+            next_item = "TRACK_NFCTYPE4A"
+            new_location = ""
+
+            while(True):
+                new_location = ser.readline().decode('ascii')
+
+                # Check if our location has changed and if so update current location
+                if new_location not in self.current_location:
+                    self.current_location = new_location
+                    print("Current location: {:}".format(self.current_location))
+
+                    # Check if we have arrived at the item
+                    if next_item in self.current_location:
+                        print("You have arrived at {:}".format(next_item))
+                        self.arrived(next_item, "middle") # Need to replace shelf position with that from the JSON
+                else:
+                    print("Location has not changed.")
 
         if "arrival" in self.state:
             #replace for barcode scanner info.
             action = input("Please enter scanned.  ")
             if "scanned" in action: 
-                item = self.orderedList[self.listPointer]
+                item = self.ordered_list[self.list_pointer]
                 self.scanned(item)
         
     
@@ -113,9 +136,9 @@ class SpeechInteractor:
         elif "identify" in self.state and word == "yes":
             self.describe_item()
         elif "continue" in self.state and word == "yes":
-            self.continueShopping()
+            self.continue_shopping()
         else:
-            self.speak_to_me(self.options[word]['reply'])
+            self.say(self.options[word]['reply'])
             self.last_reply = self.options[word]['reply']
             self.next_state(self.options[word]['nextState'])
 
@@ -153,20 +176,20 @@ class SpeechInteractor:
 
     def arrived(self, item, shelf):
         response = self.options['arrived']['reply'] + item + self.options['arrived']['second'] + shelf + self.options['arrived']['prompt']
-        self.speak_to_me(response)
+        self.say(response)
         self.last_reply = response
         self.next_state(self.options['arrived']['nextState'])
 
     def scanned(self, item):
         response = self.options['scanned']['reply'] + item + self.options['scanned']['prompt']
-        self.speak_to_me(response)
+        self.say(response)
         self.last_reply = response
         self.next_state(self.options['scanned']['nextState'])
 
     def cart(self):
-        currentItem = self.orderedList[self.listPointer]
-        quantity = self.shoppingList[currentItem]
-        self.shoppingList[currentItem] = quantity-1
+        current_item = self.ordered_list[self.list_pointer]
+        quantity = self.shopping_list[current_item]
+        self.shopping_list[current_item] = quantity-1
         if quantity > 1:
             nextState = 'nextState_quantity+'
             response = self.options['yes']['reply_quantity+'] + str(quantity-1) + self.options['yes']['prompt']
@@ -176,13 +199,13 @@ class SpeechInteractor:
             response = self.options['yes']['reply_quantity0']
             send_message(ws, "PA")
         
-        self.speak_to_me(response)
+        self.say(response)
         self.last_reply = response
         self.next_state(self.options['yes'][nextState])
 
     def describe_item(self):
         for tings in self.stuff['products']:
-            if tings['product']['name'] == self.orderedList[self.listPointer]:
+            if tings['product']['name'] == self.ordered_list[self.list_pointer]:
                 cost = tings['product']['price']
                 # Format the output to tell the user the price in pounds and pence.
                 if cost >= 1:
@@ -198,32 +221,28 @@ class SpeechInteractor:
         self.next_state(self.options['no']['nextState'])
     
     #Retrieves all the items and quantities on the shopping list.
-    def getShoppingList(self, list_file):
+    def get_shopping_list(self, list_file):
         sp.run(['wget','-O', 'list.json', 'http://129.215.2.55:8080/lists/load/1234567'])
         print(open('list.json','r').read())
         self.stuff = json.load(open('list.json', 'r'))
-        self.listPointer = 0
-        self.shoppingList = {}
-        self.orderedList = []
+        self.list_pointer = 0
+        self.shopping_list = {}
+        self.ordered_list = []
         for tings in self.stuff['products']:
-            self.shoppingList.update({tings['product']['name']:tings['quantity']})
-            self.orderedList.append(tings['product']['name'])
-        print(self.shoppingList)
-
-    
+            self.shopping_list.update({tings['product']['name']:tings['quantity']})
+            self.ordered_list.append(tings['product']['name'])
+        print(self.shopping_list)
 
     # Sets the current item to the next item on the list and informs the user what item they are
     # going to collect next.
-    def continueShopping(self):
-        self.listPointer = self.listPointer + 1
-        nextProduct = self.orderedList[self.listPointer]
-        response = self.options['yes']['reply'] + nextProduct
+    def continue_shopping(self):
+        self.list_pointer = self.list_pointer + 1
+        next_product = self.ordered_list[self.list_pointer]
+        response = self.options['yes']['reply'] + next_product
         self.speak_to_me(response)
         self.last_reply = response
         self.next_state(self.options['yes']['nextState'])
         
-
-
 
 if __name__ == '__main__':
     sint = SpeechInteractor()
