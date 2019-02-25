@@ -17,7 +17,7 @@ class AppManager {
 
     suspend fun onMessage(id: String, message: String) {
         println("$id : $message")
-        listeners[id]?.onAppMessage(message)
+        listeners[id]?.onAppMessage(Message.Transformer.messageFromAppString(message))
 
     }
 

@@ -21,7 +21,7 @@ class TrolleyManager {
 
     suspend fun onMessage(id: String, message: String) {
         println("Trolley $id sent $message")
-        listeners[id]?.onTrolleyMessage(message)
+        listeners[id]?.onTrolleyMessage(Message.Transformer.messageFromTrolleyString(message))
     }
 
     suspend fun joinTrolley(id: String, socket: WebSocketSession) {

@@ -2,10 +2,10 @@ package service.shopping
 
 interface IncomingMessageListener {
 
-    fun onAppMessage(message: String)
+    fun onAppMessage(message: Message.IncomingMessage.FromApp)
 
     fun onConnectivityChange(isConnected: Boolean)
 
-    fun onTrolleyMessage(message: String)
+    fun onTrolleyMessage(message: Message.IncomingMessage.FromTrolley)
 
 }

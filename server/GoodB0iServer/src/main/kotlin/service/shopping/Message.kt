@@ -39,6 +39,8 @@ sealed class Message {
     sealed class OutgoingMessage : Message() {
         sealed class ToTrolley : OutgoingMessage() {
 
+            object AppScannedProduct : ToTrolley()
+
             object AppAcceptedProduct : ToTrolley()
 
             object AppRejectedProduct : ToTrolley()
@@ -89,6 +91,7 @@ sealed class Message {
             is OutgoingMessage.ToApp.TrolleyRejectedProduct -> "TR"
             is OutgoingMessage.ToTrolley.AppAcceptedProduct -> "AA"
             is OutgoingMessage.ToTrolley.AppRejectedProduct -> "AR"
+            is OutgoingMessage.ToTrolley.AppScannedProduct -> "AS"
         }
     }
 

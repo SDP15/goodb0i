@@ -35,19 +35,19 @@ class SessionManager {
 
     interface TrolleyMessageSender {
 
-        suspend fun sendToTrolley(message: String)
+        suspend fun sendToTrolley(message: Message.OutgoingMessage.ToTrolley)
 
     }
 
     interface AppMessageSender {
 
-        suspend fun sendToApp(message: String)
+        suspend fun sendToApp(message: Message.OutgoingMessage.ToApp)
 
     }
 
     private class SimpleMessageSender(val socket: WebSocketSession) : TrolleyMessageSender {
-        override suspend fun sendToTrolley(message: String) {
-            socket.send(Frame.Text(message))
+        override suspend fun sendToTrolley(message: Message.OutgoingMessage.ToTrolley) {
+            socket.send(Frame.Text(Message.Transformer.messageToString(message)))
         }
     }
 
@@ -58,16 +58,16 @@ class SessionManager {
             socket = newSocket
         }
 
-        override suspend fun sendToApp(message: String) {
+        override suspend fun sendToApp(message: Message.OutgoingMessage.ToApp) {
             if (socket.isActive) {
                 if (outGoingMessageQueue.isNotEmpty()) {
                     outGoingMessageQueue.forEach { oldMessage ->
                         socket.send(Frame.Text(oldMessage))
                     }
                 }
-                socket.send(Frame.Text(message))
+                socket.send(Frame.Text(Message.Transformer.messageToString(message)))
             } else {
-                outGoingMessageQueue.addLast(message)
+                outGoingMessageQueue.addLast(Message.Transformer.messageToString(message))
             }
         }
     }
