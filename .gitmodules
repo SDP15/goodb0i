@@ -1,3 +1,6 @@
 [submodule "ev3/ev3dev-lang-cpp"]
 	path = ev3/ev3dev-lang-cpp
 	url = https://github.com/ddemidov/ev3dev-lang-cpp.git
+[submodule "ev3/glm"]
+	path = ev3/glm
+	url = https://github.com/g-truc/glm.git
