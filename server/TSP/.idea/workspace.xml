@@ -1,14 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="e4aadfae-9dc9-4f4c-8b7a-b8ad99948dd5" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/../GoodB0iServer/src/main/kotlin/service/routing/RouteFinder.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../android/App/app/src/main/java/com/sdp15/goodb0i/view/list/saved/SavedListsAdapter.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../android/App/app/src/main/java/com/sdp15/goodb0i/view/list/saved/SavedListsAdapter.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../android/App/app/src/main/java/com/sdp15/goodb0i/view/navigation/scanner/ScannerViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../android/App/app/src/main/java/com/sdp15/goodb0i/view/navigation/scanner/ScannerViewModel.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../GoodB0iServer/src/main/kotlin/service/routing/Graph.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../GoodB0iServer/src/main/kotlin/service/routing/Graph.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../GoodB0iServer/src/main/kotlin/service/shopping/SessionManager.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../GoodB0iServer/src/main/kotlin/service/shopping/SessionManager.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="e4aadfae-9dc9-4f4c-8b7a-b8ad99948dd5" name="Default Changelist" comment="" />
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -204,7 +197,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="-36" width="3200" height="1768" extended-state="7" />
-    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" weight="0.3388594" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
