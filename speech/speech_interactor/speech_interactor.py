@@ -2,11 +2,14 @@ import pyttsx3 as pyttsx
 import json
 import os
 import sys
+import math
 import datetime
 import subprocess as goodboi
 import serial
 from pocketsphinx import LiveSpeech, get_model_path
 
+import websocket
+from socket_control import on_message, on_error, on_open, on_close
 
 model_path = get_model_path()
 now = datetime.datetime.now()
@@ -27,6 +30,7 @@ speech = LiveSpeech(
 
 class SpeechInteractor:
     def __init__(self, state_file='interactor_states.json', list_file = 'example_list.json'):
+        initialise_socket()
         log_filename = now.strftime("%Y-%m-%d-%H%M%S")
         self.logging = False
 
@@ -132,6 +136,8 @@ class SpeechInteractor:
             self.cart()
         elif "identify" in self.state and word == "yes":
             self.describe_item()
+        elif "continue" in self.state and word == "yes":
+            self.continueShopping()
         else:
             self.say(self.options[word]['reply'])
             self.last_reply = self.options[word]['reply']
@@ -182,12 +188,12 @@ class SpeechInteractor:
         self.next_state(self.options['scanned']['nextState'])
 
     def cart(self):
-        currentItem = self.ordered_list[self.list_pointer]
-        quantity = self.shopping_list[currentItem]
-        self.shopping_list[currentItem] = quantity-1
+        current_item = self.ordered_list[self.list_pointer]
+        quantity = self.shopping_list[current_item]
+        self.shopping_list[current_item] = quantity-1
         if quantity > 1:
             nextState = 'nextState_quantity+'
-            response = self.options['yes']['reply_quantity+'] + str(quantity) + self.options['yes']['prompt']
+            response = self.options['yes']['reply_quantity+'] + str(quantity-1) + self.options['yes']['prompt']
         else:
             nextState = 'nextState_quantity0'
             response = self.options['yes']['reply_quantity0']
@@ -200,13 +206,24 @@ class SpeechInteractor:
     def describe_item(self):
         for tings in self.stuff['products']:
             if tings['product']['name'] == self.ordered_list[self.list_pointer]:
-                response = self.options['yes']['price'] + str(tings['product']['price']) + self.options['no']['reply']
-        self.say(response)
+                cost = tings['product']['price']
+                # Format the output to tell the user the price in pounds and pence.
+                if cost >= 1:
+                    pounds = math.floor(cost)
+                    pence = math.floor((cost - pounds) * 100) 
+                    total = str(pounds) + " pounds and " + str(int(pence)) + " pence"
+                else:
+                    pence = cost * 100
+                    total = str(int(pence)) + " pence"
+        response = self.options['yes']['price'] + total + self.options['no']['reply'] 
+        self.speak_to_me(response)
         self.last_reply = response
         self.next_state(self.options['no']['nextState'])
     
     #Retrieves all the items and quantities on the shopping list.
-    def get_shopping_list(self, list_file):
+    def getShoppingList(self, list_file):
+        sp.run(['wget','-O', 'list.json', 'http://129.215.2.55:8080/lists/load/1234567'])
+        print(open('list.json','r').read())
         self.stuff = json.load(open(list_file, 'r'))
         self.list_pointer = 0
         self.shopping_list = {}
@@ -215,6 +232,27 @@ class SpeechInteractor:
             self.shopping_list.update({tings['product']['name']:tings['quantity']})
             self.ordered_list.append(tings['product']['name'])
         print(self.shopping_list)
+
+    
+
+    # Sets the current item to the next item on the list and informs the user what item they are
+    # going to collect next.
+    def continueShopping(self):
+        self.list_pointer = self.list_pointer + 1
+        next_product = self.ordered_list[self.list_pointer]
+        response = self.options['yes']['reply'] + next_product
+        self.speak_to_me(response)
+        self.last_reply = response
+        self.next_state(self.options['yes']['nextState'])
+        
+def initialise_socket():
+    websocket.enableTrace(True)
+    ws = websocket.WebSocketApp("ws://129.215.2.55:8080/trolley",
+                              on_message = on_message,
+                              on_error = on_error,
+                              on_close = on_close)
+    ws.on_open = on_open
+    ws.run_forever()
 
 
 if __name__ == '__main__':
