@@ -6,6 +6,10 @@ sealed class Message {
 
         sealed class FromTrolley : IncomingMessage() {
 
+            object UserAtTrolley : FromTrolley()
+
+            object ReceivedRoute : FromTrolley()
+
             object TrolleyAcceptedProduct : FromTrolley()
 
             object TrolleyRejectedProduct : FromTrolley()
@@ -16,6 +20,8 @@ sealed class Message {
         }
 
         sealed class FromApp : IncomingMessage() {
+
+            object ReceivedRoute : FromApp()
 
             data class Reconnect(val oldId: String) : FromApp()
 
@@ -39,6 +45,10 @@ sealed class Message {
     sealed class OutgoingMessage : Message() {
         sealed class ToTrolley : OutgoingMessage() {
 
+            object AssignedToApp : ToTrolley()
+
+            data class Route(val route: String) : ToTrolley()
+
             object AppScannedProduct : ToTrolley()
 
             object AppAcceptedProduct : ToTrolley()
@@ -48,6 +58,12 @@ sealed class Message {
         }
 
         sealed class ToApp : OutgoingMessage() {
+
+            object TrolleyAssigned : ToApp()
+
+            object UserAtTrolley : ToApp()
+
+            data class Route(val route: String) : ToApp()
 
             data class ReachedPoint(val point: String) : ToApp()
 
@@ -71,6 +87,7 @@ sealed class Message {
                 "PR" -> IncomingMessage.FromApp.AppRejectedProduct
                 "RH" -> IncomingMessage.FromApp.RequestHelp
                 "SP" -> IncomingMessage.FromApp.RequestStop
+                "RR" -> IncomingMessage.FromApp.ReceivedRoute
                 else -> IncomingMessage.FromApp.InvalidMessage(message)
             }
         }
@@ -81,6 +98,8 @@ sealed class Message {
                 "RP" -> IncomingMessage.FromTrolley.ReachedPoint(message.substringAfter(DELIM))
                 "PA" -> IncomingMessage.FromTrolley.TrolleyAcceptedProduct
                 "PR" -> IncomingMessage.FromTrolley.TrolleyRejectedProduct
+                "UT" -> IncomingMessage.FromTrolley.UserAtTrolley
+                "RR" -> IncomingMessage.FromTrolley.ReceivedRoute
                 else -> IncomingMessage.FromTrolley.InvalidMessage(message)
             }
         }
@@ -89,9 +108,14 @@ sealed class Message {
             is OutgoingMessage.ToApp.ReachedPoint -> "RP$DELIM${message.point}"
             is OutgoingMessage.ToApp.TrolleyAcceptedProduct -> "TA"
             is OutgoingMessage.ToApp.TrolleyRejectedProduct -> "TR"
+            is OutgoingMessage.ToApp.Route -> "RC$DELIM${message.route}"
+            is OutgoingMessage.ToApp.TrolleyAssigned -> "TA$DELIM"
+            is OutgoingMessage.ToApp.UserAtTrolley -> "UT$DELIM"
             is OutgoingMessage.ToTrolley.AppAcceptedProduct -> "AA"
             is OutgoingMessage.ToTrolley.AppRejectedProduct -> "AR"
             is OutgoingMessage.ToTrolley.AppScannedProduct -> "AS"
+            is OutgoingMessage.ToTrolley.AssignedToApp -> "AA$DELIM"
+            is OutgoingMessage.ToTrolley.Route -> "RC$DELIM${message.route}"
         }
     }
 
