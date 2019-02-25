@@ -5,6 +5,23 @@
         "*.mll": "llvm",
         "*.sll": "llvm",
         "*.oll": "llvm",
-        "stdexcept": "cpp"
-    }
+        "stdexcept": "cpp",
+        "array": "cpp",
+        "fstream": "cpp",
+        "cmath": "cpp",
+        "complex": "cpp",
+        "chrono": "cpp",
+        "functional": "cpp",
+        "istream": "cpp",
+        "ostream": "cpp",
+        "ratio": "cpp",
+        "type_traits": "cpp",
+        "tuple": "cpp",
+        "utility": "cpp",
+        "thread": "cpp"
+    },
+    "C_Cpp.default.includePath": [
+        "ev3/util",
+        "ev3/glm"
+    ]
 }

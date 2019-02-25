@@ -1,5 +1,5 @@
 
-PROJNAME=main
+PROJNAME=g0b-rootev3
 
 include ../util/common.make
 
