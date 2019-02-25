@@ -15,6 +15,7 @@ import com.sdp15.goodb0i.data.store.products.ProductLoader
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 /**
  * Manages state across a shopping session
@@ -57,6 +58,7 @@ class SessionManager(
             }
         }
         sh.incomingMessages.observeForever { message ->
+            Timber.i("$message")
             var consume = false // We may consume the message and not emit it elsewhere
             when (message) {
                 is Message.IncomingMessage.Connected -> {
@@ -71,6 +73,12 @@ class SessionManager(
                 }
                 is Message.IncomingMessage.ReachedPoint -> {
                     consume = reachedPoint(message.id)
+                }
+                is Message.IncomingMessage.TrolleyAcceptedProduct -> {
+                    productAcceptedInternal()
+                }
+                is Message.IncomingMessage.TrolleyRejectedProduct -> {
+                    productRejectedInternal()
                 }
             }
             if (!consume) incomingMessages.postValue(message)
@@ -140,6 +148,14 @@ class SessionManager(
 
     override fun productAccepted() {
         sh.sendMessage(Message.OutgoingMessage.ProductAccepted(lastScannedProduct.value!!.id))
+        productAcceptedInternal()
+    }
+
+    /*
+     Change session state when product is accepted
+     Either by the app or via message from trolley
+     */
+    private fun productAcceptedInternal() {
         //TODO: Move to next Either Scanning or NavigatingTo state
         val next = route[index + 1]
         if (next is Route.RoutePoint.EntryCollectionPoint) {
@@ -152,6 +168,10 @@ class SessionManager(
 
     override fun productRejected() {
         sh.sendMessage(Message.OutgoingMessage.ProductRejected(lastScannedProduct.value!!.id))
+        productRejectedInternal()
+    }
+
+    private fun productRejectedInternal() {
         sessionState.postValue(ShoppingSessionState.Scanning(route[index] as Route.RoutePoint.EntryCollectionPoint))
     }
 
