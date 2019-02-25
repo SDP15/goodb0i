@@ -1,7 +1,12 @@
+#include <arpa/inet.h>
 #include <bits/stdc++.h>
 #include <cassert>
 #include <cstdint>
+#include <cstring>
+#include <netinet/in.h>
 #include <signal.h>
+#include <sys/socket.h>
+#include <sys/types.h>
 #include <unistd.h>
 
 #include "ev3dev.cpp"
@@ -89,9 +94,11 @@ public:
 
   deque<Command> commands;
 
-  void pushCommand(Command cmd) { commands.push_front(cmd); }
+  void pushCommand(Command cmd) { commands.push_back(cmd); }
 
   void pushCommandToFront(Command cmd) { commands.push_front(cmd); }
+
+  bool queueEmpty() { return commands.empty(); }
 
 private:
   int forwardBaseSpeed{70};
@@ -135,6 +142,11 @@ public:
   SteeringSubsystem() {
     lastWaitUpdate = chrono::steady_clock::now();
     lastCmdTime = lastWaitUpdate;
+  }
+
+  bool isMoving() {
+    return targetMotorSpeeds[DRIVE_LEFT_BACK] != 0 ||
+           targetMotorSpeeds[DRIVE_RIGHT_BACK] != 0;
   }
 
   void process() {
@@ -199,6 +211,7 @@ class LineFollowSubsystem {
 private:
   enum class Direction { left, right } lastLineDir;
   int avgLineAngle{0};
+  bool lastStopped{false}, stopped{false};
   SteeringSubsystem *sysSteering;
 
 public:
@@ -217,13 +230,14 @@ public:
     auto rrcol{rightColor->getRawRGB()};
     // cerr << (int)lcol << " " << (int)rcol << " " << rrcol.x << " " << rrcol.y
     //     << " " << rrcol.z << endl;
-    constexpr int STEER_ANGLE{45};
-    constexpr int SMALL_STEER_ANGLE{30};
+    constexpr int STEER_ANGLE{85};
+    constexpr int SMALL_STEER_ANGLE{70};
     constexpr int SONAR_STOP_DISTANCE{45};
 
     if (sonar->distance_centimeters() < SONAR_STOP_DISTANCE) {
-      // ALL STOP
+      stopped = true;
     } else {
+      stopped = false;
       int lineAngle{};
       if (mcol == evutil::Color::line) {
         if (lcol == evutil::Color::line && rcol != evutil::Color::line) {
@@ -255,11 +269,22 @@ public:
       }
       // Rolling average to smooth out steering
       avgLineAngle = (avgLineAngle + 7 * lineAngle) / 8;
-      // steerDrive->runToDegree(avgLineAngle);
-      // leftDrive->runForever(avgLineAngle < 0 ? getForwardSpeed() / 2
-      //                                       : getForwardSpeed());
-      // rightDrive->runForever(avgLineAngle > 0 ? getForwardSpeed() / 2
-      //                                        : getForwardSpeed());
+      if (lastStopped != stopped) {
+        lastStopped = stopped;
+        if (stopped) {
+          sysSteering->pushCommandToFront(
+              {SteeringSubsystem::Command::CommandType::saveAndHalt});
+        } else {
+          sysSteering->pushCommandToFront(
+              {SteeringSubsystem::Command::CommandType::resume});
+        }
+      } else {
+        if (sysSteering->queueEmpty()) {
+          sysSteering->pushCommand(
+              {SteeringSubsystem::Command::CommandType::setTurnAngle, 0, 0,
+               avgLineAngle});
+        }
+      }
     }
   }
 };
@@ -269,17 +294,103 @@ private:
   SteeringSubsystem sysSteering;
   LineFollowSubsystem sysLine;
 
+  bool halted{false};
+  mutex accessMutex;
+  int socketFd{-1};
+
+  void spawnNewConnThread() { new thread(&Robot::socketThreadFn, this); }
+
+  void socketThreadFn() {
+    int connectFd{accept(socketFd, nullptr, nullptr)};
+    spawnNewConnThread();
+    if (connectFd < 0) {
+      perror("accept fail");
+      return;
+    }
+    auto rsend = [&](const char *str) {
+      ::send(connectFd, str, strlen(str), 0);
+    };
+
+    rsend("EV3READY\n");
+    char rbuf[64];
+    int rlen;
+    while ((rlen = recv(connectFd, rbuf, sizeof rbuf, 0)) > 0) {
+      if (rbuf[rlen - 1] == '\n') {
+        --rlen;
+      }
+      if (rlen == 0) {
+        continue;
+      }
+      lock_guard<mutex> _l{accessMutex};
+      if (strncmp(rbuf, "stop", rlen) == 0) {
+        if (!halted) {
+          halted = true;
+          sysSteering.pushCommandToFront(
+              {SteeringSubsystem::Command::CommandType::saveAndHalt});
+        }
+      }
+      if (strncmp(rbuf, "start", rlen) == 0) {
+        if (halted) {
+          halted = false;
+          sysSteering.pushCommandToFront(
+              {SteeringSubsystem::Command::CommandType::resume});
+        }
+      }
+    }
+
+    if (shutdown(connectFd, SHUT_RDWR) == -1) {
+      perror("shutdown failed");
+    }
+    close(connectFd);
+  }
+
 public:
   Robot() : sysSteering(), sysLine(&sysSteering) {
     sysSteering.pushCommand(
         {SteeringSubsystem::Command::CommandType::setSpeed, 100, 1000, 0});
     sysSteering.pushCommand(
         {SteeringSubsystem::Command::CommandType::setTurnAngle, 0, 3000, 80});
+    // Start up server
+    {
+      socketFd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+      if (socketFd == -1) {
+        perror("Cannot create server socket");
+        throw new runtime_error("Cannot create server socket");
+      }
+
+      sockaddr_in addr;
+      memset(&addr, 0, sizeof addr);
+      addr.sin_family = AF_INET;
+      addr.sin_port = htons(6081);
+      addr.sin_addr.s_addr = htonl(INADDR_ANY);
+
+      if (bind(socketFd, reinterpret_cast<sockaddr *>(&addr), sizeof addr) ==
+          -1) {
+        perror("bind fail");
+        throw new runtime_error("Could not bind server socket");
+      }
+      if (listen(socketFd, 10) == -1) {
+        perror("listen fail");
+        throw new runtime_error("Could not listen to socket");
+      }
+    }
+    spawnNewConnThread();
+  }
+
+  ~Robot() {
+    lock_guard<mutex> _l{accessMutex};
+    if (socketFd >= 0) {
+      close(socketFd);
+    }
   }
 
   void process() {
+    lock_guard<mutex> _l{accessMutex};
+
     sysSteering.process();
-    // sysLine.process();
+    if (!halted) {
+      sysLine.process();
+    }
   }
 };
 
