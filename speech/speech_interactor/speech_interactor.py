@@ -6,6 +6,7 @@ import math
 import datetime
 import subprocess as sp
 import serial
+import websocket
 from pocketsphinx import LiveSpeech, get_model_path
 
 from socket_control import on_message, on_error, on_open, on_close, send_message
@@ -29,7 +30,7 @@ speech = LiveSpeech(
 
 class SpeechInteractor:
     def __init__(self, state_file='interactor_states.json', list_file = 'list.json'):
-        #initialise_socket()
+        self.ws = initialise_socket()
         log_filename = now.strftime("%Y-%m-%d-%H%M%S")
         self.logging = False
 
@@ -193,11 +194,11 @@ class SpeechInteractor:
         if quantity > 1:
             nextState = 'nextState_quantity+'
             response = self.options['yes']['reply_quantity+'] + str(quantity-1) + self.options['yes']['prompt']
-            send_message(ws, "PA")
+            send_message(self.ws, "PA")
         else:
             nextState = 'nextState_quantity0'
             response = self.options['yes']['reply_quantity0']
-            send_message(ws, "PA")
+            send_message(self.ws, "PA")
         
         self.say(response)
         self.last_reply = response
