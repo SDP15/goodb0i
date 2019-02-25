@@ -4,17 +4,15 @@ import os
 import sys
 import math
 import datetime
-import subprocess as goodboi
+import subprocess as sp
 import serial
 from pocketsphinx import LiveSpeech, get_model_path
 
-import websocket
-from socket_control import on_message, on_error, on_open, on_close
+from socket_control import on_message, on_error, on_open, on_close, send_message
 
 model_path = get_model_path()
 now = datetime.datetime.now()
 universal_phrases = {'repeat', 'options'}
-
 
 speech = LiveSpeech(
     verbose=False,
@@ -28,9 +26,10 @@ speech = LiveSpeech(
     kws='kws.list',
 )
 
+
 class SpeechInteractor:
-    def __init__(self, state_file='interactor_states.json', list_file = 'example_list.json'):
-        initialise_socket()
+    def __init__(self, state_file='interactor_states.json', list_file = 'list.json'):
+        #initialise_socket()
         log_filename = now.strftime("%Y-%m-%d-%H%M%S")
         self.logging = False
 
@@ -137,7 +136,7 @@ class SpeechInteractor:
         elif "identify" in self.state and word == "yes":
             self.describe_item()
         elif "continue" in self.state and word == "yes":
-            self.continueShopping()
+            self.continue_shopping()
         else:
             self.say(self.options[word]['reply'])
             self.last_reply = self.options[word]['reply']
@@ -173,7 +172,7 @@ class SpeechInteractor:
             with open(self.log_filepath, 'a') as f:
                 f.write("{:}\n".format(string))
                     
-        goodboi.run(["mimic/mimic", "-t", string, "-voice", "awb"])
+        sp.run(["mimic/mimic", "-t", string, "-voice", "awb"])
 
     def arrived(self, item, shelf):
         response = self.options['arrived']['reply'] + item + self.options['arrived']['second'] + shelf + self.options['arrived']['prompt']
@@ -194,10 +193,11 @@ class SpeechInteractor:
         if quantity > 1:
             nextState = 'nextState_quantity+'
             response = self.options['yes']['reply_quantity+'] + str(quantity-1) + self.options['yes']['prompt']
+            send_message(ws, "PA")
         else:
             nextState = 'nextState_quantity0'
             response = self.options['yes']['reply_quantity0']
-            self.list_pointer = self.list_pointer + 1
+            send_message(ws, "PA")
         
         self.say(response)
         self.last_reply = response
@@ -221,10 +221,10 @@ class SpeechInteractor:
         self.next_state(self.options['no']['nextState'])
     
     #Retrieves all the items and quantities on the shopping list.
-    def getShoppingList(self, list_file):
+    def get_shopping_list(self, list_file):
         sp.run(['wget','-O', 'list.json', 'http://129.215.2.55:8080/lists/load/1234567'])
         print(open('list.json','r').read())
-        self.stuff = json.load(open(list_file, 'r'))
+        self.stuff = json.load(open('list.json', 'r'))
         self.list_pointer = 0
         self.shopping_list = {}
         self.ordered_list = []
@@ -233,11 +233,9 @@ class SpeechInteractor:
             self.ordered_list.append(tings['product']['name'])
         print(self.shopping_list)
 
-    
-
     # Sets the current item to the next item on the list and informs the user what item they are
     # going to collect next.
-    def continueShopping(self):
+    def continue_shopping(self):
         self.list_pointer = self.list_pointer + 1
         next_product = self.ordered_list[self.list_pointer]
         response = self.options['yes']['reply'] + next_product
@@ -245,15 +243,6 @@ class SpeechInteractor:
         self.last_reply = response
         self.next_state(self.options['yes']['nextState'])
         
-def initialise_socket():
-    websocket.enableTrace(True)
-    ws = websocket.WebSocketApp("ws://129.215.2.55:8080/trolley",
-                              on_message = on_message,
-                              on_error = on_error,
-                              on_close = on_close)
-    ws.on_open = on_open
-    ws.run_forever()
-
 
 if __name__ == '__main__':
     sint = SpeechInteractor()

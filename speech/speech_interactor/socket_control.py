@@ -18,13 +18,18 @@ def on_error(ws, error):
 def on_close(ws):
     print("### closed ###")
 
+def send_message(ws, message):
+    print("Sent " + message)
+    ws.send(str(message))
+
+
 def on_open(ws):
     def run(*args):
         print("listening")
-        for phrase in lsp:
-            print("You said: "+str(phrase))
-            time.sleep(1)
-            ws.send(str(phrase))
+        # for phrase in lsp:
+        #     print("You said: "+str(phrase))
+        #     time.sleep(1)
+        #     ws.send(str(phrase))
         time.sleep(1)
         ws.close()
         print("thread terminating...")
