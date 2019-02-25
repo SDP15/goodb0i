@@ -35,6 +35,8 @@ class ScannerViewModel : BaseViewModel<Any>(),
             val product = sm.checkScannedCode(code)
             if (product != null) {
                 transitions.postValue(ScannerFragmentDirections.actionScannerFragmentToConfirmationFragment())
+            } else {
+                isRunning.set(false)
             }
         }
     }
@@ -48,7 +50,7 @@ class ScannerViewModel : BaseViewModel<Any>(),
                 override fun onBarcodeRead(reading: BarcodeReading) {
                     Timber.i("Barcode read $reading")
                     isRunning.set(false)
-                    if (reading.value != null) onRead(reading.value)
+                    //if (reading.value != null) onRead(reading.value)
                     this@ScannerViewModel.reading.postValue(reading)
                 }
 

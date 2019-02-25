@@ -24,6 +24,9 @@
         <action
             android:id="@+id/action_welcome_fragment_to_code_fragment"
             app:destination="@id/code_fragment" />
+        <action
+            android:id="@+id/action_welcome_fragment_to_scanner_fragment"
+            app:destination="@id/scanner_fragment" />
 
     </fragment>
 

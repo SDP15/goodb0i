@@ -4,8 +4,7 @@ package service.routing
  */
 class Graph<ID> : Collection<Graph.Vertex<ID>> {
     private val nodes: MutableSet<Node<ID>> = mutableSetOf()
-    private val edges: MutableMap<Node<ID>, MutableSet<Edge<ID>>> = hashMapOf()
-
+    private val edges: MutableMap<Node<ID>, MutableList<Edge<ID>>> = hashMapOf()
 
     override val size: Int = nodes.size
 
@@ -21,7 +20,7 @@ class Graph<ID> : Collection<Graph.Vertex<ID>> {
 
         override fun next(): Vertex<ID> {
             val node = internal.next()
-            return Vertex(node, edges[node] ?: emptySet())
+            return Vertex(node, edges[node] ?: emptyList())
         }
     }
 
@@ -40,7 +39,7 @@ class Graph<ID> : Collection<Graph.Vertex<ID>> {
         return "Graph(${nodes.map { "$it : ${edges[it]}\n" }})"
     }
 
-    data class Vertex<ID>(val node: Node<ID>, val edges: Set<Edge<ID>>)
+    data class Vertex<ID>(val node: Node<ID>, val edges: List<Edge<ID>>)
 
     data class Node<ID>(val id: ID)
 
@@ -49,7 +48,6 @@ class Graph<ID> : Collection<Graph.Vertex<ID>> {
         fun reverse() = Edge(to, from, cost)
 
     }
-
 
     // Builder functions
 
@@ -112,13 +110,13 @@ class Graph<ID> : Collection<Graph.Vertex<ID>> {
         if (edges.containsKey(fromNode)) {
             edges[fromNode]?.add(edge)
         } else {
-            edges[fromNode] = mutableSetOf(edge)
+            edges[fromNode] = mutableListOf(edge)
         }
         if (bidirectional) {
             if (edges.containsKey(toNode)) {
                 edges[toNode]?.add(edge.reverse())
             } else {
-                edges[toNode] = mutableSetOf(edge.reverse())
+                edges[toNode] = mutableListOf(edge.reverse())
             }
         }
         return edge
@@ -127,8 +125,6 @@ class Graph<ID> : Collection<Graph.Vertex<ID>> {
     operator fun plusAssign(edge: Triple<ID, ID, Int>) {
         edge(edge.first, edge.second, edge.third)
     }
-
-
 
     operator fun plusAssign(id: ID) {
         nodes.add(Node(id))
@@ -146,14 +142,14 @@ class Graph<ID> : Collection<Graph.Vertex<ID>> {
         nodes.remove(node)
     }
 
-    operator fun plusAssign(vertex: Vertex<ID>) {
-        nodes.add(vertex.node)
-        if (edges.containsKey(vertex.node)) {
-            edges[vertex.node]?.addAll(vertex.edges)
-        } else {
-            edges[vertex.node] = vertex.edges.toMutableSet()
-        }
-    }
+//    operator fun plusAssign(vertex: Vertex<ID>) {
+//        nodes.add(vertex.node)
+//        if (edges.containsKey(vertex.node)) {
+//            edges[vertex.node]?.addAll(vertex.edges)
+//        } else {
+//            edges[vertex.node] = vertex.edges.toMutableSet()
+//        }
+//    }
 
     operator fun get(id: ID) = edges[Node(id)]
 

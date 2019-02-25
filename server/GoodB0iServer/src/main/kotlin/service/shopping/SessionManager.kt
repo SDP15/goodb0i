@@ -51,6 +51,12 @@ class SessionManager {
         }
     }
 
+    private class MockTrolleySender : TrolleyMessageSender {
+        override suspend fun sendToTrolley(message: Message.OutgoingMessage.ToTrolley) {
+            println("Message to trolley $message")
+        }
+    }
+
     private class QueuedMessageSender(var socket: WebSocketSession) : AppMessageSender {
         private val outGoingMessageQueue = LinkedList<String>()
 

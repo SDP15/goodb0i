@@ -16,6 +16,7 @@ import repository.shelves.Shelf
 import repository.shelves.ShelfRack
 import repository.products.Product
 import java.io.File
+import java.util.*
 
 object TestDataProvider {
 
@@ -26,19 +27,19 @@ object TestDataProvider {
 
             kLogger.debug("Inserting test products data")
             transaction {
-                getTestData().forEach {
-                    Product.new {
-                        name = it.name
-                        averageSellingUnitWeight = it.averageSellingUnitWeight
-                        contentsMeasureType = it.contentsMeasureType
-                        contentsQuantity = it.contentsQuantity
-                        unitOfSale = it.unitOfSale
-                        unitQuantity = it.unitQuantity
-                        department = it.department
-                        description = it.description.joinToString("//")
-                        price = it.price
-                        superDepartment = it.superDepartment
-                        unitPrice = it.unitPrice
+                getTestData().forEachIndexed { index, item ->
+                    Product.new(UUID.nameUUIDFromBytes(index.toString().toByteArray())) {
+                        name = item.name
+                        averageSellingUnitWeight = item.averageSellingUnitWeight
+                        contentsMeasureType = item.contentsMeasureType
+                        contentsQuantity = item.contentsQuantity
+                        unitOfSale = item.unitOfSale
+                        unitQuantity = item.unitQuantity
+                        department = item.department
+                        description = item.description.joinToString("//")
+                        price = item.price
+                        superDepartment = item.superDepartment
+                        unitPrice = item.unitPrice
                     }
                 }
                 kLogger.debug("Product insert complete. ${Product.all().count()} inserted")
