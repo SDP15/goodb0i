@@ -30,7 +30,8 @@ class Main {
             "SWEETS" to "TILLS" cost cost
 
         }
-
+        val path = solver(graph, Graph.Node("ENTRANCE"), Graph.Node("FOOD_CUPBOARD"), listOf(Graph.Node("BAKERY")))
+        println("Path $path")
         val other = graph<Int> {
             edge(1, 4, 13)
             edge(1, 5, 7)
@@ -85,8 +86,7 @@ class Main {
             edge(13, 11, 12)
             edge(13, 12, 9)
         }
-        val path = solver(other, Graph.Node(2), Graph.Node(13), listOf(Graph.Node(3), Graph.Node(10)))
-        println("Path $path")
+
     }
 
     companion object {
@@ -107,11 +107,13 @@ class Main {
             println("From $current, next best is $next")
             remaining.remove(next)
             var temp = next
+            val subPath = mutableListOf<Graph.Node<ID>>()
             while (temp != current) {
-                path.add(temp)
+                subPath.add(temp)
                 temp = result.previous[temp]!!
             }
-            path.add(current)
+            subPath.add(current)
+            path.addAll(subPath.asReversed())
             println("Path is now $path")
             current = next
             if (current == end) break

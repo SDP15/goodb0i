@@ -17,6 +17,7 @@ import repository.TestDataProvider
 import repository.exposedTypeAdapters
 import service.*
 import service.shopping.AppManager
+import service.shopping.SessionManager
 import service.shopping.TrolleyManager
 
 
@@ -38,11 +39,15 @@ fun Application.module() {
 
     TestDataProvider.insert()
 
+    val trolleyManager = TrolleyManager()
+    val appManager = AppManager()
+    val sessionManager = SessionManager()
+
     install(Routing) {
         products(productService)
         shelves(shelfService)
         lists(listService)
-        sockets(TrolleyManager(), AppManager())
+        sockets(sessionManager, trolleyManager, appManager)
     }
 
 
