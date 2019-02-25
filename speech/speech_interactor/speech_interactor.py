@@ -4,11 +4,11 @@ import os
 import sys
 import math
 import datetime
-import subprocess as goodboi
+import subprocess as sp
 from pocketsphinx import LiveSpeech, get_model_path
 
 import websocket
-from socket_control import on_message, on_error, on_open, on_close
+from socket_control import on_message, on_error, on_open, on_close, send_message
 
 model_path = get_model_path()
 now = datetime.datetime.now()
@@ -28,7 +28,7 @@ speech = LiveSpeech(
 )
 
 class SpeechInteractor:
-    def __init__(self, state_file='interactor_states.json', list_file = 'example_list.json'):
+    def __init__(self, state_file='interactor_states.json', list_file = 'list.json'):
         initialise_socket()
         log_filename = now.strftime("%Y-%m-%d-%H%M%S")
         self.logging = False
@@ -149,7 +149,7 @@ class SpeechInteractor:
             with open(self.log_filepath, 'a') as f:
                 f.write("{:}\n".format(string))
                     
-        goodboi.run(["mimic/mimic", "-t", string, "-voice", "awb"])
+        sp.run(["mimic/mimic", "-t", string, "-voice", "awb"])
 
     def arrived(self, item, shelf):
         response = self.options['arrived']['reply'] + item + self.options['arrived']['second'] + shelf + self.options['arrived']['prompt']
@@ -170,10 +170,11 @@ class SpeechInteractor:
         if quantity > 1:
             nextState = 'nextState_quantity+'
             response = self.options['yes']['reply_quantity+'] + str(quantity-1) + self.options['yes']['prompt']
+            send_message(ws, "PA")
         else:
             nextState = 'nextState_quantity0'
             response = self.options['yes']['reply_quantity0']
-            # self.listPointer = self.listPointer + 1
+            send_message(ws, "PA")
         
         self.speak_to_me(response)
         self.last_reply = response
@@ -200,7 +201,7 @@ class SpeechInteractor:
     def getShoppingList(self, list_file):
         sp.run(['wget','-O', 'list.json', 'http://129.215.2.55:8080/lists/load/1234567'])
         print(open('list.json','r').read())
-        self.stuff = json.load(open(list_file, 'r'))
+        self.stuff = json.load(open('list.json', 'r'))
         self.listPointer = 0
         self.shoppingList = {}
         self.orderedList = []
@@ -221,14 +222,7 @@ class SpeechInteractor:
         self.last_reply = response
         self.next_state(self.options['yes']['nextState'])
         
-def initialise_socket():
-    websocket.enableTrace(True)
-    ws = websocket.WebSocketApp("ws://129.215.2.55:8080/trolley",
-                              on_message = on_message,
-                              on_error = on_error,
-                              on_close = on_close)
-    ws.on_open = on_open
-    ws.run_forever()
+
 
 
 if __name__ == '__main__':
