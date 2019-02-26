@@ -24,7 +24,8 @@ class PiController:
         while True:
             pass
         
-        
+    def get_ws(self):
+        return self.ws 
 
     def on_message(self, ws, message):
         print("Message: " + str(message))
