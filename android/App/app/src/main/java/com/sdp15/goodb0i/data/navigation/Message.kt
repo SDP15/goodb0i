@@ -43,6 +43,8 @@ sealed class Message {
 
     sealed class OutgoingMessage : Message() {
 
+        data class PlanRoute(val code: Long) : OutgoingMessage()
+
         /**
          * Reconnect to session using old id
          */
@@ -101,13 +103,14 @@ sealed class Message {
 
         override fun transformOutgoing(message: OutgoingMessage): String {
             return when (message) {
+                is OutgoingMessage.PlanRoute -> "LP$delim${message.code}"
                 is OutgoingMessage.Reconnect -> "RC$delim${message.oldId}"
                 is OutgoingMessage.ProductScanned -> "PS$delim${message.id}"
                 is OutgoingMessage.ProductAccepted -> "PA$delim${message.id}"
                 is OutgoingMessage.ProductRejected -> "PR$delim${message.id}"
                 is OutgoingMessage.RequestHelp -> "RH$delim"
                 is OutgoingMessage.Stop -> "SP$delim${message.reason.code}"
-                is OutgoingMessage.RouteReceived -> "RR"
+                is OutgoingMessage.RouteReceived -> "RR$delim"
             }
         }
     }

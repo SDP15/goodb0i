@@ -28,7 +28,6 @@ class SessionManager(
     private val productLoader: ProductLoader
 ) : ShoppingSessionManager<Message.IncomingMessage> {
 
-
     private var uid: String = ""
     private var route: Route = Route.emptyRoute()
     private var index = 0
@@ -94,6 +93,7 @@ class SessionManager(
             shoppingList = list
             sessionState.postValue(ShoppingSessionState.Connecting)
             sh.start(RetrofitProvider.root + "/app")
+            sh.sendMessage(Message.OutgoingMessage.PlanRoute(list.code))
         }
     }
 
@@ -106,9 +106,9 @@ class SessionManager(
       If we have reached a shelf, consume the message and switch to scanning state
      */
     private fun reachedPoint(id: String): Boolean {
-        val pointIndex = route.indexOfFirst { rp -> rp.id == id }
+        val pointIndex = route.indexOfFirst { rp -> rp is Route.RoutePoint.Stop && rp.id == id }
         val point = route.getOrNull(pointIndex)
-        if (point is Route.RoutePoint.EntryCollectionPoint) {
+        if (point is Route.RoutePoint.Stop) {
             index = pointIndex
             sessionState.postValue(ShoppingSessionState.Scanning(point))
             return true
@@ -162,7 +162,7 @@ class SessionManager(
     private fun productAcceptedInternal() {
         //TODO: Move to next Either Scanning or NavigatingTo state
         val next = route[index + 1]
-        if (next is Route.RoutePoint.EntryCollectionPoint) {
+        if (next is Route.RoutePoint.Stop) {
             sessionState.postValue(ShoppingSessionState.Scanning(next))
         } else {
             //TODO: End state
@@ -176,7 +176,7 @@ class SessionManager(
     }
 
     private fun productRejectedInternal() {
-        sessionState.postValue(ShoppingSessionState.Scanning(route[index] as Route.RoutePoint.EntryCollectionPoint))
+        sessionState.postValue(ShoppingSessionState.Scanning(route[index] as Route.RoutePoint.Stop))
     }
 
     override fun requestAssistance() {

@@ -90,6 +90,7 @@ sealed class Message {
                 "RH" -> IncomingMessage.FromApp.RequestHelp
                 "SP" -> IncomingMessage.FromApp.RequestStop
                 "RR" -> IncomingMessage.FromApp.ReceivedRoute
+                "LP" -> IncomingMessage.FromApp.PlanRoute(message.substringAfter(DELIM).toLong())
                 else -> IncomingMessage.FromApp.InvalidMessage(message)
             }
         }

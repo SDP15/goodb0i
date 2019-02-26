@@ -28,7 +28,7 @@ sealed class ShoppingSessionState {
     /* Scanning a particular item
        NB: This state covers both ProductFragment and ScannerFragment
       */
-    data class Scanning(val item: Route.RoutePoint.EntryCollectionPoint) : ShoppingSessionState()
+    data class Scanning(val item: Route.RoutePoint.Stop) : ShoppingSessionState()
 
     // User is being asked to confirm an item
     data class Confirming(val product: Product) : ShoppingSessionState()
