@@ -9,7 +9,7 @@ import serial
 import websocket
 from pocketsphinx import LiveSpeech, get_model_path
 
-from socket_control import on_message, on_error, on_open, on_close, send_message
+from socket_control import on_message, on_error, on_open, on_close, send_message, initialise_socket
 
 model_path = get_model_path()
 now = datetime.datetime.now()
@@ -128,24 +128,6 @@ class SpeechInteractor:
                         f.write("Multiple keywords detected: {:}\n".format(phrase))
                     else:
                         f.write("Keyword detected: {:}\n".format(word))
-                        
-
-    def react(self, word):
-        # self.say(self.options[word]['reply'])
-        if "cart" in self.state and word == "yes":
-            self.cart()
-        elif "identify" in self.state and word == "yes":
-            self.describe_item()
-        elif "continue" in self.state and word == "yes":
-            self.continue_shopping()
-        else:
-            self.say(self.options[word]['reply'])
-            self.last_reply = self.options[word]['reply']
-            self.next_state(self.options[word]['nextState'])
-
-    def list_options(self):
-        self.say("Your options are: %s, and repeat." 
-            % ", ".join(str(o) for o in self.options))
 
     def find_word(self, phrase):
        valid_words = set(phrase) & (set(self.options)|universal_phrases)
@@ -155,6 +137,28 @@ class SpeechInteractor:
            return "n/a"
        else:
            return "multiple"
+
+
+    def list_options(self):
+        self.say("Your options are: %s, and repeat." 
+            % ", ".join(str(o) for o in self.options))
+
+
+    def react(self, word):
+        # self.say(self.options[word]['reply'])
+        if "cart" in self.state and word == "yes" or word == "no":
+            self.cart(word)
+        elif "identify" in self.state and word == "yes":
+            self.describe_item()
+        elif "continue" in self.state and word == "yes":
+            self.continue_shopping()
+        elif "init" in self.state and word == "start":
+            self.start_state(word)
+        else:
+            self.say(self.options[word]['reply'])
+            self.last_reply = self.options[word]['reply']
+            self.next_state(self.options[word]['nextState'])
+
 
     def say(self, string):
         # Logs the string that is given to the TTS engine
@@ -167,6 +171,7 @@ class SpeechInteractor:
         engine.say(string)
         engine.runAndWait()
     
+
     def speak_to_me(self, string):
         # Logs the string that is given to the TTS engine
         if self.logging is True:
@@ -175,11 +180,13 @@ class SpeechInteractor:
                     
         sp.run(["mimic/mimic", "-t", string, "-voice", "awb"])
 
+
     def arrived(self, item, shelf):
         response = self.options['arrived']['reply'] + item + self.options['arrived']['second'] + shelf + self.options['arrived']['prompt']
         self.say(response)
         self.last_reply = response
         self.next_state(self.options['arrived']['nextState'])
+
 
     def scanned(self, item):
         response = self.options['scanned']['reply'] + item + self.options['scanned']['prompt']
@@ -187,22 +194,28 @@ class SpeechInteractor:
         self.last_reply = response
         self.next_state(self.options['scanned']['nextState'])
 
-    def cart(self):
+
+    def cart(self, word):
         current_item = self.ordered_list[self.list_pointer]
         quantity = self.shopping_list[current_item]
         self.shopping_list[current_item] = quantity-1
-        if quantity > 1:
-            nextState = 'nextState_quantity+'
-            response = self.options['yes']['reply_quantity+'] + str(quantity-1) + self.options['yes']['prompt']
-            send_message(self.ws, "PA")
+
+        if "yes" in word:
+            send_message(self.ws, "PA&")
+            if quantity > 1:
+                nextState = 'nextState_quantity+'
+                response = self.options['yes']['reply_quantity+'] + str(quantity-1) + self.options['yes']['prompt']
+            else:
+                nextState = 'nextState_quantity0'
+                response = self.options['yes']['reply_quantity0']
+                
         else:
-            nextState = 'nextState_quantity0'
-            response = self.options['yes']['reply_quantity0']
-            send_message(self.ws, "PA")
-        
+            send_message(self.ws, "PR&")
+            response = self.options['no']['reply']
         self.say(response)
         self.last_reply = response
-        self.next_state(self.options['yes'][nextState])
+        self.next_state(self.options[word][nextState])
+
 
     def describe_item(self):
         for tings in self.stuff['products']:
@@ -221,6 +234,7 @@ class SpeechInteractor:
         self.last_reply = response
         self.next_state(self.options['no']['nextState'])
     
+
     #Retrieves all the items and quantities on the shopping list.
     def get_shopping_list(self, list_file):
         sp.run(['wget','-O', 'list.json', 'http://129.215.2.55:8080/lists/load/1234567'])
@@ -234,6 +248,7 @@ class SpeechInteractor:
             self.ordered_list.append(tings['product']['name'])
         print(self.shopping_list)
 
+
     # Sets the current item to the next item on the list and informs the user what item they are
     # going to collect next.
     def continue_shopping(self):
@@ -243,6 +258,16 @@ class SpeechInteractor:
         self.say(response)
         self.last_reply = response
         self.next_state(self.options['yes']['nextState'])
+
+
+    # Sends the server a message that the user is at this cart and ready to start
+    def start_state(self, word):
+        send_message(self.ws, "UT&")
+        self.say(self.options[word]['reply'])
+        self.last_reply = self.options[word]['reply']
+        self.next_state(self.options[word]['nextState'])
+
+
         
 
 if __name__ == '__main__':

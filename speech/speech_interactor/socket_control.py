@@ -2,6 +2,7 @@
 import websocket
 import os
 import subprocess as sp
+from speech_interactor import SpeechInteractor
 
 try:
     import thread
@@ -11,6 +12,13 @@ import time
 
 def on_message(ws, message):
     print("Message: " + str(message))
+    if "AA" in message:
+        SpeechInteractor.cart(word = "yes")
+    elif "AR" in message:
+        SpeechInteractor.cart("no")
+    # elif "AS" in message:
+    #     speech_interactor.scanned(item)
+
 
 def on_error(ws, error):
     print(error)
