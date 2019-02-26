@@ -14,9 +14,10 @@ import time
 class PiController:
 
     def __init__(self):
-        self.sp_interactor = speech_interactor.SpeechInteractor(self)
         self.ws = self.initialise_websocket()
         self.initialise_ev3_socket()
+        self.sp_interactor = speech_interactor.SpeechInteractor(self)
+        
 
     def on_message(self, ws, message):
         print("Message: " + str(message))
@@ -57,13 +58,15 @@ class PiController:
         thread.start_new_thread(run, ())
 
     def initialise_websocket(self):
+        print("initialise websocket")
         websocket.enableTrace(True)
-        ws = websocket.WebSocketApp("ws://129.215.2.55:8080/trolley",
+        ws = websocket.WebSocketApp("ws://127.0.0.1:8080/trolley",
                                     on_message=self.on_message,
                                     on_error=self.on_error,
                                     on_close=self.on_close)
         ws.on_open = self.on_open
         ws.run_forever()
+        print("Websocket connection")
         return ws
 
     def initialise_ev3_socket(self):
