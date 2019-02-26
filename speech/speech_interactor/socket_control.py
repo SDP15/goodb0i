@@ -18,6 +18,8 @@ def on_message(ws, message):
         SpeechInteractor.cart("no")
     # elif "AS" in message:
     #     speech_interactor.scanned(item)
+    elif "RC" in message:
+        
 
 
 def on_error(ws, error):
