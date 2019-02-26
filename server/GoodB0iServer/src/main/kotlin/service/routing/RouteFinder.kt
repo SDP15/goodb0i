@@ -21,7 +21,8 @@ class RouteFinder(private val listService: ListService) {
     private val end = 13
 
     val graph = Graph.graph<Int> {
-        // 0       1         2         3              4         5       6         7
+        // Test shelves are 3, 1, 5, 7
+        // 1         2         3              4         5       6         7         8
         //"Dairy", "Bakery", "Fruits", "Vegetables", "Seafood", "Meat", "Sweets", "Food cupboard"
         10 to 2 cost 5 // Start to fruits
         2 to 11 cost 5  // Fruits to top left
