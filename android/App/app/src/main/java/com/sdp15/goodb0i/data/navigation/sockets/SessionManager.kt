@@ -114,9 +114,10 @@ class SessionManager(
         val point = route.getOrNull(pointIndex)
         if (point is Route.RoutePoint.Stop) {
             index = pointIndex
+            Timber.i("At stop point")
             sessionState.postValue(ShoppingSessionState.Scanning(point))
             return true
-        } else if (point is Route.RoutePoint.Pass || point is Route.RoutePoint.TurnLeft || point is Route.RoutePoint.TurnRight) {
+        } else if (point is Route.RoutePoint.Pass || point is Route.RoutePoint.TurnLeft || point is Route.RoutePoint.TurnRight || point is Route.RoutePoint.TurnCenter) {
             // We don't want to change state if a tag scan is triggered while we are scanning
             // TODO: Make sure the Trolley scanning code doesn't post tags twice sequentially
             if (sessionState.value !is ShoppingSessionState.Scanning && sessionState.value !is ShoppingSessionState.Confirming) {
@@ -124,6 +125,8 @@ class SessionManager(
                 // We should already be in a NavigatingTo state at this point
                 sessionState.postValue(ShoppingSessionState.NavigatingTo(route[index - 1], route[index]))
             }
+        } else {
+            Timber.i("At other point $point")
         }
         return false
     }
