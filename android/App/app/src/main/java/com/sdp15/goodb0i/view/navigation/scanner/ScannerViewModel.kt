@@ -32,12 +32,12 @@ class ScannerViewModel : BaseViewModel<Any>(),
     private fun onRead(code: String) {
         isRunning.set(true)
         GlobalScope.launch(Dispatchers.IO) {
-            val product = sm.checkScannedCode(code)
-            if (product != null) {
-                transitions.postValue(ScannerFragmentDirections.actionScannerFragmentToConfirmationFragment())
-            } else {
-                isRunning.set(false)
-            }
+//            val product = sm.checkScannedCode(code)
+//            if (product != null) {
+//                transitions.postValue(ScannerFragmentDirections.actionScannerFragmentToConfirmationFragment())
+//            } else {
+//                isRunning.set(false)
+//            }
         }
     }
 

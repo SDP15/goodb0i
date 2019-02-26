@@ -1,5 +1,6 @@
 package com.sdp15.goodb0i.view.navigation.scanner
 
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -18,6 +19,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class ScannerFragment : Fragment() {
 
     private val vm: ScannerViewModel by viewModel()
+    private lateinit var mp: MediaPlayer
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,6 +28,8 @@ class ScannerFragment : Fragment() {
 
     private fun bindViewModel() {
         vm.reading.observe(this, Observer {
+            mp = MediaPlayer.create(this.requireContext(), R.raw.pop_up)
+            mp.start ()
             Toast.makeText(context, "Reading: ${it.value}", Toast.LENGTH_SHORT).show()
         })
     }
