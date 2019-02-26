@@ -16,14 +16,10 @@ class Session(
     private var trolleyReceivedRoute = false
     private var appReceivedRoute = false
 
-    init {
-        //TODO: Plan route and send to both devices
-
-    }
-
     private fun plan(code: Long) {
         val plan = routeFinder.plan(code)
-
+        sendToApp(Message.OutgoingMessage.ToApp.Route(plan))
+        sendToTrolley(Message.OutgoingMessage.ToTrolley.Route(plan))
     }
 
     override fun onAppMessage(message: Message.IncomingMessage.FromApp) {
@@ -31,6 +27,9 @@ class Session(
         when (message) {
             is Message.IncomingMessage.FromApp.PlanRoute -> {
                 plan(message.code)
+            }
+            is Message.IncomingMessage.FromApp.ReceivedRoute -> {
+                appReceivedRoute = true
             }
             is Message.IncomingMessage.FromApp.ProductScanned -> {
                 sendToTrolley(Message.OutgoingMessage.ToTrolley.AppScannedProduct)
@@ -50,6 +49,9 @@ class Session(
     override fun onTrolleyMessage(message: Message.IncomingMessage.FromTrolley) {
         println("IN: $message")
         when (message) {
+            is Message.IncomingMessage.FromTrolley.ReceivedRoute -> {
+                trolleyReceivedRoute = true
+            }
             is Message.IncomingMessage.FromTrolley.TrolleyAcceptedProduct -> {
                 sendToApp(Message.OutgoingMessage.ToApp.TrolleyAcceptedProduct)
             }
