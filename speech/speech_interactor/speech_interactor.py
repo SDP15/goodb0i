@@ -6,12 +6,10 @@ import math
 import datetime
 import subprocess as sp
 import serial
-
+import websocket
 from pocketsphinx import LiveSpeech, get_model_path
 
-#from pi_controller import PiController
-
-#from socket_control import on_message, on_error, on_open, on_close, send_message, initialise_socket
+from socket_control import on_message, on_error, on_open, on_close, send_message, initialise_socket
 
 model_path = get_model_path()
 now = datetime.datetime.now()
@@ -31,7 +29,8 @@ speech = LiveSpeech(
 
 
 class SpeechInteractor:
-    def __init__(self, controller, state_file='interactor_states.json', list_file = 'list.json'):
+    def __init__(self, state_file='interactor_states.json', list_file = 'list.json'):
+        self.ws = initialise_socket()
         log_filename = now.strftime("%Y-%m-%d-%H%M%S")
         self.logging = False
 
@@ -49,7 +48,6 @@ class SpeechInteractor:
         if self.logging is True:
             print("Conversation is being logged in: {:}".format(self.log_filepath))
 
-        self.controller = controller
         self.current_location = ""
         self.possible_states = json.load(open(state_file,'r'))
         self.get_shopping_list(list_file)
@@ -60,12 +58,7 @@ class SpeechInteractor:
         # state = input("Please enter shopping0. ")
         # self.next_state(state)
 
-        # self.listen()
-    
-    # def start_listening(self):
-    #     while 1:
-    #         self.react(self.word)
-    #         self.listen()
+        self.listen()
 
 
     def next_state(self, state):
@@ -208,7 +201,7 @@ class SpeechInteractor:
         self.shopping_list[current_item] = quantity-1
 
         if "yes" in word:
-            self.controller.message_server("PA&")
+            send_message(self.ws, "PA&")
             if quantity > 1:
                 nextState = 'nextState_quantity+'
                 response = self.options['yes']['reply_quantity+'] + str(quantity-1) + self.options['yes']['prompt']
@@ -217,7 +210,7 @@ class SpeechInteractor:
                 response = self.options['yes']['reply_quantity0']
                 
         else:
-            self.controller.message_server("PR&")
+            send_message(self.ws, "PR&")
             response = self.options['no']['reply']
         self.say(response)
         self.last_reply = response
@@ -244,7 +237,7 @@ class SpeechInteractor:
 
     #Retrieves all the items and quantities on the shopping list.
     def get_shopping_list(self, list_file):
-        sp.run(['wget','-O', 'list.json', '127.0.0.1:8080/lists/load/1234567'])
+        sp.run(['wget','-O', 'list.json', 'http://129.215.2.55:8080/lists/load/1234567'])
         print(open('list.json','r').read())
         self.stuff = json.load(open('list.json', 'r'))
         self.list_pointer = 0
@@ -269,7 +262,7 @@ class SpeechInteractor:
 
     # Sends the server a message that the user is at this cart and ready to start
     def start_state(self, word):
-        controller.message_server("UT&")
+        send_message(self.ws, "UT&")
         self.say(self.options[word]['reply'])
         self.last_reply = self.options[word]['reply']
         self.next_state(self.options[word]['nextState'])
@@ -278,5 +271,4 @@ class SpeechInteractor:
         
 
 if __name__ == '__main__':
-    # sint = PiController()
-    print("Run PiCOntroller instead")
+    sint = SpeechInteractor()
