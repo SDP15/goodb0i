@@ -1,0 +1,205 @@
+{
+  "code": 1234567,
+  "time": 1551104768404,
+  "products": [
+    {
+      "quantity": 1,
+      "product": {
+        "id": "c21b7fe0-b4fe-4d4e-9a86-6b2bb982b9ce",
+        "name": "British Whole Milk 3.408L, 6 Pints",
+        "superDepartment": "Fresh Food",
+        "ContentsMeasureType": "L",
+        "UnitOfSale": 1,
+        "description": [
+          "Pasteurised standardised homogenised whole milk.",
+          "From British Farms. Supporting our trusted dairy farmers Fair For Farmers Guarantee: We Promise every farmer is paid fairly for every pint of milk, every pint is 100% British and every cow is well cared for For more information go to www.tescoplc.com/little helps plan/"
+        ],
+        "AverageSellingUnitWeight": 2.083,
+        "UnitQuantity": "LITRE",
+        "contentsQuantity": 0.0,
+        "department": "Milk, Butter \u0026 Eggs",
+        "price": 1.5,
+        "unitPrice": 0.0
+      }
+    },
+    {
+      "quantity": 2,
+      "product": {
+        "id": "80fd980f-4e77-4cc1-a33e-0c919fbcce8d",
+        "name": "Grated 30% Reduced Fat Mature Cheese 250G",
+        "superDepartment": "Fresh Food",
+        "ContentsMeasureType": "G",
+        "UnitOfSale": 1,
+        "description": [
+          "Medium fat hard mature cheese.",
+          "Rich \u0026 Versatile Hand selected by our cheesemakers for taste"
+        ],
+        "AverageSellingUnitWeight": 0.256,
+        "UnitQuantity": "KG",
+        "contentsQuantity": 0.0,
+        "department": "Cheese",
+        "price": 1.9,
+        "unitPrice": 0.0
+      }
+    },
+    {
+      "quantity": 3,
+      "product": {
+        "id": "03ee9249-0d23-494a-b7e4-36bbc6c7349e",
+        "name": "Lurpak Unsalted Block Butter 250G",
+        "superDepartment": "Fresh Food",
+        "ContentsMeasureType": "G",
+        "UnitOfSale": 1,
+        "description": [
+          "Unsalted Butter."
+        ],
+        "AverageSellingUnitWeight": 0.263,
+        "UnitQuantity": "KG",
+        "contentsQuantity": 0.0,
+        "department": "Milk, Butter \u0026 Eggs",
+        "price": 2.0,
+        "unitPrice": 0.0
+      }
+    },
+    {
+      "quantity": 4,
+      "product": {
+        "id": "785fdb68-c85b-45d0-8d9b-33aafaba6341",
+        "name": "British Chicken Breast Portions 650G",
+        "superDepartment": "Fresh Food",
+        "ContentsMeasureType": "G",
+        "UnitOfSale": 1,
+        "description": [
+          "Fresh Class A skinless chicken breast fillet portions.",
+          "From Trusted Farms Fed on a wholegrain diet for a succulent texture"
+        ],
+        "AverageSellingUnitWeight": 0.746,
+        "UnitQuantity": "KG",
+        "contentsQuantity": 0.0,
+        "department": "Fresh Meat \u0026 Poultry",
+        "price": 3.8,
+        "unitPrice": 0.0
+      }
+    },
+    {
+      "quantity": 5,
+      "product": {
+        "id": "ed3988d3-bd79-4285-a1bd-2d227d4383c9",
+        "name": "8 Pork Loin Steaks 1.08Kg",
+        "superDepartment": "Fresh Food",
+        "ContentsMeasureType": "G",
+        "UnitOfSale": 1,
+        "description": [
+          "Boneless pork loin steaks.",
+          "From trusted farms. Working with selected farmers that we trust, to ensure high welfare standards and consistent quality."
+        ],
+        "AverageSellingUnitWeight": 1.26,
+        "UnitQuantity": "KG",
+        "contentsQuantity": 0.0,
+        "department": "Fresh Meat \u0026 Poultry",
+        "price": 5.0,
+        "unitPrice": 0.0
+      }
+    },
+    {
+      "quantity": 6,
+      "product": {
+        "id": "c604c17e-d079-4b27-a6ce-4460229ff9f4",
+        "name": "Boswell Farms Beef Mince 500G 20% Fat",
+        "superDepartment": "Fresh Food",
+        "ContentsMeasureType": "G",
+        "UnitOfSale": 1,
+        "description": [
+          "Typical percentage fat content under 20% Typical percentage collagen/ meat protein ratio under 17% For UK Market Only",
+          "BOSWELL FARMS BEEF MINCE 20% FAT"
+        ],
+        "AverageSellingUnitWeight": 0.591,
+        "UnitQuantity": "KG",
+        "contentsQuantity": 0.0,
+        "department": "Fresh Meat \u0026 Poultry",
+        "price": 1.49,
+        "unitPrice": 0.0
+      }
+    },
+    {
+      "quantity": 7,
+      "product": {
+        "id": "ed52b8df-3874-42f3-989a-e5f352560760",
+        "name": "Sweet Vine Ripened Tomatoes 230G",
+        "superDepartment": "Fresh Food",
+        "ContentsMeasureType": "G",
+        "UnitOfSale": 1,
+        "description": [
+          "Sweet vine ripened tomatoes",
+          "Sweet vine ripened tomatoes"
+        ],
+        "AverageSellingUnitWeight": 0.292,
+        "UnitQuantity": "KG",
+        "contentsQuantity": 0.0,
+        "department": "Fresh Salad \u0026 Dips",
+        "price": 1.0,
+        "unitPrice": 0.0
+      }
+    },
+    {
+      "quantity": 8,
+      "product": {
+        "id": "cf8cf45b-f740-44a9-942f-41a43d2c7288",
+        "name": "Bunched Carrots Bag",
+        "superDepartment": "Fresh Food",
+        "ContentsMeasureType": "SNGL",
+        "UnitOfSale": 1,
+        "description": [
+          "Crunchy and sweet, perfect for roasting",
+          "Bunched in the field by hand ~ High in Vitamin A"
+        ],
+        "AverageSellingUnitWeight": 0.733,
+        "UnitQuantity": "EACH",
+        "contentsQuantity": 0.0,
+        "department": "Fresh Vegetables",
+        "price": 1.5,
+        "unitPrice": 0.0
+      }
+    },
+    {
+      "quantity": 9,
+      "product": {
+        "id": "dc8bdf98-b575-44c5-805f-21c03f665afd",
+        "name": "Broccoli Florets 240G",
+        "superDepartment": "Fresh Food",
+        "ContentsMeasureType": "G",
+        "UnitOfSale": 1,
+        "description": [
+          "Broccoli.",
+          "Crunchy and full of flavour"
+        ],
+        "AverageSellingUnitWeight": 0.305,
+        "UnitQuantity": "KG",
+        "contentsQuantity": 0.0,
+        "department": "Fresh Vegetables",
+        "price": 1.3,
+        "unitPrice": 0.0
+      }
+    },
+    {
+      "quantity": 10,
+      "product": {
+        "id": "1a711de8-b367-444e-a6f8-6defdc04552e",
+        "name": "Organic Small Bananas 6 Pack",
+        "superDepartment": "Fresh Food",
+        "ContentsMeasureType": "SNGL",
+        "UnitOfSale": 1,
+        "description": [
+          "Small Bananas",
+          "Probably yellow"
+        ],
+        "AverageSellingUnitWeight": 0.891,
+        "UnitQuantity": "EACH",
+        "contentsQuantity": 0.0,
+        "department": "Fresh Fruit",
+        "price": 1.39,
+        "unitPrice": 0.0
+      }
+    }
+  ]
+}
