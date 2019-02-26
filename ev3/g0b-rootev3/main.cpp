@@ -345,6 +345,10 @@ public:
   /// Add marker action to the queue
   void enqueueAction(QueuedAction a) { queuedActions.push_back(a); }
 
+  bool isWaitingOnQueue() { return state == State::waitingForCommand; }
+
+  bool queueEmpty() { return queuedActions.empty(); }
+
   /// Iterate over queued actions
   deque<QueuedAction>::const_iterator begin() { return queuedActions.begin(); }
 
@@ -579,9 +583,10 @@ private:
       lock_guard<mutex> _l{accessMutex};
       // Implemented TCP commands
       if (strncmp(rbuf, "help", rlen) == 0) {
-        rsend("Supported commands: stop start moving? enqueue-stop "
-              "enqueue-forward enqueue-left enqueue-right dump-queue "
-              "clear-queue resume-from-stop-marker dump\n");
+        rsend("Supported commands: help stop start moving? enqueue-stop "
+              "enqueue-forward enqueue-left enqueue-right queue-status "
+              "dump-queue clear-queue resume-from-stop-marker dump dump-hsv "
+              "disconnect\n");
       } else if (strncmp(rbuf, "stop", rlen) == 0) {
         if (!halted) {
           sysSteering.requestStop(SUBSYS_ROBOT);
@@ -645,9 +650,20 @@ private:
       } else if (strncmp(rbuf, "clear-queue", rlen) == 0) {
         sysLine.forceClearQueue();
         rsend("clear-queue OK\n");
-      } else if (strncmp(rbuf, "hsv-dump", rlen) == 0) {
+      } else if (strncmp(rbuf, "queue-status", rlen) == 0) {
+        if (sysLine.isWaitingOnQueue()) {
+          rsend("waiting-for-command OK\n");
+        } else if (sysLine.queueEmpty()) {
+          rsend("empty OK\n");
+        } else {
+          rsend("in-progress OK\n");
+        }
+      } else if (strncmp(rbuf, "dump-hsv", rlen) == 0) {
         hsvDump = !hsvDump;
-        rsend("hsv-dump OK\n");
+        rsend("dump-hsv OK\n");
+      } else if (strncmp(rbuf, "disconnect", rlen) == 0) {
+        rsend("disconnect OK\n");
+        break;
       } else {
         rsend("unknown command FAIL\n");
       }
@@ -700,7 +716,7 @@ public:
     if (socketFd >= 0) {
       close(socketFd);
     }
-    for (auto &cfd : connectionFds) {
+    for (int cfd : connectionFds) {
       shutdown(cfd, SHUT_RDWR);
       close(cfd);
     }
