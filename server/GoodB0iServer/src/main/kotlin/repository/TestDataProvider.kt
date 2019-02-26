@@ -69,7 +69,7 @@ object TestDataProvider {
             Product.all().forEach { stock ->
                 when {
                     arrayOf("Milk", "Cheese").any { stock.department.contains(it) } -> {
-                        kLogger.debug("Inserting dairy shelf for ${stock.department}")
+                        kLogger.debug("Inserting dairy shelf for ${stock.department} ${stock.name}")
                         Shelf.new {
                             position = count % 3
                             quantity = 5

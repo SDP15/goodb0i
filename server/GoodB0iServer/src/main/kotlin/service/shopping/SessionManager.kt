@@ -3,10 +3,11 @@ package service.shopping
 import io.ktor.http.cio.websocket.Frame
 import io.ktor.http.cio.websocket.WebSocketSession
 import kotlinx.coroutines.isActive
+import service.routing.RouteFinder
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
-class SessionManager {
+class SessionManager(private val routeFinder: RouteFinder) {
 
     private val sessions = ConcurrentHashMap<String, Session>()
     private val outs = ConcurrentHashMap<String, QueuedMessageSender>()
@@ -15,6 +16,7 @@ class SessionManager {
         val appOut = QueuedMessageSender(appSocket)
         outs[id] = appOut
         val session = Session(
+                routeFinder,
                 appOut,
                 SimpleMessageSender(trolleySession)
         )

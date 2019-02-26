@@ -17,7 +17,9 @@ import java.nio.charset.StandardCharsets
 import java.util.concurrent.TimeUnit
 
 @UseExperimental(ObsoleteCoroutinesApi::class)
-fun Route.sockets(sessionManager: SessionManager, trolleyManager: TrolleyManager, appManager: AppManager) {
+fun Route.sockets(sessionManager: SessionManager,
+                  trolleyManager: TrolleyManager,
+                  appManager: AppManager) {
 
     /*
     https://ktor.io/servers/features/websockets.html

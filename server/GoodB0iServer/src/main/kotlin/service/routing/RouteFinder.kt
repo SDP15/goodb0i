@@ -1,7 +1,38 @@
 package service.routing
 
-object RouteFinder {
+import repository.shelves.Shelf
+import repository.shelves.ShelfRack
+import repository.shelves.Shelves
+import service.ListService
 
+class RouteFinder(private val listService: ListService) {
+
+    fun plan(code: Long): String {
+        val list = listService.loadList(code)!!
+        // Fruits, Dairy, Seafood, Sweets
+        val shelves = Shelf.find { Shelves.product inList list.products.map { it.product.id } }
+        val ids = shelves.map { ShelfRack[it.rack].id.value }
+        val path = convert(graph, Graph.Node(start), Graph.Node(end), ids.map { Graph.Node(it) })
+        println("Generated path $path")
+        return path
+    }
+
+    private val start = 10
+    private val end = 13
+
+    val graph = Graph.graph<Int> {
+        // 0       1         2         3              4         5       6         7
+        //"Dairy", "Bakery", "Fruits", "Vegetables", "Seafood", "Meat", "Sweets", "Food cupboard"
+        10 to 2 cost 5 // Start to fruits
+        2 to 11 cost 5  // Fruits to top left
+        11 to 12 cost 5 // Top left to top right
+        11 to 0 cost 5 // Top left to dairy
+        0 to 4 cost 5 // dairy to seafood
+        4 to 12 cost 5// Seafood to top right
+        12 to 6 cost 5// Top right to sweets
+        6 to 13 cost 5// Sweets to end
+
+    }
 
     fun <ID> convert(graph: Graph<ID>, start: Graph.Node<ID>, end: Graph.Node<ID>, waypoints: List<Graph.Node<ID>>): String {
         val route = solver(graph, start, end, waypoints)

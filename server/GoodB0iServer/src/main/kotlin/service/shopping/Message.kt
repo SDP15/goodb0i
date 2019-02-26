@@ -21,6 +21,8 @@ sealed class Message {
 
         sealed class FromApp : IncomingMessage() {
 
+            data class PlanRoute(val code: Long) : FromApp()
+
             object ReceivedRoute : FromApp()
 
             data class Reconnect(val oldId: String) : FromApp()
@@ -106,14 +108,14 @@ sealed class Message {
 
         fun messageToString(message: OutgoingMessage): String = when (message) {
             is OutgoingMessage.ToApp.ReachedPoint -> "RP$DELIM${message.point}"
-            is OutgoingMessage.ToApp.TrolleyAcceptedProduct -> "TA"
-            is OutgoingMessage.ToApp.TrolleyRejectedProduct -> "TR"
+            is OutgoingMessage.ToApp.TrolleyAcceptedProduct -> "TA$DELIM"
+            is OutgoingMessage.ToApp.TrolleyRejectedProduct -> "TR$DELIM"
             is OutgoingMessage.ToApp.Route -> "RC$DELIM${message.route}"
             is OutgoingMessage.ToApp.TrolleyAssigned -> "TA$DELIM"
             is OutgoingMessage.ToApp.UserReady -> "UR$DELIM"
-            is OutgoingMessage.ToTrolley.AppAcceptedProduct -> "AA"
-            is OutgoingMessage.ToTrolley.AppRejectedProduct -> "AR"
-            is OutgoingMessage.ToTrolley.AppScannedProduct -> "AS"
+            is OutgoingMessage.ToTrolley.AppAcceptedProduct -> "AB$DELIM"
+            is OutgoingMessage.ToTrolley.AppRejectedProduct -> "AR$DELIM"
+            is OutgoingMessage.ToTrolley.AppScannedProduct -> "AS$DELIM"
             is OutgoingMessage.ToTrolley.AssignedToApp -> "AA$DELIM"
             is OutgoingMessage.ToTrolley.Route -> "RC$DELIM${message.route}"
         }

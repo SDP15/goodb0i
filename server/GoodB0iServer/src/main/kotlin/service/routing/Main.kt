@@ -1,7 +1,6 @@
 package service.routing
 
 import service.routing.Graph.Companion.graph
-import service.routing.RouteFinder.convert
 
 class Main {
 
@@ -17,9 +16,9 @@ class Main {
             "TOPRIGHT" to "RACK4" cost 5
             "RACK4" to "END" cost 5
         }
-        val path = convert(demograph, Graph.Node("START"),
-                Graph.Node("END"), listOf(Graph.Node("RACK1"), Graph.Node("RACK2"), Graph.Node("RACK4")))
-        println("Path $path")
+//        val path = convert(demograph, Graph.Node("START"),
+//                Graph.Node("END"), listOf(Graph.Node("RACK1"), Graph.Node("RACK2"), Graph.Node("RACK4")))
+//        println("Path $path")
 
 //        val graph = graph<String> {
 //            val cost = 5

@@ -2,17 +2,36 @@ package service.shopping
 
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import service.ListService
+import service.routing.RouteFinder
 import java.util.concurrent.atomic.AtomicBoolean
 
 class Session(
+        private val routeFinder: RouteFinder,
         private val appOut: SessionManager.AppMessageSender,
         private val trolleyOut: SessionManager.TrolleyMessageSender
 ) : IncomingMessageListener {
 
 
+    private var trolleyReceivedRoute = false
+    private var appReceivedRoute = false
+
+    init {
+        //TODO: Plan route and send to both devices
+
+    }
+
+    private fun plan(code: Long) {
+        val plan = routeFinder.plan(code)
+
+    }
+
     override fun onAppMessage(message: Message.IncomingMessage.FromApp) {
         println("IN: $message")
         when (message) {
+            is Message.IncomingMessage.FromApp.PlanRoute -> {
+                plan(message.code)
+            }
             is Message.IncomingMessage.FromApp.ProductScanned -> {
                 sendToTrolley(Message.OutgoingMessage.ToTrolley.AppScannedProduct)
             }

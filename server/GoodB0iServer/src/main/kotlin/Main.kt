@@ -16,6 +16,7 @@ import repository.DatabaseFactory
 import repository.TestDataProvider
 import repository.exposedTypeAdapters
 import service.*
+import service.routing.RouteFinder
 import service.shopping.AppManager
 import service.shopping.SessionManager
 import service.shopping.TrolleyManager
@@ -41,7 +42,9 @@ fun Application.module() {
 
     val trolleyManager = TrolleyManager()
     val appManager = AppManager()
-    val sessionManager = SessionManager()
+    val routeFinder = RouteFinder(listService)
+    val sessionManager = SessionManager(routeFinder)
+
 
     install(Routing) {
         products(productService)
