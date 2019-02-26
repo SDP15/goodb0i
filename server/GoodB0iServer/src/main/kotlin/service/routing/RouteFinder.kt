@@ -24,6 +24,13 @@ class RouteFinder(private val listService: ListService) {
     private val start = 10
     private val end = 13
 
+    companion object {
+        @JvmStatic
+        fun main(args: Array<String>) {
+
+        }
+    }
+
     val graph = Graph.graph<Int> {
         // Test shelves are 3, 1, 5, 7
         // 1         2         3              4         5       6         7         8
