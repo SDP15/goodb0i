@@ -2,6 +2,7 @@
 import websocket
 import os
 import subprocess as sp
+from speech_interactor import SpeechInteractor
 
 try:
     import thread
@@ -11,6 +12,13 @@ import time
 
 def on_message(ws, message):
     print("Message: " + str(message))
+    if "AA" in message:
+        SpeechInteractor.cart(word = "yes")
+    elif "AR" in message:
+        SpeechInteractor.cart("no")
+    # elif "AS" in message:
+    #     speech_interactor.scanned(item)
+
 
 def on_error(ws, error):
     print(error)
@@ -35,6 +43,15 @@ def on_open(ws):
         print("thread terminating...")
     thread.start_new_thread(run, ())
 
+def initialise_socket():
+    websocket.enableTrace(True)
+    ws = websocket.WebSocketApp("ws://129.215.2.55:8080/trolley",
+                            on_message = on_message,
+                            on_error = on_error,
+                            on_close = on_close)
+    ws.on_open = on_open
+    ws.run_forever()
+    return ws
 
 if __name__ == "__main__":
     "Get a life!"
