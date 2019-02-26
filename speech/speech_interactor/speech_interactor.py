@@ -222,7 +222,7 @@ class SpeechInteractor:
     
     #Retrieves all the items and quantities on the shopping list.
     def get_shopping_list(self, list_file):
-        sp.run(['wget','-O', 'list.json', 'http://129.215.2.55:8080/lists/load/1234567'])
+        sp.run(['wget','-O', 'list.json', '127.0.0.1:8080/lists/load/1234567'])
         print(open('list.json','r').read())
         self.stuff = json.load(open('list.json', 'r'))
         self.list_pointer = 0
