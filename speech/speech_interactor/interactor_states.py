@@ -15,6 +15,16 @@ tut0no = "I will tell you when we have arrived at an item. "\
                "and what shelf the item is on. Would you like an example?"
 
 interactor_states = {
+  "connecting":{
+    "connected":{ 
+      "reply": "",
+    "nextState": "init"
+    },
+    "n/a":{
+      "reply": "",
+      "nextState": "connecting"
+    }
+  },
   "init": {
     "start": {
       "reply": "Hello, my name is Iona Trolley. Have you ever used good boy before?",

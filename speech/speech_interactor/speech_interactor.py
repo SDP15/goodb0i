@@ -9,6 +9,11 @@ import requests
 import serial
 import websocket
 from pocketsphinx import LiveSpeech, get_model_path
+try:
+    import thread
+except ImportError:
+    import _thread as thread
+import time
 
 # from socket_control import on_message, on_error, on_open, on_close, send_message, initialise_socket
 
@@ -55,15 +60,20 @@ class SpeechInteractor:
 
         self.current_location = ""
         self.possible_states = json.load(open(state_file, 'r'))
+        print(self.possible_states)
         self.get_shopping_list(list_file)
-        self.next_state('init')
+        self.next_state('connection')
         self.react("n/a")
 
         # Uncomment the code below to test out NFC tag reading
         # state = input("Please enter shopping0. ")
         # self.next_state(state)
 
-        self.listen()
+        thread.start_new_thread(self.listen, ())#
+        # while True:
+        #     pass
+        # self.listen()
+        # self.listen()
 
     def next_state(self, state):
         print(state)
@@ -104,7 +114,8 @@ class SpeechInteractor:
                 item = self.ordered_list[self.list_pointer]
                 self.scanned(item)
 
-    def listen(self):
+    def listen(self, *arg):
+        print("listening")
         for sphrase in speech:
             phrase = str(sphrase).lower().split()
             word = self.find_word(phrase)
@@ -160,6 +171,7 @@ class SpeechInteractor:
         elif "init" in self.state and word == "start":
             self.start_state(word)
         else:
+            print(word)
             self.say(self.options[word]['reply'])
             self.last_reply = self.options[word]['reply']
             self.next_state(self.options[word]['nextState'])
@@ -278,5 +290,3 @@ class SpeechInteractor:
         self.next_state(self.options[word]['nextState'])
 
 
-if __name__ == '__main__':
-    sint = SpeechInteractor()
