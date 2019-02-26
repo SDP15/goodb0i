@@ -34,6 +34,8 @@ sealed class Message {
 
         object TrolleyRejectedProduct : IncomingMessage()
 
+        object NoAvailableTrolley : IncomingMessage()
+
         /*
          Message string couldn't be parsed
          */
@@ -97,6 +99,7 @@ sealed class Message {
                 }
                 "PT" -> IncomingMessage.ReachedPoint(message.substringAfter(delim))
                 "UR" -> IncomingMessage.UserReady
+                "NT" -> IncomingMessage.NoAvailableTrolley
                 else -> IncomingMessage.InvalidMessage(message)
             }
         }

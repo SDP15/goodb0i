@@ -64,6 +64,9 @@ class SessionManager(
                     uid = message.id
                     sessionState.postValue(ShoppingSessionState.NegotiatingTrolley)
                 }
+                is Message.IncomingMessage.NoAvailableTrolley -> {
+                    sessionState.postValue(ShoppingSessionState.NoSession)
+                }
                 is Message.IncomingMessage.TrolleyConnected -> {
                     sessionState.postValue(ShoppingSessionState.Connected)
                 }
@@ -90,6 +93,7 @@ class SessionManager(
 
     override fun startSession(list: ShoppingList) {
         if (!sh.isConnected) {
+            Timber.i("Starting session")
             shoppingList = list
             sessionState.postValue(ShoppingSessionState.Connecting)
             sh.start(RetrofitProvider.root + "/app")

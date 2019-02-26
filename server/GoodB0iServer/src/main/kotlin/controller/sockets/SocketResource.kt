@@ -56,6 +56,7 @@ fun Route.sockets(sessionManager: SessionManager,
     }
 
     webSocket("/app") {
+        println("Socket with app opened")
         val trolley = trolleyManager.assignAvailableTrolley()
         if (trolley != null) {
             val nonce = generateNonce()
@@ -80,8 +81,9 @@ fun Route.sockets(sessionManager: SessionManager,
                 appManager.removeApp(nonce, this)
             }
         } else {
+            println("No available trolley")
             outgoing.send(Frame.Text("NT&"))
-            close(CloseReason(CloseReason.Codes.TRY_AGAIN_LATER, "No available trolleys"))
+            //close(CloseReason(CloseReason.Codes.TRY_AGAIN_LATER, "No available trolleys"))
         }
 
 

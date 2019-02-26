@@ -24,6 +24,7 @@ import com.sdp15.goodb0i.view.list.confirmation.ListConfirmationViewModel
 import com.sdp15.goodb0i.view.list.creation.ListViewModel
 import com.sdp15.goodb0i.view.list.saved.SavedListsViewModel
 import com.sdp15.goodb0i.view.navigation.confirmation.ItemConfirmationViewModel
+import com.sdp15.goodb0i.view.navigation.connecting.ShopConnectionViewModel
 import com.sdp15.goodb0i.view.navigation.moving.NavigatingToViewModel
 import com.sdp15.goodb0i.view.navigation.product.ProductViewModel
 import com.sdp15.goodb0i.view.navigation.scanner.ScannerViewModel
@@ -64,6 +65,7 @@ class App : Application() {
             viewModel<ListViewModel>()
             viewModel<SavedListsViewModel>()
             viewModel<NavigatingToViewModel>()
+            viewModel<ShopConnectionViewModel>()
         },
         module {
             single<ProductLoader> {

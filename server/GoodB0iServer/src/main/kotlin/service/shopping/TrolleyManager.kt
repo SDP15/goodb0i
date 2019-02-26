@@ -16,7 +16,7 @@ class TrolleyManager {
 
     fun assignAvailableTrolley(): Pair<String, WebSocketSession>? {
         //TODO: Actually track assigned trolleys
-        return members.entries.first().toPair()
+        return members.entries.firstOrNull()?.toPair()
     }
 
     suspend fun onMessage(id: String, message: String) {
