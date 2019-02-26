@@ -43,6 +43,9 @@ class Session(
             is Message.IncomingMessage.FromApp.RequestHelp -> {
                 //TODO
             }
+            is Message.IncomingMessage.FromApp.RequestStop -> {
+                //TODO
+            }
         }
     }
 
@@ -51,6 +54,9 @@ class Session(
         when (message) {
             is Message.IncomingMessage.FromTrolley.ReceivedRoute -> {
                 trolleyReceivedRoute = true
+            }
+            is  Message.IncomingMessage.FromTrolley.UserAtTrolley -> {
+                sendToApp(Message.OutgoingMessage.ToApp.UserReady)
             }
             is Message.IncomingMessage.FromTrolley.TrolleyAcceptedProduct -> {
                 sendToApp(Message.OutgoingMessage.ToApp.TrolleyAcceptedProduct)
