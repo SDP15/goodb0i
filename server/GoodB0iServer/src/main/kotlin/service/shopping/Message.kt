@@ -61,7 +61,7 @@ sealed class Message {
 
             object TrolleyAssigned : ToApp()
 
-            object UserAtTrolley : ToApp()
+            object UserReady : ToApp()
 
             data class Route(val route: String) : ToApp()
 
@@ -110,7 +110,7 @@ sealed class Message {
             is OutgoingMessage.ToApp.TrolleyRejectedProduct -> "TR"
             is OutgoingMessage.ToApp.Route -> "RC$DELIM${message.route}"
             is OutgoingMessage.ToApp.TrolleyAssigned -> "TA$DELIM"
-            is OutgoingMessage.ToApp.UserAtTrolley -> "UT$DELIM"
+            is OutgoingMessage.ToApp.UserReady -> "UR$DELIM"
             is OutgoingMessage.ToTrolley.AppAcceptedProduct -> "AA"
             is OutgoingMessage.ToTrolley.AppRejectedProduct -> "AR"
             is OutgoingMessage.ToTrolley.AppScannedProduct -> "AS"
