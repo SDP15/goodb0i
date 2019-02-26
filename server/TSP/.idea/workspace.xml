@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="e4aadfae-9dc9-4f4c-8b7a-b8ad99948dd5" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/out/production/TSP/META-INF/TSP.kotlin_module" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -77,8 +77,7 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="7">
-    <option name="x" value="1600" />
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="y" value="-36" />
     <option name="width" value="1600" />
     <option name="height" value="1768" />
@@ -88,38 +87,13 @@
     <navigator proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
     </navigator>
-    <panes>
-      <pane id="Scope" />
-      <pane id="PackagesPane" />
-      <pane id="ProjectPane">
-        <subPane>
-          <expand>
-            <path>
-              <item name="TSP" type="b2602c69:ProjectViewProjectNode" />
-              <item name="TSP" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="TSP" type="b2602c69:ProjectViewProjectNode" />
-              <item name="TSP" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="TSP" type="b2602c69:ProjectViewProjectNode" />
-              <item name="TSP" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="pathfinding" type="462c0819:PsiDirectoryNode" />
-            </path>
-          </expand>
-          <select />
-        </subPane>
-      </pane>
-    </panes>
+    <panes />
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1551131628207" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1551177215141" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../GoodB0iServer" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="project.structure.last.edited" value="Project" />
@@ -191,15 +165,15 @@
       <workItem from="1550664355672" duration="6950000" />
       <workItem from="1550753904439" duration="6198000" />
       <workItem from="1551102651053" duration="598000" />
-      <workItem from="1551119785614" duration="2015000" />
+      <workItem from="1551119785614" duration="2227000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="22099000" />
+    <option name="totallyTimeSpent" value="22311000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="-36" width="3200" height="1768" extended-state="7" />
+    <frame x="0" y="-36" width="3200" height="1768" extended-state="6" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" weight="0.3388594" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />

@@ -27,14 +27,7 @@ sealed class Message {
          */
         data class ReachedPoint(val id: String) : IncomingMessage()
 
-        /**
-         *  Trolley has begun moving
-         */
-        data class MovementBegun(val type: Movement) : IncomingMessage()
-
-        enum class Movement {
-            LINEAR, TURN
-        }
+        object UserReady : IncomingMessage()
 
 
         object TrolleyAcceptedProduct : IncomingMessage()
@@ -77,6 +70,8 @@ sealed class Message {
 
         object RequestHelp : OutgoingMessage()
 
+        object RouteReceived : OutgoingMessage()
+
         enum class StopReason(val code: Int) {
             HelpRequest(1)
         }
@@ -94,9 +89,12 @@ sealed class Message {
                 "TC" -> IncomingMessage.TrolleyConnected
                 "RC" -> {
                     val route = Route.fromString(message.substringAfter(delim))
-                    if (route != null) IncomingMessage.RouteCalculated(route) else IncomingMessage.InvalidMessage(message)
+                    if (route != null) IncomingMessage.RouteCalculated(route) else IncomingMessage.InvalidMessage(
+                        message
+                    )
                 }
                 "PT" -> IncomingMessage.ReachedPoint(message.substringAfter(delim))
+                "UR" -> IncomingMessage.UserReady
                 else -> IncomingMessage.InvalidMessage(message)
             }
         }
@@ -109,6 +107,7 @@ sealed class Message {
                 is OutgoingMessage.ProductRejected -> "PR$delim${message.id}"
                 is OutgoingMessage.RequestHelp -> "RH$delim"
                 is OutgoingMessage.Stop -> "SP$delim${message.reason.code}"
+                is OutgoingMessage.RouteReceived -> "RR"
             }
         }
     }

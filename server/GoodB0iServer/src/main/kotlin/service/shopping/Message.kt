@@ -6,9 +6,9 @@ sealed class Message {
 
         sealed class FromTrolley : IncomingMessage() {
 
-            object UserAtTrolley : FromTrolley()
-
             object ReceivedRoute : FromTrolley()
+
+            object UserAtTrolley : FromTrolley()
 
             object TrolleyAcceptedProduct : FromTrolley()
 
