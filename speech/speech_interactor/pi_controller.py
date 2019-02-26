@@ -1,4 +1,4 @@
-from speech_interactor import SpeechInteractor
+import speech_interactor.speech_interactor 
 import websocket
 import os
 import socket
@@ -15,7 +15,7 @@ class PiController:
 
 
     def __init__(self):
-        self.sp_interactor = SpeechInteractor()
+        self.sp_interactor = speech_interactor.SpeechInteractor()
         self.ws = self.initialise_websocket()
         self.initialise_ev3_socket()
 
