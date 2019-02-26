@@ -570,6 +570,7 @@ private:
     };
 
     rsend("EV3READY\n");
+    led::set_color(led::left, led::amber);
     char rbuf[64];
     char wbuf[64];
     int rlen;
@@ -748,6 +749,7 @@ void disableMotors() {
       drive->stop();
     }
   }
+  led::all_off();
 }
 
 volatile bool sigintTerminate{false};
@@ -768,6 +770,10 @@ int main() {
     openLogFile();
 
     Robot robot{};
+
+    led::all_off();
+    led::set_color(led::left, led::red);
+
     while (!(sigintTerminate || button::back.pressed())) {
       robot.process();
       this_thread::yield();
