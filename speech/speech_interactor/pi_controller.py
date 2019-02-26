@@ -66,3 +66,6 @@ def initialise_socket(spint):
     ws.on_open = on_open
     ws.run_forever()
     return ws
+
+if __name__ == '__main__':
+    sint = PiController()

@@ -9,7 +9,7 @@ import serial
 
 from pocketsphinx import LiveSpeech, get_model_path
 
-from pi_controller import PiController
+#from pi_controller import PiController
 
 #from socket_control import on_message, on_error, on_open, on_close, send_message, initialise_socket
 
@@ -31,7 +31,7 @@ speech = LiveSpeech(
 
 
 class SpeechInteractor:
-    def __init__(self, controller, state_file='interactor_states.json', list_file = 'list.json':
+    def __init__(self, controller, state_file='interactor_states.json', list_file = 'list.json'):
         log_filename = now.strftime("%Y-%m-%d-%H%M%S")
         self.logging = False
 
@@ -278,4 +278,5 @@ class SpeechInteractor:
         
 
 if __name__ == '__main__':
-    sint = SpeechInteractor()
+    # sint = PiController()
+    print("Run PiCOntroller instead")
