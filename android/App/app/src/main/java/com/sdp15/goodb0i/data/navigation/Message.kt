@@ -86,7 +86,7 @@ sealed class Message {
             val type = message.substringBefore(delim)
             return when (type) {
                 "ID" -> IncomingMessage.Connected(message.substringAfter(delim))
-                "TC" -> IncomingMessage.TrolleyConnected
+                "TA" -> IncomingMessage.TrolleyConnected
                 "RC" -> {
                     val route = Route.fromString(message.substringAfter(delim))
                     if (route != null) IncomingMessage.RouteCalculated(route) else IncomingMessage.InvalidMessage(

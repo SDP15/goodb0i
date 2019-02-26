@@ -45,8 +45,10 @@ class ShopConnectionViewModel : BaseViewModel<Any>() {
             }
             ShoppingSessionState.Connected -> {
                 log("Connected")
+            }
+            is ShoppingSessionState.NavigatingTo -> {
                 transitions.postValue(ShopConnectionFragmentDirections.actionShopConnectionFragmentToNavigatingToFragment())
-                //TODO: Should we remove the observer here?
+
             }
         }
 

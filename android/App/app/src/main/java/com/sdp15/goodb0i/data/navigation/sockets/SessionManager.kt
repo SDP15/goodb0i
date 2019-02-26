@@ -68,6 +68,10 @@ class SessionManager(
                 is Message.IncomingMessage.TrolleyConnected -> {
                     sessionState.postValue(ShoppingSessionState.Connected)
                 }
+                is Message.IncomingMessage.UserReady -> {
+                    //First moving state
+                    postMovingState()
+                }
                 is Message.IncomingMessage.RouteCalculated -> {
                     route = message.route
                 }

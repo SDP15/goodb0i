@@ -11,13 +11,11 @@ import org.koin.standalone.inject
 
 class ListConfirmationViewModel : BaseViewModel<Any>() {
 
-    private val sm: ShoppingSessionManager<Message.IncomingMessage> by inject()
     private lateinit var sl: ShoppingList
 
     override fun bind() {
 
     }
-
 
 
     //TODO: Replace with LiveData<ShoppingList> and abstract some formatter
