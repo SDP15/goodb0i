@@ -299,11 +299,15 @@ protected:
 };
 
 class LineFollowSubsystem : public Subsystem {
+public:
+  enum class QueuedAction { stop, turnLeft, turnRight, goStraight };
+
 private:
   enum class Direction { left, right } lastLineDir;
   enum class State { following } state{State::following};
   int avgLineAngle{0};
   SteeringSubsystem *sysSteering;
+  deque<QueuedAction> queuedActions;
 
 public:
   bool turningOn{true};
@@ -311,6 +315,18 @@ public:
   LineFollowSubsystem(SteeringSubsystem *sysSteering) {
     this->sysSteering = sysSteering;
   }
+
+  /// Add marker action to the queue
+  void enqueueAction(QueuedAction a) { queuedActions.push_back(a); }
+
+  /// Iterate over queued actions
+  deque<QueuedAction>::const_iterator begin() { return queuedActions.begin(); }
+
+  /// Iterate over queued actions
+  deque<QueuedAction>::const_iterator end() { return queuedActions.end(); }
+
+  /// Clears action queue
+  void forceClearQueue() { queuedActions.clear(); }
 
   virtual void dump(ostream &os) {
     os << "Line follow subsystem:";
@@ -419,6 +435,7 @@ private:
 
     rsend("EV3READY\n");
     char rbuf[64];
+    char wbuf[64];
     int rlen;
     while ((rlen = recv(connectFd, rbuf, sizeof rbuf, 0)) > 0) {
       if (rbuf[rlen - 1] == '\n') {
@@ -429,16 +446,26 @@ private:
       }
       lock_guard<mutex> _l{accessMutex};
       // Implemented TCP commands
-      if (strncmp(rbuf, "stop", rlen) == 0) {
+      if (strncmp(rbuf, "help", rlen) == 0) {
+        rsend("Supported commands: stop start moving? enqueue-stop "
+              "enqueue-forward enqueue-left enqueue-right dump-queue "
+              "clear-queue dump\n");
+      } else if (strncmp(rbuf, "stop", rlen) == 0) {
         if (!halted) {
           sysSteering.requestStop(SUBSYS_ROBOT);
           halted = true;
         }
+        rsend("stop OK\n");
       } else if (strncmp(rbuf, "start", rlen) == 0) {
         if (halted) {
           sysSteering.cancelStopRequest(SUBSYS_ROBOT);
           halted = false;
         }
+        rsend("start OK\n");
+      } else if (strncmp(rbuf, "moving?", rlen) == 0) {
+        snprintf(wbuf, sizeof wbuf, "moving = %d\n",
+                 sysSteering.isMoving() ? 1 : 0);
+        rsend(wbuf);
       } else if (strncmp(rbuf, "dump", rlen) == 0) {
         rsend("EV3DUMP START\n");
         stringstream ss;
@@ -447,10 +474,44 @@ private:
         sysLine.dump(ss);
         rsend(ss.str().c_str());
         rsend("\nEV3DUMP END\n");
-      } else if (strncmp(rbuf, "right", rlen) == 0) {
-        sysLine.turningOn = true;
-      } else if (strncmp(rbuf, "straight", rlen) == 0) {
-        sysLine.turningOn = false;
+      } else if (strncmp(rbuf, "enqueue-stop", rlen) == 0) {
+        sysLine.enqueueAction(LineFollowSubsystem::QueuedAction::stop);
+        rsend("enqueue-stop OK\n");
+      } else if (strncmp(rbuf, "enqueue-forward", rlen) == 0) {
+        sysLine.enqueueAction(LineFollowSubsystem::QueuedAction::goStraight);
+        rsend("enqueue-forward OK\n");
+      } else if (strncmp(rbuf, "enqueue-left", rlen) == 0) {
+        sysLine.enqueueAction(LineFollowSubsystem::QueuedAction::turnLeft);
+        rsend("enqueue-left OK\n");
+      } else if (strncmp(rbuf, "enqueue-right", rlen) == 0) {
+        sysLine.enqueueAction(LineFollowSubsystem::QueuedAction::turnRight);
+        rsend("enqueue-right OK\n");
+      } else if (strncmp(rbuf, "dump-queue", rlen) == 0) {
+        stringstream ss;
+        ss << "Queue: ";
+        for (auto action : sysLine) {
+          switch (action) {
+          case LineFollowSubsystem::QueuedAction::stop:
+            ss << "stop ";
+            break;
+          case LineFollowSubsystem::QueuedAction::turnLeft:
+            ss << "left ";
+            break;
+          case LineFollowSubsystem::QueuedAction::turnRight:
+            ss << "right ";
+            break;
+          case LineFollowSubsystem::QueuedAction::goStraight:
+            ss << "forward ";
+            break;
+          }
+        }
+        ss << "OK\n";
+        rsend(ss.str().c_str());
+      } else if (strncmp(rbuf, "clear-queue", rlen) == 0) {
+        sysLine.forceClearQueue();
+        rsend("clear-queue OK\n");
+      } else {
+        rsend("unknown command FAIL\n");
       }
     }
 
