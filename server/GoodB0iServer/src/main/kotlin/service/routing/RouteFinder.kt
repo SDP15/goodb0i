@@ -1,5 +1,6 @@
 package service.routing
 
+import org.jetbrains.exposed.sql.transactions.transaction
 import repository.shelves.Shelf
 import repository.shelves.ShelfRack
 import repository.shelves.Shelves
@@ -10,11 +11,14 @@ class RouteFinder(private val listService: ListService) {
     fun plan(code: Long): String {
         val list = listService.loadList(code)!!
         // Fruits, Dairy, Seafood, Sweets
-        val shelves = Shelf.find { Shelves.product inList list.products.map { it.product.id } }
-        val ids = shelves.map { ShelfRack[it.rack].id.value }
-        val path = convert(graph, Graph.Node(start), Graph.Node(end), ids.map { Graph.Node(it) })
-        println("Generated path $path")
-        return path
+        return transaction {
+            val shelves = Shelf.find { Shelves.product inList list.products.map { it.product.id } }
+            val ids = shelves.map { ShelfRack[it.rack].id.value }
+            println("IDs are $ids")
+            val path = convert(graph, Graph.Node(start), Graph.Node(end), ids.map { Graph.Node(it) })
+            println("Generated path $path")
+            return@transaction path
+        }
     }
 
     private val start = 10
@@ -81,6 +85,7 @@ class RouteFinder(private val listService: ListService) {
     }
 
     fun <ID> solver(graph: Graph<ID>, start: Graph.Node<ID>, end: Graph.Node<ID>, waypoints: List<Graph.Node<ID>>): List<Graph.Node<ID>> {
+        println("Running solver from $start to $end")
         var current = start
         val remaining = waypoints.toMutableList()
         val path = mutableListOf<Graph.Node<ID>>()
@@ -103,6 +108,7 @@ class RouteFinder(private val listService: ListService) {
             if (remaining.isEmpty()) remaining.add(end)
 
         }
+        path.add(end)
         return path
     }
 

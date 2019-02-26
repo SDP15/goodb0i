@@ -1,6 +1,7 @@
 {"connection":
     {"connected":
-        {"reply": "", "nextState":"init"}},
+        {"reply": " ", "nextState":"init"},
+    "n/a": {"reply": " ", "nextState":"connection"}},
 
     "init": 
     {"start": 
