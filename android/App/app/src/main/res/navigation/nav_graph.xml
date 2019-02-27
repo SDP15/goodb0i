@@ -17,7 +17,7 @@
 
         <action
             android:id="@+id/action_welcome_fragment_to_list_creation_fragment"
-            app:destination="@id/list_creation_fragment" />
+            app:destination="@id/scanner_fragment" />
         <action
             android:id="@+id/action_welcome_fragment_to_view_shopping_list"
             app:destination="@id/saved_lists_fragment" />

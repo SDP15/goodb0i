@@ -39,6 +39,9 @@ fun Route.sockets(sessionManager: SessionManager,
 
 
     webSocket("/trolley") {
+
+        println("Trolley Connected")
+
         val nonce = generateNonce()
 
         trolleyManager.joinTrolley(nonce, this)

@@ -14,10 +14,18 @@ import time
 class PiController:
 
     def __init__(self):
-        self.ws = self.initialise_websocket()
-        self.initialise_ev3_socket()
-        self.sp_interactor = speech_interactor.SpeechInteractor(self)
+        # thread.start_new_thread(self.run_speech, ())
         
+        
+        self.ws = self.initialise_websocket()
+        self.sp_interactor = speech_interactor.SpeechInteractor(self)
+        print("\n\n\n\nReturned\n\n\n\n")
+        #self.initialise_ev3_socket()
+        while True:
+            pass
+        
+    def get_ws(self):
+        return self.ws 
 
     def on_message(self, ws, message):
         print("Message: " + str(message))
@@ -45,17 +53,16 @@ class PiController:
         print("Sent " + message)
         ws.send(str(message))
 
+    def run(self, *args):
+        print("listening")
+        # for phrase in lsp:
+        #     print("You said: "+str(phrase))
+        #     time.sleep(1)
+        #     ws.send(str(phrase))
+        args[0].run_forever()
+
     def on_open(self, ws):
-        def run(*args):
-            print("listening")
-            # for phrase in lsp:
-            #     print("You said: "+str(phrase))
-            #     time.sleep(1)
-            #     ws.send(str(phrase))
-            time.sleep(1)
-            ws.close()
-            print("thread terminating...")
-        thread.start_new_thread(run, ())
+        pass
 
     def initialise_websocket(self):
         print("initialise websocket")
@@ -65,7 +72,8 @@ class PiController:
                                     on_error=self.on_error,
                                     on_close=self.on_close)
         ws.on_open = self.on_open
-        ws.run_forever()
+        # ws.run_forever()
+        thread.start_new_thread(self.run, (ws, ))
         print("Websocket connection")
         return ws
 
@@ -89,8 +97,29 @@ class PiController:
                 print("Connection from %s" % str(client_address))
             finally:
                 self.receive_tcpsocket()
-                self.send_tcpsocket(message="Hello")
-                break
+    
+    # def initialise_ev3_socket(self):
+    #     global connection
+    #     # Create a TCP/IP socket
+    #     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    #     # bind the address to the port
+    #     server_address = ('192.168.105.144', 8080)
+    #     #print("Starting on address: '%s'" % server_address)
+
+    #     sock.bind(server_address)
+
+    #     sock.listen(1)
+
+    #     while True:
+    #         print("waiting for a connection")
+    #         connection, client_address = sock.accept()
+    #         try:
+    #             print("Connection from %s" % str(client_address))
+    #         finally:
+    #             self.receive_tcpsocket()
+    #             self.send_tcpsocket(message="Hello")
+    #             break
 
     def receive_tcpsocket(self):
         global connection
@@ -111,7 +140,30 @@ class PiController:
 
     def close_tcpsocket(self):
         global connection
-        connection.close()
+        connection.close()         
+        self.send_tcpsocket(message="Hello")
+        
+
+    # def receive_tcpsocket(self):
+    #     global connection
+    #     while True:
+    #         data = connection.recv(32)  # max buffer size
+    #         print("received '%s'" % str(data))
+    #         if data:
+    #             print("sending data back to the client")
+    #         else:
+    #             print("No more data")
+    #             break
+
+    # def send_tcpsocket(self, message):
+    #     global connection
+    #     print("sending data back to the client")
+    #     connection.sendall(message)
+    #     self.close_tcpsocket()
+
+    # def close_tcpsocket(self):
+    #     global connection
+    #     connection.close()
 
 
 PiController()
