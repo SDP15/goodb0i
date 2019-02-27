@@ -4,9 +4,7 @@ import controller.sockets.sockets
 import controller.products
 import io.ktor.application.Application
 import io.ktor.application.install
-import io.ktor.features.CallLogging
-import io.ktor.features.ContentNegotiation
-import io.ktor.features.DefaultHeaders
+import io.ktor.features.*
 import io.ktor.gson.gson
 import io.ktor.routing.Routing
 import io.ktor.server.engine.embeddedServer
@@ -34,6 +32,11 @@ fun Application.module() {
     install(ContentNegotiation) {
         gson(block = exposedTypeAdapters())
     }
+
+    install(Compression) {
+        gzip()
+    }
+
 
     DatabaseFactory.init()
 

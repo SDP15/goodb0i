@@ -9,4 +9,5 @@ class ShelfRack(id: EntityID<Int>) : IntEntity(id) {
 
     var capacity by ShelfRacks.capacity
     var info by ShelfRacks.info
+    val shelves by Shelf referrersOn Shelves.rack
 }
