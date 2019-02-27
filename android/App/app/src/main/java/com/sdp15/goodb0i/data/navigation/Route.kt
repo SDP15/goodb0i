@@ -6,9 +6,8 @@ import timber.log.Timber
  * A route is a list of RoutePoints
  */
 class Route private constructor(
-    points: List<RoutePoint>,
-    private val routePoints: List<RoutePoint> = mutableListOf(RoutePoint.Start) + points + mutableListOf(RoutePoint.End)
-) : List<Route.RoutePoint> by routePoints {
+    points: List<RoutePoint>
+) : List<Route.RoutePoint> by points {
 
 
     companion object {

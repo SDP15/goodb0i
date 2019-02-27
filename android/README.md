@@ -215,7 +215,7 @@ val list = args.value.shoppingList
 
 
 
-## Existing classes and their uses (as of 2019/02/27)
+## Existing data and view classes and their uses (as of 2019/02/27)
 
 ### Base classes and utilities
 
@@ -444,5 +444,75 @@ fun <T : Any> Response<T>.toResult(log: Boolean = BuildConfig.DEBUG): Result<T> 
 `RoomDB` defines a `Room` database with only the `ShoppingList` entity, and defines an abstract method to access a `ListDAO` from the `RoomDB`.
 
 `RoomShoppingListStore` takes the `RoomDB` instance and uses its methods to implement `ShoppingListStore`.
+
+
+## Connection to server
+
+These classes are in `data/navigation` but they are important/complex enough to warrant another section. 
+
+
+### `Message`
+
+This is a nested `sealed` class which defines the types and structure of message to and from the server. 
+
+N.B A `sealed` class is just an `abstract` class, the `sealed` type hierarchy is just a feature of the compiler, which can do things like recognise a `when` (`switch`) expression as being exhaustive when it has branches for all possible subtypes
+
+The classes are mostly documented with comments, and their names should be pretty self explanatory. 
+
+They are converted to and from strings in `Transformer`.
+Each message is represented with a two character code, followed by a delimiter (&), and then any message body. 
+It's been a bit of a pain keeping these in sync between the different code bases, so I will probably define them somewhere else at some point. 
+
+### `Route` 
+
+A `RoutePoint` represents one of the points in the route around the sop
+- `Start` is a constant fixed start point. We always start here regardless of the route
+- `End` is similar for the end. This is probably the tills
+- `Pass` is marker point that we expect to pass through 
+- `TurnLeft`, `TurnRight`, and `TurnCenter` are parts of the route which represent the direction we turn at the next junction
+- `Stop` is a shelf that we stop at
+
+The expected process is that when the trolley reaches a marker, it searches for the next stop point after the last position it registered. This means that it can miss a `Pass` point and then ignore it later when it reaches a shelf. 
+
+The `Route` is just a wrapper around a `List` of `RoutePoints` which is built from a string. 
+
+
+The route string is a comma separated list with each element being one of `start`, `end`, `left`, `right`, `center`, `stop%id`, or `pass%id`, where `%` is used as a delimeter, and `id` is the id of the point to pass through or stop at. 
+
+### `ShoppingSessionManager` 
+
+This interface defines the state and functions of the session manager. This is a class which exists across the scope of all the `Fragments` in `view/navigation`. 
+
+It provides `LiveData` for the current product, most recently scanned product, and `ShoppingSessionState`. 
+
+(The incoming messages are also accessible, but there probably isn't a use for this. The `ViewModels` shouldn't really be accessing this as that's the whole point of the `ShoppingSessionManager`)
+
+### `SocketHandler`
+
+This is a generic class with two type parameters `IN` and `OUT`. These are the types of the messages coming in and out, and are converted to and from strings with a `SocketMessageTransformer`. (This is implemented by `Message.Transformer`). 
+
+The `SocketHandler` manages opening a `WebSocket` with `OKHTTP`, sending message, emitting received messages as the `OUT` type, and providing a `LiveData` for the socket state. 
+
+
+### `SessionManager` 
+
+This is the implementation of `ShoppingSessionManager`. It's not finished. 
+
+It tracks
+- The app id provided by the server
+- The route
+- The index within the route
+- The `ShoppingList` that we are collecting products for
+- The scanned product
+- The current state of the session 
+- The state of the `WebSocket` through a `SocketHandler`
+
+It manages all incoming and outgoing messages as well as actions coming from the `Fragments`. 
+
+Currently it's ~200 lines, which is fairly acceptable. But it could quite easily become overly complicated, which would make it a pain to work with.
+
+
+
+
 
 
