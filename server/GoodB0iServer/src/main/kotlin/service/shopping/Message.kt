@@ -8,7 +8,7 @@ sealed class Message {
 
             object ReceivedRoute : FromTrolley()
 
-            object UserAtTrolley : FromTrolley()
+            object UserReady : FromTrolley()
 
             object TrolleyAcceptedProduct : FromTrolley()
 
@@ -101,7 +101,7 @@ sealed class Message {
                 "RP" -> IncomingMessage.FromTrolley.ReachedPoint(message.substringAfter(DELIM))
                 "PA" -> IncomingMessage.FromTrolley.TrolleyAcceptedProduct
                 "PR" -> IncomingMessage.FromTrolley.TrolleyRejectedProduct
-                "UT" -> IncomingMessage.FromTrolley.UserAtTrolley
+                "UR" -> IncomingMessage.FromTrolley.UserReady
                 "RR" -> IncomingMessage.FromTrolley.ReceivedRoute
                 else -> IncomingMessage.FromTrolley.InvalidMessage(message)
             }

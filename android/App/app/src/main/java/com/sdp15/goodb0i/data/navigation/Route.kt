@@ -1,5 +1,7 @@
 package com.sdp15.goodb0i.data.navigation
 
+import timber.log.Timber
+
 /*
  * A route is a list of RoutePoints
  */
@@ -19,7 +21,7 @@ class Route private constructor(
             data.split(separator).forEach { point ->
                 val type = point.substringBefore(delim)
                 val id = point.substringAfter(delim)
-                if (id.isEmpty()) return null
+                Timber.i("Type $type id $id")
                 when (type) {
                     "start" -> points.add(RoutePoint.Start)
                     "end" -> points.add(RoutePoint.End)
@@ -30,6 +32,7 @@ class Route private constructor(
                     "pass" -> points.add(RoutePoint.Pass(id))
                 }
             }
+            Timber.i("Created route with points $points")
             return Route(points)
         }
 

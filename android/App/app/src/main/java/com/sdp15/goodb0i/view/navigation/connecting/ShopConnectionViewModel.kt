@@ -53,7 +53,6 @@ class ShopConnectionViewModel : BaseViewModel<Any>() {
             }
             is ShoppingSessionState.NavigatingTo -> {
                 transitions.postValue(ShopConnectionFragmentDirections.actionShopConnectionFragmentToNavigatingToFragment())
-
             }
         }
 

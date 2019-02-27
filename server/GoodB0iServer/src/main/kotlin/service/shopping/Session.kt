@@ -2,9 +2,7 @@ package service.shopping
 
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import service.ListService
 import service.routing.RouteFinder
-import java.util.concurrent.atomic.AtomicBoolean
 
 class Session(
         private val routeFinder: RouteFinder,
@@ -55,7 +53,7 @@ class Session(
             is Message.IncomingMessage.FromTrolley.ReceivedRoute -> {
                 trolleyReceivedRoute = true
             }
-            is  Message.IncomingMessage.FromTrolley.UserAtTrolley -> {
+            is  Message.IncomingMessage.FromTrolley.UserReady -> {
                 sendToApp(Message.OutgoingMessage.ToApp.UserReady)
             }
             is Message.IncomingMessage.FromTrolley.TrolleyAcceptedProduct -> {

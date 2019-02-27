@@ -23,14 +23,11 @@ class NavigatingToViewModel : BaseViewModel<Any>() {
 
     private val stateObserver = Observer<ShoppingSessionState> { state ->
         if (state is ShoppingSessionState.NavigatingTo) {
-            if (state.from is Route.RoutePoint.Stop) {
-                transitions.postValue(NavigatingToFragmentDirections.actionNavigatingToFragmentToItemFragment())
-            } else {
-                Timber.d("Moving towards RoutePoint ${state.point}")
-                //TODO: Update progress display
-            }
+            // TODO: Update progress display
         } else if (state is ShoppingSessionState.Disconnected) {
             //TODO: Do something about this
+        } else if (state is ShoppingSessionState.Scanning) {
+            transitions.postValue(NavigatingToFragmentDirections.actionNavigatingToFragmentToItemFragment())
         }
         Timber.d("State: $state")
     }

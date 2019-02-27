@@ -132,7 +132,8 @@
     <fragment
         android:id="@+id/shopConnectionFragment"
         android:name="com.sdp15.goodb0i.view.navigation.connecting.ShopConnectionFragment"
-        android:label="ShopConnectionFragment" >
+        android:label="ShopConnectionFragment"
+        tools:layout="@layout/layout_shop_connection">
         <argument
             android:name="shopping_list"
             app:argType="com.sdp15.goodb0i.data.store.lists.ShoppingList" />

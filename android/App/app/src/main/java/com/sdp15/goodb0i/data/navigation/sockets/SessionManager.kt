@@ -72,6 +72,7 @@ class SessionManager(
                 }
                 is Message.IncomingMessage.UserReady -> {
                     //First moving state
+
                     postMovingState()
                 }
                 is Message.IncomingMessage.RouteCalculated -> {
@@ -133,7 +134,14 @@ class SessionManager(
     }
 
     private fun postMovingState() {
+        Timber.i("Moving from ${route[index]} to ${route[index+1]}")
         sessionState.postValue(ShoppingSessionState.NavigatingTo(route[index], route[index + 1]))
+        val point = route.subList(fromIndex = index, toIndex = route.size).firstOrNull { point -> point is Route.RoutePoint.Stop  }
+        Timber.i("Found point $point")
+        if (point is Route.RoutePoint.Stop) {
+            //TODO
+            currentListProduct.postValue(shoppingList.products.first())
+        }
     }
 
     /*

@@ -97,7 +97,7 @@ sealed class Message {
                         message
                     )
                 }
-                "PT" -> IncomingMessage.ReachedPoint(message.substringAfter(delim))
+                "RP" -> IncomingMessage.ReachedPoint(message.substringAfter(delim))
                 "UR" -> IncomingMessage.UserReady
                 "NT" -> IncomingMessage.NoAvailableTrolley
                 else -> IncomingMessage.InvalidMessage(message)
