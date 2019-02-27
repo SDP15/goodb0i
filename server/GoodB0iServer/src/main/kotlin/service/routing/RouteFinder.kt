@@ -80,7 +80,7 @@ class RouteFinder(private val listService: ListService) {
             builder.append(sep)
             previous = node
         }
-
+        builder.setLength(builder.length - 1) // Remove last comma
         return builder.toString()
     }
 

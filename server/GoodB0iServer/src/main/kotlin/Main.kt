@@ -12,6 +12,8 @@ import io.ktor.routing.Routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.ktor.websocket.WebSockets
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import repository.DatabaseFactory
 import repository.TestDataProvider
 import repository.exposedTypeAdapters
@@ -20,6 +22,7 @@ import service.routing.RouteFinder
 import service.shopping.AppManager
 import service.shopping.SessionManager
 import service.shopping.TrolleyManager
+import java.util.concurrent.TimeUnit
 
 
 fun Application.module() {
@@ -51,6 +54,10 @@ fun Application.module() {
         shelves(shelfService)
         lists(listService)
         sockets(sessionManager, trolleyManager, appManager)
+    }
+    GlobalScope.launch {
+        TimeUnit.SECONDS.sleep(5)
+        routeFinder.plan(7654321)
     }
 
 
