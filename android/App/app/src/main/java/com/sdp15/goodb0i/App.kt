@@ -25,7 +25,7 @@ import com.sdp15.goodb0i.view.list.creation.ListViewModel
 import com.sdp15.goodb0i.view.list.saved.SavedListsViewModel
 import com.sdp15.goodb0i.view.navigation.confirmation.ItemConfirmationViewModel
 import com.sdp15.goodb0i.view.navigation.connecting.ShopConnectionViewModel
-import com.sdp15.goodb0i.view.navigation.moving.NavigatingToViewModel
+import com.sdp15.goodb0i.view.navigation.navigating.NavigatingToViewModel
 import com.sdp15.goodb0i.view.navigation.product.ProductViewModel
 import com.sdp15.goodb0i.view.navigation.scanner.ScannerViewModel
 import com.sdp15.goodb0i.view.welcome.WelcomeViewModel

@@ -1,4 +1,4 @@
-package com.sdp15.goodb0i.view.navigation.moving
+package com.sdp15.goodb0i.view.navigation.navigating
 
 import android.os.Bundle
 import android.view.LayoutInflater

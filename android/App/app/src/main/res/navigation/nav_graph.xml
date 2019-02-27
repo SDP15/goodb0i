@@ -122,7 +122,7 @@
     </fragment>
     <fragment
         android:id="@+id/navigatingToFragment"
-        android:name="com.sdp15.goodb0i.view.navigation.moving.NavigatingToFragment"
+        android:name="com.sdp15.goodb0i.view.navigation.navigating.NavigatingToFragment"
         android:label="NavigatingToFragment"
         tools:layout="@layout/layout_navigating_to">
         <action

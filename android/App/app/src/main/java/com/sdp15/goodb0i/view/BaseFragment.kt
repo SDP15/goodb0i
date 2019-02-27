@@ -12,4 +12,6 @@ abstract class BaseFragment : Fragment() {
 
     val baseActivity: MainActivity
         get() = activity as MainActivity
+
+
 }

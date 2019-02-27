@@ -13,10 +13,10 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.koin.standalone.KoinComponent
 import org.koin.standalone.inject
-import timber.log.Timber
 import kotlin.math.min
 
-class SavedListsAdapter(val onClick: (ShoppingList) -> Unit) : RecyclerView.Adapter<SavedListsAdapter.SavedListViewHolder>(), KoinComponent {
+class SavedListsAdapter(val onClick: (ShoppingList) -> Unit) :
+    RecyclerView.Adapter<SavedListsAdapter.SavedListViewHolder>(), KoinComponent {
 
     private val lists = mutableListOf<ShoppingList>()
     private val listStore: ShoppingListStore by inject()
@@ -31,11 +31,10 @@ class SavedListsAdapter(val onClick: (ShoppingList) -> Unit) : RecyclerView.Adap
 
     override fun getItemCount(): Int = lists.size
 
-    suspend fun deleteList(pos: Int){
+    private suspend fun deleteList(pos: Int) {
         listStore.deleteList(lists[pos])
         lists.removeAt(pos)
         notifyItemRemoved(pos)
-        //need to update the screen
     }
 
 
@@ -52,9 +51,9 @@ class SavedListsAdapter(val onClick: (ShoppingList) -> Unit) : RecyclerView.Adap
                 onClick(sl)
             }
             delete_order_btn.setOnClickListener {
-                GlobalScope.launch(Dispatchers.IO){
-                    deleteList(position)
-                   }
+                GlobalScope.launch(Dispatchers.IO) {
+                    deleteList(holder.adapterPosition)
+                }
 
             }
         }

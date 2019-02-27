@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import com.arlib.floatingsearchview.FloatingSearchView
 import com.sdp15.goodb0i.R
 import com.sdp15.goodb0i.switchOnEmpty
 import kotlinx.android.synthetic.main.layout_search.*
@@ -29,8 +28,7 @@ class SearchFragment : Fragment() {
         vm.search.observe(this, Observer {
             adapter.itemsChanged(it)
         })
-        val fsv = parentFragment!!.view!!.findViewById<FloatingSearchView>(R.id.floating_search_view)
-        fsv.setOnQueryChangeListener(vm::onQueryChange)
+
     }
 
     override fun onCreateView(

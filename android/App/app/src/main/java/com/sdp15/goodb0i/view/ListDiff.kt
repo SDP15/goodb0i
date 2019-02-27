@@ -4,7 +4,7 @@ package com.sdp15.goodb0i.view
  * Model for a change in the contents of a [List]
  * @param items The current state of the list
  */
-sealed class ListDiff<T>(val items: List<T>) {
+sealed class ListDiff<T>(val items: List<T>) : List<T> by items {
     class All<T>(items: List<T>) : ListDiff<T>(items)
     class Add<T>(items: List<T>, val added: T) : ListDiff<T>(items)
     class Remove<T>(items: List<T>, val removed: T) : ListDiff<T>(items)

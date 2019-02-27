@@ -37,14 +37,8 @@ class CodeFragment : androidx.fragment.app.Fragment() {
                 login_code_input.error = getString(it.second)
             }
         })
-        vm.actions.observe(this, Observer {
-            if (it is CodeViewModel.CodeAction.ConfirmShoppingListAction) {
-                findNavController().navigate(
-                    CodeFragmentDirections.actionCodeFragmentToListConfirmationFragment(
-                        it.list
-                    )
-                )
-            }
+        vm.transitions.observe(this, Observer {
+            findNavController().navigate(it)
         })
     }
 

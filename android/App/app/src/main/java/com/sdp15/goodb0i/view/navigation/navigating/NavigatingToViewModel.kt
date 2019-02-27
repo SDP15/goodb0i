@@ -1,9 +1,8 @@
-package com.sdp15.goodb0i.view.navigation.moving
+package com.sdp15.goodb0i.view.navigation.navigating
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import com.sdp15.goodb0i.data.navigation.Message
-import com.sdp15.goodb0i.data.navigation.Route
 import com.sdp15.goodb0i.data.navigation.ShoppingSessionManager
 import com.sdp15.goodb0i.data.navigation.ShoppingSessionState
 import com.sdp15.goodb0i.data.store.lists.ListItem
