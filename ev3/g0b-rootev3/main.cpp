@@ -150,7 +150,7 @@ public:
   }
 
 private:
-  int forwardBaseSpeed{40};
+  int forwardBaseSpeed{30};
   int currentTurnAngle{0}, currentSpeed{0};
 
   array<int, 4> currentMotorSpeeds{{0, 0, 0, 0}},
@@ -395,8 +395,8 @@ protected:
     evutil::Color rcol{rightColor->getColor()};
 
     auto rrcol{rightColor->getRawRGB()};
-    constexpr int STEER_ANGLE{85};
-    constexpr int SMALL_STEER_ANGLE{70};
+    constexpr int STEER_ANGLE{110};
+    constexpr int SMALL_STEER_ANGLE{90};
 
     bool seeingMarker{lcol == evutil::Color::turnRight ||
                       mcol == evutil::Color::turnRight ||
