@@ -512,7 +512,18 @@ It manages all incoming and outgoing messages as well as actions coming from the
 Currently it's ~200 lines, which is fairly acceptable. But it could quite easily become overly complicated, which would make it a pain to work with.
 
 
+## Testing
 
+There is currently only a proper test for `ListViewModel`. 
 
+This tests all of the of the functionality of the `ViewModel`. 
 
+Some of the `ViewModels` are so simple that they aren't worth testing (There are a couple without any conditionals to test), however the rest still need testing. 
 
+## Integrated testing 
+
+Every time a commit is made to a branch containing the `.travis.yml` file, an automated build of the Android app will be run, and the unit tests will be run. The green tick/red cross showing up beside commits is whether the commit built successfully. 
+
+You can click on these to see the build log.
+
+## 
