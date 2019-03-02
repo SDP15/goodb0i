@@ -15,10 +15,13 @@ class ProductService {
     }
 
     fun search(query: String?): List<Product> = transaction {
-        Product.all().filter {
-            (it.name + it.description + it.department).toLowerCase().contains(query?.toLowerCase()
-                    ?: "")
-        }
+        val filtered = Search.search(Product.all().toList(), query ?: "", {product -> listOf(product.name, product.description, product.department)}).toList()
+        println("Filtered results $filtered")
+        filtered
+//        Product.all().filter {
+//            (it.name + it.description + it.department).toLowerCase().contains(query?.toLowerCase()
+//                    ?: "")
+//        }
     }
 
 //    fun deleteProduct(id: UUID): Boolean = transaction {
