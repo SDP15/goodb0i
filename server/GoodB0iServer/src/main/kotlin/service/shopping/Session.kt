@@ -17,7 +17,7 @@ class Session(
     private fun plan(code: Long) {
         val plan = routeFinder.plan(code)
         sendToApp(Message.OutgoingMessage.ToApp.Route(plan))
-        sendToTrolley(Message.OutgoingMessage.ToTrolley.Route(plan))
+        sendToTrolley(Message.OutgoingMessage.ToTrolley.RouteCalculated(plan))
     }
 
     override fun onAppMessage(message: Message.IncomingMessage.FromApp) {

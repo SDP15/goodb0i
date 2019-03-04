@@ -90,30 +90,30 @@ sealed class Message {
             val type = message.substringBefore(delim)
             return when (type) {
                 "ID" -> IncomingMessage.Connected(message.substringAfter(delim))
-                "TA" -> IncomingMessage.TrolleyConnected
-                "RC" -> {
+                "TrolleyConnected" -> IncomingMessage.TrolleyConnected
+                "RouteCalculated" -> {
                     val route = Route.fromString(message.substringAfter(delim))
                     if (route != null) IncomingMessage.RouteCalculated(route) else IncomingMessage.InvalidMessage(
                         message
                     )
                 }
-                "RP" -> IncomingMessage.ReachedPoint(message.substringAfter(delim))
-                "UR" -> IncomingMessage.UserReady
-                "NT" -> IncomingMessage.NoAvailableTrolley
+                "ReachedPoint" -> IncomingMessage.ReachedPoint(message.substringAfter(delim))
+                "UserReady" -> IncomingMessage.UserReady
+                "NoAvailableTrolley" -> IncomingMessage.NoAvailableTrolley
                 else -> IncomingMessage.InvalidMessage(message)
             }
         }
 
         override fun transformOutgoing(message: OutgoingMessage): String {
             return when (message) {
-                is OutgoingMessage.PlanRoute -> "LP$delim${message.code}"
-                is OutgoingMessage.Reconnect -> "RC$delim${message.oldId}"
-                is OutgoingMessage.ProductScanned -> "PS$delim${message.id}"
-                is OutgoingMessage.ProductAccepted -> "PA$delim${message.id}"
-                is OutgoingMessage.ProductRejected -> "PR$delim${message.id}"
-                is OutgoingMessage.RequestHelp -> "RH$delim"
-                is OutgoingMessage.Stop -> "SP$delim${message.reason.code}"
-                is OutgoingMessage.RouteReceived -> "RR$delim"
+                is OutgoingMessage.PlanRoute -> "PlanRoute$delim${message.code}"
+                is OutgoingMessage.Reconnect -> "Reconnect$delim${message.oldId}"
+                is OutgoingMessage.ProductScanned -> "ProductScanned$delim${message.id}"
+                is OutgoingMessage.ProductAccepted -> "ProductAccepted$delim${message.id}"
+                is OutgoingMessage.ProductRejected -> "ProductRejected$delim${message.id}"
+                is OutgoingMessage.RequestHelp -> "RequestHelp$delim"
+                is OutgoingMessage.Stop -> "Stop$delim${message.reason.code}"
+                is OutgoingMessage.RouteReceived -> "RouteReceived$delim"
             }
         }
     }

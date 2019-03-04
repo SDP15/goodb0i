@@ -11,9 +11,19 @@ object Search {
     private const val DEFAULT_SCALING_FACTOR = 0.1
     private const val SCORE_THRESHOLD = 0.6
 
-    fun search(data: Collection<String>, query: String, threshold: Double = SCORE_THRESHOLD): Collection<String> = data.map { item ->
-        Pair(item, getAdjustedJaroWinklerSimilarity(item, query))
-    }.filter { it.second > threshold }.sortedBy { it.second }.map { it.first }
+    private inline fun <T, R> Iterable<T>.mapThenFilter(transform: (T) -> R, predicate: (R) -> Boolean): List<R> {
+        val out = ArrayList<R>()
+        for (element in this) {
+            val transformed = transform(element)
+            if (predicate(transformed)) out.add(transformed)
+        }
+        return out
+    }
+
+
+//    fun search(data: Collection<String>, query: String, threshold: Double = SCORE_THRESHOLD): Collection<String> = data.map { item ->
+//        Pair(item, getAdjustedJaroWinklerSimilarity(item, query))
+//    }.filter { it.second > threshold }.sortedBy { it.second }.map { it. }
 
 
     fun <T> search(data: Collection<T>, query: String, fields: (T) -> Collection<String>, threshold: Double = SCORE_THRESHOLD): Collection<T> =
