@@ -98,7 +98,7 @@ sealed class Message {
         fun messageFromTrolleyString(message: String): IncomingMessage.FromTrolley {
             val type = message.substringBefore(DELIM)
             return when (type) {
-                "RP" -> IncomingMessage.FromTrolley.ReachedPoint(message.substringAfter(DELIM))
+                "ReachedPoint" -> IncomingMessage.FromTrolley.ReachedPoint(message.substringAfter(DELIM))
                 "AcceptedProduct" -> IncomingMessage.FromTrolley.TrolleyAcceptedProduct
                 "RejectedProduct" -> IncomingMessage.FromTrolley.TrolleyRejectedProduct
                 "UserReady" -> IncomingMessage.FromTrolley.UserReady
