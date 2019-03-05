@@ -6,8 +6,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.sdp15.goodb0i.R
+import kotlinx.android.synthetic.main.layout_confirmation.*
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ItemConfirmationFragment : Fragment() {
+
+    private val vm: ItemConfirmationViewModel by viewModel()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -16,4 +20,9 @@ class ItemConfirmationFragment : Fragment() {
         return inflater.inflate(R.layout.layout_confirmation, container, false)
     }
 
+    override fun onResume() {
+        super.onResume()
+        confirmation_button_positive.setOnClickListener { vm.accept() }
+        confirmation_button_negative.setOnClickListener { vm.reject() }
+    }
 }
