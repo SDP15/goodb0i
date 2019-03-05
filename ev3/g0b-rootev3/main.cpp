@@ -75,7 +75,46 @@ void openLogFile() {
   }
 }
 
-class SteeringSubsystem {
+enum SubsystemId {
+  SUBSYS_ROBOT,
+  SUBSYS_STEERING,
+  SUBSYS_LINEFOLLOW,
+  SUBSYS_AVOIDANCE,
+};
+
+class Subsystem {
+private:
+  bool paused{false};
+
+protected:
+  virtual void process() {}
+  virtual void onPause() {}
+  virtual void onResume() {}
+
+public:
+  virtual ~Subsystem() {}
+  void pause() {
+    if (!paused) {
+      onPause();
+      paused = true;
+    }
+  }
+  void resume() {
+    if (paused) {
+      onResume();
+      paused = false;
+    }
+  }
+  void processIfNeeded() {
+    if (!paused) {
+      process();
+    }
+  }
+  bool isPaused() { return paused; }
+  virtual void dump(ostream &os) { os << "Unknown subsystem\n"; }
+};
+
+class SteeringSubsystem : public Subsystem {
 public:
   struct Command {
     enum class CommandType {
@@ -94,21 +133,32 @@ public:
 
   deque<Command> commands;
 
-  void pushCommand(Command cmd) { commands.push_back(cmd); }
-
-  void pushCommandToFront(Command cmd) { commands.push_front(cmd); }
-
   bool queueEmpty() { return commands.empty(); }
 
+  void pushCommand(Command cmd) {
+    if (queueEmpty()) {
+      commandWaitStopwatch.restart();
+    }
+    commands.push_back(cmd);
+  }
+
+  void pushCommandToFront(Command cmd) {
+    if (queueEmpty()) {
+      commandWaitStopwatch.restart();
+    }
+    commands.push_front(cmd);
+  }
+
 private:
-  int forwardBaseSpeed{60};
+  int forwardBaseSpeed{30};
   int currentTurnAngle{0}, currentSpeed{0};
 
   array<int, 4> currentMotorSpeeds{{0, 0, 0, 0}},
-      savedMotorSpeeds{{0, 0, 0, 0}}, targetMotorSpeeds{{0, 0, 0, 0}};
+      targetMotorSpeeds{{0, 0, 0, 0}};
   /// Time remaining before the next command is popped off the queue
   int remainingWaitMs{0};
-  chrono::steady_clock::time_point lastWaitUpdate, lastCmdTime;
+  evutil::Stopwatch commandWaitStopwatch;
+  set<SubsystemId> stopCauses;
 
   /// TurnAngle goes from -100 to 100
   void setTargetSpeedsClassic(int speedPercent, int turnAngle) {
@@ -139,23 +189,44 @@ private:
   }
 
 public:
-  SteeringSubsystem() {
-    lastWaitUpdate = chrono::steady_clock::now();
-    lastCmdTime = lastWaitUpdate;
-  }
+  SteeringSubsystem() { commandWaitStopwatch.restart(); }
 
   bool isMoving() {
     return targetMotorSpeeds[DRIVE_LEFT_BACK] != 0 ||
            targetMotorSpeeds[DRIVE_RIGHT_BACK] != 0;
   }
 
+  void requestStop(SubsystemId who) {
+    if (stopCauses.empty()) {
+      commandWaitStopwatch.pause();
+    }
+    stopCauses.insert(who);
+  }
+
+  void cancelStopRequest(SubsystemId who) {
+    stopCauses.erase(who);
+    if (stopCauses.empty()) {
+      commandWaitStopwatch.resume();
+    }
+  }
+
+  virtual void dump(ostream &os) {
+    os << "Steering subsystem:\n";
+    os << " * Stop causes: ";
+    for (auto &sc : stopCauses) {
+      os << sc << " ";
+    }
+    os << "\n * Turn angle: " << currentTurnAngle;
+    os << "\n * Speed: " << currentSpeed;
+    os << "\n";
+  }
+
+protected:
   void process() {
-    // process command
-    auto newWaitUpdate{chrono::steady_clock::now()};
-    auto deltaTime{chrono::duration_cast<chrono::milliseconds>(newWaitUpdate -
-                                                               lastCmdTime)};
-    lastWaitUpdate = newWaitUpdate;
-    if (deltaTime.count() >= remainingWaitMs) {
+    // process command(s)
+    if (stopCauses.empty() &&
+        commandWaitStopwatch.elapsedMilliseconds() >= remainingWaitMs) {
+      commandWaitStopwatch.restart();
       // process next command(s)
       remainingWaitMs = 0;
       while (!commands.empty()) {
@@ -176,25 +247,17 @@ public:
           currentTurnAngle = next.newTurnAngle;
           setTargetSpeedsClassic(currentSpeed, currentTurnAngle);
         } break;
-        case Command::CommandType::saveAndHalt: {
-          savedMotorSpeeds = targetMotorSpeeds;
-          setTargetSpeedsClassic(0, 0);
-        } break;
-        case Command::CommandType::resume: {
-          targetMotorSpeeds = savedMotorSpeeds;
-        } break;
         }
 
         if (next.milliseconds > 0) {
           remainingWaitMs = next.milliseconds;
-          lastCmdTime = chrono::steady_clock::now();
           break;
         }
       }
     }
     // push updates to motors
     for (int m = 0; m < drives.size(); ++m) {
-      auto targetSpeed{targetMotorSpeeds[m]};
+      auto targetSpeed{stopCauses.empty() ? targetMotorSpeeds[m] : 0};
       if (currentMotorSpeeds[m] != targetSpeed) {
         currentMotorSpeeds[m] = targetSpeed;
         if (targetSpeed == 0) {
@@ -207,12 +270,70 @@ public:
   }
 };
 
-class LineFollowSubsystem {
+class AvoidanceSubsystem : public Subsystem {
 private:
-  enum class Direction { left, right } lastLineDir;
-  int avgLineAngle{0};
-  bool lastStopped{false}, stopped{false};
+  int obstacleDistanceCm{45};
+  bool seenObstacle{false};
+  vector<Subsystem *> systemsToPause;
   SteeringSubsystem *sysSteering;
+
+public:
+  AvoidanceSubsystem(SteeringSubsystem *sysSteering) {
+    this->sysSteering = sysSteering;
+    sonar->distance_centimeters(true);
+  }
+
+  void registerSystemToPause(Subsystem *sys) { systemsToPause.push_back(sys); }
+
+  virtual void dump(ostream &os) {
+    os << "Avoidance subsystem:";
+    os << "\n * Distance cm: " << obstacleDistanceCm;
+    os << "\n * Seeing obstacle: " << seenObstacle;
+    os << "\n";
+  }
+
+protected:
+  void process() {
+    bool nowSeesObstacle{sonar->distance_centimeters(false) <
+                         obstacleDistanceCm};
+    if (nowSeesObstacle != seenObstacle) {
+      seenObstacle = nowSeesObstacle;
+      for_each(systemsToPause.begin(), systemsToPause.end(),
+               nowSeesObstacle ? mem_fn(&Subsystem::pause)
+                               : mem_fn(&Subsystem::resume));
+      if (nowSeesObstacle) {
+        sysSteering->requestStop(SUBSYS_AVOIDANCE);
+      } else {
+        sysSteering->cancelStopRequest(SUBSYS_AVOIDANCE);
+      }
+    }
+  }
+};
+
+class LineFollowSubsystem : public Subsystem {
+public:
+  enum class QueuedAction { stop, turnLeft, turnRight, goStraight };
+
+private:
+  enum class Direction { left, right, middle };
+  /// On which side of the robot was the line last seen.
+  Direction lastLineDir{Direction::left};
+  /// If seeing diverging lines AND in the turning state, which line to follow.
+  Direction turnBias{Direction::middle};
+  enum class State {
+    following,
+    stoppedAtMarker,
+    turningAtMarker,
+    waitingForCommand
+  } state{State::following};
+  int avgLineAngle{0};
+  SteeringSubsystem *sysSteering;
+  deque<QueuedAction> queuedActions;
+
+  bool ignoreMarker{false};
+  evutil::Stopwatch markerIgnoreStopwatch;
+  int markerIgnoreMs{0};
+  static constexpr int MARKER_IGNORE_MS{2000};
 
 public:
   bool turningOn{true};
@@ -221,7 +342,51 @@ public:
     this->sysSteering = sysSteering;
   }
 
+  /// Add marker action to the queue
+  void enqueueAction(QueuedAction a) { queuedActions.push_back(a); }
+
+  bool isWaitingOnQueue() { return state == State::waitingForCommand; }
+
+  bool queueEmpty() { return queuedActions.empty(); }
+
+  /// Iterate over queued actions
+  deque<QueuedAction>::const_iterator begin() { return queuedActions.begin(); }
+
+  /// Iterate over queued actions
+  deque<QueuedAction>::const_iterator end() { return queuedActions.end(); }
+
+  /// Clears action queue
+  void forceClearQueue() { queuedActions.clear(); }
+
+  virtual void dump(ostream &os) {
+    os << "Line follow subsystem:";
+    os << "\n * Line last seen on the "
+       << (lastLineDir == Direction::left ? "left" : "right");
+    os << "\n * State: " << (int)state;
+    os << "\n * Avg line angle: " << avgLineAngle;
+    os << "\n";
+  }
+
+  void resumeFromStopMarker() {
+    if (state == State::stoppedAtMarker) {
+      ignoreMarker = true;
+      markerIgnoreMs = MARKER_IGNORE_MS;
+      markerIgnoreStopwatch.restart();
+      state = State::following;
+    }
+  }
+
+protected:
+  virtual void onPause() { markerIgnoreStopwatch.pause(); }
+
+  virtual void onResume() { markerIgnoreStopwatch.resume(); }
+
   void process() {
+
+    if (state == State::stoppedAtMarker) {
+      return;
+    }
+
     leftColor->update();
     midColor->update();
     rightColor->update();
@@ -230,85 +395,162 @@ public:
     evutil::Color rcol{rightColor->getColor()};
 
     auto rrcol{rightColor->getRawRGB()};
-    // cerr << (int)lcol << " " << (int)rcol << " " << rrcol.x << " " << rrcol.y
-    //     << " " << rrcol.z << endl;
-    constexpr int STEER_ANGLE{85};
-    constexpr int SMALL_STEER_ANGLE{70};
-    constexpr int SONAR_STOP_DISTANCE{45};
+    constexpr int STEER_ANGLE{110};
+    constexpr int SMALL_STEER_ANGLE{90};
 
-    if (sonar->distance_centimeters() < SONAR_STOP_DISTANCE) {
-      stopped = true;
-    } else if (sysSteering->queueEmpty()) {
-      stopped = false;
-      int lineAngle{};
-      if (mcol == evutil::Color::turnRight ||
-          lcol == evutil::Color::turnRight ||
-          rcol == evutil::Color::turnRight) {
-        cerr << "Starting turn" << endl;
-        sysSteering->pushCommand(
-            {SteeringSubsystem::Command::CommandType::setTurnAngle, 0,
-             turningOn ? 2000 : 1000, turningOn ? STEER_ANGLE : 0});
-        lastLineDir = Direction::left;
-        return;
-      }
-      if (mcol == evutil::Color::line) {
-        if (lcol == evutil::Color::line && rcol != evutil::Color::line) {
-          // LMr -> adjust slightly left
-          lineAngle = -SMALL_STEER_ANGLE;
-          lastLineDir = Direction::left;
-        } else if (lcol != evutil::Color::line && rcol == evutil::Color::line) {
-          // lMR -> adjust slightly right
-          lineAngle = SMALL_STEER_ANGLE;
-          lastLineDir = Direction::right;
-        } else {
-          // lMr/LMR -> going straight
-          lineAngle = 0;
-        }
+    bool seeingMarker{lcol == evutil::Color::turnRight ||
+                      mcol == evutil::Color::turnRight ||
+                      rcol == evutil::Color::turnRight};
+    if (ignoreMarker) {
+      if (markerIgnoreStopwatch.elapsedMilliseconds() >= markerIgnoreMs) {
+        ignoreMarker = false;
+        markerIgnoreStopwatch.pause();
       } else {
-        if (lcol == evutil::Color::line && rcol != evutil::Color::line) {
-          // Lmr -> adjust left
-          lineAngle = -STEER_ANGLE;
-          lastLineDir = Direction::left;
-        } else if (lcol != evutil::Color::line && rcol == evutil::Color::line) {
-          // lmR -> adjust right
-          lineAngle = STEER_ANGLE;
-          lastLineDir = Direction::right;
-        } else {
-          // lmr (LmR would be a bug) -> turn to the predicted line
-          lineAngle =
-              (lastLineDir == Direction::left) ? -STEER_ANGLE : STEER_ANGLE;
-        }
-      }
-      // Rolling average to smooth out steering
-      avgLineAngle = (avgLineAngle + 7 * lineAngle) / 8;
-      if (lastStopped != stopped) {
-        lastStopped = stopped;
-        if (stopped) {
-          sysSteering->pushCommandToFront(
-              {SteeringSubsystem::Command::CommandType::saveAndHalt});
-        } else {
-          sysSteering->pushCommandToFront(
-              {SteeringSubsystem::Command::CommandType::resume});
-        }
-      } else {
-        sysSteering->pushCommand(
-            {SteeringSubsystem::Command::CommandType::setTurnAngle, 0, 0,
-             avgLineAngle});
-        sysSteering->pushCommand(
-            {SteeringSubsystem::Command::CommandType::setSpeed, 100, 0, 0});
+        seeingMarker = false;
+        // make the robot blind to the marker
+        lcol = evutil::Color::line;
+        mcol = evutil::Color::line;
+        rcol = evutil::Color::line;
       }
     }
+
+    if (seeingMarker || state == State::waitingForCommand) {
+      ignoreMarker = true;
+      markerIgnoreMs = MARKER_IGNORE_MS;
+      markerIgnoreStopwatch.restart();
+      log() << "Seen marker: ";
+      if (queuedActions.empty()) {
+        if (state != State::waitingForCommand) {
+          log() << "MISSING QUEUE ACTION, HALTING" << endl;
+          state = State::waitingForCommand;
+        }
+      } else {
+        QueuedAction A{queuedActions.front()};
+        queuedActions.pop_front();
+        switch (A) {
+        case QueuedAction::stop:
+          log() << "Stop marker" << endl;
+          state = State::stoppedAtMarker;
+          break;
+        case QueuedAction::goStraight:
+          log() << "Straight marker" << endl;
+          state = State::turningAtMarker;
+          turnBias = Direction::middle;
+          break;
+        case QueuedAction::turnLeft:
+          log() << "Left marker" << endl;
+          state = State::turningAtMarker;
+          turnBias = Direction::left;
+          break;
+        case QueuedAction::turnRight:
+          log() << "Right marker" << endl;
+          state = State::turningAtMarker;
+          turnBias = Direction::right;
+          break;
+        }
+      }
+    }
+
+    // Do not move if stopped.
+    if (state == State::waitingForCommand || state == State::stoppedAtMarker) {
+      sysSteering->requestStop(SUBSYS_LINEFOLLOW);
+      return;
+    } else {
+      sysSteering->cancelStopRequest(SUBSYS_LINEFOLLOW);
+    }
+
+    if (state == State::turningAtMarker && !ignoreMarker) {
+      // out of time for the turn - resume normally
+      state = State::following;
+    }
+
+    int lineAngle{0};
+    // Track line position
+    if (mcol == evutil::Color::line) {
+      // Handle turn bias - mask out unwanted line parts
+      if (state == State::turningAtMarker) {
+        switch (turnBias) {
+        case Direction::left:
+          // take only leftmost reading
+          if (lcol == evutil::Color::line) {
+            mcol = evutil::Color::bg;
+          } else if (rcol == evutil::Color::line) {
+            rcol = evutil::Color::bg;
+          }
+          break;
+        case Direction::middle:
+          // take only middle reading (TODO: This might be buggy, might be
+          // good to know intersection layout)
+          lcol = evutil::Color::bg;
+          rcol = evutil::Color::bg;
+          break;
+        case Direction::right:
+          // take only rightmost reading
+          if (lcol == evutil::Color::line) {
+            lcol = evutil::Color::bg;
+          } else if (rcol == evutil::Color::line) {
+            mcol = evutil::Color::bg;
+          }
+          break;
+        }
+      }
+
+      if (lcol == evutil::Color::line && rcol != evutil::Color::line) {
+        // LMr -> adjust slightly left
+        lineAngle = -SMALL_STEER_ANGLE;
+        lastLineDir = Direction::left;
+      } else if (lcol != evutil::Color::line && rcol == evutil::Color::line) {
+        // lMR -> adjust slightly right
+        lineAngle = SMALL_STEER_ANGLE;
+        lastLineDir = Direction::right;
+      } else {
+        // lMr/LMR -> going straight
+        lineAngle = 0;
+      }
+    } else {
+      if (lcol == evutil::Color::line && rcol != evutil::Color::line) {
+        // Lmr -> adjust left
+        lineAngle = -STEER_ANGLE;
+        lastLineDir = Direction::left;
+      } else if (lcol != evutil::Color::line && rcol == evutil::Color::line) {
+        // lmR -> adjust right
+        lineAngle = STEER_ANGLE;
+        lastLineDir = Direction::right;
+      } else if (state != State::turningAtMarker &&
+                 lcol != evutil::Color::line) {
+        // lmr -> turn to the predicted line
+        lineAngle =
+            (lastLineDir == Direction::left) ? -STEER_ANGLE : STEER_ANGLE;
+      } else {
+        // LmR -> turn to bias line if turning
+        lineAngle = (turnBias == Direction::right) ? STEER_ANGLE : -STEER_ANGLE;
+        lastLineDir =
+            (turnBias == Direction::right) ? Direction::right : Direction::left;
+      }
+    }
+    // Rolling average to smooth out steering
+    avgLineAngle = (avgLineAngle + 7 * lineAngle) / 8;
+
+    sysSteering->pushCommand(
+        {SteeringSubsystem::Command::CommandType::setTurnAngle, 0, 0,
+         avgLineAngle});
+    sysSteering->pushCommand(
+        {SteeringSubsystem::Command::CommandType::setSpeed, 100, 0, 0});
   }
 };
 
 class Robot {
 private:
   SteeringSubsystem sysSteering;
+  AvoidanceSubsystem sysAvoid;
   LineFollowSubsystem sysLine;
 
   bool halted{true};
+  bool hsvDump{false};
+
   mutex accessMutex;
   int socketFd{-1};
+  set<int> connectionFds;
 
   void spawnNewConnThread() { new thread(&Robot::socketThreadFn, this); }
 
@@ -319,12 +561,18 @@ private:
       perror("accept fail");
       return;
     }
+    {
+      lock_guard<mutex> _l{accessMutex};
+      connectionFds.insert(connectFd);
+    }
     auto rsend = [&](const char *str) {
       ::send(connectFd, str, strlen(str), 0);
     };
 
     rsend("EV3READY\n");
+    led::set_color(led::left, led::amber);
     char rbuf[64];
+    char wbuf[64];
     int rlen;
     while ((rlen = recv(connectFd, rbuf, sizeof rbuf, 0)) > 0) {
       if (rbuf[rlen - 1] == '\n') {
@@ -335,33 +583,108 @@ private:
       }
       lock_guard<mutex> _l{accessMutex};
       // Implemented TCP commands
-      if (strncmp(rbuf, "stop", rlen) == 0) {
+      if (strncmp(rbuf, "help", rlen) == 0) {
+        rsend("Supported commands: help stop start moving? enqueue-stop "
+              "enqueue-forward enqueue-left enqueue-right queue-status "
+              "dump-queue clear-queue resume-from-stop-marker dump dump-hsv "
+              "disconnect\n");
+      } else if (strncmp(rbuf, "stop", rlen) == 0) {
         if (!halted) {
+          sysSteering.requestStop(SUBSYS_ROBOT);
           halted = true;
-          sysSteering.pushCommandToFront(
-              {SteeringSubsystem::Command::CommandType::saveAndHalt});
         }
+        rsend("stop OK\n");
       } else if (strncmp(rbuf, "start", rlen) == 0) {
         if (halted) {
+          sysSteering.cancelStopRequest(SUBSYS_ROBOT);
           halted = false;
-          sysSteering.pushCommandToFront(
-              {SteeringSubsystem::Command::CommandType::resume});
         }
-      } else if (strncmp(rbuf, "right", rlen) == 0) {
-        sysLine.turningOn = true;
-      } else if (strncmp(rbuf, "straight", rlen) == 0) {
-        sysLine.turningOn = false;
+        rsend("start OK\n");
+      } else if (strncmp(rbuf, "moving?", rlen) == 0) {
+        snprintf(wbuf, sizeof wbuf, "moving = %d\n",
+                 sysSteering.isMoving() ? 1 : 0);
+        rsend(wbuf);
+      } else if (strncmp(rbuf, "dump", rlen) == 0) {
+        rsend("EV3DUMP START\n");
+        stringstream ss;
+        sysSteering.dump(ss);
+        sysAvoid.dump(ss);
+        sysLine.dump(ss);
+        rsend(ss.str().c_str());
+        rsend("\nEV3DUMP END\n");
+      } else if (strncmp(rbuf, "enqueue-stop", rlen) == 0) {
+        sysLine.enqueueAction(LineFollowSubsystem::QueuedAction::stop);
+        rsend("enqueue-stop OK\n");
+      } else if (strncmp(rbuf, "enqueue-forward", rlen) == 0) {
+        sysLine.enqueueAction(LineFollowSubsystem::QueuedAction::goStraight);
+        rsend("enqueue-forward OK\n");
+      } else if (strncmp(rbuf, "enqueue-left", rlen) == 0) {
+        sysLine.enqueueAction(LineFollowSubsystem::QueuedAction::turnLeft);
+        rsend("enqueue-left OK\n");
+      } else if (strncmp(rbuf, "enqueue-right", rlen) == 0) {
+        sysLine.enqueueAction(LineFollowSubsystem::QueuedAction::turnRight);
+        rsend("enqueue-right OK\n");
+      } else if (strncmp(rbuf, "resume-from-stop-marker", rlen) == 0) {
+        sysLine.resumeFromStopMarker();
+        rsend("resume-from-stop-marker OK\n");
+      } else if (strncmp(rbuf, "dump-queue", rlen) == 0) {
+        stringstream ss;
+        ss << "Queue: ";
+        for (auto action : sysLine) {
+          switch (action) {
+          case LineFollowSubsystem::QueuedAction::stop:
+            ss << "stop ";
+            break;
+          case LineFollowSubsystem::QueuedAction::turnLeft:
+            ss << "left ";
+            break;
+          case LineFollowSubsystem::QueuedAction::turnRight:
+            ss << "right ";
+            break;
+          case LineFollowSubsystem::QueuedAction::goStraight:
+            ss << "forward ";
+            break;
+          }
+        }
+        ss << "OK\n";
+        rsend(ss.str().c_str());
+      } else if (strncmp(rbuf, "clear-queue", rlen) == 0) {
+        sysLine.forceClearQueue();
+        rsend("clear-queue OK\n");
+      } else if (strncmp(rbuf, "queue-status", rlen) == 0) {
+        if (sysLine.isWaitingOnQueue()) {
+          rsend("waiting-for-command OK\n");
+        } else if (sysLine.queueEmpty()) {
+          rsend("empty OK\n");
+        } else {
+          rsend("in-progress OK\n");
+        }
+      } else if (strncmp(rbuf, "dump-hsv", rlen) == 0) {
+        hsvDump = !hsvDump;
+        rsend("dump-hsv OK\n");
+      } else if (strncmp(rbuf, "disconnect", rlen) == 0) {
+        rsend("disconnect OK\n");
+        break;
+      } else {
+        rsend("unknown command FAIL\n");
       }
     }
 
+    {
+      lock_guard<mutex> _l{accessMutex};
+      connectionFds.erase(connectFd);
+    }
     if (shutdown(connectFd, SHUT_RDWR) == -1) {
-      perror("shutdown failed");
+      perror("socket shutdown failed");
     }
     close(connectFd);
   }
 
 public:
-  Robot() : sysSteering(), sysLine(&sysSteering) {
+  Robot() : sysSteering(), sysAvoid(&sysSteering), sysLine(&sysSteering) {
+    sysAvoid.registerSystemToPause(&sysLine);
+    sysSteering.requestStop(SUBSYS_ROBOT);
+
     // Start up server
     {
       socketFd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -394,19 +717,26 @@ public:
     if (socketFd >= 0) {
       close(socketFd);
     }
+    for (int cfd : connectionFds) {
+      shutdown(cfd, SHUT_RDWR);
+      close(cfd);
+    }
   }
 
   void process() {
     lock_guard<mutex> _l{accessMutex};
 
-    sysSteering.process();
+    sysSteering.processIfNeeded();
     if (!halted) {
-      sysLine.process();
-    } else {
-      /*midColor->update();
+      sysAvoid.processIfNeeded();
+      sysLine.processIfNeeded();
+    }
+
+    if (hsvDump) {
+      midColor->update();
       cerr << midColor->getRawHSV().x << ", " << midColor->getRawHSV().y << ", "
            << midColor->getRawHSV().z << endl;
-      this_thread::sleep_for(70ms);*/
+      this_thread::sleep_for(70ms);
     }
   }
 };
@@ -419,6 +749,7 @@ void disableMotors() {
       drive->stop();
     }
   }
+  led::all_off();
 }
 
 volatile bool sigintTerminate{false};
@@ -439,9 +770,13 @@ int main() {
     openLogFile();
 
     Robot robot{};
+
+    led::all_off();
+    led::set_color(led::left, led::red);
+
     while (!(sigintTerminate || button::back.pressed())) {
       robot.process();
-      this_thread::sleep_for(8ms);
+      this_thread::yield();
     }
     disableMotors();
     return 0;

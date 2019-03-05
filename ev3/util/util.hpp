@@ -1,11 +1,9 @@
 
 #include "ev3dev.h"
-#include <fstream>
+#include <bits/stdc++.h>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
 #include <glm/gtx/color_space.hpp>
-#include <iostream>
-#include <memory>
 
 namespace evutil {
 
@@ -207,6 +205,46 @@ public:
   }
 
   inline void runToDegree(int deg) { runToPosition(deg * countsPerDegree); }
+};
+
+class Stopwatch {
+private:
+  typedef std::chrono::steady_clock clock;
+  clock::time_point startTime;
+  int msOffset{0};
+  bool running{false};
+
+  int elapsedStartMs() {
+    auto now{clock::now()};
+    auto delta{
+        std::chrono::duration_cast<std::chrono::milliseconds>(now - startTime)};
+    return delta.count();
+  }
+
+public:
+  inline Stopwatch() { startTime = clock::now(); }
+
+  inline void restart() {
+    running = true;
+    msOffset = 0;
+    startTime = clock::now();
+  }
+
+  inline void pause() {
+    msOffset += elapsedStartMs();
+    running = false;
+  }
+
+  inline void resume() {
+    startTime = clock::now();
+    running = true;
+  }
+
+  inline bool isRunning() { return running; }
+
+  inline int elapsedMilliseconds() {
+    return msOffset + running ? elapsedStartMs() : 0;
+  }
 };
 
 } // namespace evutil
