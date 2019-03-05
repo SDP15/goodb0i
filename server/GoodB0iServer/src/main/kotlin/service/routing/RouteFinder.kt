@@ -46,6 +46,12 @@ class RouteFinder(private val listService: ListService) {
 
     }
 
+    private fun generateSupermarket(aisles: Int, racksPerAisle: Int, splitsPerAisle: Int) {
+        (1..aisles).forEach {
+
+        }
+    }
+
     fun <ID> convert(graph: Graph<ID>, start: Graph.Node<ID>, end: Graph.Node<ID>, waypoints: List<Graph.Node<ID>>): String {
         val route = solver(graph, start, end, waypoints)
         val builder = StringBuilder()

@@ -79,7 +79,7 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(),
 
     fun onSaveList() {
         //TODO: Error handling
-        GlobalScope.launch(Dispatchers.IO) {
+        launch {
             val params = currentList.map { Pair(it.product.id, it.quantity) }
             // Create or update a list
             val result =

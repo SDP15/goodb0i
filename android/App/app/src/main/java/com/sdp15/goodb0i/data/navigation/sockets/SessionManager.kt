@@ -201,6 +201,7 @@ class SessionManager(
 
     // Repeatedly attempt to reconnect to the server
     private fun attemptReconnection() {
+        //TODO: How to scope this
         GlobalScope.launch {
             //TODO: Break after some number of reconnection attempts
             while (!sh.isConnected) {

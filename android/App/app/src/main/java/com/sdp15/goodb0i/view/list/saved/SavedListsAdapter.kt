@@ -51,6 +51,7 @@ class SavedListsAdapter(val onClick: (ShoppingList) -> Unit) :
                 onClick(sl)
             }
             delete_order_btn.setOnClickListener {
+                // GlobalScope is fine here, we don't want to interrupt the DB job
                 GlobalScope.launch(Dispatchers.IO) {
                     deleteList(holder.adapterPosition)
                 }

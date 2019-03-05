@@ -26,7 +26,7 @@ class CodeViewModel : BaseViewModel<Any>(),
     override fun onInput(input: String) {
         if (input.length == 7) {
             validInput.postValue(Pair(true, 0))
-            GlobalScope.launch(Dispatchers.IO) {
+            launch {
                 val result = listManager.loadList(input.toLong())
                 if (result is Result.Success) {
                     Timber.i("Retrieved list ${result.data}")

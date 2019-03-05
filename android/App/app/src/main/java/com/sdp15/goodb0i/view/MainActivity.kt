@@ -5,12 +5,9 @@ import android.view.KeyEvent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.collection.CircularIntArray
 import androidx.navigation.findNavController
-import com.sdp15.goodb0i.data.navigation.sockets.SocketHandler
 import com.sdp15.goodb0i.view.debug.Config
 import kotlinx.android.synthetic.main.activity_main.*
-import org.koin.android.ext.android.inject
 import android.app.Activity
-import androidx.core.content.ContextCompat.getSystemService
 import android.R
 import android.view.inputmethod.InputMethodManager
 
