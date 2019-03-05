@@ -27,7 +27,7 @@ sealed class Message {
 
             data class Reconnect(val oldId: String) : FromApp()
 
-            object ProductScanned : FromApp()
+            data class ProductScanned(val id: String) : FromApp()
 
             object AppRejectedProduct : FromApp()
 
@@ -51,7 +51,7 @@ sealed class Message {
 
             data class RouteCalculated(val route: String) : ToTrolley()
 
-            object AppScannedProduct : ToTrolley()
+            data class AppScannedProduct(val id: String) : ToTrolley()
 
             object AppAcceptedProduct : ToTrolley()
 
@@ -84,7 +84,7 @@ sealed class Message {
             val type = message.substringBefore(DELIM)
             return when (type) {
                 "Reconnect" -> IncomingMessage.FromApp.Reconnect(message.substringAfter(DELIM))
-                "ProductScanned" -> IncomingMessage.FromApp.ProductScanned
+                "ProductScanned" -> IncomingMessage.FromApp.ProductScanned(message.substringAfter(DELIM))
                 "AcceptedProduct" -> IncomingMessage.FromApp.AppAcceptedProduct
                 "RejectedProduct" -> IncomingMessage.FromApp.AppRejectedProduct
                 "RequestHelp" -> IncomingMessage.FromApp.RequestHelp
@@ -116,7 +116,7 @@ sealed class Message {
             is OutgoingMessage.ToApp.UserReady -> "UserReady$DELIM"
             is OutgoingMessage.ToTrolley.AppAcceptedProduct -> "AppAcceptedProduct$DELIM"
             is OutgoingMessage.ToTrolley.AppRejectedProduct -> "AppRejectedProduct$DELIM"
-            is OutgoingMessage.ToTrolley.AppScannedProduct -> "AppScannedProduct$DELIM"
+            is OutgoingMessage.ToTrolley.AppScannedProduct -> "AppScannedProduct$DELIM${message.id}"
             is OutgoingMessage.ToTrolley.AssignedToApp -> "Assigned$DELIM"
             is OutgoingMessage.ToTrolley.RouteCalculated -> "RouteCalculated$DELIM${message.route}"
         }

@@ -30,7 +30,7 @@ class Session(
                 appReceivedRoute = true
             }
             is Message.IncomingMessage.FromApp.ProductScanned -> {
-                sendToTrolley(Message.OutgoingMessage.ToTrolley.AppScannedProduct)
+                sendToTrolley(Message.OutgoingMessage.ToTrolley.AppScannedProduct(message.id))
             }
             is Message.IncomingMessage.FromApp.AppAcceptedProduct -> {
                 sendToTrolley(Message.OutgoingMessage.ToTrolley.AppAcceptedProduct)
