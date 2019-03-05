@@ -37,8 +37,8 @@ class SessionManager(
     //TODO: If there isn't a use for publicly exposing direct message access, remove this. (Currently no usages)
     override val incoming: LiveData<Message.IncomingMessage> = incomingMessages
 
-    private val currentListProduct = MutableLiveData<ListItem>()
-    override val currentProduct: LiveData<ListItem> = currentListProduct
+    private val currentListProduct = MutableLiveData<List<ListItem>>()
+    override val currentProducts: LiveData<List<ListItem>> = currentListProduct
 
     private val lastScannedProduct = MutableLiveData<Product>()
     override val scannedProduct: LiveData<Product> = lastScannedProduct
@@ -139,9 +139,8 @@ class SessionManager(
         val point = route.subList(fromIndex = index, toIndex = route.size).firstOrNull { point -> point is Route.RoutePoint.Stop  }
         Timber.i("Found point $point")
         if (point is Route.RoutePoint.Stop) {
-            //TODO
-
-            currentListProduct.postValue(shoppingList.products.first())
+            val indices = point.productIndices
+            currentListProduct.postValue(shoppingList.products.slice(indices))
         }
     }
 

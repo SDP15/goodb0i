@@ -14,7 +14,7 @@ class NavigatingToViewModel : BaseViewModel<Any>() {
 
     private val sm: ShoppingSessionManager<Message.IncomingMessage> by inject()
 
-    val currentProduct: LiveData<ListItem> = sm.currentProduct
+    val currentProduct: LiveData<List<ListItem>> = sm.currentProducts
 
     override fun bind() {
         sm.state.observeForever(stateObserver)

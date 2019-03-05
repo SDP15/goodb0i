@@ -11,7 +11,7 @@ class ProductViewModel : BaseViewModel<Any>() {
 
     private val sm: ShoppingSessionManager<Message.IncomingMessage> by inject()
 
-    val product: LiveData<ListItem> = sm.currentProduct
+    val product: LiveData<List<ListItem>> = sm.currentProducts
 
     override fun bind() {
 

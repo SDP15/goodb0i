@@ -25,8 +25,11 @@ class NavigatingToFragment : BaseFragment() {
     override fun onResume() {
         super.onResume()
         vm.bind()
-        vm.currentProduct.observe(this, Observer { item ->
-            navigation_item_name.text = item.product.name
+        vm.currentProduct.observe(this, Observer { items ->
+            navigation_item_name.text = items.first().product.name
+            if (items.size > 1) {
+                // TODO: Other products on the rack
+            }
             //TODO: Next item, quantity information
         })
         vm.transitions.observe(this, Observer {
