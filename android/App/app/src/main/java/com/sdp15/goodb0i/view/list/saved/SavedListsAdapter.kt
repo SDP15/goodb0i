@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.sdp15.goodb0i.R
 import com.sdp15.goodb0i.data.store.cache.ShoppingListStore
 import com.sdp15.goodb0i.data.store.lists.ShoppingList
+import com.sdp15.goodb0i.data.store.price.PriceComputer
 import kotlinx.android.synthetic.main.list_order.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -20,6 +21,7 @@ class SavedListsAdapter(val onClick: (ShoppingList) -> Unit) :
 
     private val lists = mutableListOf<ShoppingList>()
     private val listStore: ShoppingListStore by inject()
+    private val priceComputer: PriceComputer by inject()
     fun setItems(items: Collection<ShoppingList>) {
         lists.clear()
         lists.addAll(items)
@@ -43,7 +45,7 @@ class SavedListsAdapter(val onClick: (ShoppingList) -> Unit) :
         holder.itemView.apply {
             text_list_code.text = sl.code.toString()
             text_list_price.text = context.getString(R.string.label_total_price,
-                sl.products.sumByDouble { it.quantity * it.product.price })
+                priceComputer.itemsPrice(sl.products))
             text_list_preview.text = sl.products.take(min(3, sl.products.size)).joinToString(separator = "\n") { item ->
                 context.getString(R.string.label_list_item_info, item.quantity, item.product.name)
             }

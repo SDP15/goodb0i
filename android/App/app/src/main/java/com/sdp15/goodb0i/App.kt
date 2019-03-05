@@ -14,6 +14,8 @@ import com.sdp15.goodb0i.data.store.cache.RoomShoppingListStore
 import com.sdp15.goodb0i.data.store.cache.ShoppingListStore
 import com.sdp15.goodb0i.data.store.lists.ListManager
 import com.sdp15.goodb0i.data.store.lists.RetrofitListManager
+import com.sdp15.goodb0i.data.store.price.PriceComputer
+import com.sdp15.goodb0i.data.store.price.SimplePriceComputer
 import com.sdp15.goodb0i.data.store.products.ProductLoader
 import com.sdp15.goodb0i.data.store.products.RetrofitProductLoader
 import com.sdp15.goodb0i.data.store.products.TestDataProductLoader
@@ -90,6 +92,7 @@ class App : Application() {
             single<ShoppingSessionManager<Message.IncomingMessage>> {
                 SessionManager(SocketHandler(transform = Message.Transformer), get())
             }
+            single<PriceComputer> { SimplePriceComputer }
         }
     )
 }
