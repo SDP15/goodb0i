@@ -136,7 +136,7 @@ class SessionManager(
 
     private fun postMovingState() {
         Timber.i("Moving from ${route[index]} to ${route[index + 1]}")
-        sessionState.postValue(ShoppingSessionState.NavigatingTo(route[index], route[index + 1]))
+
         val point = route.subList(fromIndex = index, toIndex = route.size)
             .firstOrNull { point -> point is Route.RoutePoint.Stop }
         Timber.i("Found point $point")
@@ -145,6 +145,11 @@ class SessionManager(
             remainingRackProducts.clear()
             remainingRackProducts.addAll(shoppingList.products.slice(indices))
             currentRackProducts.postValue(remainingRackProducts)
+            sessionState.postValue(ShoppingSessionState.NavigatingTo(route[index], point))
+        } else {
+            //TODO: This will happen when we reach the end of the stop points in the route
+            // Is this the behaviour we want or should it be NavigatingTo(route[index], End)?
+            sessionState.postValue(ShoppingSessionState.NavigatingTo(route[index], route[index+1]))
         }
     }
 
