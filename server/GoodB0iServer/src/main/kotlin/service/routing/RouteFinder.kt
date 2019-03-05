@@ -1,6 +1,7 @@
 package service.routing
 
 import org.jetbrains.exposed.sql.transactions.transaction
+import repository.lists.ShoppingList
 import repository.shelves.Shelf
 import repository.shelves.ShelfRack
 import repository.shelves.Shelves
@@ -13,9 +14,20 @@ class RouteFinder(private val listService: ListService) {
         // Fruits, Dairy, Seafood, Sweets
         return transaction {
             val shelves = Shelf.find { Shelves.product inList list.products.map { it.product.id } }
-            val ids = shelves.map { ShelfRack[it.rack].id.value }
-            println("IDs are $ids")
-            val path = convert(graph, Graph.Node(start), Graph.Node(end), ids.map { Graph.Node(it) })
+            val racks = shelves.map { shelf -> ShelfRack[shelf.rack] }
+
+            val rackProductMap = racks.associate { rack ->
+                Graph.Node(rack.id.value) to rack.shelves.mapNotNull { shelf ->
+                    val index = list.products.indexOfFirst { it.product == shelf.product }
+                    if (index == -1) null else index
+                }
+            }
+
+            val path = convert(graph,
+                    Graph.Node(start),
+                    Graph.Node(end),
+                    rackProductMap,
+                    racks.map { rack -> Graph.Node(rack.id.value) })
             println("Generated path $path")
             return@transaction path
         }
@@ -52,7 +64,12 @@ class RouteFinder(private val listService: ListService) {
         }
     }
 
-    fun <ID> convert(graph: Graph<ID>, start: Graph.Node<ID>, end: Graph.Node<ID>, waypoints: List<Graph.Node<ID>>): String {
+
+    fun <ID> convert(graph: Graph<ID>,
+                     start: Graph.Node<ID>,
+                     end: Graph.Node<ID>,
+                     productMap: Map<Graph.Node<ID>, List<Int>>,
+                     waypoints: List<Graph.Node<ID>>): String {
         val route = solver(graph, start, end, waypoints)
         val builder = StringBuilder()
         val sep = ','
@@ -78,6 +95,10 @@ class RouteFinder(private val listService: ListService) {
                 }
                 if (node in waypoints) {
                     builder.append("stop$delim${node.id}")
+                    val products = productMap[node]
+                    builder.append("{${products?.joinToString("|")}}")
+
+
                 } else {
                     builder.append("pass$delim${node.id}")
                 }

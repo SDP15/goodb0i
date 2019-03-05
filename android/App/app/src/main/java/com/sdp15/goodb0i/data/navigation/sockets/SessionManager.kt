@@ -140,6 +140,7 @@ class SessionManager(
         Timber.i("Found point $point")
         if (point is Route.RoutePoint.Stop) {
             //TODO
+
             currentListProduct.postValue(shoppingList.products.first())
         }
     }
