@@ -33,7 +33,7 @@ class RouteFinder(private val listService: ListService, private val graph: Graph
         // Fruits, Dairy, Seafood, Sweets
         return transaction {
             val shelves = Shelf.find { Shelves.product inList list.products.map { it.product.id } }
-            val racks = shelves.map { shelf -> ShelfRack[shelf.rack] }
+            val racks = shelves.map { shelf -> ShelfRack[shelf.rack] }.toSet()
 
             val rackProductMap = racks.associate { rack ->
                 Graph.Node(rack.id.value) to rack.shelves.mapNotNull { shelf ->
