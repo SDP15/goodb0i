@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.sdp15.goodb0i.R
+import com.sdp15.goodb0i.data.store.lists.ListItem
 import com.sdp15.goodb0i.view.BaseFragment
 import kotlinx.android.synthetic.main.layout_navigating_to.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -25,15 +26,28 @@ class NavigatingToFragment : BaseFragment() {
     override fun onResume() {
         super.onResume()
         vm.bind()
-        vm.currentProduct.observe(this, Observer { items ->
-            navigation_item_name.text = items.first().product.name
-            if (items.size > 1) {
-                // TODO: Other products on the rack
+        vm.destination.observe(this, Observer { destination ->
+            if (destination is NavigationDestination.EndPoint) {
+                //TODO
+            } else if (destination is NavigationDestination.ShelfRack) {
+                navigation_item_name.text = destination.toCollect.first().product.name
+                if (destination.toCollect.size > 1) {
+                    // TODO: Other products on the rack
+                }
+                //TODO: Next item, quantity information
             }
-            //TODO: Next item, quantity information
         })
         vm.transitions.observe(this, Observer {
             findNavController().navigate(it)
         })
     }
+
+    sealed class NavigationDestination {
+
+        data class ShelfRack(val toCollect: List<ListItem>) : NavigationDestination()
+
+        object EndPoint : NavigationDestination()
+
+    }
+
 }
