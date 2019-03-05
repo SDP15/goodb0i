@@ -96,7 +96,7 @@ class RouteFinder(private val listService: ListService) {
                 if (node in waypoints) {
                     builder.append("stop$delim${node.id}")
                     val products = productMap[node]
-                    builder.append("{${products?.joinToString("|")}}")
+                    builder.append(products?.joinToString(separator = "$delim", prefix = "$delim"))
 
 
                 } else {
