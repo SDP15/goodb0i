@@ -16,6 +16,7 @@ import repository.DatabaseFactory
 import repository.TestDataProvider
 import repository.exposedTypeAdapters
 import service.*
+import service.routing.Graph
 import service.routing.RouteFinder
 import service.shopping.AppManager
 import service.shopping.SessionManager
@@ -48,7 +49,21 @@ fun Application.module() {
 
     val trolleyManager = TrolleyManager()
     val appManager = AppManager()
-    val routeFinder = RouteFinder(listService)
+    val routeFinder = RouteFinder(listService,
+            Graph.graph<Int> {
+                // Test shelves are 3, 1, 5, 7
+                // 1         2         3              4         5       6         7         8
+                //"Dairy", "Bakery", "Fruits", "Vegetables", "Seafood", "Meat", "Sweets", "Food cupboard"
+                10 to 3 cost 5 // Start to fruits
+                3 to 11 cost 5  // Fruits to top left
+                11 to 12 cost 5 // Top left to top right
+                11 to 1 cost 5 // Top left to dairy
+                1 to 5 cost 5 // dairy to seafood
+                5 to 12 cost 5// Seafood to top right
+                12 to 7 cost 5// Top right to sweets
+                7 to 13 cost 5// Sweets to end
+
+            })
     val sessionManager = SessionManager(routeFinder)
 
 

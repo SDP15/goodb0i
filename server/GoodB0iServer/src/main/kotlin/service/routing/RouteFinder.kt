@@ -1,13 +1,32 @@
 package service.routing
 
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.koin.core.time.logDuration
+import org.koin.core.time.measureDuration
 import repository.lists.ShoppingList
 import repository.shelves.Shelf
 import repository.shelves.ShelfRack
 import repository.shelves.Shelves
 import service.ListService
+import kotlin.system.measureNanoTime
 
-class RouteFinder(private val listService: ListService) {
+class RouteFinder(private val listService: ListService, private val graph: Graph<Int>) {
+
+    private val cache = HashMap<Graph.Node<Int>, DijkstraResult<Int>>()
+
+    init {
+        generateAllPaths()
+    }
+
+    fun generateAllPaths() {
+        val dur = measureNanoTime {
+            graph.forEach { vertex ->
+                cache[vertex.node] = dijkstras(vertex.node, graph)
+            }
+        } / 1E9
+        println("Precomputation complete in $dur")
+
+    }
 
     fun plan(code: Long): String {
         val list = listService.loadList(code)!!
@@ -43,20 +62,6 @@ class RouteFinder(private val listService: ListService) {
         }
     }
 
-    val graph = Graph.graph<Int> {
-        // Test shelves are 3, 1, 5, 7
-        // 1         2         3              4         5       6         7         8
-        //"Dairy", "Bakery", "Fruits", "Vegetables", "Seafood", "Meat", "Sweets", "Food cupboard"
-        10 to 3 cost 5 // Start to fruits
-        3 to 11 cost 5  // Fruits to top left
-        11 to 12 cost 5 // Top left to top right
-        11 to 1 cost 5 // Top left to dairy
-        1 to 5 cost 5 // dairy to seafood
-        5 to 12 cost 5// Seafood to top right
-        12 to 7 cost 5// Top right to sweets
-        7 to 13 cost 5// Sweets to end
-
-    }
 
     private fun generateSupermarket(aisles: Int, racksPerAisle: Int, splitsPerAisle: Int) {
         (1..aisles).forEach {
@@ -64,6 +69,48 @@ class RouteFinder(private val listService: ListService) {
         }
     }
 
+
+    private fun intSolve(graph: Graph<Int>, start: Int, end: Int, rackToListMap: Map<Int, List<Int>>, waypoints: List<Int>): String {
+        val route = solver(graph, Graph.Node(start), Graph.Node(end), waypoints.map { Graph.Node(it) })
+        val builder = StringBuilder()
+        val sep = ','
+        val delim = '%'
+        var previous = Graph.Node(start)
+        route.forEach { node ->
+            if (node.id == start) {
+                builder.append("start")
+            } else if (node.id == end) {
+                builder.append("end")
+            } else {
+                // Add a turn if there's more than one way to get to the next node
+                val edges = graph[previous]
+                if (edges != null && edges.size > 1) {
+                    val index = edges.indexOfFirst { edge -> edge.to == node }
+                    println("Node $node Edges are $edges. Index is $index")
+                    when (index) {
+                        //0 -> builder.append("left")
+                        0 -> builder.append("center")
+                        1 -> builder.append("right")
+                    }
+                    builder.append(sep)
+                }
+                if (node.id in waypoints) {
+                    builder.append("stop$delim${node.id}")
+                    val products = rackToListMap[node.id]
+                    builder.append(products?.joinToString(separator = "$delim", prefix = "$delim"))
+
+
+                } else {
+                    builder.append("pass$delim${node.id}")
+                }
+            }
+
+            builder.append(sep)
+            previous = node
+        }
+        builder.setLength(builder.length - 1) // Remove last comma
+        return builder.toString()
+    }
 
     fun <ID> convert(graph: Graph<ID>,
                      start: Graph.Node<ID>,
