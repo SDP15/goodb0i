@@ -19,16 +19,20 @@ class Route private constructor(
             val points = mutableListOf<RoutePoint>()
             data.split(separator).forEach { point ->
                 val type = point.substringBefore(delim)
-                val id = point.substringAfter(delim)
-                Timber.i("Type $type id $id")
+                val body = point.substringAfter(delim)
+                Timber.i("Type $type id $body")
                 when (type) {
                     "start" -> points.add(RoutePoint.Start)
                     "end" -> points.add(RoutePoint.End)
                     "left" -> points.add(RoutePoint.TurnLeft)
                     "right" -> points.add(RoutePoint.TurnRight)
                     "center" -> points.add(RoutePoint.TurnCenter)
-                    "stop" -> points.add(RoutePoint.Stop(id))
-                    "pass" -> points.add(RoutePoint.Pass(id))
+                    "stop" -> {
+                        val id = body.substringBefore(delim) // First int value
+                        val indices = body.substringAfter(delim).split(delim).map { it.toInt() }
+                        points.add(RoutePoint.Stop(id, indices))
+                    }
+                    "pass" -> points.add(RoutePoint.Pass(body))
                 }
             }
             Timber.i("Created route with points $points")
@@ -54,7 +58,7 @@ class Route private constructor(
         object TurnCenter : RoutePoint()
 
         // A point at which to stop
-        data class Stop(val id: String) : RoutePoint()
+        data class Stop(val id: String, val productIndices: List<Int>) : RoutePoint()
 
         // Constant end point
         object End : RoutePoint()
