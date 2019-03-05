@@ -37,8 +37,9 @@ class SessionManager(
     //TODO: If there isn't a use for publicly exposing direct message access, remove this. (Currently no usages)
     override val incoming: LiveData<Message.IncomingMessage> = incomingMessages
 
-    private val currentListProduct = MutableLiveData<List<ListItem>>()
-    override val currentProducts: LiveData<List<ListItem>> = currentListProduct
+    private val remainingRackProducts: MutableList<ListItem> = mutableListOf()
+    private val currentRackProducts = MutableLiveData<List<ListItem>>()
+    override val currentProducts: LiveData<List<ListItem>> = currentRackProducts
 
     private val lastScannedProduct = MutableLiveData<Product>()
     override val scannedProduct: LiveData<Product> = lastScannedProduct
@@ -134,13 +135,16 @@ class SessionManager(
     }
 
     private fun postMovingState() {
-        Timber.i("Moving from ${route[index]} to ${route[index+1]}")
+        Timber.i("Moving from ${route[index]} to ${route[index + 1]}")
         sessionState.postValue(ShoppingSessionState.NavigatingTo(route[index], route[index + 1]))
-        val point = route.subList(fromIndex = index, toIndex = route.size).firstOrNull { point -> point is Route.RoutePoint.Stop  }
+        val point = route.subList(fromIndex = index, toIndex = route.size)
+            .firstOrNull { point -> point is Route.RoutePoint.Stop }
         Timber.i("Found point $point")
         if (point is Route.RoutePoint.Stop) {
             val indices = point.productIndices
-            currentListProduct.postValue(shoppingList.products.slice(indices))
+            remainingRackProducts.clear()
+            remainingRackProducts.addAll(shoppingList.products.slice(indices))
+            currentRackProducts.postValue(remainingRackProducts)
         }
     }
 
@@ -176,13 +180,20 @@ class SessionManager(
      Either by the app or via message from trolley
      */
     private fun productAcceptedInternal() {
-        //TODO: Move to next Either Scanning or NavigatingTo state
-        val next = route[index + 1]
-        if (next is Route.RoutePoint.Stop) {
-            sessionState.postValue(ShoppingSessionState.Scanning(next))
-        } else {
-            //TODO: End state
+        val current = remainingRackProducts.first()
+        // Decrement quantity of current product
+        remainingRackProducts[0] = current.copy(quantity = current.quantity - 1)
+        if (remainingRackProducts.first().quantity == 0) {
+            remainingRackProducts.removeAt(0)
+        }
+        // If there are no products remaining on the rack, navigate to the next point
+        if (remainingRackProducts.isEmpty()) {
+            currentRackProducts.postValue(null) // Nothing left to observe
             postMovingState()
+        } else {
+            // Otherwise, we are still in the scanning state
+            currentRackProducts.postValue(remainingRackProducts)
+            sessionState.postValue(ShoppingSessionState.Scanning(route[index] as Route.RoutePoint.Stop))
         }
     }
 
