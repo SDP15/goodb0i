@@ -26,6 +26,7 @@ enum DriveNumber : int {
 array<unique_ptr<evutil::Drive>, 4> drives;
 unique_ptr<evutil::ColorSensor> leftColor, midColor, rightColor;
 unique_ptr<ev3dev::ultrasonic_sensor> sonar;
+power_supply battery{"lego-ev3-battery"};
 
 ofstream sensorLog;
 
@@ -588,7 +589,7 @@ private:
           rsend("Supported commands: help stop start moving? enqueue-stop "
                 "enqueue-forward enqueue-left enqueue-right queue-status "
                 "dump-queue clear-queue resume-from-stop-marker dump dump-hsv "
-                "disconnect\n");
+                "battery disconnect\n");
         } else if (cmd == "stop") {
           if (!halted) {
             sysSteering.requestStop(SUBSYS_ROBOT);
@@ -666,6 +667,12 @@ private:
         } else if (cmd == "disconnect") {
           rsend("disconnect OK\n");
           break;
+        } else if (cmd == "battery") {
+          float V{battery.measured_volts()};
+          float A{battery.measured_amps()};
+          snprintf(wbuf, sizeof wbuf, "battery volt %.3f max 8.4 amp %.6f OK\n",
+                   V, A);
+          rsend(wbuf);
         } else {
           rsend("unknown command FAIL\n");
         }
