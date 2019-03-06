@@ -405,7 +405,7 @@ protected:
       if (markerIgnoreStopwatch.elapsedMilliseconds() >= markerIgnoreMs) {
         ignoreMarker = false;
         markerIgnoreStopwatch.pause();
-      } else {
+      } else if (seeingMarker) {
         seeingMarker = false;
         // make the robot blind to the marker
         lcol = evutil::Color::line;
@@ -528,8 +528,7 @@ protected:
             (turnBias == Direction::right) ? Direction::right : Direction::left;
       }
     }
-    // Rolling average to smooth out steering
-    avgLineAngle = (avgLineAngle + 7 * lineAngle) / 8;
+    avgLineAngle = lineAngle;
 
     sysSteering->pushCommand(
         {SteeringSubsystem::Command::CommandType::setTurnAngle, 0, 0,
