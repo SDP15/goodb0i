@@ -15,6 +15,7 @@ import com.sdp15.goodb0i.data.store.products.ProductLoader
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 /**
  * Manages state across a shopping session
@@ -27,7 +28,6 @@ class SessionManager(
     private val productLoader: ProductLoader
 ) : ShoppingSessionManager<Message.IncomingMessage> {
 
-
     private var uid: String = ""
     private var route: Route = Route.emptyRoute()
     private var index = 0
@@ -37,8 +37,9 @@ class SessionManager(
     //TODO: If there isn't a use for publicly exposing direct message access, remove this. (Currently no usages)
     override val incoming: LiveData<Message.IncomingMessage> = incomingMessages
 
-    private val currentListProduct = MutableLiveData<ListItem>()
-    override val currentProduct: LiveData<ListItem> = currentListProduct
+    private val remainingRackProducts: MutableList<ListItem> = mutableListOf()
+    private val currentRackProducts = MutableLiveData<List<ListItem>>()
+    override val currentProducts: LiveData<List<ListItem>> = currentRackProducts
 
     private val lastScannedProduct = MutableLiveData<Product>()
     override val scannedProduct: LiveData<Product> = lastScannedProduct
@@ -57,20 +58,36 @@ class SessionManager(
             }
         }
         sh.incomingMessages.observeForever { message ->
+            Timber.i("$message")
             var consume = false // We may consume the message and not emit it elsewhere
             when (message) {
                 is Message.IncomingMessage.Connected -> {
                     uid = message.id
                     sessionState.postValue(ShoppingSessionState.NegotiatingTrolley)
                 }
+                is Message.IncomingMessage.NoAvailableTrolley -> {
+                    sessionState.postValue(ShoppingSessionState.NoSession)
+                }
                 is Message.IncomingMessage.TrolleyConnected -> {
                     sessionState.postValue(ShoppingSessionState.Connected)
                 }
+                is Message.IncomingMessage.UserReady -> {
+                    //First moving state
+
+                    postMovingState()
+                }
                 is Message.IncomingMessage.RouteCalculated -> {
                     route = message.route
+                    sh.sendMessage(Message.OutgoingMessage.RouteReceived)
                 }
                 is Message.IncomingMessage.ReachedPoint -> {
                     consume = reachedPoint(message.id)
+                }
+                is Message.IncomingMessage.TrolleyAcceptedProduct -> {
+                    productAcceptedInternal()
+                }
+                is Message.IncomingMessage.TrolleyRejectedProduct -> {
+                    productRejectedInternal()
                 }
             }
             if (!consume) incomingMessages.postValue(message)
@@ -79,9 +96,11 @@ class SessionManager(
 
     override fun startSession(list: ShoppingList) {
         if (!sh.isConnected) {
+            Timber.i("Starting session")
             shoppingList = list
             sessionState.postValue(ShoppingSessionState.Connecting)
             sh.start(RetrofitProvider.root + "/app")
+            sh.sendMessage(Message.OutgoingMessage.PlanRoute(list.code))
         }
     }
 
@@ -94,13 +113,14 @@ class SessionManager(
       If we have reached a shelf, consume the message and switch to scanning state
      */
     private fun reachedPoint(id: String): Boolean {
-        val pointIndex = route.indexOfFirst { rp -> rp.id == id }
+        val pointIndex = route.indexOfFirst { rp -> rp is Route.RoutePoint.Stop && rp.id == id }
         val point = route.getOrNull(pointIndex)
-        if (point is Route.RoutePoint.EntryCollectionPoint) {
+        if (point is Route.RoutePoint.Stop) {
             index = pointIndex
+            Timber.i("At stop point")
             sessionState.postValue(ShoppingSessionState.Scanning(point))
             return true
-        } else if (point is Route.RoutePoint.Pass || point is Route.RoutePoint.TurnLeft || point is Route.RoutePoint.TurnRight) {
+        } else if (point is Route.RoutePoint.Pass || point is Route.RoutePoint.TurnLeft || point is Route.RoutePoint.TurnRight || point is Route.RoutePoint.TurnCenter) {
             // We don't want to change state if a tag scan is triggered while we are scanning
             // TODO: Make sure the Trolley scanning code doesn't post tags twice sequentially
             if (sessionState.value !is ShoppingSessionState.Scanning && sessionState.value !is ShoppingSessionState.Confirming) {
@@ -108,12 +128,29 @@ class SessionManager(
                 // We should already be in a NavigatingTo state at this point
                 sessionState.postValue(ShoppingSessionState.NavigatingTo(route[index - 1], route[index]))
             }
+        } else {
+            Timber.i("At other point $point")
         }
         return false
     }
 
     private fun postMovingState() {
-        sessionState.postValue(ShoppingSessionState.NavigatingTo(route[index], route[index + 1]))
+        Timber.i("Moving from ${route[index]} to ${route[index + 1]}")
+
+        val point = route.subList(fromIndex = index, toIndex = route.size)
+            .firstOrNull { point -> point is Route.RoutePoint.Stop }
+        Timber.i("Found point $point")
+        if (point is Route.RoutePoint.Stop) {
+            val indices = point.productIndices
+            remainingRackProducts.clear()
+            remainingRackProducts.addAll(shoppingList.products.slice(indices))
+            currentRackProducts.postValue(remainingRackProducts)
+            sessionState.postValue(ShoppingSessionState.NavigatingTo(route[index], point))
+        } else {
+            //TODO: This will happen when we reach the end of the stop points in the route
+            // Is this the behaviour we want or should it be NavigatingTo(route[index], End)?
+            sessionState.postValue(ShoppingSessionState.NavigatingTo(route[index], route[index+1]))
+        }
     }
 
     /*
@@ -140,19 +177,38 @@ class SessionManager(
 
     override fun productAccepted() {
         sh.sendMessage(Message.OutgoingMessage.ProductAccepted(lastScannedProduct.value!!.id))
-        //TODO: Move to next Either Scanning or NavigatingTo state
-        val next = route[index + 1]
-        if (next is Route.RoutePoint.EntryCollectionPoint) {
-            sessionState.postValue(ShoppingSessionState.Scanning(next))
-        } else {
-            //TODO: End state
+        productAcceptedInternal()
+    }
+
+    /*
+     Change session state when product is accepted
+     Either by the app or via message from trolley
+     */
+    private fun productAcceptedInternal() {
+        val current = remainingRackProducts.first()
+        // Decrement quantity of current product
+        remainingRackProducts[0] = current.copy(quantity = current.quantity - 1)
+        if (remainingRackProducts.first().quantity == 0) {
+            remainingRackProducts.removeAt(0)
+        }
+        // If there are no products remaining on the rack, navigate to the next point
+        if (remainingRackProducts.isEmpty()) {
+            currentRackProducts.postValue(null) // Nothing left to observe
             postMovingState()
+        } else {
+            // Otherwise, we are still in the scanning state
+            currentRackProducts.postValue(remainingRackProducts)
+            sessionState.postValue(ShoppingSessionState.Scanning(route[index] as Route.RoutePoint.Stop))
         }
     }
 
     override fun productRejected() {
         sh.sendMessage(Message.OutgoingMessage.ProductRejected(lastScannedProduct.value!!.id))
-        sessionState.postValue(ShoppingSessionState.Scanning(route[index] as Route.RoutePoint.EntryCollectionPoint))
+        productRejectedInternal()
+    }
+
+    private fun productRejectedInternal() {
+        sessionState.postValue(ShoppingSessionState.Scanning(route[index] as Route.RoutePoint.Stop))
     }
 
     override fun requestAssistance() {
@@ -161,6 +217,7 @@ class SessionManager(
 
     // Repeatedly attempt to reconnect to the server
     private fun attemptReconnection() {
+        //TODO: How to scope this
         GlobalScope.launch {
             //TODO: Break after some number of reconnection attempts
             while (!sh.isConnected) {

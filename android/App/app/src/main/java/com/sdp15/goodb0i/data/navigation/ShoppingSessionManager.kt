@@ -9,7 +9,7 @@ interface ShoppingSessionManager<IN> {
 
     val incoming: LiveData<IN>
 
-    val currentProduct: LiveData<ListItem>
+    val currentProducts: LiveData<List<ListItem>>
 
     val scannedProduct: LiveData<Product>
 

@@ -16,7 +16,6 @@ class ItemConfirmationViewModel : BaseViewModel<Any>() {
 
     override fun bind() {
         sm.state.observeForever(sessionStateObserver)
-        sm.incoming.observeForever(trolleyMessageListener)
     }
 
     private val sessionStateObserver = Observer<ShoppingSessionState> { state ->
@@ -27,16 +26,8 @@ class ItemConfirmationViewModel : BaseViewModel<Any>() {
             // Either scan rejected, or item on the same ShelfRack -> ScanningFragment or ItemFragment
             //TODO: Check that this pops the ItemConfirmationFragment
             transitions.postValue(ItemConfirmationFragmentDirections.actionConfirmationFragmentToItemFragment())
-            //TODO: Add check to go straight bak to ScannerFragment ??
+            //TODO: Add check to go straight back to ScannerFragment ??
             //transitions.postValue(ItemConfirmationFragmentDirections.actionConfirmationFragmentToScannerFragment())
-        }
-    }
-
-    private val trolleyMessageListener = Observer<Message.IncomingMessage> { message ->
-        if (message is Message.IncomingMessage.TrolleyAcceptedProduct) {
-            accept()
-        } else if (message is Message.IncomingMessage.TrolleyRejectedProduct) {
-            reject()
         }
     }
 
@@ -59,6 +50,5 @@ class ItemConfirmationViewModel : BaseViewModel<Any>() {
     override fun onCleared() {
         super.onCleared()
         sm.state.observeForever(sessionStateObserver)
-        sm.incoming.removeObserver(trolleyMessageListener)
     }
 }

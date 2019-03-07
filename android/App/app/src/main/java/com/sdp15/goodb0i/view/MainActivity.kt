@@ -5,11 +5,12 @@ import android.view.KeyEvent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.collection.CircularIntArray
 import androidx.navigation.findNavController
-import com.sdp15.goodb0i.R
-import com.sdp15.goodb0i.data.navigation.sockets.SocketHandler
 import com.sdp15.goodb0i.view.debug.Config
 import kotlinx.android.synthetic.main.activity_main.*
-import org.koin.android.ext.android.inject
+import android.app.Activity
+import android.R
+import android.view.inputmethod.InputMethodManager
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -21,10 +22,12 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(com.sdp15.goodb0i.R.layout.activity_main)
         supportActionBar?.hide()
-        findNavController(R.id.nav_host_fragment).addOnDestinationChangedListener { controller, destination, arguments ->
+        findNavController(com.sdp15.goodb0i.R.id.nav_host_fragment).addOnDestinationChangedListener { controller, destination, arguments ->
             // Keep track of id of the previous fragment. Currently only used by ListConfirmationFragment
+            val imm = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(nav_host_fragment.view?.windowToken, 0)
             fragmentHistory.addFirst(currentFragment)
             currentFragment = destination.id
         }
@@ -51,7 +54,7 @@ class MainActivity : AppCompatActivity() {
         return super.onKeyDown(keyCode, event)
     }
 
-    override fun onSupportNavigateUp(): Boolean = findNavController(R.id.nav_host_fragment).navigateUp()
+    override fun onSupportNavigateUp(): Boolean = findNavController(com.sdp15.goodb0i.R.id.nav_host_fragment).navigateUp()
 
 
 

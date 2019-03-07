@@ -1,12 +1,13 @@
 package com.sdp15.goodb0i.data.navigation
 
+import timber.log.Timber
+
 /*
  * A route is a list of RoutePoints
  */
 class Route private constructor(
-    points: List<RoutePoint>,
-    private val routePoints: List<RoutePoint> = mutableListOf(RoutePoint.Start) + points + mutableListOf(RoutePoint.End)
-) : List<Route.RoutePoint> by routePoints {
+    points: List<RoutePoint>
+) : List<Route.RoutePoint> by points {
 
 
     companion object {
@@ -17,23 +18,24 @@ class Route private constructor(
         fun fromString(data: String): Route? {
             val points = mutableListOf<RoutePoint>()
             data.split(separator).forEach { point ->
-                val id = point.substringBefore(delim)
-                val type = point.substringAfter(delim)
-                if (id.isEmpty()) return null
+                val type = point.substringBefore(delim)
+                val body = point.substringAfter(delim)
+                Timber.i("Type $type id $body")
                 when (type) {
-                    "pass" -> points.add(RoutePoint.Pass(id))
-                    "turnr" -> points.add(RoutePoint.TurnRight(id))
-                    "turnl" -> points.add(RoutePoint.TurnLeft(id))
-                    "stop" -> points.add(RoutePoint.Stop(id))
-                    else -> {
-                        if (type.length == 36) { //UUID string is always 36 characters
-                            points.add(RoutePoint.EntryCollectionPoint(id, type))
-                        } else {
-                            return null
-                        }
+                    "start" -> points.add(RoutePoint.Start)
+                    "end" -> points.add(RoutePoint.End)
+                    "left" -> points.add(RoutePoint.TurnLeft)
+                    "right" -> points.add(RoutePoint.TurnRight)
+                    "center" -> points.add(RoutePoint.TurnCenter)
+                    "stop" -> {
+                        val id = body.substringBefore(delim) // First int value
+                        val indices = body.substringAfter(delim).split(delim).map { it.toInt() }
+                        points.add(RoutePoint.Stop(id, indices))
                     }
+                    "pass" -> points.add(RoutePoint.Pass(body))
                 }
             }
+            Timber.i("Created route with points $points")
             return Route(points)
         }
 
@@ -41,26 +43,25 @@ class Route private constructor(
 
     }
 
-    sealed class RoutePoint(val id: String) {
+    sealed class RoutePoint {
 
         // Constant start point
-        object Start : RoutePoint("start")
+        object Start : RoutePoint()
 
         // A point to be passed through (only used to ensure that we are still on track)
-        class Pass(id: String) : RoutePoint(id)
+        data class Pass(val id: String) : RoutePoint()
 
-        class TurnRight(id: String) : RoutePoint(id)
+        object TurnLeft : RoutePoint()
 
-        class TurnLeft(id: String) : RoutePoint(id)
+        object TurnRight : RoutePoint()
 
-        // A shelf at which we should stop to collect a product
-        class EntryCollectionPoint(id: String, val productId: String) : RoutePoint(id)
+        object TurnCenter : RoutePoint()
 
         // A point at which to stop
-        class Stop(id: String) : RoutePoint(id)
+        data class Stop(val id: String, val productIndices: List<Int>) : RoutePoint()
 
         // Constant end point
-        object End : RoutePoint("end")
+        object End : RoutePoint()
 
     }
 

@@ -6,9 +6,9 @@ sealed class Message {
 
         sealed class FromTrolley : IncomingMessage() {
 
-            object UserAtTrolley : FromTrolley()
-
             object ReceivedRoute : FromTrolley()
+
+            object UserReady : FromTrolley()
 
             object TrolleyAcceptedProduct : FromTrolley()
 
@@ -21,11 +21,13 @@ sealed class Message {
 
         sealed class FromApp : IncomingMessage() {
 
+            data class PlanRoute(val code: Long) : FromApp()
+
             object ReceivedRoute : FromApp()
 
             data class Reconnect(val oldId: String) : FromApp()
 
-            object ProductScanned : FromApp()
+            data class ProductScanned(val id: String) : FromApp()
 
             object AppRejectedProduct : FromApp()
 
@@ -47,9 +49,9 @@ sealed class Message {
 
             object AssignedToApp : ToTrolley()
 
-            data class Route(val route: String) : ToTrolley()
+            data class RouteCalculated(val route: String) : ToTrolley()
 
-            object AppScannedProduct : ToTrolley()
+            data class AppScannedProduct(val id: String) : ToTrolley()
 
             object AppAcceptedProduct : ToTrolley()
 
@@ -61,7 +63,7 @@ sealed class Message {
 
             object TrolleyAssigned : ToApp()
 
-            object UserAtTrolley : ToApp()
+            object UserReady : ToApp()
 
             data class Route(val route: String) : ToApp()
 
@@ -81,13 +83,14 @@ sealed class Message {
         fun messageFromAppString(message: String): IncomingMessage.FromApp {
             val type = message.substringBefore(DELIM)
             return when (type) {
-                "RC" -> IncomingMessage.FromApp.Reconnect(message.substringAfter(DELIM))
-                "PS" -> IncomingMessage.FromApp.ProductScanned
-                "PA" -> IncomingMessage.FromApp.AppAcceptedProduct
-                "PR" -> IncomingMessage.FromApp.AppRejectedProduct
-                "RH" -> IncomingMessage.FromApp.RequestHelp
-                "SP" -> IncomingMessage.FromApp.RequestStop
-                "RR" -> IncomingMessage.FromApp.ReceivedRoute
+                "Reconnect" -> IncomingMessage.FromApp.Reconnect(message.substringAfter(DELIM))
+                "ProductScanned" -> IncomingMessage.FromApp.ProductScanned(message.substringAfter(DELIM))
+                "AcceptedProduct" -> IncomingMessage.FromApp.AppAcceptedProduct
+                "RejectedProduct" -> IncomingMessage.FromApp.AppRejectedProduct
+                "RequestHelp" -> IncomingMessage.FromApp.RequestHelp
+                "Stop" -> IncomingMessage.FromApp.RequestStop
+                "ReceivedRoute" -> IncomingMessage.FromApp.ReceivedRoute
+                "PlanRoute" -> IncomingMessage.FromApp.PlanRoute(message.substringAfter(DELIM).toLong())
                 else -> IncomingMessage.FromApp.InvalidMessage(message)
             }
         }
@@ -95,27 +98,27 @@ sealed class Message {
         fun messageFromTrolleyString(message: String): IncomingMessage.FromTrolley {
             val type = message.substringBefore(DELIM)
             return when (type) {
-                "RP" -> IncomingMessage.FromTrolley.ReachedPoint(message.substringAfter(DELIM))
-                "PA" -> IncomingMessage.FromTrolley.TrolleyAcceptedProduct
-                "PR" -> IncomingMessage.FromTrolley.TrolleyRejectedProduct
-                "UT" -> IncomingMessage.FromTrolley.UserAtTrolley
-                "RR" -> IncomingMessage.FromTrolley.ReceivedRoute
+                "ReachedPoint" -> IncomingMessage.FromTrolley.ReachedPoint(message.substringAfter(DELIM))
+                "AcceptedProduct" -> IncomingMessage.FromTrolley.TrolleyAcceptedProduct
+                "RejectedProduct" -> IncomingMessage.FromTrolley.TrolleyRejectedProduct
+                "UserReady" -> IncomingMessage.FromTrolley.UserReady
+                "ReceivedRoute" -> IncomingMessage.FromTrolley.ReceivedRoute
                 else -> IncomingMessage.FromTrolley.InvalidMessage(message)
             }
         }
 
         fun messageToString(message: OutgoingMessage): String = when (message) {
-            is OutgoingMessage.ToApp.ReachedPoint -> "RP$DELIM${message.point}"
-            is OutgoingMessage.ToApp.TrolleyAcceptedProduct -> "TA"
-            is OutgoingMessage.ToApp.TrolleyRejectedProduct -> "TR"
-            is OutgoingMessage.ToApp.Route -> "RC$DELIM${message.route}"
-            is OutgoingMessage.ToApp.TrolleyAssigned -> "TA$DELIM"
-            is OutgoingMessage.ToApp.UserAtTrolley -> "UT$DELIM"
-            is OutgoingMessage.ToTrolley.AppAcceptedProduct -> "AA"
-            is OutgoingMessage.ToTrolley.AppRejectedProduct -> "AR"
-            is OutgoingMessage.ToTrolley.AppScannedProduct -> "AS"
-            is OutgoingMessage.ToTrolley.AssignedToApp -> "AA$DELIM"
-            is OutgoingMessage.ToTrolley.Route -> "RC$DELIM${message.route}"
+            is OutgoingMessage.ToApp.ReachedPoint -> "ReachedPoint$DELIM${message.point}"
+            is OutgoingMessage.ToApp.TrolleyAcceptedProduct -> "TrolleyAcceptedProduct$DELIM"
+            is OutgoingMessage.ToApp.TrolleyRejectedProduct -> "TrolleyRejectedProduct$DELIM"
+            is OutgoingMessage.ToApp.Route -> "RouteCalculated$DELIM${message.route}"
+            is OutgoingMessage.ToApp.TrolleyAssigned -> "TrolleyAssigned$DELIM"
+            is OutgoingMessage.ToApp.UserReady -> "UserReady$DELIM"
+            is OutgoingMessage.ToTrolley.AppAcceptedProduct -> "AppAcceptedProduct$DELIM"
+            is OutgoingMessage.ToTrolley.AppRejectedProduct -> "AppRejectedProduct$DELIM"
+            is OutgoingMessage.ToTrolley.AppScannedProduct -> "AppScannedProduct$DELIM${message.id}"
+            is OutgoingMessage.ToTrolley.AssignedToApp -> "Assigned$DELIM"
+            is OutgoingMessage.ToTrolley.RouteCalculated -> "RouteCalculated$DELIM${message.route}"
         }
     }
 

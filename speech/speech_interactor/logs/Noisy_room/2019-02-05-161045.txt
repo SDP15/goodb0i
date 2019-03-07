@@ -1,0 +1,7 @@
+Hello there, in order to use good boy, please say: start.
+Your options are: start, n/a, and repeat.
+Keyword detected: n/a
+Your options are: start, n/a, and repeat.
+Keyword detected: n/a
+Your options are: start, n/a, and repeat.
+Keyword detected: n/a

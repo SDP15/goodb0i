@@ -17,7 +17,9 @@ import java.nio.charset.StandardCharsets
 import java.util.concurrent.TimeUnit
 
 @UseExperimental(ObsoleteCoroutinesApi::class)
-fun Route.sockets(sessionManager: SessionManager, trolleyManager: TrolleyManager, appManager: AppManager) {
+fun Route.sockets(sessionManager: SessionManager,
+                  trolleyManager: TrolleyManager,
+                  appManager: AppManager) {
 
     /*
     https://ktor.io/servers/features/websockets.html
@@ -37,7 +39,9 @@ fun Route.sockets(sessionManager: SessionManager, trolleyManager: TrolleyManager
 
 
     webSocket("/trolley") {
-        
+
+        println("Trolley Connected")
+
         val nonce = generateNonce()
 
         trolleyManager.joinTrolley(nonce, this)
@@ -54,6 +58,7 @@ fun Route.sockets(sessionManager: SessionManager, trolleyManager: TrolleyManager
     }
 
     webSocket("/app") {
+        println("Socket with app opened")
         val trolley = trolleyManager.assignAvailableTrolley()
         if (trolley != null) {
             val nonce = generateNonce()
@@ -78,8 +83,9 @@ fun Route.sockets(sessionManager: SessionManager, trolleyManager: TrolleyManager
                 appManager.removeApp(nonce, this)
             }
         } else {
+            println("No available trolley")
             outgoing.send(Frame.Text("NT&"))
-            close(CloseReason(CloseReason.Codes.TRY_AGAIN_LATER, "No available trolleys"))
+            //close(CloseReason(CloseReason.Codes.TRY_AGAIN_LATER, "No available trolleys"))
         }
 
 

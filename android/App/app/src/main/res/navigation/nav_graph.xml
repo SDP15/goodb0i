@@ -17,16 +17,13 @@
 
         <action
             android:id="@+id/action_welcome_fragment_to_list_creation_fragment"
-            app:destination="@id/list_creation_fragment" />
+            app:destination="@id/scanner_fragment" />
         <action
             android:id="@+id/action_welcome_fragment_to_view_shopping_list"
             app:destination="@id/saved_lists_fragment" />
         <action
             android:id="@+id/action_welcome_fragment_to_code_fragment"
             app:destination="@id/code_fragment" />
-        <action
-            android:id="@+id/action_welcome_fragment_to_scanner_fragment"
-            app:destination="@id/scanner_fragment" />
 
     </fragment>
 
@@ -120,18 +117,29 @@
             android:id="@+id/action_list_confirmation_fragment_to_list_creation_fragment"
             app:destination="@id/list_creation_fragment" />
         <action
-            android:id="@+id/action_list_confirmation_fragment_to_navigatingToFragment"
-            app:launchSingleTop="true"
-            app:destination="@id/navigatingToFragment" />
+            android:id="@+id/action_list_confirmation_fragment_to_shopConnectionFragment"
+            app:destination="@id/shopConnectionFragment" />
     </fragment>
     <fragment
         android:id="@+id/navigatingToFragment"
-        android:name="com.sdp15.goodb0i.view.navigation.moving.NavigatingToFragment"
+        android:name="com.sdp15.goodb0i.view.navigation.navigating.NavigatingToFragment"
         android:label="NavigatingToFragment"
         tools:layout="@layout/layout_navigating_to">
         <action
             android:id="@+id/action_navigatingToFragment_to_item_fragment"
             app:destination="@id/item_fragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/shopConnectionFragment"
+        android:name="com.sdp15.goodb0i.view.navigation.connecting.ShopConnectionFragment"
+        android:label="ShopConnectionFragment"
+        tools:layout="@layout/layout_shop_connection">
+        <argument
+            android:name="shopping_list"
+            app:argType="com.sdp15.goodb0i.data.store.lists.ShoppingList" />
+        <action
+            android:id="@+id/action_shopConnectionFragment_to_navigatingToFragment"
+            app:destination="@id/navigatingToFragment" />
     </fragment>
 
 

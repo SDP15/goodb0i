@@ -22,7 +22,7 @@ class SocketHandler<IN, OUT>(private val transform: SocketMessageTransformer<IN,
     fun start(url: String) {
         val request = Request.Builder().url(url).build()
         val client = OkHttpClient()
-        Timber.i("Starting websocket")
+        Timber.i("Starting websocket for $url")
         socket = client.newWebSocket(request, SocketListener())
     }
 

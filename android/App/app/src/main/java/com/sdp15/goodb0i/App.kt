@@ -14,6 +14,8 @@ import com.sdp15.goodb0i.data.store.cache.RoomShoppingListStore
 import com.sdp15.goodb0i.data.store.cache.ShoppingListStore
 import com.sdp15.goodb0i.data.store.lists.ListManager
 import com.sdp15.goodb0i.data.store.lists.RetrofitListManager
+import com.sdp15.goodb0i.data.store.price.PriceComputer
+import com.sdp15.goodb0i.data.store.price.SimplePriceComputer
 import com.sdp15.goodb0i.data.store.products.ProductLoader
 import com.sdp15.goodb0i.data.store.products.RetrofitProductLoader
 import com.sdp15.goodb0i.data.store.products.TestDataProductLoader
@@ -24,7 +26,8 @@ import com.sdp15.goodb0i.view.list.confirmation.ListConfirmationViewModel
 import com.sdp15.goodb0i.view.list.creation.ListViewModel
 import com.sdp15.goodb0i.view.list.saved.SavedListsViewModel
 import com.sdp15.goodb0i.view.navigation.confirmation.ItemConfirmationViewModel
-import com.sdp15.goodb0i.view.navigation.moving.NavigatingToViewModel
+import com.sdp15.goodb0i.view.navigation.connecting.ShopConnectionViewModel
+import com.sdp15.goodb0i.view.navigation.navigating.NavigatingToViewModel
 import com.sdp15.goodb0i.view.navigation.product.ProductViewModel
 import com.sdp15.goodb0i.view.navigation.scanner.ScannerViewModel
 import com.sdp15.goodb0i.view.welcome.WelcomeViewModel
@@ -64,6 +67,7 @@ class App : Application() {
             viewModel<ListViewModel>()
             viewModel<SavedListsViewModel>()
             viewModel<NavigatingToViewModel>()
+            viewModel<ShopConnectionViewModel>()
         },
         module {
             single<ProductLoader> {
@@ -88,6 +92,7 @@ class App : Application() {
             single<ShoppingSessionManager<Message.IncomingMessage>> {
                 SessionManager(SocketHandler(transform = Message.Transformer), get())
             }
+            single<PriceComputer> { SimplePriceComputer }
         }
     )
 }

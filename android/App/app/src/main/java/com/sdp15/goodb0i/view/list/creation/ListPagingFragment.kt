@@ -42,7 +42,6 @@ class ListPagingFragment : BaseFragment() {
         val vp = ViewPagerAdapter(childFragmentManager)
         list_viewpager.adapter = vp
         //list_tab_layout.setupWithViewPager(list_viewpager)
-
     }
 
     override fun onResume() {
@@ -59,6 +58,7 @@ class ListPagingFragment : BaseFragment() {
                 setCurrentItem(if (currentItem == 1) 0 else 1, true)
             }
         }
+        floating_search_view.setOnQueryChangeListener(vm::onQueryChange)
         list_viewpager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrollStateChanged(state: Int) {
 

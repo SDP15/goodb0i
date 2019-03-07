@@ -14,6 +14,4 @@ object Products : UUIDTable() {
     val price = double("price")
     val superDepartment = varchar("superDepartment", 50)
     val unitPrice = double("unitPrice")
-
-
 }

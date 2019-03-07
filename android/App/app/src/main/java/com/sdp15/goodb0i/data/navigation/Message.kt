@@ -27,19 +27,14 @@ sealed class Message {
          */
         data class ReachedPoint(val id: String) : IncomingMessage()
 
-        /**
-         *  Trolley has begun moving
-         */
-        data class MovementBegun(val type: Movement) : IncomingMessage()
-
-        enum class Movement {
-            LINEAR, TURN
-        }
+        object UserReady : IncomingMessage()
 
 
         object TrolleyAcceptedProduct : IncomingMessage()
 
         object TrolleyRejectedProduct : IncomingMessage()
+
+        object NoAvailableTrolley : IncomingMessage()
 
         /*
          Message string couldn't be parsed
@@ -49,6 +44,8 @@ sealed class Message {
     }
 
     sealed class OutgoingMessage : Message() {
+
+        data class PlanRoute(val code: Long) : OutgoingMessage()
 
         /**
          * Reconnect to session using old id
@@ -77,6 +74,8 @@ sealed class Message {
 
         object RequestHelp : OutgoingMessage()
 
+        object RouteReceived : OutgoingMessage()
+
         enum class StopReason(val code: Int) {
             HelpRequest(1)
         }
@@ -91,24 +90,30 @@ sealed class Message {
             val type = message.substringBefore(delim)
             return when (type) {
                 "ID" -> IncomingMessage.Connected(message.substringAfter(delim))
-                "TC" -> IncomingMessage.TrolleyConnected
-                "RC" -> {
+                "TrolleyConnected" -> IncomingMessage.TrolleyConnected
+                "RouteCalculated" -> {
                     val route = Route.fromString(message.substringAfter(delim))
-                    if (route != null) IncomingMessage.RouteCalculated(route) else IncomingMessage.InvalidMessage(message)
+                    if (route != null) IncomingMessage.RouteCalculated(route) else IncomingMessage.InvalidMessage(
+                        message
+                    )
                 }
-                "PT" -> IncomingMessage.ReachedPoint(message.substringAfter(delim))
+                "ReachedPoint" -> IncomingMessage.ReachedPoint(message.substringAfter(delim))
+                "UserReady" -> IncomingMessage.UserReady
+                "NoAvailableTrolley" -> IncomingMessage.NoAvailableTrolley
                 else -> IncomingMessage.InvalidMessage(message)
             }
         }
 
         override fun transformOutgoing(message: OutgoingMessage): String {
             return when (message) {
-                is OutgoingMessage.Reconnect -> "RC$delim${message.oldId}"
-                is OutgoingMessage.ProductScanned -> "PS$delim${message.id}"
-                is OutgoingMessage.ProductAccepted -> "PA$delim${message.id}"
-                is OutgoingMessage.ProductRejected -> "PR$delim${message.id}"
-                is OutgoingMessage.RequestHelp -> "RH$delim"
-                is OutgoingMessage.Stop -> "SP$delim${message.reason.code}"
+                is OutgoingMessage.PlanRoute -> "PlanRoute$delim${message.code}"
+                is OutgoingMessage.Reconnect -> "Reconnect$delim${message.oldId}"
+                is OutgoingMessage.ProductScanned -> "ProductScanned$delim${message.id}"
+                is OutgoingMessage.ProductAccepted -> "ProductAccepted$delim${message.id}"
+                is OutgoingMessage.ProductRejected -> "ProductRejected$delim${message.id}"
+                is OutgoingMessage.RequestHelp -> "RequestHelp$delim"
+                is OutgoingMessage.Stop -> "Stop$delim${message.reason.code}"
+                is OutgoingMessage.RouteReceived -> "RouteReceived$delim"
             }
         }
     }

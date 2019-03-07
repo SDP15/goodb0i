@@ -24,7 +24,7 @@ class ProductFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         vm.product.observe(this, Observer { item ->
-            product_text_name.text = getString(R.string.label_list_item_info, item.quantity, item.product.name)
+            product_text_name.text = getString(R.string.label_list_item_info, item.first().quantity, item.first().product.name)
             //TODO: Shelf contents
 
         })

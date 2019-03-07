@@ -7,6 +7,7 @@ import com.sdp15.goodb0i.data.store.cache.ShoppingListStore
 import com.sdp15.goodb0i.data.store.lists.ListItem
 import com.sdp15.goodb0i.data.store.lists.ListManager
 import com.sdp15.goodb0i.data.store.lists.ShoppingList
+import com.sdp15.goodb0i.data.store.price.PriceComputer
 import com.sdp15.goodb0i.data.store.products.Product
 import com.sdp15.goodb0i.data.store.products.ProductLoader
 import com.sdp15.goodb0i.move
@@ -25,6 +26,7 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(),
     private val productLoader: ProductLoader by inject()
     private val listManager: ListManager by inject()
     private val listStore: ShoppingListStore by inject()
+    private val priceComputer: PriceComputer by inject()
 
     private var existingList: ShoppingList? = null
 
@@ -79,7 +81,7 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(),
 
     fun onSaveList() {
         //TODO: Error handling
-        GlobalScope.launch(Dispatchers.IO) {
+        launch {
             val params = currentList.map { Pair(it.product.id, it.quantity) }
             // Create or update a list
             val result =
@@ -120,7 +122,7 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(),
     }
 
     private val price: Double
-        get() = currentList.sumByDouble { it.quantity * it.product.price }
+        get() = priceComputer.itemsPrice(currentList)
 
     fun incrementItem(product: Product) {
         Timber.i("Incrementing added ${product.name}")

@@ -1,0 +1,35 @@
+Hello there, in order to use good boy, please say: start.
+Hello, my name is Iona Trolley. Have you ever used good boy before?
+Keyword detected: start
+Would you like to do a quick tutorial?
+Keyword detected: no
+Your options are: yes, no, and repeat.
+Keyword detected: n/a
+Sorry, I have heard more than one possible option. Can you confirm your option?
+## Keyword detection error ##
+Multiple keywords detected: ['yes', 'repeat', 'yes']
+Perfect. Today I will be guiding you around the shop. You can give me a list of items or simply browse the shop. Would you like more information about this service?
+Keyword detected: yes
+I am a shopping trolley that follows a route around the shop to help you pick up items. To give me a list simply attach your smartphone and send me the list... I will tell you when we have arrived at an item. In this shop, the items will always be on your right. I will then tell you what item you have arrived at, and what shelf the item is on. Would you like an example?
+Keyword detected: yes
+Sorry, I have heard more than one possible option. Can you confirm your option?
+## Keyword detection error ##
+Multiple keywords detected: ['no', 'yes', 'no']
+The Garlic Bread is on the middle shelf... Once you have selected an item, you can scan its barcode using the camera on your phone.Once you have scanned the item, I can tell you information about the item you have picked up. Does this make sense?
+Keyword detected: yes
+That is not an option. Please try another option. To hear your options, say: options.
+Keyword detected: no
+That is not an option. Please try another option. To hear your options, say: options.
+Keyword detected: no
+Once we have finished your list, you can continue to browse, or you may go to the checkout. Shall we start shopping?
+Keyword detected: yes
+Okay. When you are ready to start shopping, say: shopping.To begin the tutorial, say: tutorial.
+Keyword detected: no
+Would you like to go shopping?
+Keyword detected: shopping
+Here we go!
+Keyword detected: yes
+Your options are: , and repeat.
+Keyword detected: n/a
+Your options are: , and repeat.
+Keyword detected: n/a

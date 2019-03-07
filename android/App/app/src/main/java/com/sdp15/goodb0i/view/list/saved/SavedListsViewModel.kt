@@ -1,5 +1,6 @@
 package com.sdp15.goodb0i.view.list.saved
 
+import androidx.lifecycle.LiveData
 import com.sdp15.goodb0i.data.store.cache.ShoppingListStore
 import com.sdp15.goodb0i.data.store.lists.ShoppingList
 import com.sdp15.goodb0i.view.BaseViewModel
@@ -9,7 +10,7 @@ class SavedListsViewModel : BaseViewModel<Any>() {
 
     private val listStore: ShoppingListStore by inject()
 
-    val lists = listStore.loadLists()
+    val lists: LiveData<List<ShoppingList>> = listStore.loadLists()
 
     override fun bind() {
 
