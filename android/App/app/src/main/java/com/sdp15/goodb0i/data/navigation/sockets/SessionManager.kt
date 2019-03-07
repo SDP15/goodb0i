@@ -59,6 +59,7 @@ class SessionManager(
         //TODO: Handle disconnecting observers
         sh.connectionState.observeForever { state ->
             if (state == SocketHandler.SocketState.ErrorDisconnect) {
+                Timber.i("Socket state disconnected. Attempting reconnect")
                 sessionState.postValue(ShoppingSessionState.Disconnected)
                 attemptReconnection()
             }
@@ -243,9 +244,11 @@ class SessionManager(
         GlobalScope.launch {
             //TODO: Break after some number of reconnection attempts
             while (!sh.isConnected) {
+                sh.start(RetrofitProvider.root + "/app")
                 sh.sendMessage(Message.OutgoingMessage.Reconnect(uid))
-                delay(1000)
+                delay(500)
             }
+            Timber.i("Socket reconnected")
         }
     }
 }
