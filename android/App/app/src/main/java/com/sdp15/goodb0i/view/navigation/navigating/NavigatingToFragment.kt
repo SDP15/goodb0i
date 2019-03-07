@@ -28,7 +28,7 @@ class NavigatingToFragment : BaseFragment() {
         vm.bind()
         vm.destination.observe(this, Observer { destination ->
             if (destination is NavigationDestination.EndPoint) {
-
+                navigation_item_name.text = "Tills"
             } else if (destination is NavigationDestination.ShelfRack) {
                 navigation_item_name.text = destination.toCollect.first().product.name
                 if (destination.toCollect.size > 1) {
