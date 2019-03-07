@@ -47,7 +47,7 @@ sealed class Message {
     sealed class OutgoingMessage : Message() {
         sealed class ToTrolley : OutgoingMessage() {
 
-            object AssignedToApp : ToTrolley()
+            data class AssignedToApp(val id: String) : ToTrolley()
 
             data class RouteCalculated(val route: String) : ToTrolley()
 
