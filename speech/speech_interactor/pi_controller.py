@@ -3,6 +3,7 @@ import websocket
 import os
 import socket
 import sys
+import requests
 
 try:
     import thread
@@ -11,9 +12,12 @@ except ImportError:
 import time
 
 
+
 class PiController:
 
+
     def __init__(self):
+        self.ip_port = "127.0.0.1:8080"
         # thread.start_new_thread(self.run_speech, ())
         
         
@@ -29,19 +33,22 @@ class PiController:
 
     def on_message(self, ws, message):
         print("Message: " + str(message))
-        if "AP" in message:
+        if "AppAcceptedProduct" in message:
             self.sp_interactor.cart(word="yes")
-        elif "AR" in message:
+        elif "AppRejectedProject" in message:
             self.sp_interactor.cart("no")
-        #
-        # elif "AS" in message:
-        #     sp_interactor.scanned(item)
-        elif "RC" in message:
+        elif "AppScannedProduct" in message:
+            item = message.split("&")
+            self.sp_interactor.scanned(item[1])
+        elif "RouteCalculated" in message:
             full_route = message.split("&")
             route_commands = full_route[1].split(",")
             print(route_commands)
-            self.send_message(ws, "RR&")
+            self.send_message(ws, "ReceivedRoute&")
             self.sp_interactor.react("connected")
+        elif "Assigned" in message:
+            list_id = message.split("&")
+            
 
     def on_error(self, ws, error):
         print(error)
@@ -76,6 +83,27 @@ class PiController:
         thread.start_new_thread(self.run, (ws, ))
         print("Websocket connection")
         return ws
+
+    def query_web_server(self, ws, request):
+        r = requests.get("http://"+self.ip_port + request)
+        list_json = r.json()
+    
+
+    # Retrieves all the items and quantities on the shopping list.
+    def get_shopping_list(self, list_file):
+        r = requests.get("http://" + self.ip_port + "/lists/load/1234567")
+        json  = r.json()
+        print("JSON is " + str(json))
+        self.stuff = json
+        self.list_pointer = 0
+        self.shopping_list = {}
+        self.ordered_list = []
+        for tings in self.stuff['products']:
+            self.shopping_list.update(
+                {tings['product']['name']: tings['quantity']})
+            self.ordered_list.append(tings['product']['name'])
+        print(self.shopping_list)
+        return (self.shopping_list, self.ordered_list)
 
     def initialise_ev3_socket(self):
         global connection
