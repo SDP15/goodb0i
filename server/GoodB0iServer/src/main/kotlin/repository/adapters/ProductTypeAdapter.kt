@@ -8,7 +8,7 @@ import repository.products.Product
 object ProductTypeAdapter : TypeAdapter<Product>() {
     override fun write(out: JsonWriter, value: Product) {
         out.beginObject()
-        out.name("id")
+        out.name("code")
         out.value(value.id.value.toString())
         out.name("name")
         out.value(value.name)

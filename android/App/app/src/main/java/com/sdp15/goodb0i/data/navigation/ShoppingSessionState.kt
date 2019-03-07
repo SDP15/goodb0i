@@ -22,18 +22,18 @@ sealed class ShoppingSessionState {
     // Asking server to allocate a trolley
     object NegotiatingTrolley : ShoppingSessionState()
 
-    // Moving towards a point
-    data class NavigatingTo(val from: Route.RoutePoint, val point: Route.RoutePoint) : ShoppingSessionState()
+    // Moving towards a at
+    data class NavigatingTo(val from: Route.RoutePoint.IndexPoint, val to: Route.RoutePoint.IndexPoint, val at: Route.RoutePoint.IndexPoint) : ShoppingSessionState()
 
     /* Scanning a particular item
        NB: This state covers both ProductFragment and ScannerFragment
       */
-    data class Scanning(val item: Route.RoutePoint.Stop) : ShoppingSessionState()
+    data class Scanning(val item: Route.RoutePoint.IndexPoint.IdentifiedPoint.Stop) : ShoppingSessionState()
 
     // User is being asked to confirm an item
     data class Confirming(val product: Product) : ShoppingSessionState()
 
-    // Reached end route point
+    // Reached end route at
     object Checkout : ShoppingSessionState()
 
     // User has requested help

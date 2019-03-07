@@ -19,23 +19,41 @@ class NavigatingToViewModel : BaseViewModel<Any>() {
 
     override fun bind() {
         sm.state.observeForever(stateObserver)
-        sm.currentProducts.observeForever(productsObserver)
-    }
-
-    private val productsObserver = Observer<List<ListItem>> { list ->
-        destination.postValue(NavigatingToFragment.NavigationDestination.ShelfRack(list))
     }
 
     private val stateObserver = Observer<ShoppingSessionState> { state ->
         if (state is ShoppingSessionState.NavigatingTo) {
             // TODO: Update progress display
-            if (state.point is Route.RoutePoint.End) {
-                destination.postValue(NavigatingToFragment.NavigationDestination.EndPoint)
+            Timber.i("Navigating from ${state.from.index} to ${state.to.index}, at ${state.at.index}")
+            if (state.to is Route.RoutePoint.IndexPoint.End) {
+                destination.postValue(
+                    NavigatingToFragment.NavigationDestination.EndPoint(
+                        distance = state.to.index - state.from.index,
+                        progress = state.at.index - state.from.index
+                    )
+                )
+            } else {
+                //TODO: Cleaner way to do this mess, we really just want to get the
+                // products once, as they won't change while we are navigating
+                sm.currentProducts.observeForever(object : Observer<List<ListItem>> {
+                    override fun onChanged(list: List<ListItem>) {
+                        destination.postValue(
+                            NavigatingToFragment.NavigationDestination.ShelfRack(
+                                distance = state.to.index - state.from.index,
+                                progress = state.at.index - state.from.index,
+                                toCollect = list
+                            )
+                        )
+                        sm.currentProducts.removeObserver(this)
+                    }
+                })
             }
         } else if (state is ShoppingSessionState.Disconnected) {
             //TODO: Do something about this
         } else if (state is ShoppingSessionState.Scanning) {
             transitions.postValue(NavigatingToFragmentDirections.actionNavigatingToFragmentToItemFragment())
+        } else if (state is ShoppingSessionState.Checkout) {
+            transitions.postValue(NavigatingToFragmentDirections.actionNavigatingToFragmentToCompleteFragment())
         }
         Timber.d("State: $state")
     }
@@ -43,6 +61,5 @@ class NavigatingToViewModel : BaseViewModel<Any>() {
     override fun onCleared() {
         super.onCleared()
         sm.state.removeObserver(stateObserver)
-        sm.currentProducts.removeObserver(productsObserver)
     }
 }

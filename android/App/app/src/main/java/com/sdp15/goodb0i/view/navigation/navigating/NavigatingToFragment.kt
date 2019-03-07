@@ -28,7 +28,7 @@ class NavigatingToFragment : BaseFragment() {
         vm.bind()
         vm.destination.observe(this, Observer { destination ->
             if (destination is NavigationDestination.EndPoint) {
-                //TODO
+
             } else if (destination is NavigationDestination.ShelfRack) {
                 navigation_item_name.text = destination.toCollect.first().product.name
                 if (destination.toCollect.size > 1) {
@@ -36,17 +36,24 @@ class NavigatingToFragment : BaseFragment() {
                 }
                 //TODO: Next item, quantity information
             }
+
+            if (destination.distance > 1) {
+                navigation_move_progress.visibility = View.VISIBLE
+                navigation_move_progress.text = getString(R.string.label_navigation_progress, destination.progress, destination.distance)
+            } else {
+                navigation_move_progress.visibility = View.GONE
+            }
         })
         vm.transitions.observe(this, Observer {
             findNavController().navigate(it)
         })
     }
 
-    sealed class NavigationDestination {
+    sealed class NavigationDestination(val distance: Int, val progress: Int) {
 
-        data class ShelfRack(val toCollect: List<ListItem>) : NavigationDestination()
+        class ShelfRack(distance: Int, progress: Int, val toCollect: List<ListItem>) : NavigationDestination(distance, progress)
 
-        object EndPoint : NavigationDestination()
+        class EndPoint(distance: Int, progress: Int) : NavigationDestination(distance, progress)
 
     }
 
