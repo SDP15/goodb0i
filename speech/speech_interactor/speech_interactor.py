@@ -15,9 +15,6 @@ except ImportError:
     import _thread as thread
 import time
 
-# from socket_control import on_message, on_error, on_open, on_close, send_message, initialise_socket
-
-
 model_path = get_model_path()
 now = datetime.datetime.now()
 universal_phrases = {'repeat', 'options'}
@@ -70,7 +67,7 @@ class SpeechInteractor:
         # state = input("Please enter shopping0. ")
         # self.next_state(state)
 
-        thread.start_new_thread(self.listen, ())#
+        thread.start_new_thread(self.listen, ())
         # while True:
         #     pass
         # self.listen()
@@ -289,5 +286,3 @@ class SpeechInteractor:
         self.say(self.options[word]['reply'])
         self.last_reply = self.options[word]['reply']
         self.next_state(self.options[word]['nextState'])
-
-
