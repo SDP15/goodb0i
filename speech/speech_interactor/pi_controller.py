@@ -1,22 +1,17 @@
-import speech_interactor
-import websocket
 import os
 import socket
 import sys
-
-try:
-    import thread
-except ImportError:
-    import _thread as thread
+import threading
 import time
+
+import websocket
+
+import speech_interactor
 
 
 class PiController:
 
     def __init__(self):
-        # thread.start_new_thread(self.run_speech, ())
-        
-        
         self.ws = self.initialise_websocket()
         self.sp_interactor = speech_interactor.SpeechInteractor(self)
         print("\n\n\n\nReturned\n\n\n\n")
@@ -54,7 +49,7 @@ class PiController:
         ws.send(str(message))
 
     def run(self, *args):
-        print("listening")
+        # print("listening")
         # for phrase in lsp:
         #     print("You said: "+str(phrase))
         #     time.sleep(1)
@@ -73,7 +68,9 @@ class PiController:
                                     on_close=self.on_close)
         ws.on_open = self.on_open
         # ws.run_forever()
-        thread.start_new_thread(self.run, (ws, ))
+        t1 = threading.Thread(name='WebSocketThread', target=self.run, args=(ws, ))
+        t1.start()
+        # threading.start_new_thread(self.run, (ws, ))
         print("Websocket connection")
         return ws
 

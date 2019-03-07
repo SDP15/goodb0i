@@ -1,19 +1,17 @@
-import pyttsx3 as pyttsx
-import json
-import os
-import sys
-import math
 import datetime
+import json
+import math
+import os
 import subprocess as sp
+import sys
+import threading
+import time
+
+import pyttsx3 as pyttsx
 import requests
 import serial
 import websocket
 from pocketsphinx import LiveSpeech, get_model_path
-try:
-    import thread
-except ImportError:
-    import _thread as thread
-import time
 
 model_path = get_model_path()
 now = datetime.datetime.now()
@@ -36,7 +34,6 @@ class SpeechInteractor:
     def __init__(self, controller, state_file='interactor_states.json', list_file='list.json'):
         self.controller = controller
         self.ws = self.controller.get_ws()
-        # self.ws = initialise_socket()
         log_filename = now.strftime("%Y-%m-%d-%H%M%S")
         self.logging = False
 
@@ -63,47 +60,31 @@ class SpeechInteractor:
         self.next_state('connection')
         self.react("n/a")
 
-        # Uncomment the code below to test out NFC tag reading
-        # state = input("Please enter shopping0. ")
-        # self.next_state(state)
+        self.event = threading.Event()
 
-        thread.start_new_thread(self.listen, ())
-        # while True:
-        #     pass
-        # self.listen()
-        # self.listen()
+        t1 = threading.Thread(name='SpeechInteractorThread', target=self.listen)
+        t1.start()
 
     def next_state(self, state):
         print(state)
         self.state = state
         self.options = self.possible_states[state]
 
-        # These states require other forms of input which is not speech. Wait for the user to input a given text
         if "shopping0" in self.state:
-            ser = serial.Serial('/dev/ttyACM0', 9600)
-
             # Uncomment line below once NFC tags have item strings on them
             #next_item = self.ordered_list[self.list_pointer]
-
             next_item = "TRACK_NFCTYPE4A"
-            new_location = ""
 
-            while(True):
-                new_location = ser.readline().decode('ascii')
+            # Start thread to listen for location changes
+            t2 = threading.Thread(name='LocationListenerThread', target=self.on_location_change, args=(next_item,))
+            t2.start()
+            
+            # Block current thread while waiting for location change
+            self.event.wait() 
+            self.event.clear()
 
-                # Check if our location has changed and if so update current location
-                if new_location not in self.current_location:
-                    self.current_location = new_location
-                    print("Current location: {:}".format(
-                        self.current_location))
-
-                    # Check if we have arrived at the item
-                    if next_item in self.current_location:
-                        print("You have arrived at {:}".format(next_item))
-                        # Need to replace shelf position with that from the JSON
-                        self.arrived(next_item, "middle")
-                else:
-                    print("Location has not changed.")
+            # Need to replace shelf position with that from the JSON
+            self.arrived(next_item, "middle")
 
         if "arrival" in self.state:
             # replace for barcode scanner info.
@@ -114,6 +95,7 @@ class SpeechInteractor:
 
     def listen(self, *arg):
         print("listening")
+
         for sphrase in speech:
             phrase = str(sphrase).lower().split()
             word = self.find_word(phrase)
@@ -159,7 +141,6 @@ class SpeechInteractor:
                  % ", ".join(str(o) for o in self.options))
 
     def react(self, word):
-        # self.say(self.options[word]['reply'])
         if "cart" in self.state and word == "yes" or word == "no":
             self.cart(word)
         elif "identify" in self.state and word == "yes":
@@ -250,13 +231,9 @@ class SpeechInteractor:
         self.next_state(self.options['no']['nextState'])
 
     # Retrieves all the items and quantities on the shopping list.
-
     def get_shopping_list(self, list_file):
         r = requests.get("http://127.0.0.1:8080/lists/load/1234567")
         json  = r.json()
-        # sp.run(['wget', '-O', 'list.json',
-        #         'http://127.0.0.1:8080/lists/load/1234567'])
-        # print(open('list.json', 'r').read())
         print("JSON is " + str(json))
         self.stuff = json
         self.list_pointer = 0
@@ -270,7 +247,6 @@ class SpeechInteractor:
 
     # Sets the current item to the next item on the list and informs the user what item they are
     # going to collect next.
-
     def continue_shopping(self):
         self.list_pointer = self.list_pointer + 1
         next_product = self.ordered_list[self.list_pointer]
@@ -280,9 +256,28 @@ class SpeechInteractor:
         self.next_state(self.options['yes']['nextState'])
 
     # Sends the server a message that the user is at this cart and ready to start
-
     def start_state(self, word):
         self.controller.send_message(self.ws, "UR&")
         self.say(self.options[word]['reply'])
         self.last_reply = self.options[word]['reply']
         self.next_state(self.options[word]['nextState'])
+    
+    def on_location_change(self, next_item):
+        ser = serial.Serial('/dev/ttyACM0', 9600)
+        new_location = ""
+
+        while not self.event.isSet():
+            new_location = ser.readline().decode('ascii')
+
+            # Check if our location has changed and if so update current location
+            if new_location not in self.current_location:
+                self.current_location = new_location
+                print("Current location: {:}".format(
+                    self.current_location))
+
+                # Check if we have arrived at the item
+                if next_item in self.current_location:
+                    print("You have arrived at {:}".format(next_item))
+                    self.event.set()
+            else:
+                print("Location has not changed.")
