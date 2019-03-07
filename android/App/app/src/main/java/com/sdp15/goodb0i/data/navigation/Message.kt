@@ -74,7 +74,7 @@ sealed class Message {
 
         object RequestHelp : OutgoingMessage()
 
-        object RouteReceived : OutgoingMessage()
+        object ReceivedRoute : OutgoingMessage()
 
         enum class StopReason(val code: Int) {
             HelpRequest(1)
@@ -113,7 +113,7 @@ sealed class Message {
                 is OutgoingMessage.ProductRejected -> "ProductRejected$delim${message.id}"
                 is OutgoingMessage.RequestHelp -> "RequestHelp$delim"
                 is OutgoingMessage.Stop -> "Stop$delim${message.reason.code}"
-                is OutgoingMessage.RouteReceived -> "RouteReceived$delim"
+                is OutgoingMessage.ReceivedRoute -> "ReceivedRoute$delim"
             }
         }
     }

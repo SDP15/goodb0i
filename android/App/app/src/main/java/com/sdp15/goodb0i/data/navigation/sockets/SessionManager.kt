@@ -78,7 +78,7 @@ class SessionManager(
                 }
                 is Message.IncomingMessage.RouteCalculated -> {
                     route = message.route
-                    sh.sendMessage(Message.OutgoingMessage.RouteReceived)
+                    sh.sendMessage(Message.OutgoingMessage.ReceivedRoute)
                 }
                 is Message.IncomingMessage.ReachedPoint -> {
                     consume = reachedPoint(message.id)
