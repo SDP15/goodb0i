@@ -15,7 +15,9 @@ class Session(
     private var appReceivedRoute = false
 
     private fun plan(code: Long) {
+        sendToTrolley(Message.OutgoingMessage.ToTrolley.AssignedToApp(code.toString()))
         val plan = routeFinder.plan(code)
+
         sendToApp(Message.OutgoingMessage.ToApp.Route(plan))
         sendToTrolley(Message.OutgoingMessage.ToTrolley.RouteCalculated(plan))
     }

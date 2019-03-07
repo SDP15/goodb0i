@@ -48,6 +48,15 @@
             tools:text="Item 1: Milk 2L" />
 
         <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/navigation_move_progress"
+            style="@style/BodyText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/default_horizontal_margin"
+            android:textColor="@color/colorAccent"
+            tools:text="20% complete" />
+
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/navigation_item_up_nex"
             style="@style/BodyText.SubText"
             android:layout_width="match_parent"

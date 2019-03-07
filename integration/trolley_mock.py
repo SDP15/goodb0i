@@ -3,16 +3,24 @@ import thread
 from pynput.keyboard import Key, Listener
 
 components = []
+should_wait = False
 
 def key_listener(ws):
     def on_press(key):
         try:
             key_press = key.char
+            global should_wait
+            if (key_press == '`'):
+                should_wait = not should_wait
+            if (should_wait):
+                return
             print("PRESSED", key_press)
             if (key_press == 'q'):
                 exit()
             elif (key_press == 'p'):
+            
                 current = components.pop(0)
+                print("Reached point " + str(current))
                 if (current[0] == "pass"):
                     ws.send("ReachedPoint&" + str(current[1]))
                 else:
@@ -23,7 +31,6 @@ def key_listener(ws):
                 ws.send("RejectedProduct&")
             elif (key_press == 'u'):
                 ws.send("UserReady&")
-
         except AttributeError:
             pass
 
@@ -56,7 +63,7 @@ def on_close(ws):
     print("closed")
 
 def on_open(ws):
-    print("Websocket connected.\nq: Quit\np: Reach next point\na: Accept\nr: Reject\nu: User ready ")
+    print("Websocket connected.\nq: Quit\n`: pause\np: Reach next point\na: Accept\nr: Reject\nu: User ready ")
     thread.start_new_thread(key_listener, (ws,))
 
 

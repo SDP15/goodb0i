@@ -32,7 +32,7 @@ class ProductServiceTest  : ServerTest() {
             val product = products.random()
             transaction {
                 val retrieved = service.getProduct(product.id.value.toString())
-                Assertions.assertEquals(product.id, retrieved?.id, "Retrieving product by id should return same product")
+                Assertions.assertEquals(product.id, retrieved?.id, "Retrieving product by code should return same product")
             }
         }
     }

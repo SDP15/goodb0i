@@ -47,7 +47,7 @@ sealed class Message {
     sealed class OutgoingMessage : Message() {
         sealed class ToTrolley : OutgoingMessage() {
 
-            object AssignedToApp : ToTrolley()
+            data class AssignedToApp(val code: String) : ToTrolley()
 
             data class RouteCalculated(val route: String) : ToTrolley()
 
@@ -117,7 +117,7 @@ sealed class Message {
             is OutgoingMessage.ToTrolley.AppAcceptedProduct -> "AppAcceptedProduct$DELIM"
             is OutgoingMessage.ToTrolley.AppRejectedProduct -> "AppRejectedProduct$DELIM"
             is OutgoingMessage.ToTrolley.AppScannedProduct -> "AppScannedProduct$DELIM${message.id}"
-            is OutgoingMessage.ToTrolley.AssignedToApp -> "Assigned$DELIM"
+            is OutgoingMessage.ToTrolley.AssignedToApp -> "Assigned$DELIM${message.code}"
             is OutgoingMessage.ToTrolley.RouteCalculated -> "RouteCalculated$DELIM${message.route}"
         }
     }
