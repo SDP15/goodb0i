@@ -137,9 +137,9 @@ class SessionManager(
     private fun postMovingState() {
         Timber.i("Moving from ${route[index]} to ${route[index + 1]}")
 
-        val point = route.subList(fromIndex = index, toIndex = route.size)
+        val point = route.subList(fromIndex = index+1, toIndex = route.size)
             .firstOrNull { point -> point is Route.RoutePoint.Stop }
-        Timber.i("Found point $point")
+        Timber.i("Found next stop point point $point")
         if (point is Route.RoutePoint.Stop) {
             val indices = point.productIndices
             remainingRackProducts.clear()
@@ -147,7 +147,6 @@ class SessionManager(
             currentRackProducts.postValue(remainingRackProducts)
             sessionState.postValue(ShoppingSessionState.NavigatingTo(route[index], point))
         } else {
-            //TODO: This will happen when we reach the end of the stop points in the route
             // Is this the behaviour we want or should it be NavigatingTo(route[index], End)?
             sessionState.postValue(ShoppingSessionState.NavigatingTo(route[index], route[index+1]))
         }
@@ -187,16 +186,20 @@ class SessionManager(
     private fun productAcceptedInternal() {
         val current = remainingRackProducts.first()
         // Decrement quantity of current product
+        Timber.i("Decrementing quantity for $current")
         remainingRackProducts[0] = current.copy(quantity = current.quantity - 1)
         if (remainingRackProducts.first().quantity == 0) {
+            Timber.i("Removing product with quantity 0")
             remainingRackProducts.removeAt(0)
         }
         // If there are no products remaining on the rack, navigate to the next point
         if (remainingRackProducts.isEmpty()) {
+            Timber.i("No products remaining for this rack")
             currentRackProducts.postValue(null) // Nothing left to observe
             postMovingState()
         } else {
             // Otherwise, we are still in the scanning state
+            Timber.i("Products remaining on rack $remainingRackProducts")
             currentRackProducts.postValue(remainingRackProducts)
             sessionState.postValue(ShoppingSessionState.Scanning(route[index] as Route.RoutePoint.Stop))
         }

@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import com.otaliastudios.cameraview.Audio
 import com.otaliastudios.cameraview.Gesture
 import com.otaliastudios.cameraview.GestureAction
@@ -27,10 +28,14 @@ class ScannerFragment : Fragment() {
     }
 
     private fun bindViewModel() {
+        vm.bind()
         vm.reading.observe(this, Observer {
             mp = MediaPlayer.create(this.requireContext(), R.raw.pop_up)
             mp.start ()
             Toast.makeText(context, "Reading: ${it.value}", Toast.LENGTH_SHORT).show()
+        })
+        vm.transitions.observe(this, Observer {
+            findNavController().navigate(it)
         })
     }
 

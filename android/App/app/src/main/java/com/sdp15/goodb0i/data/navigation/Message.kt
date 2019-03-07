@@ -100,6 +100,8 @@ sealed class Message {
                 "ReachedPoint" -> IncomingMessage.ReachedPoint(message.substringAfter(delim))
                 "UserReady" -> IncomingMessage.UserReady
                 "NoAvailableTrolley" -> IncomingMessage.NoAvailableTrolley
+                "TrolleyAcceptedProduct" -> IncomingMessage.TrolleyAcceptedProduct
+                "TrolleyRejectedProduct" -> IncomingMessage.TrolleyRejectedProduct
                 else -> IncomingMessage.InvalidMessage(message)
             }
         }

@@ -21,7 +21,7 @@
         android:layout_height="match_parent"
         android:layout_weight="0.4"
         android:background="@color/colorPositive"
-        tools:text="Add to cart" />
+        android:text="@string/action_add_to_cart" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/confirmation_button_negative"
@@ -29,6 +29,6 @@
         android:layout_height="match_parent"
         android:layout_weight="0.4"
         android:background="@color/colorNegative"
-        tools:text="Don't add" />
+        android:text="@string/action_dont_add_to_art" />
 
 </androidx.appcompat.widget.LinearLayoutCompat>
