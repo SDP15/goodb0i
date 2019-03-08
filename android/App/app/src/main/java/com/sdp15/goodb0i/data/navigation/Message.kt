@@ -34,6 +34,8 @@ sealed class Message {
 
         object TrolleyRejectedProduct : IncomingMessage()
 
+        object TrolleySkippedProduct : IncomingMessage()
+
         object NoAvailableTrolley : IncomingMessage()
 
         /*
@@ -66,6 +68,8 @@ sealed class Message {
          * User has rejected the product
          */
         data class RejectedProduct(val id: String) : OutgoingMessage()
+
+        object SkippedProduct : OutgoingMessage()
 
         /*
          * Request stopping the trolley
@@ -102,6 +106,7 @@ sealed class Message {
                 "NoAvailableTrolley" -> IncomingMessage.NoAvailableTrolley
                 "TrolleyAcceptedProduct" -> IncomingMessage.TrolleyAcceptedProduct
                 "TrolleyRejectedProduct" -> IncomingMessage.TrolleyRejectedProduct
+                "TrolleySkippedProduct" -> IncomingMessage.TrolleySkippedProduct
                 else -> IncomingMessage.InvalidMessage(message)
             }
         }
@@ -113,6 +118,7 @@ sealed class Message {
                 is OutgoingMessage.ProductScanned -> "ProductScanned$delim${message.id}"
                 is OutgoingMessage.AcceptedProduct -> "AcceptedProduct$delim${message.id}"
                 is OutgoingMessage.RejectedProduct -> "RejectedProduct$delim${message.id}"
+                is OutgoingMessage.SkippedProduct -> "SkippedProduct$delim"
                 is OutgoingMessage.RequestHelp -> "RequestHelp$delim"
                 is OutgoingMessage.Stop -> "Stop$delim${message.reason.code}"
                 is OutgoingMessage.ReceivedRoute -> "ReceivedRoute$delim"
