@@ -47,7 +47,10 @@ class PiController:
             self.send_message(ws, "ReceivedRoute&")
             self.sp_interactor.react("connected")
         elif "Assigned" in message:
-            list_id = message.split("&")
+            list_message = message.split("&")
+            list_id = list_message[1]
+            self.get_shopping_list(list_id)
+
             
 
     def on_error(self, ws, error):
@@ -87,11 +90,12 @@ class PiController:
     def query_web_server(self, ws, request):
         r = requests.get("http://"+self.ip_port + request)
         list_json = r.json()
-    
+        return list_json
+     
 
     # Retrieves all the items and quantities on the shopping list.
     def get_shopping_list(self, list_file):
-        r = requests.get("http://" + self.ip_port + "/lists/load/1234567")
+        r = requests.get("http://" + self.ip_port + "/lists/load/" + list_file)
         json  = r.json()
         print("JSON is " + str(json))
         self.stuff = json
