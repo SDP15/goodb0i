@@ -210,7 +210,7 @@ object TestDataProvider {
 }
 
 data class Item(
-        @SerializedName("id") val id: Long = -1,
+        @SerializedName("code") val id: Long = -1,
         @SerializedName("name") val name: String,
         @SerializedName("AverageSellingUnitWeight") val averageSellingUnitWeight: Double,
         @SerializedName("ContentsMeasureType") val contentsMeasureType: String,

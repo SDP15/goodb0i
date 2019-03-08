@@ -22,8 +22,8 @@ fun Route.products(productService: ProductService) {
             call.respond(if (products.isNotEmpty()) products else HttpStatusCode.NotFound)
         }
 
-        get("/{id}") {
-            val product = productService.getProduct(call.parameters["id"]!!)
+        get("/{code}") {
+            val product = productService.getProduct(call.parameters["code"]!!)
             call.respond(product ?: HttpStatusCode.NotFound)
         }
 
