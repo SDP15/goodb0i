@@ -195,7 +195,7 @@ class SessionManager(
     }
 
     override fun productAccepted() {
-        sh.sendMessage(Message.OutgoingMessage.ProductAccepted(lastScannedProduct.value!!.id))
+        sh.sendMessage(Message.OutgoingMessage.AcceptedProduct(lastScannedProduct.value!!.id))
         productAcceptedInternal()
     }
 
@@ -226,7 +226,7 @@ class SessionManager(
     }
 
     override fun productRejected() {
-        sh.sendMessage(Message.OutgoingMessage.ProductRejected(lastScannedProduct.value!!.id))
+        sh.sendMessage(Message.OutgoingMessage.RejectedProduct(lastScannedProduct.value!!.id))
         productRejectedInternal()
     }
 

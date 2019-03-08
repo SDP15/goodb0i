@@ -60,12 +60,12 @@ sealed class Message {
         /*
          * User has accepted the product
          */
-        data class ProductAccepted(val id: String) : OutgoingMessage()
+        data class AcceptedProduct(val id: String) : OutgoingMessage()
 
         /*
          * User has rejected the product
          */
-        data class ProductRejected(val id: String) : OutgoingMessage()
+        data class RejectedProduct(val id: String) : OutgoingMessage()
 
         /*
          * Request stopping the trolley
@@ -111,8 +111,8 @@ sealed class Message {
                 is OutgoingMessage.PlanRoute -> "PlanRoute$delim${message.code}"
                 is OutgoingMessage.Reconnect -> "Reconnect$delim${message.oldId}"
                 is OutgoingMessage.ProductScanned -> "ProductScanned$delim${message.id}"
-                is OutgoingMessage.ProductAccepted -> "ProductAccepted$delim${message.id}"
-                is OutgoingMessage.ProductRejected -> "ProductRejected$delim${message.id}"
+                is OutgoingMessage.AcceptedProduct -> "AcceptedProduct$delim${message.id}"
+                is OutgoingMessage.RejectedProduct -> "RejectedProduct$delim${message.id}"
                 is OutgoingMessage.RequestHelp -> "RequestHelp$delim"
                 is OutgoingMessage.Stop -> "Stop$delim${message.reason.code}"
                 is OutgoingMessage.ReceivedRoute -> "ReceivedRoute$delim"
