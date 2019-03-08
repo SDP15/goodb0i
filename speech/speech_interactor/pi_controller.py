@@ -3,6 +3,7 @@ import socket
 import sys
 import threading
 import time
+import requests
 
 import websocket
 
@@ -83,6 +84,7 @@ class PiController:
         print("Websocket connection")
         return ws
 
+    #the request parameter has to be in the correct format e.g. /lists/load/7654321
     def query_web_server(self, ws, request):
         r = requests.get("http://"+self.ip_port + request)
         list_json = r.json()
