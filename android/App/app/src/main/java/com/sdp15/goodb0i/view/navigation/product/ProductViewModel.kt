@@ -21,8 +21,8 @@ class ProductViewModel : BaseViewModel<Any>() {
         transitions.postValue(ProductFragmentDirections.actionItemFragmentToScannerFragment())
     }
 
-    fun repeat() {
-
+    fun skip() {
+        sm.skipProduct()
     }
 
     override fun onCleared() {

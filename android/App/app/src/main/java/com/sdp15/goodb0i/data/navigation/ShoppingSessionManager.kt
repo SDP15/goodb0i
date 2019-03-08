@@ -25,6 +25,8 @@ interface ShoppingSessionManager<IN> {
 
     fun productRejected()
 
+    fun skipProduct()
+
     fun requestAssistance()
 
 }

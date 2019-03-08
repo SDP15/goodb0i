@@ -175,10 +175,11 @@ object TestDataProvider {
             val dairy = Shelf.find { Shelves.rack eq 1}.first().product
             val seafood = Shelf.find { Shelves.rack eq 5}.first().product
             val sweets = Shelf.find { Shelves.rack eq 7}.first().product
+            val sweets2 = Shelf.find { Shelves.rack eq 7}.toList()[1].product
             ShoppingList.new {
                 code = 7654321
                 time = System.currentTimeMillis()
-                products = SizedCollection(listOf(fruits, sweets).mapIndexed { i, p ->
+                products = SizedCollection(listOf(fruits, sweets, sweets2).mapIndexed { i, p ->
                     ListEntry.new {
                         index = i
                         product = p

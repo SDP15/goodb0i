@@ -32,8 +32,8 @@ class ProductFragment : Fragment() {
         product_button_scan.setOnClickListener {
             vm.scan()
         }
-        product_button_repeat.setOnClickListener {
-            vm.repeat()
+        product_button_skip.setOnClickListener {
+            vm.skip()
         }
         vm.transitions.observe(this, Observer {
             findNavController().navigate(it)

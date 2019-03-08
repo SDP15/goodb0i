@@ -96,6 +96,9 @@ class SessionManager(
                 is Message.IncomingMessage.TrolleyRejectedProduct -> {
                     if(state.value is ShoppingSessionState.Confirming) productRejectedInternal()
                 }
+                is Message.IncomingMessage.TrolleySkippedProduct -> {
+                    if (state.value is ShoppingSessionState.Scanning) skipProductInternal()
+                }
             }
             if (!consume) incomingMessages.postValue(message)
         }
@@ -194,6 +197,16 @@ class SessionManager(
         return product
     }
 
+    override fun skipProduct() {
+        sh.sendMessage(Message.OutgoingMessage.SkippedProduct)
+        skipProductInternal()
+    }
+
+    private fun skipProductInternal() {
+        remainingRackProducts.removeAt(0)
+        switchToNextListItem()
+    }
+
     override fun productAccepted() {
         sh.sendMessage(Message.OutgoingMessage.AcceptedProduct(lastScannedProduct.value!!.id))
         productAcceptedInternal()
@@ -212,6 +225,11 @@ class SessionManager(
             Timber.i("Removing product with quantity 0")
             remainingRackProducts.removeAt(0)
         }
+        switchToNextListItem()
+    }
+
+    private fun switchToNextListItem() {
+
         // If there are no products remaining on the rack, navigate to the next at
         if (remainingRackProducts.isEmpty()) {
             Timber.i("No products remaining for this rack")
