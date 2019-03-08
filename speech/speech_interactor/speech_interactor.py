@@ -34,12 +34,9 @@ class SpeechInteractor:
     def __init__(self, controller, state_file='interactor_states.json', list_file='list.json'):
         self.controller = controller
         self.ws = self.controller.get_ws()
-<<<<<<< HEAD
         #Change so that it either knows the list id or the lists are global in controller.
         self.controller.get_shopping_list('7654321')
         # self.ws = initialise_socket()
-=======
->>>>>>> b8ff0164e8fccfd6bd89be4a6041e4819e4393b1
         log_filename = now.strftime("%Y-%m-%d-%H%M%S")
         self.logging = False
 
@@ -62,7 +59,6 @@ class SpeechInteractor:
         self.current_location = ""
         self.possible_states = json.load(open(state_file, 'r'))
         print(self.possible_states)
-        self.get_shopping_list(list_file)
         self.next_state('connection')
         self.react("n/a")
 
@@ -235,24 +231,6 @@ class SpeechInteractor:
         self.say(response)
         self.last_reply = response
         self.next_state(self.options['no']['nextState'])
-
-<<<<<<< HEAD
-=======
-    # Retrieves all the items and quantities on the shopping list.
-    def get_shopping_list(self, list_file):
-        r = requests.get("http://127.0.0.1:8080/lists/load/1234567")
-        json  = r.json()
-        print("JSON is " + str(json))
-        self.stuff = json
-        self.list_pointer = 0
-        self.shopping_list = {}
-        self.ordered_list = []
-        for tings in self.stuff['products']:
-            self.shopping_list.update(
-                {tings['product']['name']: tings['quantity']})
-            self.ordered_list.append(tings['product']['name'])
-        print(self.shopping_list)
->>>>>>> b8ff0164e8fccfd6bd89be4a6041e4819e4393b1
 
     # Sets the current item to the next item on the list and informs the user what item they are
     # going to collect next.
