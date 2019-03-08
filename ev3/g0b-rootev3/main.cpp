@@ -26,6 +26,7 @@ enum DriveNumber : int {
 array<unique_ptr<evutil::Drive>, 4> drives;
 unique_ptr<evutil::ColorSensor> leftColor, midColor, rightColor;
 unique_ptr<ev3dev::ultrasonic_sensor> sonar;
+power_supply battery{"lego-ev3-battery"};
 
 ofstream sensorLog;
 
@@ -405,7 +406,7 @@ protected:
       if (markerIgnoreStopwatch.elapsedMilliseconds() >= markerIgnoreMs) {
         ignoreMarker = false;
         markerIgnoreStopwatch.pause();
-      } else {
+      } else if (seeingMarker) {
         seeingMarker = false;
         // make the robot blind to the marker
         lcol = evutil::Color::line;
@@ -528,8 +529,7 @@ protected:
             (turnBias == Direction::right) ? Direction::right : Direction::left;
       }
     }
-    // Rolling average to smooth out steering
-    avgLineAngle = (avgLineAngle + 7 * lineAngle) / 8;
+    avgLineAngle = lineAngle;
 
     sysSteering->pushCommand(
         {SteeringSubsystem::Command::CommandType::setTurnAngle, 0, 0,
@@ -573,100 +573,109 @@ private:
     led::set_color(led::left, led::amber);
     char rbuf[64];
     char wbuf[64];
+    string cmdbuf;
     int rlen;
     while ((rlen = recv(connectFd, rbuf, sizeof rbuf, 0)) > 0) {
-      if (rbuf[rlen - 1] == '\n') {
-        --rlen;
-      }
-      if (rlen == 0) {
-        continue;
-      }
-      lock_guard<mutex> _l{accessMutex};
-      // Implemented TCP commands
-      if (strncmp(rbuf, "help", rlen) == 0) {
-        rsend("Supported commands: help stop start moving? enqueue-stop "
-              "enqueue-forward enqueue-left enqueue-right queue-status "
-              "dump-queue clear-queue resume-from-stop-marker dump dump-hsv "
-              "disconnect\n");
-      } else if (strncmp(rbuf, "stop", rlen) == 0) {
-        if (!halted) {
-          sysSteering.requestStop(SUBSYS_ROBOT);
-          halted = true;
-        }
-        rsend("stop OK\n");
-      } else if (strncmp(rbuf, "start", rlen) == 0) {
-        if (halted) {
-          sysSteering.cancelStopRequest(SUBSYS_ROBOT);
-          halted = false;
-        }
-        rsend("start OK\n");
-      } else if (strncmp(rbuf, "moving?", rlen) == 0) {
-        snprintf(wbuf, sizeof wbuf, "moving = %d\n",
-                 sysSteering.isMoving() ? 1 : 0);
-        rsend(wbuf);
-      } else if (strncmp(rbuf, "dump", rlen) == 0) {
-        rsend("EV3DUMP START\n");
-        stringstream ss;
-        sysSteering.dump(ss);
-        sysAvoid.dump(ss);
-        sysLine.dump(ss);
-        rsend(ss.str().c_str());
-        rsend("\nEV3DUMP END\n");
-      } else if (strncmp(rbuf, "enqueue-stop", rlen) == 0) {
-        sysLine.enqueueAction(LineFollowSubsystem::QueuedAction::stop);
-        rsend("enqueue-stop OK\n");
-      } else if (strncmp(rbuf, "enqueue-forward", rlen) == 0) {
-        sysLine.enqueueAction(LineFollowSubsystem::QueuedAction::goStraight);
-        rsend("enqueue-forward OK\n");
-      } else if (strncmp(rbuf, "enqueue-left", rlen) == 0) {
-        sysLine.enqueueAction(LineFollowSubsystem::QueuedAction::turnLeft);
-        rsend("enqueue-left OK\n");
-      } else if (strncmp(rbuf, "enqueue-right", rlen) == 0) {
-        sysLine.enqueueAction(LineFollowSubsystem::QueuedAction::turnRight);
-        rsend("enqueue-right OK\n");
-      } else if (strncmp(rbuf, "resume-from-stop-marker", rlen) == 0) {
-        sysLine.resumeFromStopMarker();
-        rsend("resume-from-stop-marker OK\n");
-      } else if (strncmp(rbuf, "dump-queue", rlen) == 0) {
-        stringstream ss;
-        ss << "Queue: ";
-        for (auto action : sysLine) {
-          switch (action) {
-          case LineFollowSubsystem::QueuedAction::stop:
-            ss << "stop ";
-            break;
-          case LineFollowSubsystem::QueuedAction::turnLeft:
-            ss << "left ";
-            break;
-          case LineFollowSubsystem::QueuedAction::turnRight:
-            ss << "right ";
-            break;
-          case LineFollowSubsystem::QueuedAction::goStraight:
-            ss << "forward ";
-            break;
+      cmdbuf.append(rbuf, rlen);
+      int splitPoint = cmdbuf.npos;
+      while ((splitPoint = cmdbuf.find('\n')) != cmdbuf.npos) {
+        // found a command
+        string cmd = cmdbuf.substr(0, splitPoint);
+        cmdbuf = cmdbuf.substr(splitPoint + 1);
+
+        lock_guard<mutex> _l{accessMutex};
+        // Implemented TCP commands
+        if (cmd == "help") {
+          rsend("Supported commands: help stop start moving? enqueue-stop "
+                "enqueue-forward enqueue-left enqueue-right queue-status "
+                "dump-queue clear-queue resume-from-stop-marker dump dump-hsv "
+                "battery disconnect\n");
+        } else if (cmd == "stop") {
+          if (!halted) {
+            sysSteering.requestStop(SUBSYS_ROBOT);
+            halted = true;
           }
-        }
-        ss << "OK\n";
-        rsend(ss.str().c_str());
-      } else if (strncmp(rbuf, "clear-queue", rlen) == 0) {
-        sysLine.forceClearQueue();
-        rsend("clear-queue OK\n");
-      } else if (strncmp(rbuf, "queue-status", rlen) == 0) {
-        if (sysLine.isWaitingOnQueue()) {
-          rsend("waiting-for-command OK\n");
-        } else if (sysLine.queueEmpty()) {
-          rsend("empty OK\n");
+          rsend("stop OK\n");
+        } else if (cmd == "start") {
+          if (halted) {
+            sysSteering.cancelStopRequest(SUBSYS_ROBOT);
+            halted = false;
+          }
+          rsend("start OK\n");
+        } else if (cmd == "moving?") {
+          snprintf(wbuf, sizeof wbuf, "moving = %d\n",
+                   sysSteering.isMoving() ? 1 : 0);
+          rsend(wbuf);
+        } else if (cmd == "dump") {
+          rsend("EV3DUMP START\n");
+          stringstream ss;
+          sysSteering.dump(ss);
+          sysAvoid.dump(ss);
+          sysLine.dump(ss);
+          rsend(ss.str().c_str());
+          rsend("\nEV3DUMP END\n");
+        } else if (cmd == "enqueue-stop") {
+          sysLine.enqueueAction(LineFollowSubsystem::QueuedAction::stop);
+          rsend("enqueue-stop OK\n");
+        } else if (cmd == "enqueue-forward") {
+          sysLine.enqueueAction(LineFollowSubsystem::QueuedAction::goStraight);
+          rsend("enqueue-forward OK\n");
+        } else if (cmd == "enqueue-left") {
+          sysLine.enqueueAction(LineFollowSubsystem::QueuedAction::turnLeft);
+          rsend("enqueue-left OK\n");
+        } else if (cmd == "enqueue-right") {
+          sysLine.enqueueAction(LineFollowSubsystem::QueuedAction::turnRight);
+          rsend("enqueue-right OK\n");
+        } else if (cmd == "resume-from-stop-marker") {
+          sysLine.resumeFromStopMarker();
+          rsend("resume-from-stop-marker OK\n");
+        } else if (cmd == "dump-queue") {
+          stringstream ss;
+          ss << "Queue: ";
+          for (auto action : sysLine) {
+            switch (action) {
+            case LineFollowSubsystem::QueuedAction::stop:
+              ss << "stop ";
+              break;
+            case LineFollowSubsystem::QueuedAction::turnLeft:
+              ss << "left ";
+              break;
+            case LineFollowSubsystem::QueuedAction::turnRight:
+              ss << "right ";
+              break;
+            case LineFollowSubsystem::QueuedAction::goStraight:
+              ss << "forward ";
+              break;
+            }
+          }
+          ss << "OK\n";
+          rsend(ss.str().c_str());
+        } else if (cmd == "clear-queue") {
+          sysLine.forceClearQueue();
+          rsend("clear-queue OK\n");
+        } else if (cmd == "queue-status") {
+          if (sysLine.isWaitingOnQueue()) {
+            rsend("waiting-for-command OK\n");
+          } else if (sysLine.queueEmpty()) {
+            rsend("empty OK\n");
+          } else {
+            rsend("in-progress OK\n");
+          }
+        } else if (cmd == "dump-hsv") {
+          hsvDump = !hsvDump;
+          rsend("dump-hsv OK\n");
+        } else if (cmd == "disconnect") {
+          rsend("disconnect OK\n");
+          break;
+        } else if (cmd == "battery") {
+          float V{battery.measured_volts()};
+          float A{battery.measured_amps()};
+          snprintf(wbuf, sizeof wbuf, "battery volt %.3f max 8.4 amp %.6f OK\n",
+                   V, A);
+          rsend(wbuf);
         } else {
-          rsend("in-progress OK\n");
+          rsend("unknown command FAIL\n");
         }
-      } else if (strncmp(rbuf, "dump-hsv", rlen) == 0) {
-        hsvDump = !hsvDump;
-        rsend("dump-hsv OK\n");
-      } else if (strncmp(rbuf, "disconnect", rlen) == 0) {
-        rsend("disconnect OK\n");
-        break;
-      } else {
-        rsend("unknown command FAIL\n");
       }
     }
 

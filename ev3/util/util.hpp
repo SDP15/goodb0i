@@ -67,7 +67,7 @@ class ColorSensor {
 private:
   std::unique_ptr<ev3dev::color_sensor> sensor;
   glm::ivec3 currentRaw;
-  std::array<Color, 4> currentColors;
+  std::array<Color, 3> currentColors;
   int currentColorPtr{0};
   Color stableColor{Color::bg};
 
