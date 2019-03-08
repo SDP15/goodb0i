@@ -18,9 +18,6 @@ class PiController:
 
     def __init__(self):
         self.ip_port = "127.0.0.1:8080"
-        # thread.start_new_thread(self.run_speech, ())
-        
-        
         self.ws = self.initialise_websocket()
         self.sp_interactor = speech_interactor.SpeechInteractor(self)
         print("\n\n\n\nReturned\n\n\n\n")

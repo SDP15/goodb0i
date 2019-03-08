@@ -36,6 +36,8 @@ class SpeechInteractor:
     def __init__(self, controller, state_file='interactor_states.json', list_file='list.json'):
         self.controller = controller
         self.ws = self.controller.get_ws()
+        #Change so that it either knows the list id or the lists are global in controller.
+        self.controller.get_shopping_list('7654321')
         # self.ws = initialise_socket()
         log_filename = now.strftime("%Y-%m-%d-%H%M%S")
         self.logging = False
@@ -249,24 +251,6 @@ class SpeechInteractor:
         self.last_reply = response
         self.next_state(self.options['no']['nextState'])
 
-    # Retrieves all the items and quantities on the shopping list.
-
-    def get_shopping_list(self, list_file):
-        r = requests.get("http://127.0.0.1:8080/lists/load/1234567")
-        json  = r.json()
-        # sp.run(['wget', '-O', 'list.json',
-        #         'http://127.0.0.1:8080/lists/load/1234567'])
-        # print(open('list.json', 'r').read())
-        print("JSON is " + str(json))
-        self.stuff = json
-        self.list_pointer = 0
-        self.shopping_list = {}
-        self.ordered_list = []
-        for tings in self.stuff['products']:
-            self.shopping_list.update(
-                {tings['product']['name']: tings['quantity']})
-            self.ordered_list.append(tings['product']['name'])
-        print(self.shopping_list)
 
     # Sets the current item to the next item on the list and informs the user what item they are
     # going to collect next.
