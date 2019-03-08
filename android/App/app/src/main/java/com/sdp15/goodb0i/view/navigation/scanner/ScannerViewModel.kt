@@ -38,7 +38,7 @@ class ScannerViewModel : BaseViewModel<Any>(),
                         || Build.MANUFACTURER.contains("Genymotion")
                         || (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic"))
                         || "google_sdk".equals(Build.PRODUCT)) {
-                    Timber.i("On Emulator: Sending product id ${list.first().product.id}")
+                    Timber.i("On Emulator: Sending product id ${list.first().product.id} for $list")
                     onRead(list.first().product.id)
                 }
                 sm.currentProducts.removeObserver(this)

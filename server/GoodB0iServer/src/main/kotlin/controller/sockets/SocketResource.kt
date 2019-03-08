@@ -74,8 +74,10 @@ fun Route.sockets(sessionManager: SessionManager,
                     }
                 }
             } catch (e: ClosedSendChannelException) {
+                appManager.disconnected(nonce)
                 println("ClosedSendChannelException $e")
             } catch (e: Exception) {
+                appManager.disconnected(nonce)
                 println("Other exception $e")
             } finally {
                 println("$nonce closed socket")

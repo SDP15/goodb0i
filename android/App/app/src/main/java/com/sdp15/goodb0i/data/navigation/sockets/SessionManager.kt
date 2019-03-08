@@ -103,7 +103,7 @@ class SessionManager(
 
     override fun startSession(list: ShoppingList) {
         if (!sh.isConnected) {
-            Timber.i("Starting session")
+            Timber.i("Starting session $list")
             shoppingList = list
             sessionState.postValue(ShoppingSessionState.Connecting)
             sh.start(RetrofitProvider.root + "/app")

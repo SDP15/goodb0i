@@ -40,9 +40,12 @@ class AppManager(private val sessionManager: SessionManager) {
         }
     }
 
+    fun disconnected(id: String) {
+        members.remove(id)
+    }
+
     private fun rejoinApp(id: String, oldId: String, socket: WebSocketSession) {
         println("Rejoining app $oldId with new id $id")
-        members.remove(oldId)
         listeners[id] = listeners[oldId]!!
         sessionManager.updateAppSocket(id, oldId, socket)
     }
