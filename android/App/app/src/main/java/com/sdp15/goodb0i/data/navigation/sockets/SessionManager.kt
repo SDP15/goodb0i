@@ -46,7 +46,7 @@ class SessionManager(
     private val currentRackProducts = MutableLiveData<List<ListItem>>()
     override val currentProducts: LiveData<List<ListItem>> = currentRackProducts
 
-    // Last scanned product
+    // Last scanned products
     private val lastScannedProduct = MutableLiveData<Product>()
     override val scannedProduct: LiveData<Product> = lastScannedProduct
 
@@ -176,7 +176,7 @@ class SessionManager(
     }
 
     /*
-     Attempt to match a scanned barcode to a product
+     Attempt to match a scanned barcode to a products
      As we are on a local network, making a GET request is currently not an issue
      TODO: Check against cached products for the current shelf
      */
@@ -213,16 +213,16 @@ class SessionManager(
     }
 
     /*
-     Change session state when product is accepted
+     Change session state when products is accepted
      Either by the app or via message from trolley
      */
     private fun productAcceptedInternal() {
         val current = remainingRackProducts.first()
-        // Decrement quantity of current product
+        // Decrement quantity of current products
         Timber.i("Decrementing quantity for $current")
         remainingRackProducts[0] = current.copy(quantity = current.quantity - 1)
         if (remainingRackProducts.first().quantity == 0) {
-            Timber.i("Removing product with quantity 0")
+            Timber.i("Removing products with quantity 0")
             remainingRackProducts.removeAt(0)
         }
         switchToNextListItem()

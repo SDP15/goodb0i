@@ -20,7 +20,7 @@ class ItemConfirmationViewModel : BaseViewModel<Any>() {
 
     private val sessionStateObserver = Observer<ShoppingSessionState> { state ->
         if (state is ShoppingSessionState.NavigatingTo) {
-            // Scan accepted, there is another product or tills to go to
+            // Scan accepted, there is another products or tills to go to
             transitions.postValue(ItemConfirmationFragmentDirections.actionConfirmationFragmentToNavigatingToFragment())
         } else if (state is ShoppingSessionState.Scanning) {
             // Either scan rejected, or item on the same ShelfRack -> ScanningFragment or ItemFragment

@@ -60,12 +60,12 @@ sealed class Message {
         data class ProductScanned(val id: String) : OutgoingMessage()
 
         /*
-         * User has accepted the product
+         * User has accepted the products
          */
         data class AcceptedProduct(val id: String) : OutgoingMessage()
 
         /*
-         * User has rejected the product
+         * User has rejected the products
          */
         data class RejectedProduct(val id: String) : OutgoingMessage()
 

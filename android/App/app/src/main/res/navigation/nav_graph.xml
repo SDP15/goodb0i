@@ -102,6 +102,9 @@
         <action
             android:id="@+id/action_item_fragment_to_scanner_fragment"
             app:destination="@id/scanner_fragment" />
+        <action
+            android:id="@+id/action_item_fragment_to_navigatingToFragment"
+            app:destination="@id/navigatingToFragment" />
     </fragment>
 
     <fragment

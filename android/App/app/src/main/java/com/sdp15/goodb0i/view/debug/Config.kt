@@ -9,7 +9,7 @@ import com.sdp15.goodb0i.data.store.RetrofitProvider
 object Config {
 
     private val settings = mutableListOf<Pair<String, Boolean>>().apply {
-        add(Pair("Test product data", false))
+        add(Pair("Test products data", false))
 
     }
     private val names: Array<String>
