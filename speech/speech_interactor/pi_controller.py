@@ -9,10 +9,7 @@ import websocket
 import speech_interactor
 
 
-
 class PiController:
-
-
     def __init__(self):
         self.ip_port = "127.0.0.1:8080"
         self.ws = self.initialise_websocket()
@@ -125,29 +122,6 @@ class PiController:
                 print("Connection from %s" % str(client_address))
             finally:
                 self.receive_tcpsocket()
-    
-    # def initialise_ev3_socket(self):
-    #     global connection
-    #     # Create a TCP/IP socket
-    #     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-    #     # bind the address to the port
-    #     server_address = ('192.168.105.144', 8080)
-    #     #print("Starting on address: '%s'" % server_address)
-
-    #     sock.bind(server_address)
-
-    #     sock.listen(1)
-
-    #     while True:
-    #         print("waiting for a connection")
-    #         connection, client_address = sock.accept()
-    #         try:
-    #             print("Connection from %s" % str(client_address))
-    #         finally:
-    #             self.receive_tcpsocket()
-    #             self.send_tcpsocket(message="Hello")
-    #             break
 
     def receive_tcpsocket(self):
         global connection
@@ -170,28 +144,6 @@ class PiController:
         global connection
         connection.close()         
         self.send_tcpsocket(message="Hello")
-        
-
-    # def receive_tcpsocket(self):
-    #     global connection
-    #     while True:
-    #         data = connection.recv(32)  # max buffer size
-    #         print("received '%s'" % str(data))
-    #         if data:
-    #             print("sending data back to the client")
-    #         else:
-    #             print("No more data")
-    #             break
-
-    # def send_tcpsocket(self, message):
-    #     global connection
-    #     print("sending data back to the client")
-    #     connection.sendall(message)
-    #     self.close_tcpsocket()
-
-    # def close_tcpsocket(self):
-    #     global connection
-    #     connection.close()
 
 
 PiController()
