@@ -25,8 +25,8 @@ class ListService {
                 ListContentsTable.deleteWhere { ListContentsTable.entry inList sl.products.map { it.id } }
                 ListEntries.deleteWhere { ListEntries.id inList sl.products.map { it.id } }
                 val matchingProducts = Product.find { Products.id inList list.map {UUID.fromString(it.first)} }
-
-                println("Matching product list ${matchingProducts.map { it.id.value.toString() }}")
+                println("List products size ${list.size}, matching ${matchingProducts.count()}")
+                println("${list.map { it.first }}\n${matchingProducts.map { it.id.value.toString() }}")
                 //TODO: Some sort of error if an item does not exist
                 assert(matchingProducts.count() == list.size)
 

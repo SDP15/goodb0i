@@ -22,6 +22,7 @@ import kotlinx.coroutines.time.delay
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
+import java.lang.Exception
 import java.time.Duration
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -38,22 +39,19 @@ class SpeedTest : ServerTest() {
                 delay(Duration.ofSeconds(1))
                 var count = 0
                 var start = System.currentTimeMillis()
-                val messages = listOf(1,10,20,30,40,50,100,200,500,1000,5000,10000).map { "a".repeat(it) }.toMutableList()
-                client.ws(method = HttpMethod.Get, host = "192.168.105.36", port = 8081, path = "/ping") {
+                val messages = listOf(1, 10, 20, 30, 40, 50, 100, 200, 500, 1000, 5000, 10000).map { "a".repeat(it) }.toMutableList()
+                client.ws(method = HttpMethod.Get, host = "127.0.0.1", port = 8081, path = "/ping") {
                     // this: DefaultClientWebSocketSession
-
                     send(Frame.Text(messages.first()))
-                    incoming.consumeEach { frame ->
-                        if (frame is Frame.Text) {
-                            count++
-                            send(Frame.Text(messages.first()))
-                        }
-                        if (count > 10000) {
-                            println("Sent 10k ${messages.first().length} char messages in ${System.currentTimeMillis() - start}")
+                    for (message in incoming.map { it as? Frame.Text }.filterNotNull()) {
+                        count++
+                        send(if (messages.isNotEmpty()) Frame.Text(messages.first()) else Frame.Close())
+
+                        if (count > 1000) {
+                            println("Sent 1k ${messages.first().length} char messages in ${System.currentTimeMillis() - start}")
                             count = 0
                             start = System.currentTimeMillis()
                             messages.removeAt(0)
-                            if (messages.isEmpty()) close(CloseReason(CloseReason.Codes.NORMAL, ""))
                         }
                     }
                 }
