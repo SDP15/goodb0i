@@ -42,5 +42,7 @@ matrix:
     - language: java
       before_script:
         - cd server/GoodB0iServer
+      git:
+        submodules: false
       script:
         - ./gradlew test
