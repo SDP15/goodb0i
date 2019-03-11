@@ -1,6 +1,8 @@
-import websocket
 import threading
 import time
+
+import websocket
+
 
 class WebSocket:
     def __init__(self, ip_port, controller_queue):

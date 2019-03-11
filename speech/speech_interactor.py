@@ -2,20 +2,20 @@ import datetime
 import json
 import math
 import os
+import queue
 import subprocess as sp
 import sys
 import threading
 import time
-import queue
 
 import pyttsx3 as pyttsx
 import requests
 import serial
 import websocket
 from pocketsphinx import LiveSpeech, get_model_path
-from utils.custom_threads import WorkerThread
 
-import product
+from utils.custom_threads import WorkerThread
+from utils.product import Product
 
 model_path = get_model_path()
 now = datetime.datetime.now()
@@ -30,12 +30,12 @@ speech = LiveSpeech(
     hmm=os.path.join(model_path, 'en-us'),
     lm=False,
     dic=os.path.join(model_path, 'cmudict-en-us.dict'),
-    kws='kws.list',
+    kws='resources/kws.list',
 )
 
 
 class SpeechInteractor:
-    def __init__(self, websocket_instance, work_queue, state_file='interactor_states.json'):
+    def __init__(self, websocket_instance, work_queue, state_file='resources/interactor_states.json'):
         self.ws = websocket_instance
         
         log_filename = now.strftime("%Y-%m-%d-%H%M%S")

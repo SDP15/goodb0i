@@ -4,13 +4,14 @@ import socket
 import sys
 import threading
 import time
-import serial
+
 import requests
+import serial
 
 from speech_interactor import SpeechInteractor
 from utils.custom_threads import WorkerThread
-from utils.web_socket import WebSocket
 from utils.product import Product
+from utils.web_socket import WebSocket
 
 
 class PiController:
