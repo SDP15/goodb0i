@@ -44,6 +44,8 @@ class ScannerViewModel : BaseViewModel<Any>(),
                         onRead(state.toScan.first().product.id)
                     }
                     sm.state.removeObserver(this)
+                } else if (state is ShoppingSessionState.Disconnected) {
+                    transitions.postValue(ScannerFragmentDirections.actionScannerFragmentToErrorFragment())
                 }
             }
         })

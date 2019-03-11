@@ -41,7 +41,7 @@ class NavigatingToViewModel : BaseViewModel<Any>() {
                 )
             }
         } else if (state is ShoppingSessionState.Disconnected) {
-            //TODO: Do something about this
+            transitions.postValue(NavigatingToFragmentDirections.actionNavigatingToFragmentToErrorFragment())
         } else if (state is ShoppingSessionState.Scanning) {
             transitions.postValue(NavigatingToFragmentDirections.actionNavigatingToFragmentToItemFragment())
         } else if (state is ShoppingSessionState.Checkout) {

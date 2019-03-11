@@ -74,11 +74,6 @@ fun Application.module() {
         lists(listService)
         sockets(sessionManager, trolleyManager, appManager)
     }
-    GlobalScope.launch {
-        TimeUnit.SECONDS.sleep(5)
-        routeFinder.plan(7654321)
-    }
-
 
 }
 
