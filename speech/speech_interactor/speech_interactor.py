@@ -6,12 +6,14 @@ import subprocess as sp
 import sys
 import threading
 import time
+import queue
 
 import pyttsx3 as pyttsx
 import requests
 import serial
 import websocket
 from pocketsphinx import LiveSpeech, get_model_path
+from utils.custom_threads import WorkerThread
 
 import product
 
@@ -33,9 +35,8 @@ speech = LiveSpeech(
 
 
 class SpeechInteractor:
-    def __init__(self, controller, state_file='interactor_states.json', list_file='list.json'):
-        self.controller = controller
-        self.ws = self.controller.get_ws()
+    def __init__(self, websocket_instance, work_queue, state_file='interactor_states.json', list_file='list.json'):
+        self.ws = websocket_instance
         #Change so that it either knows the list id or the lists are global in controller.
         (self.shopping_list, self.ordered_list) = self.controller.get_shopping_list('7654321')
         # self.ws = initialise_socket()
@@ -60,19 +61,25 @@ class SpeechInteractor:
 
         self.current_location = ""
         self.possible_states = json.load(open(state_file, 'r'))
-        # print(self.possible_states)
         self.next_state('connection')
         self.react("n/a")
 
-        self.event = threading.Event()
+        # For testing "AppAccepted" message from server
+        # self.next_state("identify")
+        # self.react("no")
 
-        t1 = threading.Thread(name='SpeechInteractorThread', target=self.listen)
+        self.location_event = threading.Event()
+        self.listen_event = threading.Event()
+
+        self.work_queue = work_queue
+        t1 = WorkerThread("SpeechInteractorThread", self, self.work_queue, self.listen_event)
         t1.start()
 
-
+        t2 = threading.Thread(name="ListenThread", target=self.listen)
+        t2.start()
 
     def next_state(self, state):
-        print(state)
+        # print(state)
         self.state = state
         self.options = self.possible_states[state]
 
@@ -87,8 +94,8 @@ class SpeechInteractor:
             t2.start()
             
             # Block current thread while waiting for location change
-            self.event.wait() 
-            self.event.clear()
+            self.location_event.wait()
+            self.location_event.clear()
 
             # Need to replace shelf position with that from the JSON
             self.arrived(next_item, "middle")
@@ -107,25 +114,14 @@ class SpeechInteractor:
         print("listening")
 
         for sphrase in speech:
+            if self.listen_event.isSet():
+                self.listen_event.clear()
+
             phrase = str(sphrase).lower().split()
             word = self.find_word(phrase)
             print("You said:", word)
 
-            if "repeat" in word:
-                print("repeating")
-                self.say(self.last_reply)
-            elif "options" in word:
-                self.list_options()
-            elif "multiple" in word:
-                print("Multiple keywords detected")
-                self.say(
-                    "Sorry, I have heard more than one possible option. Can you confirm your option?")
-            elif "n/a" in word:
-                print("no keyword detected")
-                self.list_options()
-            else:
-                print(word, "detected")
-                self.react(word)
+            print("Current thread calling listen: {:}".format(threading.current_thread().name))
 
             # Logs the word/words that PocketSphinx has detected
             if self.logging is True:
@@ -136,6 +132,24 @@ class SpeechInteractor:
                             "Multiple keywords detected: {:}\n".format(phrase))
                     else:
                         f.write("Keyword detected: {:}\n".format(word))
+
+            if "repeat" in word:
+                print("repeating")
+                self.work_queue.put(("say", self.last_reply))
+            elif "options" in word:
+                self.work_queue.put("list_options")
+            elif "multiple" in word:
+                print("Multiple keywords detected")
+                say_this = "Sorry, I have heard more than one possible option. Can you confirm your option?"
+                self.work_queue.put(("say", say_this))
+            elif "n/a" in word:
+                print("no keyword detected")
+                self.work_queue.put("list_options")
+            else:
+                print(word, "detected")
+                self.work_queue.put(("react", word))
+
+            self.listen_event.wait()
 
     def find_word(self, phrase):
         valid_words = set(phrase) & (set(self.options) | universal_phrases)
@@ -151,7 +165,8 @@ class SpeechInteractor:
                  % ", ".join(str(o) for o in self.options))
 
     def react(self, word):
-        if "cart" in self.state and word == "yes" or word == "no":
+        if "cart" in self.state and (word == "yes" or word == "no"):
+            print("React cart")
             self.cart(word)
         elif "identify" in self.state and word == "yes":
             self.describe_item()
@@ -160,6 +175,7 @@ class SpeechInteractor:
         elif "init" in self.state and word == "start":
             self.start_state(word)
         else:
+            print("React else")
             print(word)
             self.say(self.options[word]['reply'])
             self.last_reply = self.options[word]['reply']
@@ -200,19 +216,16 @@ class SpeechInteractor:
         self.next_state(self.options['scanned']['nextState'])
         
 
-# Get the quantity of the item that is supposed to be picked up
-# if the item is the correct item remove one from quantity else dont remove as we still have to
-# pick up the correct item at this shelf 
-    def cart(self, word):
+    def cart(self, word, app=False):
         if "yes" in word:
+            if not app:
+                self.ws.send("AcceptedProduct&")
 
             quantity = self.ordered_list[0].get_quantity
-            self.controller.send_message(self.ws, "AcceptedProduct&")
 
             if self.ordered_list[0] == self.scanned_product:
                 quantity-=1
                 self.ordered_list[0].set_quantity(quantity)
-
             if quantity > 1:
                 nextState = 'nextState_quantity+'
                 response = self.options['yes']['reply_quantity+'] + \
@@ -222,8 +235,10 @@ class SpeechInteractor:
                 response = self.options['yes']['reply_quantity0']
 
         else:
-            self.controller.send_message(self.ws, "RejectedProduct&")
-            response = self.options['no']['reply']
+            if not app:
+                self.ws.send("RejectedProduct&")
+
+        response = self.options['no']['reply']       
         self.say(response)
         self.last_reply = response
         self.next_state(self.options[word][nextState])
@@ -262,14 +277,19 @@ class SpeechInteractor:
         if self.ordered_list[0].get_quantity() > 0:
             self.controller.send_message(self.ws, "SkippedProduct&")
         del self.ordered_list[0]
-        response = self.options['yes']['reply'] + self.ordered_list[0]
+        if len(self.ordered_list) == 0:
+            response = self.options['yes']['reply_finished']
+            nextState = 'finishedState'
+        else:
+            response = self.options['yes']['reply'] + self.ordered_list[0]
+            nextState = 'nextState'
         self.say(response)
         self.last_reply = response
-        self.next_state(self.options['yes']['nextState'])
+        self.next_state(self.options['yes'][nextState])
 
     # Sends the server a message that the user is at this cart and ready to start
     def start_state(self, word):
-        self.controller.send_message(self.ws, "UserReady&")
+        self.ws.send("UserReady&")
         self.say(self.options[word]['reply'])
         self.last_reply = self.options[word]['reply']
         self.next_state(self.options[word]['nextState'])
@@ -278,7 +298,7 @@ class SpeechInteractor:
         ser = serial.Serial('/dev/ttyACM0', 9600)
         new_location = ""
 
-        while not self.event.isSet():
+        while not self.location_event.isSet():
             new_location = ser.readline().decode('ascii')
 
             # Check if our location has changed and if so update current location
@@ -290,6 +310,6 @@ class SpeechInteractor:
                 # Check if we have arrived at the item
                 if next_item in self.current_location:
                     print("You have arrived at {:}".format(next_item))
-                    self.event.set()
+                    self.location_event.set()
             else:
                 print("Location has not changed.")

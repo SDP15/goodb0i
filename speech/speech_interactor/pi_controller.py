@@ -1,42 +1,41 @@
 import os
+import queue
 import socket
 import sys
 import threading
 import time
-import requests
 import serial
 
-import websocket
-
-import speech_interactor
+from speech_interactor import SpeechInteractor
+from utils.custom_threads import WorkerThread
+from utils.web_socket import WebSocket
 import product
 
 
 class PiController:
     def __init__(self):
+        # Data structures for worker threads
+        controller_queue = queue.Queue()
+        self.speech_interactor_queue = queue.Queue()
+
         self.ip_port = "127.0.0.1:8080"
-        self.ws = self.initialise_websocket()
-        self.sp_interactor = speech_interactor.SpeechInteractor(self)
-
-        #used to get the list and remember the place the robot is in the list.
-        self.shopping_list_index = 0
-
-        print("\n\n\n\nReturned\n\n\n\n")
+        self.ws = WebSocket(controller_queue).get_instance()
+        SpeechInteractor(self.ws, self.speech_interactor_queue)
         #self.initialise_ev3_socket()
-        while True:
-            pass
         
-    def get_ws(self):
-        return self.ws 
+        # Thread runs a given function and it's arguments (if given any) from the work queue
+        t1 = WorkerThread("PiControllerThread", self, controller_queue)
+        t1.start()
 
-    def on_message(self, ws, message):
-        print("Message: " + str(message))
+        # To test receiving messages from WebSocket
+        # time.sleep(3)
+        # self.ws.send("AppAcceptedProduct")
+
+    def on_message(self, message):
         if "AppAcceptedProduct" in message:
-            self.sp_interactor.cart(word="yes")
-
+            self.speech_interactor_queue.put(("cart", "yes", "app=True"))
         elif "AppRejectedProject" in message:
-            self.sp_interactor.cart("no")
-
+            self.speech_interactor_queue.put(("cart", "no", "app=True"))
         elif "AppScannedProduct" in message:
             item = message.split("&")
             query = "/products/" + item[1]
@@ -46,13 +45,13 @@ class PiController:
             name = item_json['product']['name']
             price = item_json['product']['price']
             new_product = product.Product(id, 1, name, price)
-            self.sp_interactor.set_scanned_item(new_product)
-
+            self.speech_interactor_queue.put(("scanned", item[1]))
         elif "RouteCalculated" in message:
             #Message format: RouteCalculated&forward,right%something%something,forward
             full_route = message.split("&")
             route_commands = full_route[1].split(",")
             self.marker_list = []
+            self.shelf_count = {}
             for commands in route_commands:
                 command = commands.split("%")
                 #currently server sends center and ev3 receives forward if this doesnt change uncomment
@@ -60,57 +59,16 @@ class PiController:
                 #     command[0] = "forward"
                 if len(command) > 1:
                     self.marker_list.append(command[1])
+                    self.shelf_count[command[1]] = len(command) - 1
+                    print("We are collecting " + (len(command) -1) + " at shelf " + command[1])
                 self.send_tcpsocket("enqueue-" + command[0])
             print(route_commands)
-            self.send_message(ws, "ReceivedRoute&")
-            self.sp_interactor.react("connected")
-            
+            self.ws.send("ReceivedRoute&")
+            self.speech_interactor_queue.put(("react", "connected"))
         elif "Assigned" in message:
             list_message = message.split("&")
             list_id = list_message[1]
             self.get_shopping_list(list_id)
-
-        else:
-            print(message)
-
-            
-
-    def on_error(self, ws, error):
-        print(error)
-        # Consider trying to re open a web scoket connection if the error message is a closed websocket.
-
-    def on_close(self, ws):
-        print("### closed ###")
-
-    def send_message(self, ws, message):
-        print("Sent " + message)
-        ws.send(str(message))
-
-    def run(self, *args):
-        # print("listening")
-        # for phrase in lsp:
-        #     print("You said: "+str(phrase))
-        #     time.sleep(1)
-        #     ws.send(str(phrase))
-        args[0].run_forever()
-
-    def on_open(self, ws):
-        pass
-
-    def initialise_websocket(self):
-        print("initialise websocket " + self.ip_port + "/trolley")
-        websocket.enableTrace(True)
-        ws = websocket.WebSocketApp(self.ip_port + "/trolley",
-                                    on_message=self.on_message,
-                                    on_error=self.on_error,
-                                    on_close=self.on_close)
-        ws.on_open = self.on_open
-        # ws.run_forever()
-        t1 = threading.Thread(name='WebSocketThread', target=self.run, args=(ws, ))
-        t1.start()
-        # threading.start_new_thread(self.run, (ws, ))
-        print("Websocket connection")
-        return ws
 
     #the request parameter has to be in the correct format e.g. /lists/load/7654321
     def query_web_server(self, ws, request):
@@ -118,7 +76,6 @@ class PiController:
         list_json = r.json()
         return list_json
      
-
     # Retrieves all the items and quantities on the shopping list.
     def get_shopping_list(self, list_file):
         r = requests.get("http://" + self.ip_port + "/lists/load/" + list_file)
@@ -172,6 +129,5 @@ class PiController:
     def close_tcpsocket(self):       
         if self.ser.is_open:
             self.ser.close()
-
 
 PiController()
