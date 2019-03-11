@@ -6,7 +6,6 @@ import com.sdp15.goodb0i.data.navigation.Message
 import com.sdp15.goodb0i.data.navigation.Route
 import com.sdp15.goodb0i.data.navigation.ShoppingSessionManager
 import com.sdp15.goodb0i.data.navigation.ShoppingSessionState
-import com.sdp15.goodb0i.data.store.lists.ListItem
 import com.sdp15.goodb0i.view.BaseViewModel
 import org.koin.standalone.inject
 import timber.log.Timber
@@ -33,20 +32,13 @@ class NavigatingToViewModel : BaseViewModel<Any>() {
                     )
                 )
             } else {
-                //TODO: Cleaner way to do this mess, we really just want to get the
-                // products once, as they won't change while we are navigating
-                sm.currentProducts.observeForever(object : Observer<List<ListItem>> {
-                    override fun onChanged(list: List<ListItem>) {
-                        destination.postValue(
-                            NavigatingToFragment.NavigationDestination.ShelfRack(
-                                distance = state.to.index - state.from.index,
-                                progress = state.at.index - state.from.index,
-                                toCollect = list
-                            )
-                        )
-                        sm.currentProducts.removeObserver(this)
-                    }
-                })
+                destination.postValue(
+                    NavigatingToFragment.NavigationDestination.ShelfRack(
+                        distance = state.to.index - state.from.index,
+                        progress = state.at.index - state.from.index,
+                        toCollect = state.products
+                    )
+                )
             }
         } else if (state is ShoppingSessionState.Disconnected) {
             //TODO: Do something about this

@@ -1,6 +1,6 @@
 package com.sdp15.goodb0i.view.navigation.product
 
-import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.sdp15.goodb0i.data.navigation.Message
 import com.sdp15.goodb0i.data.navigation.ShoppingSessionManager
@@ -13,7 +13,7 @@ class ProductViewModel : BaseViewModel<Any>() {
 
     private val sm: ShoppingSessionManager<Message.IncomingMessage> by inject()
 
-    val products: LiveData<List<ListItem>> = sm.currentProducts
+    val products: MutableLiveData<List<ListItem>> = MutableLiveData()
 
     override fun bind() {
         sm.state.observeForever(stateObserver)
@@ -22,6 +22,8 @@ class ProductViewModel : BaseViewModel<Any>() {
     private val stateObserver = Observer<ShoppingSessionState> { state ->
         if (state is ShoppingSessionState.NavigatingTo) {
             transitions.postValue(ProductFragmentDirections.actionItemFragmentToNavigatingToFragment())
+        } else if (state is ShoppingSessionState.Scanning) {
+            products.postValue(state.toScan)
         }
     }
 
