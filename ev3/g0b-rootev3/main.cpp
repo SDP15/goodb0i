@@ -589,7 +589,8 @@ private:
           rsend("Supported commands: help stop start moving? enqueue-stop "
                 "enqueue-forward enqueue-left enqueue-right queue-status "
                 "dump-queue clear-queue resume-from-stop-marker dump dump-hsv "
-                "battery disconnect\n");
+                "battery `set-speed 100` get-speed `set-max-turn-ratio 110` "
+                "`set-slight-turn-ratio 90` get-turn-ratios disconnect\n");
         } else if (cmd == "stop") {
           if (!halted) {
             sysSteering.requestStop(SUBSYS_ROBOT);
