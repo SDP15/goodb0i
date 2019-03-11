@@ -5,6 +5,7 @@ import sys
 import threading
 import time
 import serial
+import requests
 
 from speech_interactor import SpeechInteractor
 from utils.custom_threads import WorkerThread
@@ -39,15 +40,15 @@ class PiController:
         elif "AppScannedProduct" in message:
             item = message.split("&")
             query = "/products/" + item[1]
-            item_json = self.query_web_server(ws, query)
+            item_json = self.query_web_server(query)
 
             id = item_json['product']['id']
             name = item_json['product']['name']
             price = item_json['product']['price']
             new_product = product.Product(id, 1, name, price)
-            self.speech_interactor_queue.put(("scanned", item[1]))
+            self.speech_interactor_queue.put(("scanned", new_product))
         elif "RouteCalculated" in message:
-            #Message format: RouteCalculated&forward,right%something%something,forward
+            #Message format: RouteCalculated&forward,right%shelf_number%index_of_item,forward
             full_route = message.split("&")
             route_commands = full_route[1].split(",")
             self.marker_list = []
@@ -71,7 +72,7 @@ class PiController:
             self.get_shopping_list(list_id)
 
     #the request parameter has to be in the correct format e.g. /lists/load/7654321
-    def query_web_server(self, ws, request):
+    def query_web_server(self, request):
         r = requests.get("http://"+self.ip_port + request)
         list_json = r.json()
         return list_json
@@ -90,12 +91,8 @@ class PiController:
             new_product = product.Product(id, quantity, name, price)
             self.ordered_list.append(new_product)
         print(self.ordered_list)
-        self.sp_interactor.set_list(self.ordered_list)
+        self.speech_interactor_queue.put(("set_list", self.ordered_list))
 
-
-    def get_next_item(self):
-        self.shopping_list_index = self.shopping_list_index + 1
-        self.ordered_list[self.shopping_list_index]
     
 
     def initialise_ev3_socket(self):
@@ -111,8 +108,8 @@ class PiController:
             if byte == "\n":
                 break
             message += byte
-        # NEED TO CHANGE THIS! 
-        if message == stop_list[0]:
+        # TODO: NEED TO CHANGE THIS! 
+        if message == self.marker_list[0]:
             self.sp_interactor.on_location_change()
             self.send_message(self.ws, "ReachPoint&" + message)
         else:

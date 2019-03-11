@@ -35,11 +35,9 @@ speech = LiveSpeech(
 
 
 class SpeechInteractor:
-    def __init__(self, websocket_instance, work_queue, state_file='interactor_states.json', list_file='list.json'):
+    def __init__(self, websocket_instance, work_queue, state_file='interactor_states.json'):
         self.ws = websocket_instance
-        #Change so that it either knows the list id or the lists are global in controller.
-        (self.shopping_list, self.ordered_list) = self.controller.get_shopping_list('7654321')
-        # self.ws = initialise_socket()
+        
         log_filename = now.strftime("%Y-%m-%d-%H%M%S")
         self.logging = False
 
@@ -64,6 +62,8 @@ class SpeechInteractor:
         self.next_state('connection')
         self.react("n/a")
 
+        self.scanned_product = None
+
         # For testing "AppAccepted" message from server
         # self.next_state("identify")
         # self.react("no")
@@ -84,10 +84,7 @@ class SpeechInteractor:
         self.options = self.possible_states[state]
 
         if "shopping0" in self.state:
-            # Uncomment line below once NFC tags have item strings on them
-            #next_item = self.ordered_list[self.list_pointer]
-            next_item = "TRACK_NFCTYPE4A"
-
+            next_item = self.ordered_list[0]
 
             # Start thread to listen for location changes
             t2 = threading.Thread(name='LocationListenerThread', target=self.on_location_change, args=(next_item,))
@@ -275,7 +272,7 @@ class SpeechInteractor:
     # going to collect next. 
     def continue_shopping(self):
         if self.ordered_list[0].get_quantity() > 0:
-            self.controller.send_message(self.ws, "SkippedProduct&")
+            self.ws.send("SkippedProduct&")
         del self.ordered_list[0]
         if len(self.ordered_list) == 0:
             response = self.options['yes']['reply_finished']
