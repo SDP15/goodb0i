@@ -1,39 +1,47 @@
-before_script: 
-  - cd android/App
-language: android
-git:
-  submodules: false
-android:
-  components:
-    # Uncomment the lines below if you want to
-    # use the latest revision of Android SDK Tools
-    - tools
-    - platform-tools
+matrix:
+  include:
+    - 
+    before_script: 
+      - cd android/App
+    language: android
+    git:
+      submodules: false
+    android:
+      components:
+        # Uncomment the lines below if you want to
+        # use the latest revision of Android SDK Tools
+        - tools
+        - platform-tools
 
-    # The BuildTools version used by your project
-    #- build-tools-26.0.2
-    - build-tools-28.0.3
-    # The SDK version used to compile your project
-    - android-28
+        # The BuildTools version used by your project
+        #- build-tools-26.0.2
+        - build-tools-28.0.3
+        # The SDK version used to compile your project
+        - android-28
 
-    # Additional components
-    - extra-google-google_play_services
-    - extra-google-m2repository
-    - extra-android-m2repository
+        # Additional components
+        - extra-google-google_play_services
+        - extra-google-m2repository
+        - extra-android-m2repository
 
     # Specify at least one system image,
     # if you need to run emulator(s) during your tests
     #- sys-img-x86-android-28
     #- sys-img-armeabi-v7a-android-28
-before_cache:
-  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
-cache:
-  directories:
-    - $HOME/.gradle/caches/
-    - $HOME/.gradle/wrapper/
-    - $HOME/.android/build-cache
-before_install:
-  - yes | sdkmanager "platforms;android-28"
-script: 
-  - ./gradlew test
+    before_cache:
+      - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+      - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+    cache:
+      directories:
+        - $HOME/.gradle/caches/
+        - $HOME/.gradle/wrapper/
+        - $HOME/.android/build-cache
+      before_install:
+        - yes | sdkmanager "platforms;android-28"
+    script: 
+      - ./gradlew test
+    - 
+    before_script:
+      - cd server/GoodB0iServer
+    script:
+      - ./gradlew test
