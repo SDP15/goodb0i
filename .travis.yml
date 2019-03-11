@@ -39,7 +39,7 @@ matrix:
           - yes | sdkmanager "platforms;android-28"
       script: 
         - ./gradlew test
-    - language: kotlin
+    - language: java
       before_script:
         - cd server/GoodB0iServer
       script:
