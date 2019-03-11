@@ -46,6 +46,9 @@ class Session(
             is Message.IncomingMessage.FromApp.RequestStop -> {
                 //TODO
             }
+            is Message.IncomingMessage.FromApp.AppSkippedProduct -> {
+                sendToTrolley(Message.OutgoingMessage.ToTrolley.AppSkippedProduct)
+            }
         }
     }
 
@@ -66,6 +69,9 @@ class Session(
             }
             is Message.IncomingMessage.FromTrolley.ReachedPoint -> {
                 sendToApp(Message.OutgoingMessage.ToApp.ReachedPoint(message.id))
+            }
+            is Message.IncomingMessage.FromTrolley.TrolleySkippedProduct -> {
+                sendToApp(Message.OutgoingMessage.ToApp.TrolleySkippedProduct)
             }
         }
     }

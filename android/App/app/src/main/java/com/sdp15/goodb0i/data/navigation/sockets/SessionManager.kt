@@ -31,11 +31,14 @@ class SessionManager(
     private var uid: String = "" // Server session id
     private var route: Route = Route.emptyRoute()
     private var index = 0 // Index within the route
-    private var lastStopLocation: Route.RoutePoint.IndexPoint = Route.RoutePoint.IndexPoint.Start // Last rack we stopped at
+    private var lastStopLocation: Route.RoutePoint.IndexPoint =
+        Route.RoutePoint.IndexPoint.Start // Last rack we stopped at
     private val nextStopPoint: Route.RoutePoint.IndexPoint
         get() = route.subList(fromIndex = index + 1, toIndex = route.size)
             .firstOrNull { point -> point is Route.RoutePoint.IndexPoint.IdentifiedPoint.Stop || point is Route.RoutePoint.IndexPoint.End } as Route.RoutePoint.IndexPoint
+
     private var shoppingList: ShoppingList = ShoppingList.emptyList()
+    private var lastScannedProduct: Product? = null
 
     private val incomingMessages = MutableLiveData<Message.IncomingMessage>()
     //TODO: If there isn't a use for publicly exposing direct message access, remove this. (Currently no usages)
@@ -43,13 +46,6 @@ class SessionManager(
 
     // Products to collect from the current rack
     private val remainingRackProducts: MutableList<ListItem> = mutableListOf()
-    private val currentRackProducts = MutableLiveData<List<ListItem>>()
-    override val currentProducts: LiveData<List<ListItem>> = currentRackProducts
-
-    // Last scanned product
-    private val lastScannedProduct = MutableLiveData<Product>()
-    override val scannedProduct: LiveData<Product> = lastScannedProduct
-
     private val sessionState = MutableLiveData<ShoppingSessionState>().apply {
         postValue(ShoppingSessionState.NoSession)
     }
@@ -59,6 +55,7 @@ class SessionManager(
         //TODO: Handle disconnecting observers
         sh.connectionState.observeForever { state ->
             if (state == SocketHandler.SocketState.ErrorDisconnect) {
+                Timber.i("Socket state disconnected. Attempting reconnect")
                 sessionState.postValue(ShoppingSessionState.Disconnected)
                 attemptReconnection()
             }
@@ -93,7 +90,10 @@ class SessionManager(
                     if (state.value is ShoppingSessionState.Confirming) productAcceptedInternal()
                 }
                 is Message.IncomingMessage.TrolleyRejectedProduct -> {
-                    if(state.value is ShoppingSessionState.Confirming) productRejectedInternal()
+                    if (state.value is ShoppingSessionState.Confirming) productRejectedInternal()
+                }
+                is Message.IncomingMessage.TrolleySkippedProduct -> {
+                    if (state.value is ShoppingSessionState.Scanning) skipProductInternal()
                 }
             }
             if (!consume) incomingMessages.postValue(message)
@@ -102,7 +102,7 @@ class SessionManager(
 
     override fun startSession(list: ShoppingList) {
         if (!sh.isConnected) {
-            Timber.i("Starting session")
+            Timber.i("Starting session $list")
             shoppingList = list
             sessionState.postValue(ShoppingSessionState.Connecting)
             sh.start(RetrofitProvider.root + "/app")
@@ -125,7 +125,7 @@ class SessionManager(
             index = pointIndex
             Timber.i("At stop at $id")
             lastStopLocation = point
-            sessionState.postValue(ShoppingSessionState.Scanning(point))
+            sessionState.postValue(ShoppingSessionState.Scanning(point, remainingRackProducts))
             return true
         } else if (point is Route.RoutePoint.IndexPoint.IdentifiedPoint.Pass) {
             // We don't want to change state if a tag scan is triggered while we are scanning
@@ -135,7 +135,7 @@ class SessionManager(
                 // We should already be in a NavigatingTo state at this point
                 sessionState.postValue(
                     ShoppingSessionState.NavigatingTo(
-                        from = lastStopLocation, to = nextStopPoint, at = point
+                        from = lastStopLocation, to = nextStopPoint, at = point, products = remainingRackProducts
                     )
                 )
             }
@@ -153,18 +153,18 @@ class SessionManager(
             val indices = point.productIndices
             remainingRackProducts.clear()
             remainingRackProducts.addAll(shoppingList.products.slice(indices))
-            currentRackProducts.postValue(remainingRackProducts)
             sessionState.postValue(
                 ShoppingSessionState.NavigatingTo(
-                    from = lastStopLocation, to = point, at = route[index] as Route.RoutePoint.IndexPoint
+                    from = lastStopLocation, to = point, at = route[index] as Route.RoutePoint.IndexPoint,
+                    products = remainingRackProducts
                 )
             )
         } else if (point is Route.RoutePoint.IndexPoint.End) {
             remainingRackProducts.clear()
-            currentRackProducts.postValue(remainingRackProducts)
             sessionState.postValue(
                 ShoppingSessionState.NavigatingTo(
-                    from = lastStopLocation, at = route[index] as Route.RoutePoint.IndexPoint, to = point
+                    from = lastStopLocation, at = route[index] as Route.RoutePoint.IndexPoint, to = point,
+                    products = remainingRackProducts
                 )
             )
         } else {
@@ -172,7 +172,7 @@ class SessionManager(
     }
 
     /*
-     Attempt to match a scanned barcode to a product
+     Attempt to match a scanned barcode to a products
      As we are on a local network, making a GET request is currently not an issue
      TODO: Check against cached products for the current shelf
      */
@@ -187,50 +187,72 @@ class SessionManager(
             }
         }
         if (product != null) {
-            lastScannedProduct.postValue(product)
+            lastScannedProduct = product
             sessionState.postValue(ShoppingSessionState.Confirming(product))
         }
         return product
     }
 
+    override fun skipProduct() {
+        sh.sendMessage(Message.OutgoingMessage.SkippedProduct)
+        skipProductInternal()
+    }
+
+    private fun skipProductInternal() {
+        remainingRackProducts.removeAt(0)
+        switchToNextListItem()
+    }
+
     override fun productAccepted() {
-        sh.sendMessage(Message.OutgoingMessage.ProductAccepted(lastScannedProduct.value!!.id))
+        sh.sendMessage(Message.OutgoingMessage.AcceptedProduct(lastScannedProduct!!.id))
         productAcceptedInternal()
     }
 
     /*
-     Change session state when product is accepted
+     Change session state when products is accepted
      Either by the app or via message from trolley
      */
     private fun productAcceptedInternal() {
         val current = remainingRackProducts.first()
-        // Decrement quantity of current product
+        // Decrement quantity of current products
         Timber.i("Decrementing quantity for $current")
         remainingRackProducts[0] = current.copy(quantity = current.quantity - 1)
         if (remainingRackProducts.first().quantity == 0) {
-            Timber.i("Removing product with quantity 0")
+            Timber.i("Removing products with quantity 0")
             remainingRackProducts.removeAt(0)
         }
+        switchToNextListItem()
+    }
+
+    private fun switchToNextListItem() {
+
         // If there are no products remaining on the rack, navigate to the next at
         if (remainingRackProducts.isEmpty()) {
             Timber.i("No products remaining for this rack")
-            currentRackProducts.postValue(null) // Nothing left to observe
             postMovingState()
         } else {
             // Otherwise, we are still in the scanning state
             Timber.i("Products remaining on rack $remainingRackProducts")
-            currentRackProducts.postValue(remainingRackProducts)
-            sessionState.postValue(ShoppingSessionState.Scanning(route[index] as Route.RoutePoint.IndexPoint.IdentifiedPoint.Stop))
+            sessionState.postValue(
+                ShoppingSessionState.Scanning(
+                    route[index] as Route.RoutePoint.IndexPoint.IdentifiedPoint.Stop, remainingRackProducts
+                )
+            )
         }
     }
 
     override fun productRejected() {
-        sh.sendMessage(Message.OutgoingMessage.ProductRejected(lastScannedProduct.value!!.id))
+        sh.sendMessage(Message.OutgoingMessage.RejectedProduct(lastScannedProduct!!.id))
         productRejectedInternal()
     }
 
     private fun productRejectedInternal() {
-        sessionState.postValue(ShoppingSessionState.Scanning(route[index] as Route.RoutePoint.IndexPoint.IdentifiedPoint.Stop))
+        sessionState.postValue(
+            ShoppingSessionState.Scanning(
+                route[index] as Route.RoutePoint.IndexPoint.IdentifiedPoint.Stop,
+                remainingRackProducts
+            )
+        )
     }
 
     override fun requestAssistance() {
@@ -243,9 +265,11 @@ class SessionManager(
         GlobalScope.launch {
             //TODO: Break after some number of reconnection attempts
             while (!sh.isConnected) {
+                sh.start(RetrofitProvider.root + "/app")
                 sh.sendMessage(Message.OutgoingMessage.Reconnect(uid))
-                delay(1000)
+                delay(500)
             }
+            Timber.i("Socket reconnected")
         }
     }
 }

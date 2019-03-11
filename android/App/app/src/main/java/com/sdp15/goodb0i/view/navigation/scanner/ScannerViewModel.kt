@@ -5,10 +5,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.sdp15.goodb0i.data.navigation.Message
 import com.sdp15.goodb0i.data.navigation.ShoppingSessionManager
+import com.sdp15.goodb0i.data.navigation.ShoppingSessionState
 import com.sdp15.goodb0i.data.navigation.scanner.BarcodeReader
 import com.sdp15.goodb0i.data.navigation.scanner.BarcodeReaderCallback
 import com.sdp15.goodb0i.data.navigation.scanner.BarcodeReading
-import com.sdp15.goodb0i.data.store.lists.ListItem
 import com.sdp15.goodb0i.view.BaseViewModel
 import kotlinx.coroutines.launch
 import org.koin.standalone.inject
@@ -28,9 +28,12 @@ class ScannerViewModel : BaseViewModel<Any>(),
     override fun bind() {
         // Restart scanning on bind
         isRunning.set(false)
-        sm.currentProducts.observeForever(object: Observer<List<ListItem>> {
-            override fun onChanged(list: List<ListItem>) {
-                if(Build.FINGERPRINT.startsWith("generic")
+        // Test code for emulator runs.
+        // Automatically 'scans' the correct product
+        sm.state.observeForever(object: Observer<ShoppingSessionState> {
+            override fun onChanged(state: ShoppingSessionState) {
+                if (state is ShoppingSessionState.Scanning) {
+                    if(Build.FINGERPRINT.startsWith("generic")
                         || Build.FINGERPRINT.startsWith("unknown")
                         || Build.MODEL.contains("google_sdk")
                         || Build.MODEL.contains("Emulator")
@@ -38,10 +41,10 @@ class ScannerViewModel : BaseViewModel<Any>(),
                         || Build.MANUFACTURER.contains("Genymotion")
                         || (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic"))
                         || "google_sdk".equals(Build.PRODUCT)) {
-                    Timber.i("On Emulator: Sending product id ${list.first().product.id}")
-                    onRead(list.first().product.id)
+                        onRead(state.toScan.first().product.id)
+                    }
+                    sm.state.removeObserver(this)
                 }
-                sm.currentProducts.removeObserver(this)
             }
         })
     }

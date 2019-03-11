@@ -50,6 +50,7 @@ class SocketHandler<IN, OUT>(private val transform: SocketMessageTransformer<IN,
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
             super.onFailure(webSocket, t, response)
             Timber.e(t, "Socket failure")
+            connected.set(false)
             state.postValue(SocketState.ErrorDisconnect)
         }
 

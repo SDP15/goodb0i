@@ -14,6 +14,8 @@ sealed class Message {
 
             object TrolleyRejectedProduct : FromTrolley()
 
+            object TrolleySkippedProduct : FromTrolley()
+
             data class ReachedPoint(val id: String) : FromTrolley()
 
             data class InvalidMessage(val message: String) : FromTrolley()
@@ -32,6 +34,8 @@ sealed class Message {
             object AppRejectedProduct : FromApp()
 
             object AppAcceptedProduct : FromApp()
+
+            object AppSkippedProduct : FromApp()
 
             object RequestHelp : FromApp()
 
@@ -57,6 +61,8 @@ sealed class Message {
 
             object AppRejectedProduct : ToTrolley()
 
+            object AppSkippedProduct : ToTrolley()
+
         }
 
         sealed class ToApp : OutgoingMessage() {
@@ -72,6 +78,8 @@ sealed class Message {
             object TrolleyAcceptedProduct : ToApp()
 
             object TrolleyRejectedProduct : ToApp()
+
+            object TrolleySkippedProduct : ToApp()
         }
     }
 
@@ -87,6 +95,7 @@ sealed class Message {
                 "ProductScanned" -> IncomingMessage.FromApp.ProductScanned(message.substringAfter(DELIM))
                 "AcceptedProduct" -> IncomingMessage.FromApp.AppAcceptedProduct
                 "RejectedProduct" -> IncomingMessage.FromApp.AppRejectedProduct
+                "SkippedProduct" -> IncomingMessage.FromApp.AppSkippedProduct
                 "RequestHelp" -> IncomingMessage.FromApp.RequestHelp
                 "Stop" -> IncomingMessage.FromApp.RequestStop
                 "ReceivedRoute" -> IncomingMessage.FromApp.ReceivedRoute
@@ -101,6 +110,7 @@ sealed class Message {
                 "ReachedPoint" -> IncomingMessage.FromTrolley.ReachedPoint(message.substringAfter(DELIM))
                 "AcceptedProduct" -> IncomingMessage.FromTrolley.TrolleyAcceptedProduct
                 "RejectedProduct" -> IncomingMessage.FromTrolley.TrolleyRejectedProduct
+                "SkippedProduct" -> IncomingMessage.FromTrolley.TrolleySkippedProduct
                 "UserReady" -> IncomingMessage.FromTrolley.UserReady
                 "ReceivedRoute" -> IncomingMessage.FromTrolley.ReceivedRoute
                 else -> IncomingMessage.FromTrolley.InvalidMessage(message)
@@ -111,11 +121,13 @@ sealed class Message {
             is OutgoingMessage.ToApp.ReachedPoint -> "ReachedPoint$DELIM${message.point}"
             is OutgoingMessage.ToApp.TrolleyAcceptedProduct -> "TrolleyAcceptedProduct$DELIM"
             is OutgoingMessage.ToApp.TrolleyRejectedProduct -> "TrolleyRejectedProduct$DELIM"
+            is OutgoingMessage.ToApp.TrolleySkippedProduct -> "TrolleySkippedProduct$DELIM"
             is OutgoingMessage.ToApp.Route -> "RouteCalculated$DELIM${message.route}"
             is OutgoingMessage.ToApp.TrolleyAssigned -> "TrolleyAssigned$DELIM"
             is OutgoingMessage.ToApp.UserReady -> "UserReady$DELIM"
             is OutgoingMessage.ToTrolley.AppAcceptedProduct -> "AppAcceptedProduct$DELIM"
             is OutgoingMessage.ToTrolley.AppRejectedProduct -> "AppRejectedProduct$DELIM"
+            is OutgoingMessage.ToTrolley.AppSkippedProduct -> "AppSkippedProduct$DELIM"
             is OutgoingMessage.ToTrolley.AppScannedProduct -> "AppScannedProduct$DELIM${message.id}"
             is OutgoingMessage.ToTrolley.AssignedToApp -> "Assigned$DELIM${message.code}"
             is OutgoingMessage.ToTrolley.RouteCalculated -> "RouteCalculated$DELIM${message.route}"

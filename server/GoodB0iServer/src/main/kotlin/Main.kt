@@ -47,8 +47,7 @@ fun Application.module() {
 
     TestDataProvider.insert()
 
-    val trolleyManager = TrolleyManager()
-    val appManager = AppManager()
+
     val routeFinder = RouteFinder(listService,
             Graph.graph<Int> {
                 // Test shelves are 3, 1, 5, 7
@@ -65,6 +64,8 @@ fun Application.module() {
 
             })
     val sessionManager = SessionManager(routeFinder)
+    val trolleyManager = TrolleyManager()
+    val appManager = AppManager(sessionManager)
 
 
     install(Routing) {

@@ -1,11 +1,10 @@
 package com.sdp15.goodb0i.data.store
 
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
-import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import timber.log.Timber
 
 /*
  * Dirty static store which allows us to switch out the base URL
@@ -21,7 +20,9 @@ object RetrofitProvider {
 
     private fun build() : Retrofit =
         Retrofit.Builder().apply {
-            client(OkHttpClient().newBuilder().build())
+            client(OkHttpClient().newBuilder().addInterceptor(HttpLoggingInterceptor().apply {
+                level = HttpLoggingInterceptor.Level.BODY
+            }).build())
             baseUrl(root)
             addConverterFactory(GsonConverterFactory.create())
             addCallAdapterFactory(CoroutineCallAdapterFactory())

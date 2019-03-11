@@ -15,6 +15,8 @@ import websocket
 from pocketsphinx import LiveSpeech, get_model_path
 from utils.custom_threads import WorkerThread
 
+import product
+
 model_path = get_model_path()
 now = datetime.datetime.now()
 universal_phrases = {'repeat', 'options'}
@@ -36,7 +38,8 @@ class SpeechInteractor:
     def __init__(self, websocket_instance, work_queue, state_file='interactor_states.json', list_file='list.json'):
         self.ws = websocket_instance
         #Change so that it either knows the list id or the lists are global in controller.
-        # self.controller.get_shopping_list('7654321')
+        (self.shopping_list, self.ordered_list) = self.controller.get_shopping_list('7654321')
+        # self.ws = initialise_socket()
         log_filename = now.strftime("%Y-%m-%d-%H%M%S")
         self.logging = False
 
@@ -58,7 +61,7 @@ class SpeechInteractor:
 
         self.current_location = ""
         self.possible_states = json.load(open(state_file, 'r'))
-        self.next_state('init')
+        self.next_state('connection')
         self.react("n/a")
 
         # For testing "AppAccepted" message from server
@@ -85,6 +88,7 @@ class SpeechInteractor:
             #next_item = self.ordered_list[self.list_pointer]
             next_item = "TRACK_NFCTYPE4A"
 
+
             # Start thread to listen for location changes
             t2 = threading.Thread(name='LocationListenerThread', target=self.on_location_change, args=(next_item,))
             t2.start()
@@ -98,10 +102,13 @@ class SpeechInteractor:
 
         if "arrival" in self.state:
             # replace for barcode scanner info.
-            action = input("Please enter scanned.  ")
-            if "scanned" in action:
-                item = self.ordered_list[self.list_pointer]
-                self.scanned(item)
+            print("Waiting for item to be scanned.")
+            while self.scanned_product is None:
+                pass
+            self.scanned(self.scanned_product)
+
+
+
 
     def listen(self, *arg):
         print("listening")
@@ -203,68 +210,86 @@ class SpeechInteractor:
 
     def scanned(self, item):
         response = self.options['scanned']['reply'] + \
-            item + self.options['scanned']['prompt']
+            item.get_name + self.options['scanned']['prompt']
         self.say(response)
         self.last_reply = response
         self.next_state(self.options['scanned']['nextState'])
+        
 
     def cart(self, word, app=False):
-        current_item = self.ordered_list[self.list_pointer]
-        quantity = self.shopping_list[current_item]
-        self.shopping_list[current_item] = quantity-1
-
         if "yes" in word:
-            if app:
-                self.ws.send("PA&")
+            if not app:
+                self.ws.send("AcceptedProduct&")
+
+            quantity = self.ordered_list[0].get_quantity
+
+            if self.ordered_list[0] == self.scanned_product:
+                quantity-=1
+                self.ordered_list[0].set_quantity(quantity)
             if quantity > 1:
                 nextState = 'nextState_quantity+'
                 response = self.options['yes']['reply_quantity+'] + \
-                    str(quantity-1) + self.options['yes']['prompt']
+                    str(quantity) + " more " + self.ordered_list[0].get_name() + self.options['yes']['prompt']
             else:
                 nextState = 'nextState_quantity0'
                 response = self.options['yes']['reply_quantity0']
 
         else:
-            if app:
-                self.ws.send("PR&")
-            response = self.options['no']['reply']
-        
+            if not app:
+                self.ws.send("RejectedProduct&")
+
+        response = self.options['no']['reply']       
         self.say(response)
         self.last_reply = response
         self.next_state(self.options[word][nextState])
 
     def describe_item(self):
-        for tings in self.stuff['products']:
-            if tings['product']['name'] == self.ordered_list[self.list_pointer]:
-                cost = tings['product']['price']
-                # Format the output to tell the user the price in pounds and pence.
-                if cost >= 1:
-                    pounds = math.floor(cost)
-                    pence = math.floor((cost - pounds) * 100)
-                    total = str(pounds) + " pounds and " + \
-                        str(int(pence)) + " pence"
-                else:
-                    pence = cost * 100
-                    total = str(int(pence)) + " pence"
+        cost = self.scanned_product.get_price()
+        # Format the output to tell the user the price in pounds and pence.
+        if cost >= 1:
+            pounds = math.floor(cost)
+            pence = math.floor((cost - pounds) * 100)
+            total = str(pounds) + " pounds and " + \
+                str(int(pence)) + " pence"
+        else:
+            pence = cost * 100
+            total = str(int(pence)) + " pence"
         response = self.options['yes']['price'] + \
             total + self.options['no']['reply']
         self.say(response)
         self.last_reply = response
         self.next_state(self.options['no']['nextState'])
 
+
+    def set_list(self, ordered_list):
+        self.ordered_list = ordered_list
+
+
+    def set_scanned_item(self, scanned_product):
+        self.scanned_product = scanned_product
+
+
+
+    # Only called if the user decides to go to the next item
     # Sets the current item to the next item on the list and informs the user what item they are
-    # going to collect next.
+    # going to collect next. 
     def continue_shopping(self):
-        self.list_pointer = self.list_pointer + 1
-        next_product = self.ordered_list[self.list_pointer]
-        response = self.options['yes']['reply'] + next_product
+        if self.ordered_list[0].get_quantity() > 0:
+            self.controller.send_message(self.ws, "SkippedProduct&")
+        del self.ordered_list[0]
+        if len(self.ordered_list) == 0:
+            response = self.options['yes']['reply_finished']
+            nextState = 'finishedState'
+        else:
+            response = self.options['yes']['reply'] + self.ordered_list[0]
+            nextState = 'nextState'
         self.say(response)
         self.last_reply = response
-        self.next_state(self.options['yes']['nextState'])
+        self.next_state(self.options['yes'][nextState])
 
     # Sends the server a message that the user is at this cart and ready to start
     def start_state(self, word):
-        self.ws.send("UR&")
+        self.ws.send("UserReady&")
         self.say(self.options[word]['reply'])
         self.last_reply = self.options[word]['reply']
         self.next_state(self.options[word]['nextState'])

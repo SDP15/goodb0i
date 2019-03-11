@@ -34,6 +34,8 @@ sealed class Message {
 
         object TrolleyRejectedProduct : IncomingMessage()
 
+        object TrolleySkippedProduct : IncomingMessage()
+
         object NoAvailableTrolley : IncomingMessage()
 
         /*
@@ -58,14 +60,16 @@ sealed class Message {
         data class ProductScanned(val id: String) : OutgoingMessage()
 
         /*
-         * User has accepted the product
+         * User has accepted the products
          */
-        data class ProductAccepted(val id: String) : OutgoingMessage()
+        data class AcceptedProduct(val id: String) : OutgoingMessage()
 
         /*
-         * User has rejected the product
+         * User has rejected the products
          */
-        data class ProductRejected(val id: String) : OutgoingMessage()
+        data class RejectedProduct(val id: String) : OutgoingMessage()
+
+        object SkippedProduct : OutgoingMessage()
 
         /*
          * Request stopping the trolley
@@ -102,6 +106,7 @@ sealed class Message {
                 "NoAvailableTrolley" -> IncomingMessage.NoAvailableTrolley
                 "TrolleyAcceptedProduct" -> IncomingMessage.TrolleyAcceptedProduct
                 "TrolleyRejectedProduct" -> IncomingMessage.TrolleyRejectedProduct
+                "TrolleySkippedProduct" -> IncomingMessage.TrolleySkippedProduct
                 else -> IncomingMessage.InvalidMessage(message)
             }
         }
@@ -111,8 +116,9 @@ sealed class Message {
                 is OutgoingMessage.PlanRoute -> "PlanRoute$delim${message.code}"
                 is OutgoingMessage.Reconnect -> "Reconnect$delim${message.oldId}"
                 is OutgoingMessage.ProductScanned -> "ProductScanned$delim${message.id}"
-                is OutgoingMessage.ProductAccepted -> "ProductAccepted$delim${message.id}"
-                is OutgoingMessage.ProductRejected -> "ProductRejected$delim${message.id}"
+                is OutgoingMessage.AcceptedProduct -> "AcceptedProduct$delim${message.id}"
+                is OutgoingMessage.RejectedProduct -> "RejectedProduct$delim${message.id}"
+                is OutgoingMessage.SkippedProduct -> "SkippedProduct$delim"
                 is OutgoingMessage.RequestHelp -> "RequestHelp$delim"
                 is OutgoingMessage.Stop -> "Stop$delim${message.reason.code}"
                 is OutgoingMessage.ReceivedRoute -> "ReceivedRoute$delim"

@@ -354,7 +354,7 @@ object TestDataProductLoader : ProductLoader {
     }
 
     override suspend fun loadProduct(id: String): Result<Product> {
-        Timber.d("Returning individual product from test data")
+        Timber.d("Returning individual products from test data")
         return Result.Success(PRODUCTS.find { it.id == id }!!)
     }
 

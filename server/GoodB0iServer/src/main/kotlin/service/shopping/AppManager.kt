@@ -4,20 +4,23 @@ import io.ktor.http.cio.websocket.Frame
 import io.ktor.http.cio.websocket.WebSocketSession
 import java.util.concurrent.ConcurrentHashMap
 
-class AppManager {
+class AppManager(private val sessionManager: SessionManager) {
 
     private val members = ConcurrentHashMap<String, WebSocketSession>()
     private val listeners = ConcurrentHashMap<String, IncomingMessageListener>()
-    private var count = 0
 
 
     fun addMessageListener(id: String, listener: IncomingMessageListener) {
         listeners[id] = listener
     }
 
-    suspend fun onMessage(id: String, message: String) {
-        println("$id : $message")
-        listeners[id]?.onAppMessage(Message.Transformer.messageFromAppString(message))
+    fun onMessage(id: String, messageText: String) {
+        println("$id : $messageText")
+        val message = Message.Transformer.messageFromAppString(messageText)
+        if (message is Message.IncomingMessage.FromApp.Reconnect) {
+            rejoinApp(id, message.oldId, members[id]!!)
+        }
+        listeners[id]?.onAppMessage(message)
 
     }
 
@@ -37,8 +40,14 @@ class AppManager {
         }
     }
 
-    suspend fun rejoinApp(id: String, oldId: String) {
+    fun disconnected(id: String) {
+        members.remove(id)
+    }
 
+    private fun rejoinApp(id: String, oldId: String, socket: WebSocketSession) {
+        println("Rejoining app $oldId with new id $id")
+        listeners[id] = listeners[oldId]!!
+        sessionManager.updateAppSocket(id, oldId, socket)
     }
 
     suspend fun removeApp(id: String, socket: WebSocketSession) {
@@ -49,17 +58,9 @@ class AppManager {
     companion object {
         private const val DELIM = "&"
         private const val ID_KEY = "ID"
-        private const val TROLLEY_CONNECTED_KEY = "TC"
-        private const val REACHED_POINT_KEY = "PT"
-        private const val ROUTE_CALCULATED_KEY = "RC"
 
         fun joinKey(id: String) = Frame.Text("$ID_KEY$DELIM$id")
 
-        fun trolleyConnected() = Frame.Text("$TROLLEY_CONNECTED_KEY$DELIM")
-
-        fun reachedPoint(point: String) = Frame.Text("$REACHED_POINT_KEY$DELIM$point")
-
-        fun calculatedRoute(route: String) = Frame.Text("$ROUTE_CALCULATED_KEY$DELIM$route")
     }
 
 }
