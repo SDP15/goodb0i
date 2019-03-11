@@ -51,7 +51,7 @@ class Route private constructor(
 
             sealed class IdentifiedPoint(index: Int, val id: String) : IndexPoint(index) {
 
-                // A at to be passed through (only used to ensure that we are still on track)
+                // A point to be passed through (only used to ensure that we are still on track)
                 class Pass(index: Int, id: String) : IdentifiedPoint(index, id)
 
                 // A point at which to stop

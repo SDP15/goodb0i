@@ -1,10 +1,6 @@
 package com.sdp15.goodb0i.view.list.confirmation
 
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
-import com.sdp15.goodb0i.data.navigation.Message
-import com.sdp15.goodb0i.data.navigation.ShoppingSessionManager
-import com.sdp15.goodb0i.data.navigation.ShoppingSessionState
 import com.sdp15.goodb0i.view.BaseViewModel
 import com.sdp15.goodb0i.data.store.lists.ShoppingList
 import com.sdp15.goodb0i.data.store.price.PriceComputer

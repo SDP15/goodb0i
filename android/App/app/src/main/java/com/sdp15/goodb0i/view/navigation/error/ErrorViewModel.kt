@@ -2,14 +2,15 @@ package com.sdp15.goodb0i.view.navigation.error
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import com.sdp15.goodb0i.data.navigation.ShoppingSession
+import com.sdp15.goodb0i.data.navigation.ShoppingSessionManager
 import com.sdp15.goodb0i.data.navigation.ShoppingSessionState
-import com.sdp15.goodb0i.data.navigation.sockets.SessionManager
 import com.sdp15.goodb0i.view.BaseViewModel
-import org.koin.standalone.inject
+import org.koin.standalone.get
 
 class ErrorViewModel : BaseViewModel<Any>() {
 
-    private val sm: SessionManager by inject()
+    private val sm: ShoppingSession by get<ShoppingSessionManager>()
 
     private val errorMessage = mutableListOf<String>()
     val errorState = MutableLiveData<List<String>>()

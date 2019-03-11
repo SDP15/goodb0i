@@ -1,15 +1,15 @@
 package com.sdp15.goodb0i.view.navigation.confirmation
 
 import androidx.lifecycle.Observer
-import com.sdp15.goodb0i.data.navigation.Message
+import com.sdp15.goodb0i.data.navigation.ShoppingSession
 import com.sdp15.goodb0i.data.navigation.ShoppingSessionManager
 import com.sdp15.goodb0i.data.navigation.ShoppingSessionState
 import com.sdp15.goodb0i.view.BaseViewModel
-import org.koin.standalone.inject
+import org.koin.standalone.get
 
 class ItemConfirmationViewModel : BaseViewModel<Any>() {
 
-    private val sm: ShoppingSessionManager<Message.IncomingMessage> by inject()
+    private val sm: ShoppingSession by get<ShoppingSessionManager>()
 
     override fun bind() {
         sm.state.observeForever(sessionStateObserver)
