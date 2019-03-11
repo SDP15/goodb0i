@@ -3,8 +3,8 @@ import threading
 import time
 
 class WebSocket:
-    def __init__(self, controller_queue):
-        self.ip_port = "127.0.0.1:8080"
+    def __init__(self, ip_port, controller_queue):
+        self.ip_port = ip_port
         self.ws = self.initialise_websocket()
         self.controller_queue = controller_queue
 

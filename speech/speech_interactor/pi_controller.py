@@ -10,7 +10,7 @@ import requests
 from speech_interactor import SpeechInteractor
 from utils.custom_threads import WorkerThread
 from utils.web_socket import WebSocket
-import product
+from utils.product import Product
 
 
 class PiController:
@@ -20,7 +20,7 @@ class PiController:
         self.speech_interactor_queue = queue.Queue()
 
         self.ip_port = "127.0.0.1:8080"
-        self.ws = WebSocket(controller_queue).get_instance()
+        self.ws = WebSocket(self.ip_port, controller_queue).get_instance()
         SpeechInteractor(self.ws, self.speech_interactor_queue)
         #self.initialise_ev3_socket()
         
@@ -45,7 +45,7 @@ class PiController:
             id = item_json['product']['id']
             name = item_json['product']['name']
             price = item_json['product']['price']
-            new_product = product.Product(id, 1, name, price)
+            new_product = Product(id, 1, name, price)
             self.speech_interactor_queue.put(("scanned", new_product))
         elif "RouteCalculated" in message:
             #Message format: RouteCalculated&forward,right%shelf_number%index_of_item,forward
@@ -88,7 +88,7 @@ class PiController:
             quantity = products['quantity']
             name = products['product']['name']
             price = products['product']['price']
-            new_product = product.Product(id, quantity, name, price)
+            new_product = Product(id, quantity, name, price)
             self.ordered_list.append(new_product)
         print(self.ordered_list)
         self.speech_interactor_queue.put(("set_list", self.ordered_list))
