@@ -1,5 +1,6 @@
 package com.sdp15.goodb0i.data.navigation.sockets
 
+import androidx.collection.CircularArray
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.sdp15.goodb0i.data.navigation.Message
@@ -46,6 +47,15 @@ class SessionManager(
 
     // Products to collect from the current rack
     private val remainingRackProducts: MutableList<ListItem> = mutableListOf()
+
+    private val movingStates = CircularArray<ShoppingSessionState>(10)
+    private fun setState(state: ShoppingSessionState) {
+        sessionState.postValue(state)
+        if (state is ShoppingSessionState.NavigatingTo || state is ShoppingSessionState.Scanning || state is ShoppingSessionState.Confirming || state is ShoppingSessionState.Checkout) {
+            movingStates.addLast(state)
+        }
+    }
+
     private val sessionState = MutableLiveData<ShoppingSessionState>().apply {
         postValue(ShoppingSessionState.NoSession)
     }
@@ -56,7 +66,7 @@ class SessionManager(
         sh.connectionState.observeForever { state ->
             if (state == SocketHandler.SocketState.ErrorDisconnect) {
                 Timber.i("Socket state disconnected. Attempting reconnect")
-                sessionState.postValue(ShoppingSessionState.Disconnected)
+                setState(ShoppingSessionState.Disconnected)
                 attemptReconnection()
             }
         }
@@ -66,13 +76,13 @@ class SessionManager(
             when (message) {
                 is Message.IncomingMessage.Connected -> {
                     uid = message.id
-                    sessionState.postValue(ShoppingSessionState.NegotiatingTrolley)
+                    setState(ShoppingSessionState.NegotiatingTrolley)
                 }
                 is Message.IncomingMessage.NoAvailableTrolley -> {
-                    sessionState.postValue(ShoppingSessionState.NoSession)
+                    setState(ShoppingSessionState.NoSession)
                 }
                 is Message.IncomingMessage.TrolleyConnected -> {
-                    sessionState.postValue(ShoppingSessionState.Connected)
+                    setState(ShoppingSessionState.Connected)
                 }
                 is Message.IncomingMessage.UserReady -> {
                     //First moving state
@@ -104,7 +114,7 @@ class SessionManager(
         if (!sh.isConnected) {
             Timber.i("Starting session $list")
             shoppingList = list
-            sessionState.postValue(ShoppingSessionState.Connecting)
+            setState(ShoppingSessionState.Connecting)
             sh.start(RetrofitProvider.root + "/app")
             sh.sendMessage(Message.OutgoingMessage.PlanRoute(list.code))
         }
@@ -125,7 +135,7 @@ class SessionManager(
             index = pointIndex
             Timber.i("At stop at $id")
             lastStopLocation = point
-            sessionState.postValue(ShoppingSessionState.Scanning(point, remainingRackProducts))
+            setState(ShoppingSessionState.Scanning(point, remainingRackProducts))
             return true
         } else if (point is Route.RoutePoint.IndexPoint.IdentifiedPoint.Pass) {
             // We don't want to change state if a tag scan is triggered while we are scanning
@@ -133,7 +143,7 @@ class SessionManager(
             if (sessionState.value !is ShoppingSessionState.Scanning && sessionState.value !is ShoppingSessionState.Confirming) {
                 index = pointIndex
                 // We should already be in a NavigatingTo state at this point
-                sessionState.postValue(
+                setState(
                     ShoppingSessionState.NavigatingTo(
                         from = lastStopLocation, to = nextStopPoint, at = point, products = remainingRackProducts
                     )
@@ -153,7 +163,7 @@ class SessionManager(
             val indices = point.productIndices
             remainingRackProducts.clear()
             remainingRackProducts.addAll(shoppingList.products.slice(indices))
-            sessionState.postValue(
+            setState(
                 ShoppingSessionState.NavigatingTo(
                     from = lastStopLocation, to = point, at = route[index] as Route.RoutePoint.IndexPoint,
                     products = remainingRackProducts
@@ -161,7 +171,7 @@ class SessionManager(
             )
         } else if (point is Route.RoutePoint.IndexPoint.End) {
             remainingRackProducts.clear()
-            sessionState.postValue(
+            setState(
                 ShoppingSessionState.NavigatingTo(
                     from = lastStopLocation, at = route[index] as Route.RoutePoint.IndexPoint, to = point,
                     products = remainingRackProducts
@@ -188,7 +198,7 @@ class SessionManager(
         }
         if (product != null) {
             lastScannedProduct = product
-            sessionState.postValue(ShoppingSessionState.Confirming(product))
+            setState(ShoppingSessionState.Confirming(product))
         }
         return product
     }
@@ -233,7 +243,7 @@ class SessionManager(
         } else {
             // Otherwise, we are still in the scanning state
             Timber.i("Products remaining on rack $remainingRackProducts")
-            sessionState.postValue(
+            setState(
                 ShoppingSessionState.Scanning(
                     route[index] as Route.RoutePoint.IndexPoint.IdentifiedPoint.Stop, remainingRackProducts
                 )
@@ -247,7 +257,7 @@ class SessionManager(
     }
 
     private fun productRejectedInternal() {
-        sessionState.postValue(
+        setState(
             ShoppingSessionState.Scanning(
                 route[index] as Route.RoutePoint.IndexPoint.IdentifiedPoint.Stop,
                 remainingRackProducts
@@ -269,6 +279,7 @@ class SessionManager(
                 sh.sendMessage(Message.OutgoingMessage.Reconnect(uid))
                 delay(500)
             }
+            setState(movingStates.last)
             Timber.i("Socket reconnected")
         }
     }

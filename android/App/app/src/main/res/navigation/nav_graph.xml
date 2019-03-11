@@ -76,6 +76,9 @@
         <action
             android:id="@+id/action_scanner_fragment_to_confirmation_fragment"
             app:destination="@id/confirmation_fragment" />
+        <action
+            android:id="@+id/action_scanner_fragment_to_errorFragment"
+            app:destination="@id/errorFragment" />
     </fragment>
 
     <fragment
@@ -91,6 +94,9 @@
         <action android:id="@+id/action_confirmation_fragment_to_navigatingToFragment"
                 app:destination="@id/navigatingToFragment" app:popUpToInclusive="false"
                 app:popUpTo="@+id/navigatingToFragment"/>
+        <action
+            android:id="@+id/action_confirmation_fragment_to_errorFragment"
+            app:destination="@id/errorFragment" />
     </fragment>
 
     <fragment
@@ -105,6 +111,9 @@
         <action
             android:id="@+id/action_item_fragment_to_navigatingToFragment"
             app:destination="@id/navigatingToFragment" />
+        <action
+            android:id="@+id/action_item_fragment_to_errorFragment"
+            app:destination="@id/errorFragment" />
     </fragment>
 
     <fragment
@@ -134,6 +143,9 @@
         <action
             android:id="@+id/action_navigatingToFragment_to_completeFragment"
             app:destination="@id/completeFragment" />
+        <action
+            android:id="@+id/action_navigatingToFragment_to_errorFragment"
+            app:destination="@id/errorFragment" />
     </fragment>
     <fragment
         android:id="@+id/shopConnectionFragment"
@@ -152,6 +164,11 @@
         android:name="com.sdp15.goodb0i.view.navigation.complete.CompleteFragment"
         android:label="CompleteFragment"
         tools:layout="@layout/layout_done"/>
+    <fragment
+        android:id="@+id/errorFragment"
+        android:name="com.sdp15.goodb0i.view.navigation.error.ErrorFragment"
+        android:label="ErrorFragment"
+        tools:layout="@layout/layout_error"/>
 
 
 </navigation>

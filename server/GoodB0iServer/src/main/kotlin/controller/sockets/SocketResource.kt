@@ -95,10 +95,9 @@ fun Route.sockets(sessionManager: SessionManager,
 
     webSocket("/ping") {
         try {
-            var count = 0
             incoming.consumeEach { frame ->
                 if (frame is Frame.Text) {
-                    outgoing.send(Frame.Text("${count++}"))
+                    outgoing.send(frame)
                 }
             }
         } catch (e: Exception) {
