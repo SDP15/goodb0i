@@ -24,6 +24,8 @@ class ProductViewModel : BaseViewModel<Any>() {
             transitions.postValue(ProductFragmentDirections.actionItemFragmentToNavigatingToFragment())
         } else if (state is ShoppingSessionState.Scanning) {
             products.postValue(state.toScan)
+        } else if (state is ShoppingSessionState.Disconnected) {
+            transitions.postValue(ProductFragmentDirections.actionItemFragmentToErrorFragment())
         }
     }
 
