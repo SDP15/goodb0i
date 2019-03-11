@@ -53,6 +53,7 @@ class PiController:
             full_route = message.split("&")
             route_commands = full_route[1].split(",")
             self.marker_list = []
+            self.shelf_count = {}
             for commands in route_commands:
                 command = commands.split("%")
                 #currently server sends center and ev3 receives forward if this doesnt change uncomment
@@ -60,6 +61,8 @@ class PiController:
                 #     command[0] = "forward"
                 if len(command) > 1:
                     self.marker_list.append(command[1])
+                    self.shelf_count[command[1]] = len(command) - 1
+                    print("We are collecting " + (len(command) -1) + " at shelf " + command[1])
                 self.send_tcpsocket("enqueue-" + command[0])
             print(route_commands)
             self.send_message(ws, "ReceivedRoute&")

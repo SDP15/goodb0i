@@ -262,10 +262,15 @@ class SpeechInteractor:
         if self.ordered_list[0].get_quantity() > 0:
             self.controller.send_message(self.ws, "SkippedProduct&")
         del self.ordered_list[0]
-        response = self.options['yes']['reply'] + self.ordered_list[0]
+        if len(self.ordered_list) == 0:
+            response = self.options['yes']['reply_finished']
+            nextState = 'finishedState'
+        else:
+            response = self.options['yes']['reply'] + self.ordered_list[0]
+            nextState = 'nextState'
         self.say(response)
         self.last_reply = response
-        self.next_state(self.options['yes']['nextState'])
+        self.next_state(self.options['yes'][nextState])
 
     # Sends the server a message that the user is at this cart and ready to start
     def start_state(self, word):
