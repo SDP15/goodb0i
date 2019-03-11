@@ -397,7 +397,7 @@ protected:
 
     auto rrcol{rightColor->getRawRGB()};
     constexpr int STEER_ANGLE{110};
-    constexpr int SMALL_STEER_ANGLE{90};
+    constexpr int SMALL_STEER_ANGLE{110};
 
     bool seeingMarker{lcol == evutil::Color::turnRight ||
                       mcol == evutil::Color::turnRight ||
