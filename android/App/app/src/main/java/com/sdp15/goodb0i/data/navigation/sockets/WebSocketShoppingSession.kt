@@ -5,7 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.sdp15.goodb0i.data.navigation.Message
 import com.sdp15.goodb0i.data.navigation.Route
-import com.sdp15.goodb0i.data.navigation.ShoppingSessionManager
+import com.sdp15.goodb0i.data.navigation.ShoppingSession
 import com.sdp15.goodb0i.data.navigation.ShoppingSessionState
 import com.sdp15.goodb0i.data.store.Result
 import com.sdp15.goodb0i.data.store.RetrofitProvider
@@ -23,11 +23,11 @@ import timber.log.Timber
  * I feel like this could easily turn into a God-Object which deals with far too much information. It may need
  * decomposing later
  */
-class SessionManager(
+class WebSocketShoppingSession(
 
     private val sh: SocketHandler<Message.IncomingMessage, Message.OutgoingMessage>,
     private val productLoader: ProductLoader
-) : ShoppingSessionManager<Message.IncomingMessage> {
+) : ShoppingSession {
 
     private var uid: String = "" // Server session id
     private var route: Route = Route.emptyRoute()
@@ -42,9 +42,6 @@ class SessionManager(
     private var lastScannedProduct: Product? = null
 
     private val incomingMessages = MutableLiveData<Message.IncomingMessage>()
-    //TODO: If there isn't a use for publicly exposing direct message access, remove this. (Currently no usages)
-    override val incoming: LiveData<Message.IncomingMessage> = incomingMessages
-
     // Products to collect from the current rack
     private val remainingRackProducts: MutableList<ListItem> = mutableListOf()
 
@@ -85,9 +82,7 @@ class SessionManager(
                     setState(ShoppingSessionState.Connected)
                 }
                 is Message.IncomingMessage.UserReady -> {
-                    //First moving state
-
-                    postMovingState()
+                    postMovingState() // First moving state
                 }
                 is Message.IncomingMessage.RouteCalculated -> {
                     route = message.route

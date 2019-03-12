@@ -1,9 +1,6 @@
 package service.routing
 
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.koin.core.time.logDuration
-import org.koin.core.time.measureDuration
-import repository.lists.ShoppingList
 import repository.shelves.Shelf
 import repository.shelves.ShelfRack
 import repository.shelves.Shelves

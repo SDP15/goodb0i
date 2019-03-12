@@ -9,7 +9,7 @@ import repository.shelves.Shelves
 
 class ShelfService {
 
-    fun getProductForShelfRack(shelfId: Int): List<Product> = transaction {
+    fun getProductsForShelfRack(shelfId: Int): List<Product> = transaction {
         Shelf.find { Shelves.rack eq shelfId }.map { shelf -> shelf.product }
     }
 

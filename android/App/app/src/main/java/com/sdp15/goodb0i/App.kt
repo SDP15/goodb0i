@@ -4,10 +4,10 @@ import android.app.Application
 import androidx.room.Room
 import com.google.firebase.FirebaseApp
 import com.sdp15.goodb0i.data.navigation.Message
+import com.sdp15.goodb0i.data.navigation.SessionManagerImpl
 import com.sdp15.goodb0i.data.navigation.ShoppingSessionManager
 import com.sdp15.goodb0i.data.navigation.scanner.BarcodeReader
 import com.sdp15.goodb0i.data.navigation.scanner.MLKitScanner
-import com.sdp15.goodb0i.data.navigation.sockets.SessionManager
 import com.sdp15.goodb0i.data.navigation.sockets.SocketHandler
 import com.sdp15.goodb0i.data.store.RoomDB
 import com.sdp15.goodb0i.data.store.cache.RoomShoppingListStore
@@ -27,6 +27,7 @@ import com.sdp15.goodb0i.view.list.creation.ListViewModel
 import com.sdp15.goodb0i.view.list.saved.SavedListsViewModel
 import com.sdp15.goodb0i.view.navigation.confirmation.ItemConfirmationViewModel
 import com.sdp15.goodb0i.view.navigation.connecting.ShopConnectionViewModel
+import com.sdp15.goodb0i.view.navigation.error.ErrorViewModel
 import com.sdp15.goodb0i.view.navigation.navigating.NavigatingToViewModel
 import com.sdp15.goodb0i.view.navigation.product.ProductViewModel
 import com.sdp15.goodb0i.view.navigation.scanner.ScannerViewModel
@@ -68,6 +69,7 @@ class App : Application() {
             viewModel<SavedListsViewModel>()
             viewModel<NavigatingToViewModel>()
             viewModel<ShopConnectionViewModel>()
+            viewModel<ErrorViewModel>()
         },
         module {
             single<ProductLoader> {
@@ -89,8 +91,8 @@ class App : Application() {
                     ).build().listDAO()
                 )
             }
-            single<ShoppingSessionManager<Message.IncomingMessage>> {
-                SessionManager(SocketHandler(transform = Message.Transformer), get())
+            single<ShoppingSessionManager> {
+                SessionManagerImpl(get(), SocketHandler(transform = Message.Transformer))
             }
             single<PriceComputer> { SimplePriceComputer }
         }

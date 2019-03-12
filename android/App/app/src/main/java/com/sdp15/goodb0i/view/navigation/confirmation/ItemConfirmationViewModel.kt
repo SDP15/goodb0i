@@ -1,15 +1,15 @@
 package com.sdp15.goodb0i.view.navigation.confirmation
 
 import androidx.lifecycle.Observer
-import com.sdp15.goodb0i.data.navigation.Message
+import com.sdp15.goodb0i.data.navigation.ShoppingSession
 import com.sdp15.goodb0i.data.navigation.ShoppingSessionManager
 import com.sdp15.goodb0i.data.navigation.ShoppingSessionState
 import com.sdp15.goodb0i.view.BaseViewModel
-import org.koin.standalone.inject
+import org.koin.standalone.get
 
 class ItemConfirmationViewModel : BaseViewModel<Any>() {
 
-    private val sm: ShoppingSessionManager<Message.IncomingMessage> by inject()
+    private val sm: ShoppingSession by get<ShoppingSessionManager>()
 
     override fun bind() {
         sm.state.observeForever(sessionStateObserver)
@@ -29,14 +29,6 @@ class ItemConfirmationViewModel : BaseViewModel<Any>() {
     }
 
     fun accept() {
-        /*
-        TODO: We need to decide how we decide which screen to move to
-        If we have accepted, we should destroy the previous fragments and move
-        - If there is a new item, we check if it is on the same ShelfRack and move to either ProductFragment or
-          NavigatingToFragment
-        - If there is no new item, we move to a NavigatingToFragment for the tills
-        If we have rejected, we should navigate back to the scanner fragment which should start scanning again
-        */
         sm.productAccepted()
     }
 
@@ -46,6 +38,6 @@ class ItemConfirmationViewModel : BaseViewModel<Any>() {
 
     override fun onCleared() {
         super.onCleared()
-        sm.state.observeForever(sessionStateObserver)
+        sm.state.removeObserver(sessionStateObserver)
     }
 }
