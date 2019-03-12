@@ -2,6 +2,7 @@ import threading
 import time
 
 import websocket
+import socket
 
 
 class WebSocket:
@@ -20,7 +21,6 @@ class WebSocket:
             print("Message: " + str(message))
             self.controller_queue.put(("on_message", message))
 
-
         def on_error(ws, error):
             print(error)
 
@@ -32,7 +32,7 @@ class WebSocket:
         def on_open(ws):
             pass
 
-        ws = websocket.WebSocketApp("ws://127.0.0.1:8080/trolley",
+        ws = websocket.WebSocketApp("ws://" + self.ip_port + "/trolley",
                                     on_message=on_message,
                                     on_error=on_error,
                                     on_close=on_close)
@@ -44,3 +44,20 @@ class WebSocket:
     
     def get_instance(self):
         return self.ws
+
+
+class TCPSocket:
+    def __init__(self, ip_addr, port):
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.connect((ip_addr,port))
+
+    def receive(self):
+        while True:
+            data = self.sock.recv(8192)
+            if not data: break
+            print(data)
+
+    def send(self, msg):
+        msg += "\n"
+        msg = msg.encode()
+        self.sock.send(msg)

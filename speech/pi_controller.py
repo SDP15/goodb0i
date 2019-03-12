@@ -11,7 +11,7 @@ import serial
 from speech_interactor import SpeechInteractor
 from utils.custom_threads import WorkerThread
 from utils.product import Product
-from utils.web_socket import WebSocket
+from utils.sockets import WebSocket, TCPSocket
 
 
 class PiController:
@@ -23,15 +23,20 @@ class PiController:
         self.ip_port = "127.0.0.1:8080"
         self.ws = WebSocket(self.ip_port, controller_queue).get_instance()
         SpeechInteractor(self.ws, self.speech_interactor_queue)
-        #self.initialise_ev3_socket()
+        self.ev3 = TCPSocket("192.168.105.108", 6081)
+        # self.ev3 = TCPSocket("localhost",4000)
+        self.ev3_commands = []
         
         # Thread runs a given function and it's arguments (if given any) from the work queue
         t1 = WorkerThread("PiControllerThread", self, controller_queue)
         t1.start()
 
-        # To test receiving messages from WebSocket
+        # # To test receiving messages from WebSocket/to EV3
         # time.sleep(3)
-        # self.ws.send("AppAcceptedProduct")
+        # self.ws.send("RouteCalculated&start,stop%3%0,pass%11")
+
+        # time.sleep(2)
+        # self.ws.send("ConfirmMessage&UserReady")
 
     def on_message(self, message):
         if "AppAcceptedProduct" in message:
@@ -49,28 +54,32 @@ class PiController:
             new_product = Product(id, 1, name, price)
             self.speech_interactor_queue.put(("scanned", new_product))
         elif "RouteCalculated" in message:
-            #Message format: RouteCalculated&forward,right%shelf_number%index_of_item,forward
             full_route = message.split("&")
             route_commands = full_route[1].split(",")
             self.marker_list = []
             self.shelf_count = {}
             for commands in route_commands:
                 command = commands.split("%")
-                #currently server sends center and ev3 receives forward if this doesnt change uncomment
-                # if command[0] == "center" or command[0] == "pass":
-                #     command[0] = "forward"
+                if command[0] == "pass":
+                    command[0] = "forward"
                 if len(command) > 1:
                     self.marker_list.append(command[1])
                     self.shelf_count[command[1]] = len(command) - 1
-                    print("We are collecting " + (len(command) -1) + " at shelf " + command[1])
-                self.send_tcpsocket("enqueue-" + command[0])
-            print(route_commands)
+                if command[0] != "start":
+                    self.ev3_commands.append("enqueue-" + command[0])
             self.ws.send("ReceivedRoute&")
             self.speech_interactor_queue.put(("react", "connected"))
         elif "Assigned" in message:
             list_message = message.split("&")
             list_id = list_message[1]
             self.get_shopping_list(list_id)
+        elif "ConfirmMessage&UserReady" in message:
+            # Server & pi ready to go => queue commands on EV3
+            for command in self.ev3_commands:
+                self.ev3.send(command)
+
+            # Start following route
+            self.ev3.send("start")
 
     #the request parameter has to be in the correct format e.g. /lists/load/7654321
     def query_web_server(self, request):
@@ -94,13 +103,6 @@ class PiController:
         print(self.ordered_list)
         self.speech_interactor_queue.put(("set_list", self.ordered_list))
 
-    
-
-    def initialise_ev3_socket(self):
-        self.ser = serial.Serial(port = "/dev/ttyACM0", baudrate = 9600, timeout = 2)
-        t2 = threading.Thread(name='ev3SocketThread', target=self.readline_tcpsocket, args=(self.ser, ))
-        t2.start()
-
     def readline_tcpsocket(self, port):
         message = ""
         byte = ""
@@ -116,16 +118,5 @@ class PiController:
         else:
             print(message)
         return message
-
-
-    def send_tcpsocket(self, message):
-        print("sending \"" + message + "\" to the client")
-        self.ser.write(message.encode('utf-8'))
-        self.ser.flush()
-        
-
-    def close_tcpsocket(self):       
-        if self.ser.is_open:
-            self.ser.close()
 
 PiController()

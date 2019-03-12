@@ -61,6 +61,7 @@ class SpeechInteractor:
         self.possible_states = json.load(open(state_file, 'r'))
         self.next_state('connection')
         self.react("n/a")
+        self.begin_shopping = False
 
         self.scanned_product = None
 
@@ -84,6 +85,11 @@ class SpeechInteractor:
         self.options = self.possible_states[state]
 
         if "shopping0" in self.state:
+
+            if not self.begin_shopping:
+                self.ws.send("UserReady&")
+                self.begin_shopping = True
+
             next_item = self.ordered_list[0]
 
             # Start thread to listen for location changes
@@ -103,9 +109,6 @@ class SpeechInteractor:
             while self.scanned_product is None:
                 pass
             self.scanned(self.scanned_product)
-
-
-
 
     def listen(self, *arg):
         print("listening")
@@ -169,11 +172,7 @@ class SpeechInteractor:
             self.describe_item()
         elif "continue" in self.state and word == "yes":
             self.continue_shopping()
-        elif "init" in self.state and word == "start":
-            self.start_state(word)
         else:
-            print("React else")
-            print(word)
             self.say(self.options[word]['reply'])
             self.last_reply = self.options[word]['reply']
             self.next_state(self.options[word]['nextState'])
@@ -282,14 +281,7 @@ class SpeechInteractor:
             nextState = 'nextState'
         self.say(response)
         self.last_reply = response
-        self.next_state(self.options['yes'][nextState])
-
-    # Sends the server a message that the user is at this cart and ready to start
-    def start_state(self, word):
-        self.ws.send("UserReady&")
-        self.say(self.options[word]['reply'])
-        self.last_reply = self.options[word]['reply']
-        self.next_state(self.options[word]['nextState'])
+        self.next_state(self.options['yes'][nextState]) 
     
     def on_location_change(self, next_item):
         ser = serial.Serial('/dev/ttyACM0', 9600)
