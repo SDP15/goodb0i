@@ -19,7 +19,6 @@ class ListResourceTest : ServerTest() {
     private val products: MutableList<Product> = mutableListOf()
 
 
-
     @BeforeAll
     fun loadProducts() {
         transaction {
