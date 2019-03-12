@@ -243,10 +243,10 @@ class SpeechInteractor:
     def describe_item(self):
         cost = self.scanned_product.get_price()
         # Format the output to tell the user the price in pounds and pence.
-        pounds = math.floor(cost)
-        pence = math.floor((cost - pounds) * 100)
-        total = (cost >= 1) * (str(pounds) + " pounds and ") + \
-                bool(pence) * ( str(int(pence)) + (" penny" if pence == 1 else " pence") )
+        pounds = int(cost)
+        pence = round((cost - pounds) * 100)
+        total = bool(pounds) * (str(pounds) + " pound" + (pounds >= 2)*"s") + bool(pounds)*bool(pence) * (" and ") + \
+                bool(pence) * ( str(int(pence)) + (" penny" if pence == 1 else " pence") ) + (pounds+pence == 0) * "nothing"
         response = self.options['yes']['price'] + \
             total + self.options['no']['reply']
         self.say(response)
