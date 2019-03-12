@@ -12,6 +12,7 @@ from speech_interactor import SpeechInteractor
 from utils.custom_threads import WorkerThread
 from utils.product import Product
 from utils.web_socket import WebSocket
+from goodb0i.qr_scanner_video import QRDetection
 
 
 class PiController:
@@ -21,8 +22,12 @@ class PiController:
         self.speech_interactor_queue = queue.Queue()
 
         self.ip_port = "127.0.0.1:8080"
+        self.ev3_ip = "10.42.0.3"
+        self.ev3_port = 6081
         self.ws = WebSocket(self.ip_port, controller_queue).get_instance()
         SpeechInteractor(self.ws, self.speech_interactor_queue)
+        QRDetection(controller_queue)
+
         #self.initialise_ev3_socket()
         
         # Thread runs a given function and it's arguments (if given any) from the work queue
@@ -150,5 +155,8 @@ class PiController:
     def close_tcpsocket(self):       
         if self.ser.is_open:
             self.ser.close()
+
+    def scanned_qr_code(self, qr_code):
+        print(qr_code)
 
 PiController()
