@@ -76,6 +76,14 @@ void openLogFile() {
   }
 }
 
+set<int> connectionFds;
+
+void sendToAllClients(string msg) {
+  for (int fd : connectionFds) {
+    ::send(fd, msg.c_str(), msg.size(), 0);
+  }
+}
+
 enum SubsystemId {
   SUBSYS_ROBOT,
   SUBSYS_STEERING,
@@ -274,12 +282,12 @@ protected:
 
 class AvoidanceSubsystem : public Subsystem {
 private:
-  int obstacleDistancePct{60};
   bool seenObstacle{false};
   vector<Subsystem *> systemsToPause;
   SteeringSubsystem *sysSteering;
 
 public:
+  int obstacleDistancePct{60};
   AvoidanceSubsystem(SteeringSubsystem *sysSteering) {
     this->sysSteering = sysSteering;
   }
@@ -401,6 +409,9 @@ protected:
     bool seeingMarker{lcol == evutil::Color::turnRight ||
                       mcol == evutil::Color::turnRight ||
                       rcol == evutil::Color::turnRight};
+
+    led::set_color(led::right, seeingMarker ? led::green : led::black);
+
     if (ignoreMarker) {
       if (markerIgnoreStopwatch.elapsedMilliseconds() >= markerIgnoreMs) {
         ignoreMarker = false;
@@ -422,6 +433,7 @@ protected:
       if (queuedActions.empty()) {
         if (state != State::waitingForCommand) {
           log() << "MISSING QUEUE ACTION, HALTING" << endl;
+          sendToAllClients("detected-marker queue-empty OK\n");
           state = State::waitingForCommand;
         }
       } else {
@@ -430,20 +442,24 @@ protected:
         switch (A) {
         case QueuedAction::stop:
           log() << "Stop marker" << endl;
+          sendToAllClients("detected-marker stop OK\n");
           state = State::stoppedAtMarker;
           break;
         case QueuedAction::goStraight:
           log() << "Straight marker" << endl;
+          sendToAllClients("detected-marker forward OK\n");
           state = State::turningAtMarker;
           turnBias = Direction::middle;
           break;
         case QueuedAction::turnLeft:
           log() << "Left marker" << endl;
+          sendToAllClients("detected-marker left OK\n");
           state = State::turningAtMarker;
           turnBias = Direction::left;
           break;
         case QueuedAction::turnRight:
           log() << "Right marker" << endl;
+          sendToAllClients("detected-marker right OK\n");
           state = State::turningAtMarker;
           turnBias = Direction::right;
           break;
@@ -550,7 +566,6 @@ private:
 
   mutex accessMutex;
   int socketFd{-1};
-  set<int> connectionFds;
 
   void spawnNewConnThread() { new thread(&Robot::socketThreadFn, this); }
 
@@ -721,6 +736,23 @@ private:
           snprintf(wbuf, sizeof wbuf, "set-max-turn-ratio %d (old %d ) OK\n",
                    tr, sysLine.maxTurnRatio);
           sysLine.maxTurnRatio = tr;
+          rsend(wbuf);
+        } else if (cmd == "get-stop-distance") {
+          snprintf(wbuf, sizeof wbuf, "stop-distance %d OK\n",
+                   sysAvoid.obstacleDistancePct);
+          rsend(wbuf);
+        } else if (cmd.find("set-stop-distance") == 0) {
+          int spd{60};
+          sscanf(cmd.c_str(), "set-stop-distance %d", &spd);
+          if (spd < 0) {
+            spd = 0;
+          }
+          if (spd > 100) {
+            spd = 100;
+          }
+          snprintf(wbuf, sizeof wbuf, "set-stop-distance %d (old %d ) OK\n",
+                   spd, sysAvoid.obstacleDistancePct);
+          sysAvoid.obstacleDistancePct = spd;
           rsend(wbuf);
         } else {
           rsend("unknown command FAIL\n");

@@ -85,6 +85,10 @@ int main(int argc, char **argv) {
   while (running) {
     this_thread::sleep_for(10ms);
     SDL_Event ev;
+
+    bool clrQueue{SDL_GameControllerGetButton(
+                      gc, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER) == 0};
+
     while (SDL_PollEvent(&ev)) {
       switch (ev.type) {
       case SDL_CONTROLLERBUTTONUP:
@@ -99,19 +103,23 @@ int main(int argc, char **argv) {
           rsend("resume-from-stop-marker\n");
           break;
         case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
-          rsend("clear-queue\n");
+          if (clrQueue)
+            rsend("clear-queue\n");
           rsend("enqueue-left\n");
           break;
         case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
-          rsend("clear-queue\n");
+          if (clrQueue)
+            rsend("clear-queue\n");
           rsend("enqueue-right\n");
           break;
         case SDL_CONTROLLER_BUTTON_DPAD_UP:
-          rsend("clear-queue\n");
+          if (clrQueue)
+            rsend("clear-queue\n");
           rsend("enqueue-forward\n");
           break;
         case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
-          rsend("clear-queue\n");
+          if (clrQueue)
+            rsend("clear-queue\n");
           rsend("enqueue-stop\n");
           break;
         }
