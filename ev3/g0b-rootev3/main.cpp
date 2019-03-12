@@ -150,8 +150,9 @@ public:
     commands.push_front(cmd);
   }
 
-private:
   int forwardBaseSpeed{30};
+
+private:
   int currentTurnAngle{0}, currentSpeed{0};
 
   array<int, 4> currentMotorSpeeds{{0, 0, 0, 0}},
@@ -337,6 +338,7 @@ private:
 
 public:
   bool turningOn{true};
+  int slightTurnRatio{110}, maxTurnRatio{110};
 
   LineFollowSubsystem(SteeringSubsystem *sysSteering) {
     this->sysSteering = sysSteering;
@@ -395,8 +397,6 @@ protected:
     evutil::Color rcol{rightColor->getColor()};
 
     auto rrcol{rightColor->getRawRGB()};
-    constexpr int STEER_ANGLE{110};
-    constexpr int SMALL_STEER_ANGLE{110};
 
     bool seeingMarker{lcol == evutil::Color::turnRight ||
                       mcol == evutil::Color::turnRight ||
@@ -497,11 +497,11 @@ protected:
 
       if (lcol == evutil::Color::line && rcol != evutil::Color::line) {
         // LMr -> adjust slightly left
-        lineAngle = -SMALL_STEER_ANGLE;
+        lineAngle = -slightTurnRatio;
         lastLineDir = Direction::left;
       } else if (lcol != evutil::Color::line && rcol == evutil::Color::line) {
         // lMR -> adjust slightly right
-        lineAngle = SMALL_STEER_ANGLE;
+        lineAngle = slightTurnRatio;
         lastLineDir = Direction::right;
       } else {
         // lMr/LMR -> going straight
@@ -510,20 +510,21 @@ protected:
     } else {
       if (lcol == evutil::Color::line && rcol != evutil::Color::line) {
         // Lmr -> adjust left
-        lineAngle = -STEER_ANGLE;
+        lineAngle = -maxTurnRatio;
         lastLineDir = Direction::left;
       } else if (lcol != evutil::Color::line && rcol == evutil::Color::line) {
         // lmR -> adjust right
-        lineAngle = STEER_ANGLE;
+        lineAngle = maxTurnRatio;
         lastLineDir = Direction::right;
       } else if (state != State::turningAtMarker &&
                  lcol != evutil::Color::line) {
         // lmr -> turn to the predicted line
         lineAngle =
-            (lastLineDir == Direction::left) ? -STEER_ANGLE : STEER_ANGLE;
+            (lastLineDir == Direction::left) ? -maxTurnRatio : maxTurnRatio;
       } else {
         // LmR -> turn to bias line if turning
-        lineAngle = (turnBias == Direction::right) ? STEER_ANGLE : -STEER_ANGLE;
+        lineAngle =
+            (turnBias == Direction::right) ? maxTurnRatio : -maxTurnRatio;
         lastLineDir =
             (turnBias == Direction::right) ? Direction::right : Direction::left;
       }
@@ -672,6 +673,54 @@ private:
           float A{battery.measured_amps()};
           snprintf(wbuf, sizeof wbuf, "battery volt %.3f max 8.4 amp %.6f OK\n",
                    V, A);
+          rsend(wbuf);
+        } else if (cmd == "get-speed") {
+          snprintf(wbuf, sizeof wbuf, "speed %d OK\n",
+                   sysSteering.forwardBaseSpeed);
+          rsend(wbuf);
+        } else if (cmd.find("set-speed") == 0) {
+          int spd{30};
+          sscanf(cmd.c_str(), "set-speed %d", &spd);
+          if (spd < 5) {
+            spd = 5;
+          }
+          if (spd > 100) {
+            spd = 100;
+          }
+          snprintf(wbuf, sizeof wbuf, "set-speed %d (old %d ) OK\n", spd,
+                   sysSteering.forwardBaseSpeed);
+          sysSteering.forwardBaseSpeed = spd;
+          rsend(wbuf);
+        } else if (cmd == "get-turn-ratios") {
+          snprintf(wbuf, sizeof wbuf,
+                   "max-turn-ratio %d slight-turn-ratio %d OK\n",
+                   sysLine.maxTurnRatio, sysLine.slightTurnRatio);
+          rsend(wbuf);
+        } else if (cmd.find("set-slight-turn-ratio") == 0) {
+          int tr{110};
+          sscanf(cmd.c_str(), "set-slight-turn-ratio %d", &tr);
+          if (tr < 5) {
+            tr = 5;
+          }
+          if (tr > 300) {
+            tr = 300;
+          }
+          snprintf(wbuf, sizeof wbuf, "set-slight-turn-ratio %d (old %d ) OK\n",
+                   tr, sysLine.slightTurnRatio);
+          sysLine.slightTurnRatio = tr;
+          rsend(wbuf);
+        } else if (cmd.find("set-max-turn-ratio") == 0) {
+          int tr{110};
+          sscanf(cmd.c_str(), "set-max-turn-ratio %d", &tr);
+          if (tr < 5) {
+            tr = 5;
+          }
+          if (tr > 300) {
+            tr = 300;
+          }
+          snprintf(wbuf, sizeof wbuf, "set-max-turn-ratio %d (old %d ) OK\n",
+                   tr, sysLine.maxTurnRatio);
+          sysLine.maxTurnRatio = tr;
           rsend(wbuf);
         } else {
           rsend("unknown command FAIL\n");
