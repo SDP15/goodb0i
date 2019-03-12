@@ -158,7 +158,7 @@ public:
     commands.push_front(cmd);
   }
 
-  int forwardBaseSpeed{30};
+  int forwardBaseSpeed{40};
 
 private:
   int currentTurnAngle{0}, currentSpeed{0};
@@ -172,6 +172,8 @@ private:
 
   /// TurnAngle goes from -100 to 100
   void setTargetSpeedsClassic(int speedPercent, int turnAngle) {
+    // r1/r2~=0.948 or 243/256
+    // r2/r1~=1.054 or 270/256
     int bspeed{forwardBaseSpeed * speedPercent / 100};
     int lspeed{bspeed};
     int rspeed{bspeed};
@@ -179,15 +181,24 @@ private:
       // left turn
       turnAngle = 100 + turnAngle;
       lspeed = lspeed * turnAngle / 100;
+      if (rspeed < 70)
+        rspeed += 15;
     } else if (turnAngle > 0) {
       turnAngle = 100 - turnAngle;
       rspeed = rspeed * turnAngle / 100;
+      if (lspeed < 70)
+        lspeed += 15;
     }
 
     targetMotorSpeeds[DRIVE_LEFT_BACK] = lspeed;
-    targetMotorSpeeds[DRIVE_LEFT_FRONT] = lspeed;
     targetMotorSpeeds[DRIVE_RIGHT_BACK] = rspeed;
-    targetMotorSpeeds[DRIVE_RIGHT_FRONT] = rspeed;
+    if (lspeed == rspeed) {
+      targetMotorSpeeds[DRIVE_LEFT_FRONT] = lspeed;
+      targetMotorSpeeds[DRIVE_RIGHT_FRONT] = rspeed;
+    } else {
+      targetMotorSpeeds[DRIVE_LEFT_FRONT] = lspeed * 243 / 256;
+      targetMotorSpeeds[DRIVE_RIGHT_FRONT] = rspeed * 243 / 256;
+    }
   }
 
   void setTargetSpeedsPivot(int speedPercent, bool turnRight) {
@@ -346,7 +357,7 @@ private:
 
 public:
   bool turningOn{true};
-  int slightTurnRatio{110}, maxTurnRatio{110};
+  int slightTurnRatio{150}, maxTurnRatio{150};
 
   LineFollowSubsystem(SteeringSubsystem *sysSteering) {
     this->sysSteering = sysSteering;
@@ -694,7 +705,7 @@ private:
                    sysSteering.forwardBaseSpeed);
           rsend(wbuf);
         } else if (cmd.find("set-speed") == 0) {
-          int spd{30};
+          int spd{40};
           sscanf(cmd.c_str(), "set-speed %d", &spd);
           if (spd < 5) {
             spd = 5;
@@ -712,7 +723,7 @@ private:
                    sysLine.maxTurnRatio, sysLine.slightTurnRatio);
           rsend(wbuf);
         } else if (cmd.find("set-slight-turn-ratio") == 0) {
-          int tr{110};
+          int tr{150};
           sscanf(cmd.c_str(), "set-slight-turn-ratio %d", &tr);
           if (tr < 5) {
             tr = 5;
@@ -725,7 +736,7 @@ private:
           sysLine.slightTurnRatio = tr;
           rsend(wbuf);
         } else if (cmd.find("set-max-turn-ratio") == 0) {
-          int tr{110};
+          int tr{150};
           sscanf(cmd.c_str(), "set-max-turn-ratio %d", &tr);
           if (tr < 5) {
             tr = 5;
