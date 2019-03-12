@@ -1,27 +1,14 @@
 package com.sdp15.goodb0i.data.navigation
 
-import androidx.lifecycle.LiveData
-import com.sdp15.goodb0i.data.store.lists.ShoppingList
-import com.sdp15.goodb0i.data.store.products.Product
+import kotlin.reflect.KProperty
 
-interface ShoppingSessionManager<IN> {
+interface ShoppingSessionManager {
 
-    val incoming: LiveData<IN>
+    fun startSession(): ShoppingSession
 
-    val state: LiveData<ShoppingSessionState>
+    operator fun getValue(thisRef: Any?, property: KProperty<*>): ShoppingSession
 
-    fun startSession(list: ShoppingList)
 
-    fun endSession()
-
-    suspend fun checkScannedCode(code: String): Product?
-
-    fun productAccepted()
-
-    fun productRejected()
-
-    fun skipProduct()
-
-    fun requestAssistance()
+    fun closeSession()
 
 }

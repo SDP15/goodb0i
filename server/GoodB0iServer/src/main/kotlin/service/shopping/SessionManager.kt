@@ -3,6 +3,7 @@ package service.shopping
 import io.ktor.http.cio.websocket.Frame
 import io.ktor.http.cio.websocket.WebSocketSession
 import kotlinx.coroutines.isActive
+import service.routing.GenRouteFinder
 import service.routing.RouteFinder
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap

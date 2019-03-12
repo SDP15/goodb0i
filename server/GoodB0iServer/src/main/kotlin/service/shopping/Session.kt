@@ -2,7 +2,9 @@ package service.shopping
 
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import service.routing.GenRouteFinder
 import service.routing.RouteFinder
+import kotlin.reflect.jvm.jvmName
 
 class Session(
         private val routeFinder: RouteFinder,
@@ -60,6 +62,7 @@ class Session(
             }
             is  Message.IncomingMessage.FromTrolley.UserReady -> {
                 sendToApp(Message.OutgoingMessage.ToApp.UserReady)
+                sendToTrolley(Message.OutgoingMessage.ToTrolley.ConfirmMessage(message.body))
             }
             is Message.IncomingMessage.FromTrolley.TrolleyAcceptedProduct -> {
                 sendToApp(Message.OutgoingMessage.ToApp.TrolleyAcceptedProduct)

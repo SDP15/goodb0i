@@ -27,7 +27,7 @@ class Route private constructor(
                     "end" -> points.add(RoutePoint.IndexPoint.End(++index))
                     "left" -> points.add(RoutePoint.TurnLeft)
                     "right" -> points.add(RoutePoint.TurnRight)
-                    "center" -> points.add(RoutePoint.TurnCenter)
+                    "forward" -> points.add(RoutePoint.TurnForward)
                     "stop" -> {
                         val id = body.substringBefore(delim) // First int value
                         val indices = body.substringAfter(delim).split(delim).map { it.toInt() }
@@ -51,7 +51,7 @@ class Route private constructor(
 
             sealed class IdentifiedPoint(index: Int, val id: String) : IndexPoint(index) {
 
-                // A at to be passed through (only used to ensure that we are still on track)
+                // A point to be passed through (only used to ensure that we are still on track)
                 class Pass(index: Int, id: String) : IdentifiedPoint(index, id)
 
                 // A point at which to stop
@@ -62,15 +62,11 @@ class Route private constructor(
             class End(index: Int) : IndexPoint(index)
         }
 
-
-
-
-
         object TurnLeft : RoutePoint()
 
         object TurnRight : RoutePoint()
 
-        object TurnCenter : RoutePoint()
+        object TurnForward : RoutePoint()
 
     }
 
