@@ -27,7 +27,7 @@ class Route private constructor(
                     "end" -> points.add(RoutePoint.IndexPoint.End(++index))
                     "left" -> points.add(RoutePoint.TurnLeft)
                     "right" -> points.add(RoutePoint.TurnRight)
-                    "forward" -> points.add(RoutePoint.TurnCenter)
+                    "forward" -> points.add(RoutePoint.TurnForward)
                     "stop" -> {
                         val id = body.substringBefore(delim) // First int value
                         val indices = body.substringAfter(delim).split(delim).map { it.toInt() }
@@ -66,7 +66,7 @@ class Route private constructor(
 
         object TurnRight : RoutePoint()
 
-        object TurnCenter : RoutePoint()
+        object TurnForward : RoutePoint()
 
     }
 
