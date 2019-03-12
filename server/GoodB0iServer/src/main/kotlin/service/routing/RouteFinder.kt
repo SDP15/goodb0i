@@ -86,7 +86,7 @@ class RouteFinder(private val listService: ListService, private val graph: Graph
                     println("Node $node Edges are $edges. Index is $index")
                     when (index) {
                         //0 -> builder.append("left")
-                        0 -> builder.append("center")
+                        0 -> builder.append("forward")
                         1 -> builder.append("right")
                     }
                     builder.append(sep)
@@ -132,7 +132,7 @@ class RouteFinder(private val listService: ListService, private val graph: Graph
                     println("Node $node Edges are $edges. Index is $index")
                     when (index) {
                         //0 -> builder.append("left")
-                        0 -> builder.append("center")
+                        0 -> builder.append("forward")
                         1 -> builder.append("right")
                     }
                     builder.append(sep)

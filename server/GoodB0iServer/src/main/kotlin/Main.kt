@@ -11,6 +11,7 @@ import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.ktor.websocket.WebSockets
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import repository.DatabaseFactory
 import repository.TestDataProvider
@@ -67,6 +68,11 @@ fun Application.module() {
     val trolleyManager = TrolleyManager()
     val appManager = AppManager(sessionManager)
 
+
+    GlobalScope.launch {
+        delay(3000)
+        routeFinder.plan(7654321)
+    }
 
     install(Routing) {
         products(productService)

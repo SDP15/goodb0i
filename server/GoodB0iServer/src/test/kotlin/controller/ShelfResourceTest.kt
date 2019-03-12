@@ -9,10 +9,12 @@ import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import repository.shelves.ShelfRack
 import repository.shelves.ShelfRacks
 import service.ShelfService
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ShelfResourceTest : ServerTest() {
 
 
