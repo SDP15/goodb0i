@@ -18,11 +18,11 @@ import repository.TestDataProvider
 import repository.exposedTypeAdapters
 import service.*
 import service.routing.Graph
-import service.routing.RouteFinder
+import service.routing.GenRouteFinder
+import service.routing.IntRouteFinder
 import service.shopping.AppManager
 import service.shopping.SessionManager
 import service.shopping.TrolleyManager
-import java.util.concurrent.TimeUnit
 
 
 fun Application.module() {
@@ -49,8 +49,8 @@ fun Application.module() {
     TestDataProvider.insert()
 
 
-    val routeFinder = RouteFinder(listService,
-            Graph.graph<Int> {
+    val routeFinder = IntRouteFinder(listService,
+            Graph.graph {
                 // Test shelves are 3, 1, 5, 7
                 // 1         2         3              4         5       6         7         8
                 //"Dairy", "Bakery", "Fruits", "Vegetables", "Seafood", "Meat", "Sweets", "Food cupboard"
@@ -63,7 +63,7 @@ fun Application.module() {
                 12 to 7 cost 5// Top right to sweets
                 7 to 13 cost 5// Sweets to end
 
-            })
+            }, start = 10, end = 13)
     val sessionManager = SessionManager(routeFinder)
     val trolleyManager = TrolleyManager()
     val appManager = AppManager(sessionManager)

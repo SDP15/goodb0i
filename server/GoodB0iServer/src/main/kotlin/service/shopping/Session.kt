@@ -2,6 +2,7 @@ package service.shopping
 
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import service.routing.GenRouteFinder
 import service.routing.RouteFinder
 
 class Session(
