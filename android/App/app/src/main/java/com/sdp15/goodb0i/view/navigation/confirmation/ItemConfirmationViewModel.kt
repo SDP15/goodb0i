@@ -29,14 +29,6 @@ class ItemConfirmationViewModel : BaseViewModel<Any>() {
     }
 
     fun accept() {
-        /*
-        TODO: We need to decide how we decide which screen to move to
-        If we have accepted, we should destroy the previous fragments and move
-        - If there is a new item, we check if it is on the same ShelfRack and move to either ProductFragment or
-          NavigatingToFragment
-        - If there is no new item, we move to a NavigatingToFragment for the tills
-        If we have rejected, we should navigate back to the scanner fragment which should start scanning again
-        */
         sm.productAccepted()
     }
 
@@ -46,6 +38,6 @@ class ItemConfirmationViewModel : BaseViewModel<Any>() {
 
     override fun onCleared() {
         super.onCleared()
-        sm.state.observeForever(sessionStateObserver)
+        sm.state.removeObserver(sessionStateObserver)
     }
 }
