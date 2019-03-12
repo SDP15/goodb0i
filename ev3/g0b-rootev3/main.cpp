@@ -25,7 +25,7 @@ enum DriveNumber : int {
 };
 array<unique_ptr<evutil::Drive>, 4> drives;
 unique_ptr<evutil::ColorSensor> leftColor, midColor, rightColor;
-unique_ptr<ev3dev::ultrasonic_sensor> sonar;
+unique_ptr<ev3dev::infrared_sensor> sonar;
 power_supply battery{"lego-ev3-battery"};
 
 ofstream sensorLog;
@@ -55,8 +55,8 @@ void connectEv3Devices() {
   rightColor = make_unique<evutil::ColorSensor>(INPUT_3, failed);
 
   sonar =
-      evutil::createConnectedDevice<ev3dev::ultrasonic_sensor>(INPUT_4, failed);
-  sonar->set_mode(sonar->mode_us_dist_cm);
+      evutil::createConnectedDevice<ev3dev::infrared_sensor>(INPUT_4, failed);
+  sonar->set_mode(sonar->mode_ir_prox);
 
   if (failed) {
     throw runtime_error("Error initializing EV3 connections.");
@@ -273,7 +273,7 @@ protected:
 
 class AvoidanceSubsystem : public Subsystem {
 private:
-  int obstacleDistanceCm{45};
+  int obstacleDistancePct{60};
   bool seenObstacle{false};
   vector<Subsystem *> systemsToPause;
   SteeringSubsystem *sysSteering;
@@ -281,22 +281,21 @@ private:
 public:
   AvoidanceSubsystem(SteeringSubsystem *sysSteering) {
     this->sysSteering = sysSteering;
-    sonar->distance_centimeters(true);
   }
 
   void registerSystemToPause(Subsystem *sys) { systemsToPause.push_back(sys); }
 
   virtual void dump(ostream &os) {
     os << "Avoidance subsystem:";
-    os << "\n * Distance cm: " << obstacleDistanceCm;
+    os << "\n * Distance %: " << obstacleDistancePct;
     os << "\n * Seeing obstacle: " << seenObstacle;
+    os << "\n * Raw value: " << sonar->proximity(false);
     os << "\n";
   }
 
 protected:
   void process() {
-    bool nowSeesObstacle{sonar->distance_centimeters(false) <
-                         obstacleDistanceCm};
+    bool nowSeesObstacle{sonar->proximity(false) < obstacleDistancePct};
     if (nowSeesObstacle != seenObstacle) {
       seenObstacle = nowSeesObstacle;
       for_each(systemsToPause.begin(), systemsToPause.end(),
