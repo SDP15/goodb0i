@@ -47,15 +47,19 @@ class WebSocket:
 
 
 class TCPSocket:
-    def __init__(self, ip_addr, port):
+    def __init__(self, ip_addr, port, controller_queue):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.connect((ip_addr,port))
+        self.controller_queue = controller_queue
+        t2 = threading.Thread(name='TCPSocketReceivingThread', target=self.receive)
+        t2.start()
 
     def receive(self):
         while True:
             data = self.sock.recv(8192)
             if not data: break
-            print(data)
+            msg = data.decode('utf-8')
+            self.controller_queue.put(("on_message", msg))
 
     def send(self, msg):
         msg += "\n"

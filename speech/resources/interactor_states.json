@@ -73,14 +73,16 @@
     "cart":
         {"yes": 
             {"reply_quantity0": "Shall we proceed to the next item on the list?", "nextState_quantity0": "continue", 
-            "reply_quantity+": "You have ", "prompt": " more of this item on your list. Would you like to add these to your cart?",
+            "reply_quantity+": "You have ", "prompt": " more of this item on your list. Do you want to proceed and try to scan these items?",
              "nextState_quantity+": "scan"},
         "no":
             {"reply": "Please return the item. Do you want to scan another item?", "nextState": "scan"}},
              
     "continue": 
         {"yes": 
-            {"reply": "Okay lets go and find the ", "nextState": "shopping0"},
+            {"reply": "Okay lets go and find the ", "nextState": "shopping0",
+             "reply_finished": "The shopping list is finished. We are now going to the tills.",
+             "finishedState":"finished"},
         "no": 
             {
               "reply": "Do you want to scan more items?", "nextState": "scan"}},
@@ -90,5 +92,10 @@
             "reply": "Please scan another item.", "nextState": "arrival"},
         "no":{
             "reply": "Would you like to continue to the next item", "nextState": "continue"}},
+
+    "finished":
+        {"exit":{
+            "reply": "Thank you for shopping with good boy. Have a good day."
+        }},
 
     "errorMessage": "Sorry, I couldn't recognise your command."}
