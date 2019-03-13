@@ -27,7 +27,8 @@ object Search {
 
 
     fun <T> search(data: Collection<T>, query: String, fields: (T) -> Collection<String>, threshold: Double = SCORE_THRESHOLD): Collection<T> =
-            data.map { item -> Pair(item, computeSimilarity(item, fields, query)) }.filter { it.second > threshold }.sortedBy { it.second }.map { it.first }
+            data.filter { item -> fields(item).any { field -> field.toLowerCase().contains(query) } }
+            //data.map { item -> Pair(item, computeSimilarity(item, fields, query)) }.filter { it.second > threshold }.sortedBy { it.second }.map { it.first }
 
 
     private inline fun <T> computeSimilarity(item: T, fields: (T) -> Collection<String>, query: String): Double =
@@ -58,7 +59,6 @@ object Search {
     private fun getJaroWinklerSimilarity(first: String, second: String): Double {
         val fl = Normalizer.normalize(first.toLowerCase(), Normalizer.Form.NFD)
         val sl = Normalizer.normalize(second.toLowerCase(), Normalizer.Form.NFD)
-        println("Finding matches for $fl $sl")
         val mtp = matches(fl, sl)
         val matches = mtp[0]
         if (matches == 0) return 0.0
