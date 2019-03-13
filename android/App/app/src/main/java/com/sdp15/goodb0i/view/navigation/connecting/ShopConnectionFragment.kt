@@ -28,8 +28,10 @@ class ShopConnectionFragment : BaseFragment() {
         val args = navArgs<ShopConnectionFragmentArgs>()
         vm.bind()
         vm.setShoppingList(args.value.shoppingList)
-        vm.log.observe(this, Observer {
-            shop_collection_log.text = it
+        vm.progress.observe(this, Observer { progress ->
+            check_connecting.isChecked = progress > 0
+            check_negotiating_trolley.isChecked = progress > 1
+            check_confirming.isChecked = progress > 2
         })
         vm.transitions.observe(this, Observer {
             findNavController().navigate(it)

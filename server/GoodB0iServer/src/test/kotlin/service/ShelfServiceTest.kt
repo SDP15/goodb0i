@@ -15,7 +15,7 @@ class ShelfServiceTest : ServerTest() {
     @Test
     fun testLoadProductsForRack() {
         transaction {
-            val shelf = ShelfRack.all().first()
+            val shelf = ShelfRack.all().toList().random()
             val products = shelf.shelves.map { it.product }
             val productsOnRack = service.getProductsForShelfRack(shelf.id.value)
             products.forEach {  product ->
