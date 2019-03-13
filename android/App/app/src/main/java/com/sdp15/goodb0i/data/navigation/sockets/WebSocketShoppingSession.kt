@@ -36,7 +36,7 @@ class WebSocketShoppingSession(
         Route.RoutePoint.IndexPoint.Start // Last rack we stopped at
     private val nextStopPoint: Route.RoutePoint.IndexPoint
         get() = route.subList(fromIndex = index + 1, toIndex = route.size)
-            .firstOrNull { point -> point is Route.RoutePoint.IndexPoint.IdentifiedPoint.Stop || point is Route.RoutePoint.IndexPoint.End } as Route.RoutePoint.IndexPoint
+            .firstOrNull { point -> point is Route.RoutePoint.IndexPoint.IdentifiedPoint.Stop || point is Route.RoutePoint.IndexPoint.IdentifiedPoint.End } as Route.RoutePoint.IndexPoint
 
     private var shoppingList: ShoppingList = ShoppingList.emptyList()
     private var lastScannedProduct: Product? = null
@@ -144,8 +144,9 @@ class WebSocketShoppingSession(
                     )
                 )
             }
-        } else {
+        } else if (point is Route.RoutePoint.IndexPoint.IdentifiedPoint.End) {
             Timber.i("At other at $point")
+            setState(ShoppingSessionState.Checkout)
         }
         return false
     }
@@ -164,7 +165,7 @@ class WebSocketShoppingSession(
                     products = remainingRackProducts
                 )
             )
-        } else if (point is Route.RoutePoint.IndexPoint.End) {
+        } else if (point is Route.RoutePoint.IndexPoint.IdentifiedPoint.End) {
             remainingRackProducts.clear()
             setState(
                 ShoppingSessionState.NavigatingTo(
@@ -172,7 +173,6 @@ class WebSocketShoppingSession(
                     products = remainingRackProducts
                 )
             )
-        } else {
         }
     }
 
