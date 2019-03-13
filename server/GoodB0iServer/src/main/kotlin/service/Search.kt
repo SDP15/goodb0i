@@ -27,7 +27,7 @@ object Search {
 
 
     fun <T> search(data: Collection<T>, query: String, fields: (T) -> Collection<String>, threshold: Double = SCORE_THRESHOLD): Collection<T> =
-            data.filter { item -> fields(item).any { field -> field.toLowerCase().contains(query) } }
+            data.filter { item -> fields(item).any { field -> field.toLowerCase().contains(query.toLowerCase()) } }
             //data.map { item -> Pair(item, computeSimilarity(item, fields, query)) }.filter { it.second > threshold }.sortedBy { it.second }.map { it.first }
 
 
