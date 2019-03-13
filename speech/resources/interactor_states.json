@@ -80,7 +80,9 @@
              
     "continue": 
         {"yes": 
-            {"reply": "Okay lets go and find the ", "nextState": "shopping0"},
+            {"reply": "Okay lets go and find the ", "nextState": "shopping0",
+             "reply_finished": "The shopping list is finished. We are now going to the tills.",
+             "finishedState":"finished"},
         "no": 
             {
               "reply": "Do you want to scan more items?", "nextState": "scan"}},
@@ -90,5 +92,10 @@
             "reply": "Please scan another item.", "nextState": "arrival"},
         "no":{
             "reply": "Would you like to continue to the next item", "nextState": "continue"}},
+
+    "finished":
+        {"exit":{
+            "reply": "Thank you for shopping with good boy. Have a good day."
+        }},
 
     "errorMessage": "Sorry, I couldn't recognise your command."}
