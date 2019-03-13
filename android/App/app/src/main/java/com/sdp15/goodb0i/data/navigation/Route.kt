@@ -24,7 +24,7 @@ class Route private constructor(
                 Timber.i("Type $type id $body")
                 when (type) {
                     "start" -> points.add(RoutePoint.IndexPoint.Start)
-                    "end" -> points.add(RoutePoint.IndexPoint.End(++index))
+                    "end" -> points.add(RoutePoint.IndexPoint.IdentifiedPoint.End(++index, body))
                     "left" -> points.add(RoutePoint.TurnLeft)
                     "right" -> points.add(RoutePoint.TurnRight)
                     "forward" -> points.add(RoutePoint.TurnForward)
@@ -57,9 +57,10 @@ class Route private constructor(
                 // A point at which to stop
                 class Stop(index: Int, id: String, val productIndices: List<Int>) : IdentifiedPoint(index, id)
 
+                class End(index: Int, id: String) : IdentifiedPoint(index, id)
             }
 
-            class End(index: Int) : IndexPoint(index)
+
         }
 
         object TurnLeft : RoutePoint()

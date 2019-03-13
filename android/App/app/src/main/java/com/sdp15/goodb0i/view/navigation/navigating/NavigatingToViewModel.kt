@@ -24,7 +24,7 @@ class NavigatingToViewModel : BaseViewModel<Any>() {
         if (state is ShoppingSessionState.NavigatingTo) {
             // TODO: Update progress display
             Timber.i("Navigating from ${state.from.index} to ${state.to.index}, at ${state.at.index}")
-            if (state.to is Route.RoutePoint.IndexPoint.End) {
+            if (state.to is Route.RoutePoint.IndexPoint.IdentifiedPoint.End) {
                 destination.postValue(
                     NavigatingToFragment.NavigationDestination.EndPoint(
                         distance = state.to.index - state.from.index,

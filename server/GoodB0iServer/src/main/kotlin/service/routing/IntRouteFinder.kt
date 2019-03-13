@@ -63,7 +63,7 @@ class IntRouteFinder(private val listService: ListService, private val graph: Gr
             if (node == start) {
                 builder.append("start")
             } else if (node == end) {
-                builder.append("end")
+                builder.append("end$delim${node.id}")
             } else {
                 // Add a turn if there's more than one way to get to the next node
                 val edges = graph[previous]

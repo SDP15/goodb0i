@@ -8,7 +8,6 @@ import com.sdp15.goodb0i.data.navigation.ShoppingSessionState
 import com.sdp15.goodb0i.data.store.lists.ShoppingList
 import com.sdp15.goodb0i.view.BaseViewModel
 import org.koin.standalone.inject
-import timber.log.Timber
 
 class ShopConnectionViewModel : BaseViewModel<Any>() {
 
@@ -17,7 +16,7 @@ class ShopConnectionViewModel : BaseViewModel<Any>() {
     private lateinit var sl: ShoppingList
 
     private val builder = StringBuilder()
-    val log = MutableLiveData<String>()
+    val progress = MutableLiveData<Int>()
 
     override fun bind() {
     }
@@ -29,29 +28,23 @@ class ShopConnectionViewModel : BaseViewModel<Any>() {
         sm.state.observeForever(connectionObserver)
     }
 
-    private fun log(message: String) {
-        Timber.i(message)
-        builder.append(message)
-        builder.append('\n')
-        log.postValue(builder.toString())
-    }
-
     private val connectionObserver = Observer<ShoppingSessionState> { state ->
         when (state) {
             //TODO: Post more information to fragment
             ShoppingSessionState.Connecting -> {
-                log("Connecting")
+                progress.postValue(0)
             }
             ShoppingSessionState.NegotiatingTrolley -> {
-                log("Negotiating trolley")
+                progress.postValue(2)
             }
             ShoppingSessionState.Connected -> {
-                log("Connected")
+                progress.postValue(1)
             }
             ShoppingSessionState.NoSession -> {
-                log("No session")
+                progress.postValue(-1)
             }
             is ShoppingSessionState.NavigatingTo -> {
+                progress.postValue(3)
                 transitions.postValue(ShopConnectionFragmentDirections.actionShopConnectionFragmentToNavigatingToFragment())
             }
         }
