@@ -52,7 +52,8 @@ def on_message(ws, message):
                 components.append(("pass", part.split("%")[1]))
             elif(str(part).startswith("stop")):
                 components.append(("stop", part.split("%")[1]))
-
+            elif(str(part).startswith("end")):
+                components.append(("stop", part.split("%")[1]))
         print("Computed route " + str(components))
         ws.send("RouteReceived&")
  
