@@ -73,7 +73,7 @@
     "cart":
         {"yes": 
             {"reply_quantity0": "Shall we proceed to the next item on the list?", "nextState_quantity0": "continue", 
-            "reply_quantity+": "You have ", "prompt": " more of this item on your list. Would you like to add these to your cart?",
+            "reply_quantity+": "You have ", "prompt": " more of this item on your list. Do you want to proceed and try to scan these items?",
              "nextState_quantity+": "scan"},
         "no":
             {"reply": "Please return the item. Do you want to scan another item?", "nextState": "scan"}},

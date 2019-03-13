@@ -35,8 +35,9 @@ speech = LiveSpeech(
 
 
 class SpeechInteractor:
-    def __init__(self, websocket_instance, work_queue, state_file='resources/interactor_states.json'):
+    def __init__(self, websocket_instance, tcp_connection, work_queue, state_file='resources/interactor_states.json'):
         self.ws = websocket_instance
+        self.ev3 = tcp_connection
         
         log_filename = now.strftime("%Y-%m-%d-%H%M%S")
         self.logging = False
@@ -48,8 +49,7 @@ class SpeechInteractor:
         # Log is placed in folder associated with test number
         if len(sys.argv) > 2:
             test_num = sys.argv[2]
-            self.log_filepath = "logs/{:}/{:}.txt".format(
-                test_num, log_filename)
+            self.log_filepath = "logs/{:}/{:}.txt".format(test_num, log_filename)
         else:
             self.log_filepath = "logs/{:}.txt".format(log_filename)
 
@@ -62,8 +62,7 @@ class SpeechInteractor:
         self.next_state('connection')
         self.react("n/a")
         self.begin_shopping = False
-
-        self.scanned_product = None
+        self.moving = False
 
         # For testing "AppAccepted" message from server
         # self.next_state("identify")
@@ -71,6 +70,7 @@ class SpeechInteractor:
 
         self.location_event = threading.Event()
         self.listen_event = threading.Event()
+        self.connected_event = threading.Event()
 
         self.work_queue = work_queue
         t1 = WorkerThread("SpeechInteractorThread", self, self.work_queue, self.listen_event)
@@ -89,39 +89,40 @@ class SpeechInteractor:
             if not self.begin_shopping:
                 self.ws.send("UserReady&")
                 self.begin_shopping = True
+                self.next_item = self.ordered_list.get()
 
-            next_item = self.ordered_list[0]
-
-            # Start thread to listen for location changes
-            t2 = threading.Thread(name='LocationListenerThread', target=self.on_location_change, args=(next_item,))
-            t2.start()
+            # # Start thread to listen for location changes
+            # t2 = threading.Thread(name='LocationListenerThread', target=self.on_location_change, args=(self.next_item,))
+            # t2.start()
             
-            # Block current thread while waiting for location change
-            self.location_event.wait()
-            self.location_event.clear()
+            # # Block current thread while waiting for location change
+            # self.location_event.wait()
+            # self.location_event.clear()
 
             # Need to replace shelf position with that from the JSON
-            self.arrived(next_item, "middle")
+            # self.arrived(self.next_item, "middle")
 
-        if "arrival" in self.state:
-            # replace for barcode scanner info.
-            print("Waiting for item to be scanned.")
-            while self.scanned_product is None:
-                pass
-            self.scanned(self.scanned_product)
+        # if "arrival" in self.state:
+        #     # replace for barcode scanner info.
+        #     print("Waiting for item to be scanned.")
+        #     while self.scanned_product is None:
+        #         pass
+        #     self.scanned(self.scanned_product)
 
     def listen(self, *arg):
-        print("listening")
+        # Wait until we are connected to the server
+        self.connected_event.wait()
 
         for sphrase in speech:
             if self.listen_event.isSet():
                 self.listen_event.clear()
 
+            while self.moving:
+                continue
+
             phrase = str(sphrase).lower().split()
             word = self.find_word(phrase)
             print("You said:", word)
-
-            print("Current thread calling listen: {:}".format(threading.current_thread().name))
 
             # Logs the word/words that PocketSphinx has detected
             if self.logging is True:
@@ -166,7 +167,6 @@ class SpeechInteractor:
 
     def react(self, word):
         if "cart" in self.state and (word == "yes" or word == "no"):
-            print("React cart")
             self.cart(word)
         elif "identify" in self.state and word == "yes":
             self.describe_item()
@@ -176,6 +176,10 @@ class SpeechInteractor:
             self.say(self.options[word]['reply'])
             self.last_reply = self.options[word]['reply']
             self.next_state(self.options[word]['nextState'])
+
+        if "connected" in word:
+            self.react("n/a")
+            self.connected_event.set()
 
     def say(self, string):
         # Logs the string that is given to the TTS engine
@@ -197,7 +201,7 @@ class SpeechInteractor:
         sp.run(["mimic/mimic", "-t", string, "-voice", "awb"])
 
     def arrived(self, item, shelf):
-        response = self.options['arrived']['reply'] + item + \
+        response = self.options['arrived']['reply'] + item.get_name() + \
             self.options['arrived']['second'] + \
             shelf + self.options['arrived']['prompt']
         self.say(response)
@@ -205,8 +209,9 @@ class SpeechInteractor:
         self.next_state(self.options['arrived']['nextState'])
 
     def scanned(self, item):
+        self.scanned_product = item
         response = self.options['scanned']['reply'] + \
-            item.get_name + self.options['scanned']['prompt']
+            item.get_name() + self.options['scanned']['prompt']
         self.say(response)
         self.last_reply = response
         self.next_state(self.options['scanned']['nextState'])
@@ -217,24 +222,27 @@ class SpeechInteractor:
             if not app:
                 self.ws.send("AcceptedProduct&")
 
-            quantity = self.ordered_list[0].get_quantity
+            quantity = self.next_item.get_quantity()
 
-            if self.ordered_list[0] == self.scanned_product:
+            if self.next_item.get_id() == self.scanned_product.get_id():
+                print("Entering this if statement")
                 quantity-=1
-                self.ordered_list[0].set_quantity(quantity)
-            if quantity > 1:
+                self.next_item.set_quantity(quantity)
+            if quantity >= 1:
                 nextState = 'nextState_quantity+'
                 response = self.options['yes']['reply_quantity+'] + \
-                    str(quantity) + " more " + self.ordered_list[0].get_name() + self.options['yes']['prompt']
+                    str(quantity) + " more " + self.next_item.get_name() + self.options['yes']['prompt']
             else:
                 nextState = 'nextState_quantity0'
+                print("Current state: {:}".format(self.state))
+                print("Options: \n")
+                print(self.options)
                 response = self.options['yes']['reply_quantity0']
 
         else:
             if not app:
                 self.ws.send("RejectedProduct&")
-
-        response = self.options['no']['reply']       
+            response = self.options['no']['reply']       
         self.say(response)
         self.last_reply = response
         self.next_state(self.options[word][nextState])
@@ -257,44 +265,60 @@ class SpeechInteractor:
         self.ordered_list = ordered_list
 
 
-    def set_scanned_item(self, scanned_product):
-        self.scanned_product = scanned_product
+    def set_scanned_product(self, scanned_product=None):
+        #self.scanned_product = scanned_product
+        # TODO: Assumes item scanned by app is correct
+        self.scanned_product = self.next_item
 
-
+    def set_moving(self):
+        self.moving = True
 
     # Only called if the user decides to go to the next item
     # Sets the current item to the next item on the list and informs the user what item they are
     # going to collect next. 
     def continue_shopping(self):
-        if self.ordered_list[0].get_quantity() > 0:
+        if self.next_item.get_quantity() > 0:
             self.ws.send("SkippedProduct&")
-        del self.ordered_list[0]
-        if len(self.ordered_list) == 0:
+
+        if self.ordered_list.qsize() == 0:
             response = self.options['yes']['reply_finished']
             nextState = 'finishedState'
         else:
-            response = self.options['yes']['reply'] + self.ordered_list[0]
+            self.next_item = self.ordered_list.get()
+            response = self.options['yes']['reply'] + self.next_item.get_name()
             nextState = 'nextState'
         self.say(response)
         self.last_reply = response
-        self.next_state(self.options['yes'][nextState]) 
+        # self.next_state(self.options['yes'][nextState]) 
+        # self.ev3.send("resume-from-stop-marker")
+        print(self.next_item.get_name())
+        self.next_state(self.options['yes'][nextState])
+
+        # TODO: Need to implement items on same set of shelves
+        if "Haribo" not in self.next_item.get_name():
+            self.ev3.send("resume-from-stop-marker")
+        else:
+            self.arrived(self.next_item, "top")
     
-    def on_location_change(self, next_item):
-        ser = serial.Serial('/dev/ttyACM0', 9600)
-        new_location = ""
+    def on_location_change(self):
+        self.moving = False
+        self.arrived(self.next_item, "middle")
+        # ser = serial.Serial('/dev/ttyACM0', 9600)
+        # new_location = ""
 
-        while not self.location_event.isSet():
-            new_location = ser.readline().decode('ascii')
+        # while not self.location_event.isSet():
+        #     new_location = ser.readline().decode('ascii')
 
-            # Check if our location has changed and if so update current location
-            if new_location not in self.current_location:
-                self.current_location = new_location
-                print("Current location: {:}".format(
-                    self.current_location))
+        #     # Check if our location has changed and if so update current location
+        #     if new_location not in self.current_location:
+        #         self.current_location = new_location
+        #         print("Current location: {:}".format(
+        #             self.current_location))
 
-                # Check if we have arrived at the item
-                if next_item in self.current_location:
-                    print("You have arrived at {:}".format(next_item))
-                    self.location_event.set()
-            else:
-                print("Location has not changed.")
+        #         # Check if we have arrived at the item
+        #         if next_item in self.current_location:
+        #             print("You have arrived at {:}".format(next_item))
+        #             self.location_event.set()
+        #     else:
+        #         print("Location has not changed.")
+        
