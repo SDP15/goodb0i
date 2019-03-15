@@ -202,7 +202,7 @@ object TestDataProvider {
     }
 
     private fun getTestData(): Array<Item> {
-        val path = System.getProperty("user.dir") + "/src/main/resources/items.json"
+        val path = System.getProperty("user.dir") + "/src/main/resources/products.json"
         kLogger.debug("Reading test products data from $path")
         val file = File(path).bufferedReader()
         val gson = Gson()
@@ -213,11 +213,11 @@ object TestDataProvider {
 data class Item(
         @SerializedName("id") val id: Long = -1,
         @SerializedName("name") val name: String,
-        @SerializedName("AverageSellingUnitWeight") val averageSellingUnitWeight: Double,
-        @SerializedName("ContentsMeasureType") val contentsMeasureType: String,
+        @SerializedName("averageSellingUnitWeight") val averageSellingUnitWeight: Double,
+        @SerializedName("contentsMeasureType") val contentsMeasureType: String,
         @SerializedName("contentsQuantity") val contentsQuantity: Double,
-        @SerializedName("UnitOfSale") val unitOfSale: Int,
-        @SerializedName("UnitQuantity") val unitQuantity: String,
+        @SerializedName("unitOfSale") val unitOfSale: Int,
+        @SerializedName("unitQuantity") val unitQuantity: String,
         @SerializedName("department") val department: String,
         @SerializedName("description") val description: kotlin.collections.List<String>,
         @SerializedName("price") val price: Double,

@@ -1,0 +1,154 @@
+[
+  {
+    "id": 1,
+    "capacity": 10,
+    "info": "Dairy",
+    "shelves": [
+      {
+        "product": "af4e8397-a6c7-4d63-8769-8cddee97e960",
+        "position": "0"
+      },
+      {
+        "product": "4bd820e4-5ecc-4393-94c0-178b99f9edbb",
+        "position": "1"
+      },
+      {
+        "product": "e5809854-d401-46a7-97d7-a4b680e6837d",
+        "position": "2"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "capacity": 10,
+    "info": "Bakery",
+    "shelves": [
+      {
+        "product": "9305d331-f7c8-45f3-a0dc-a444e6864602",
+        "position": "0"
+      },
+      {
+        "product": "75c81d25-3bae-470c-975f-73a9b2cfe853",
+        "position": "1"
+      },
+      {
+        "product": "d2036958-7e7b-4135-b044-6bf04d028cd3",
+        "position": "2"
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "capacity": 10,
+    "info": "Fruit",
+    "shelves": [
+      {
+        "product": "bd732d10-94bd-4605-9c9d-136897a22d90",
+        "position": "0"
+      },
+      {
+        "product": "b896b077-f017-4b0c-9a8b-568c2dc16a54",
+        "position": "1"
+      },
+      {
+        "product": "8211f5e1-d28b-4525-91f5-76e07d17b82f",
+        "position": "2"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "capacity": 10,
+    "info": "Vegetables",
+    "shelves": [
+      {
+        "product": "f10a798c-5b6a-4b93-8c93-bbeaee696301",
+        "position": "0"
+      },
+      {
+        "product": "5881be71-e955-4f16-9899-ac1b202df912",
+        "position": "1"
+      },
+      {
+        "product": "f08ec330-d44f-4b25-86af-0f1d2e9f8eca",
+        "position": "2"
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "capacity": 10,
+    "info": "Seafood",
+    "shelves": [
+      {
+        "product": "d536042f-552d-4618-9ffe-33413378c1bd",
+        "position": "0"
+      },
+      {
+        "product": "91c779de-d660-4dda-ba86-8b8c53dd8725",
+        "position": "1"
+      },
+      {
+        "product": "aa5ba893-35c5-4590-8893-00a84256e325",
+        "position": "2"
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "capacity": 10,
+    "info": "Meat",
+    "shelves": [
+      {
+        "product": "d2dbb3f2-28e4-41c0-be61-a8530d74fa6e",
+        "position": "0"
+      },
+      {
+        "product": "adf91ea8-5696-4040-9052-8439c4ed23b4",
+        "position": "1"
+      },
+      {
+        "product": "4b35123c-794d-416c-a1b3-c16a6a7afd53",
+        "position": "2"
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "capacity": 10,
+    "info": "Sweets",
+    "shelves": [
+      {
+        "product": "60592b2c-518a-47d4-b101-01b8ac896973",
+        "position": "0"
+      },
+      {
+        "product": "1f8f1c8f-814b-403f-8cf6-c53ad5694e7b",
+        "position": "1"
+      },
+      {
+        "product": "388b76ca-44fa-4218-9e39-218cea676e64",
+        "position": "2"
+      }
+    ]
+  },
+  {
+    "id": 8,
+    "capacity": 10,
+    "info": "Cupboard",
+    "shelves": [
+      {
+        "product": "b85dd74b-4f31-4493-9a46-e692d706514a",
+        "position": "0"
+      },
+      {
+        "product": "7596e4bb-76da-4822-ba40-d4f8238c6b02",
+        "position": "1"
+      },
+      {
+        "product": "7b4adf2b-084d-4844-bce6-e0c3a2bcc93a",
+        "position": "2"
+      }
+    ]
+  }
+]

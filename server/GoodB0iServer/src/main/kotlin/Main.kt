@@ -13,6 +13,7 @@ import io.ktor.websocket.WebSockets
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import repository.DataProvider
 import repository.DatabaseFactory
 import repository.TestDataProvider
 import repository.exposedTypeAdapters
@@ -46,24 +47,17 @@ fun Application.module() {
     val shelfService = ShelfService()
     val listService = ListService()
 
-    TestDataProvider.insert()
 
+    val root = System.getProperty("user.dir")
+    val productsPath =  "$root/src/main/resources/products.json"
+    val racksPath = "$root/src/main/resources/racks.json"
+    val graphPath = "$root/src/main/resources/graph.json"
+    val listsPath = "$root/src/main/resources/lists.json"
+
+    val graph = DataProvider.loadFromFile(productsPath, racksPath, graphPath, listsPath)
 
     val routeFinder = IntRouteFinder(listService,
-            Graph.graph {
-                // Test shelves are 3, 1, 5, 7
-                // 1         2         3              4         5       6         7         8
-                //"Dairy", "Bakery", "Fruits", "Vegetables", "Seafood", "Meat", "Sweets", "Food cupboard"
-                10 to 3 cost 5 // Start to fruits
-                3 to 11 cost 5  // Fruits to top left
-                11 to 12 cost 5 // Top left to top right
-                11 to 1 cost 5 // Top left to dairy
-                1 to 5 cost 5 // dairy to seafood
-                5 to 12 cost 5// Seafood to top right
-                12 to 7 cost 5// Top right to sweets
-                7 to 13 cost 5// Sweets to end
-
-            }, start = 10, end = 13)
+            graph, start = 10, end = 13)
     val sessionManager = SessionManager(routeFinder)
     val trolleyManager = TrolleyManager()
     val appManager = AppManager(sessionManager)
