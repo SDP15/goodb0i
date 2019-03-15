@@ -35,9 +35,8 @@ speech = LiveSpeech(
 
 
 class SpeechInteractor:
-    def __init__(self, websocket_instance, tcp_connection, work_queue, state_file='resources/interactor_states.json'):
-        self.ws = websocket_instance
-        self.ev3 = tcp_connection
+    def __init__(self, work_queue, controller_queue, state_file='resources/interactor_states.json'):
+        self.controller_queue = controller_queue
         
         log_filename = now.strftime("%Y-%m-%d-%H%M%S")
         self.logging = False
@@ -87,7 +86,7 @@ class SpeechInteractor:
         if "shopping0" in self.state:
 
             if not self.begin_shopping:
-                self.ws.send("UserReady&")
+                self.controller_queue.put(("send_message", "UserReady&", "websocket=True"))
                 self.begin_shopping = True
                 self.next_item = self.ordered_list.get()
 
@@ -220,7 +219,7 @@ class SpeechInteractor:
     def cart(self, word, app=False):
         if "yes" in word:
             if not app:
-                self.ws.send("AcceptedProduct&")
+                self.controller_queue.put(("send_message", "AcceptedProduct&", "websocket=True"))
 
             quantity = self.next_item.get_quantity()
 
@@ -241,7 +240,7 @@ class SpeechInteractor:
 
         else:
             if not app:
-                self.ws.send("RejectedProduct&")
+                self.controller_queue.put(("send_message", "RejectedProduct&", "websocket=True"))
             response = self.options['no']['reply']       
         self.say(response)
         self.last_reply = response
@@ -278,7 +277,7 @@ class SpeechInteractor:
     # going to collect next. 
     def continue_shopping(self):
         if self.next_item.get_quantity() > 0:
-            self.ws.send("SkippedProduct&")
+            self.controller_queue.put(("send_message", "SkippedProduct&", "websocket=True"))
 
         if self.ordered_list.qsize() == 0:
             response = self.options['yes']['reply_finished']
@@ -296,7 +295,7 @@ class SpeechInteractor:
 
         # TODO: Need to implement items on same set of shelves
         if "Haribo" not in self.next_item.get_name():
-            self.ev3.send("resume-from-stop-marker")
+            self.controller_queue.put(("send_message", "resume-from-stop-marker", "ev3=True"))
         else:
             self.arrived(self.next_item, "top")
     
