@@ -47,4 +47,10 @@
     <string name="label_connecting">Connecting</string>
     <string name="label_negotiating_trolley">Negotiating trolley</string>
     <string name="label_confirming">Confirming</string>
+
+    <string name="config_label_server_address">Server address</string>
+    <string name="config_key_server_address">server_address</string>
+    <string name="config_label_use_test_data">Use test data</string>
+    <string name="config_key_use_test_data">use_test_data</string>
+    <string name="error_invalid_server_address_format">Enter a URL</string>
 </resources>
