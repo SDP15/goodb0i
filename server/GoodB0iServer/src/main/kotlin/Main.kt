@@ -15,6 +15,7 @@ import io.ktor.websocket.WebSockets
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.koin.ktor.ext.getProperty
 import repository.DataProvider
 import repository.DatabaseFactory
 import repository.exposedTypeAdapters
@@ -47,32 +48,34 @@ fun Application.module() {
     val listService = ListService()
 
 
-    val root = System.getProperty("user.dir")
-    val productsPath =  "$root/src/main/resources/products.json"
-    val racksPath = "$root/src/main/resources/racks.json"
-    val graphPath = "$root/src/main/resources/graph.json"
-    val listsPath = "$root/src/main/resources/lists.json"
-
-    val graph = DataProvider.loadFromFile(productsPath, racksPath, graphPath, listsPath)
-
-    val routeFinder = IntRouteFinder(listService,
-            graph, start = 10, end = 13)
-    val sessionManager = SessionManager(routeFinder)
-    val trolleyManager = TrolleyManager()
-    val appManager = AppManager(sessionManager)
 
 
-    GlobalScope.launch {
-        delay(3000)
-        routeFinder.plan(7654321)
+    environment.config.apply {
+        val root = System.getProperty("user.dir")
+        val productsPath = propertyOrNull("ktor.resources.products")?.getString() ?:"$root/src/main/resources/products.json"
+        val racksPath = propertyOrNull("ktor.resources.racks")?.getString() ?: "$root/src/main/resources/racks.json"
+        val graphPath =propertyOrNull("ktor.resources.graph")?.getString() ?:"$root/src/main/resources/graph.json"
+        val listsPath = propertyOrNull("ktor.resources.lists")?.getString() ?: "$root/src/main/resources/lists.json"
+
+
+        val graph = DataProvider.loadFromFile(productsPath, racksPath, graphPath, listsPath)
+
+        val routeFinder = IntRouteFinder(listService,
+                graph, start = 10, end = 13)
+        val sessionManager = SessionManager(routeFinder)
+        val trolleyManager = TrolleyManager()
+        val appManager = AppManager(sessionManager)
+
+
+        install(Routing) {
+            products(productService)
+            shelves(shelfService)
+            lists(listService)
+            sockets(sessionManager, trolleyManager, appManager)
+        }
+
     }
 
-    install(Routing) {
-        products(productService)
-        shelves(shelfService)
-        lists(listService)
-        sockets(sessionManager, trolleyManager, appManager)
-    }
 
 }
 
