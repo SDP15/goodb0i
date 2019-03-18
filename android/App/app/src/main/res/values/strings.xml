@@ -44,9 +44,12 @@
     <string name="label_pay">Pay</string>
     <string name="label_delete_order"> Delete Order</string>
     <string name="label_navigation_progress">Point %1$d of %2$d</string>
+    <string name="label_navigation_to_tills">Tills</string>
     <string name="label_connecting">Connecting</string>
     <string name="label_negotiating_trolley">Negotiating trolley</string>
     <string name="label_confirming">Confirming</string>
+
+
 
     <string name="config_label_server_address">Server address</string>
     <string name="config_key_server_address">server_address</string>

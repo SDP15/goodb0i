@@ -34,7 +34,6 @@
             android:value="barcode" />
 
 
-        <service android:name=".view.connection.BluetoothService" />
     </application>
 
 </manifest>
