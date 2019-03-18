@@ -7,6 +7,8 @@ import io.ktor.application.install
 import io.ktor.features.*
 import io.ktor.gson.gson
 import io.ktor.routing.Routing
+import io.ktor.server.engine.applicationEngineEnvironment
+import io.ktor.server.engine.commandLineEnvironment
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.ktor.websocket.WebSockets
@@ -15,11 +17,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import repository.DataProvider
 import repository.DatabaseFactory
-import repository.TestDataProvider
 import repository.exposedTypeAdapters
 import service.*
-import service.routing.Graph
-import service.routing.GenRouteFinder
 import service.routing.IntRouteFinder
 import service.shopping.AppManager
 import service.shopping.SessionManager
@@ -83,7 +82,15 @@ class Main {
 
         @JvmStatic
         fun main(args: Array<String>) {
-            embeddedServer(Netty, port = 8080, watchPaths = listOf("MainKt"), module = Application::module).start()
+            println("Command line args ${args.map { it }}")
+            val clEnv = commandLineEnvironment(args)
+
+//            val env = applicationEngineEnvironment {
+//                config = clEnv.application.environment.config
+//                module(Application::module)
+//            }
+            embeddedServer(Netty, clEnv).start()
+            //embeddedServer(Netty, port = 8080, watchPaths = listOf("MainKt"), module = Application::module).start()
         }
     }
 }
