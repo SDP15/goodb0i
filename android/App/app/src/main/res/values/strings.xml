@@ -33,8 +33,7 @@
     <string name="label_item_price">£%1$.2f</string>
     <string name="label_total_price">Total: £%1$.2f</string>
     <string name="label_no_items_found">No items found</string>
-    <string name="error_bluetooth_unable_to_connect">Unable to connect</string>
-    <string name="error_bluetooth_connection_lost">Device connection lost</string>
+    <string name="label_no_saved_lists">No saved lists</string>
     <string name="label_list_code">Code: %1$d</string>
     <string name="label_navigating_to">Navigating To</string>
     <string name="action_assistance">I Need Assistance</string>
@@ -61,4 +60,8 @@
     <string name="accessibility_requesting_trolley">Searching for available trollies</string>
     <string name="accessibility_prompt_confirm_with_trolley">Please begin shopping through the trolley</string>
 
+    <string name="content_description_add_item_button">Add item</string>
+    <string name="content_description_remove_item_button">Remove item</string>
+    <string name="content_description_shopping_list">Shopping list</string>
+    <string name="content_description_search">Product search</string>
 </resources>

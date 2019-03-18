@@ -1,19 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
 
     <com.otaliastudios.cameraview.CameraView
-            android:id="@+id/camera_view"
-            android:layout_width="match_parent"
-            android:layout_height="603dp"
-            android:adjustViewBounds="true"
-            android:keepScreenOn="true"/>
-    <TextView
-            android:layout_width="match_parent"
-            android:layout_height="136dp" android:id="@+id/msg_txt" android:text="@string/scan_items_msg"
-            android:textAlignment="center" android:textSize="30sp"/>
+        android:id="@+id/camera_view"
+        android:layout_width="match_parent"
+        android:layout_height="603dp"
+        android:adjustViewBounds="true"
+        android:keepScreenOn="true" />
 
-</LinearLayout>
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/msg_txt"
+        android:layout_width="match_parent"
+        android:layout_height="136dp"
+        android:text="@string/scan_items_msg"
+        android:textAlignment="center"
+        android:textSize="30sp" />
+
+</androidx.appcompat.widget.LinearLayoutCompat>
