@@ -100,7 +100,8 @@ dependencies {
     // Dependencies for reading barcodes
     implementation 'com.google.firebase:firebase-core:16.0.8'
     implementation 'com.google.firebase:firebase-ml-vision:19.0.2'
-    implementation 'com.otaliastudios:cameraview:1.6.0'
+    api 'com.otaliastudios:cameraview:2.0.0-beta04'
+
 
     def room_version = "2.1.0-alpha04"
     implementation "androidx.room:room-runtime:$room_version"

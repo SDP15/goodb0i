@@ -1,31 +1,35 @@
 <resources>
     <string name="app_name">GoodB0i</string>
 
-    <string name="title_login">Enter list code</string>
-
-    <string name="error_invalid_code_format">Invalid code format</string>
-    <string name="welcome_header">Welcome to</string>
+    <!--Welcome screen -->
+    <string name="title_welcome">Welcome to</string>
     <string name="action_prepare_order">PREPARE YOUR ORDER</string>
     <string name="action_start_shopping">START SHOPPING</string>
     <string name="action_view_lists">VIEW LISTS</string>
+
+    <!--Code entry screen -->
+    <string name="title_code_entry">Enter list code</string>
+    <string name="error_invalid_code_format">Invalid code format</string>
     <string name="action_enter_code">ENTER CODE</string>
-    <string name="label_order_saved">Your Order Has Been Saved</string>
-    <string name="label_your_orders">Your Orders</string>
-    <string name="label_your_order">Your Order</string>
-    <string name="prompt_order_number">Please enter your order number</string>
-    <string name="label_help">Help Information</string>
-    <string name="label_assistant_coming">An Assistant is coming to you. Please Wait</string>
-    <string name="content_help">help text  </string>
-    <string name="label_loading">LOADING</string>
-    <string name="label_approaching">Approaching</string>
-    <string name="action_add_to_cart">Add to cart</string>
-    <string name="action_dont_add_to_art">Don\'t add</string>
-    <string name="goodboi">@string/app_name</string>
-    <string name="action_view_shopping_list">View Shopping List</string>
+
+    <string name="action_assistance">I Need Assistance</string>
+
+    <!-- Navigating screen-->
+    <string name="label_navigation_progress">Point %1$d of %2$d</string>
+    <string name="label_navigating_to">Navigating To</string>
+    <string name="label_navigation_to_tills">Tills</string>
+
+    <!-- Product screen -->
     <string name="action_skip">Skip</string>
     <string name="action_scan">Scan</string>
-    <string name="action_edit_list">Edit Shopping List</string>
-    <string name="action_start_navigation">Start Navigation</string>
+    <string name="prompt_scan_item">Hold the item in front of the phone camera</string>
+
+    <!--Item confirmation screen -->
+    <string name="action_add_to_cart">Add to cart</string>
+    <string name="action_dont_add_to_art">Don\'t add</string>
+
+
+    <!-- Shopping list screen -->
     <string name="label_shopping_list">Shopping list</string>
     <string name="action_save">Save</string>
     <string name="action_save_changes">Save Changes</string>
@@ -33,23 +37,35 @@
     <string name="label_item_price">£%1$.2f</string>
     <string name="label_total_price">Total: £%1$.2f</string>
     <string name="label_no_items_found">No items found</string>
-    <string name="label_no_saved_lists">No saved lists</string>
+    <string name="label_order_saved">Your Order Has Been Saved</string>
+    <string name="label_your_order">Your Order</string>
+    <string name="content_description_add_item_button">Add item</string>
+    <string name="content_description_remove_item_button">Remove item</string>
+    <string name="content_description_shopping_list">Shopping list</string>
+    <string name="content_description_search">Product search</string>
+
+    <!-- List confirmation screen -->
+    <string name="action_edit_list">Edit Shopping List</string>
+    <string name="action_start_navigation">Start Navigation</string>
     <string name="label_list_code">Code: %1$d</string>
-    <string name="label_navigating_to">Navigating To</string>
-    <string name="action_assistance">I Need Assistance</string>
+
+    <!-- Saved lists screen -->
+    <string name="label_your_orders">Your Orders</string>
+    <string name="label_no_saved_lists">No saved lists</string>
     <string name="label_list_item_info">%1$d * %2$s</string>
-    <string name="scan_items_msg">Please Scan the Item </string>
     <string name="label_checkout">Checkout</string>
     <string name="label_pay">Pay</string>
     <string name="label_delete_order"> Delete Order</string>
-    <string name="label_navigation_progress">Point %1$d of %2$d</string>
-    <string name="label_navigation_to_tills">Tills</string>
+
+
+    <!-- Connection screen -->
     <string name="label_connecting">Connecting</string>
     <string name="label_negotiating_trolley">Negotiating trolley</string>
     <string name="label_confirming">Confirming</string>
+    <string name="accessibility_requesting_trolley">Searching for available trollies</string>
+    <string name="accessibility_prompt_confirm_with_trolley">Please begin shopping through the trolley</string>
 
-
-
+    <!-- Config screen -->
     <string name="config_label_server_address">Server address</string>
     <string name="config_key_server_address">server_address</string>
     <string name="config_label_use_test_data">Use test data</string>
@@ -57,11 +73,4 @@
     <string name="error_invalid_server_address_format">Enter a URL</string>
 
 
-    <string name="accessibility_requesting_trolley">Searching for available trollies</string>
-    <string name="accessibility_prompt_confirm_with_trolley">Please begin shopping through the trolley</string>
-
-    <string name="content_description_add_item_button">Add item</string>
-    <string name="content_description_remove_item_button">Remove item</string>
-    <string name="content_description_shopping_list">Shopping list</string>
-    <string name="content_description_search">Product search</string>
 </resources>
