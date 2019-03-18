@@ -42,7 +42,7 @@
     <string name="scan_items_msg">Please Scan the Item </string>
     <string name="label_checkout">Checkout</string>
     <string name="label_pay">Pay</string>
-    <string name="label_delete_order"> Delete the Order</string>
+    <string name="label_delete_order"> Delete Order</string>
     <string name="label_navigation_progress">Point %1$d of %2$d</string>
     <string name="label_connecting">Connecting</string>
     <string name="label_negotiating_trolley">Negotiating trolley</string>
@@ -53,4 +53,9 @@
     <string name="config_label_use_test_data">Use test data</string>
     <string name="config_key_use_test_data">use_test_data</string>
     <string name="error_invalid_server_address_format">Enter a URL</string>
+
+
+    <string name="accessibility_requesting_trolley">Searching for available trollies</string>
+    <string name="accessibility_prompt_confirm_with_trolley">Please begin shopping through the trolley</string>
+
 </resources>
