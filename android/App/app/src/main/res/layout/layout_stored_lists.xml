@@ -32,12 +32,14 @@
             android:layout_height="match_parent">
 
             <androidx.appcompat.widget.AppCompatTextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/label_no_saved_lists"
-                    style="@style/TitleSubText" />
+                style="@style/TitleSubText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/label_no_saved_lists"
+                android:textAlignment="center" />
 
         </androidx.appcompat.widget.LinearLayoutCompat>
+
 
     </ViewSwitcher>
 

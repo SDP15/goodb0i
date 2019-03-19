@@ -109,7 +109,6 @@ object DataProvider {
                 }
             }
         }
-
     }
 
     private fun loadGraphFromFile(graphPath: String): Graph<Int> {

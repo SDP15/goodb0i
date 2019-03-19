@@ -31,7 +31,8 @@
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/button_prepare_order"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/button_height"
+        android:layout_height="wrap_content"
+        android:minHeight="@dimen/button_height"
         android:layout_marginStart="@dimen/default_horizontal_margin"
         android:layout_marginEnd="@dimen/default_horizontal_margin"
         android:text="@string/action_prepare_order"
