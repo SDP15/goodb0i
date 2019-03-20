@@ -59,9 +59,7 @@ class SpeechInteractor:
         self.current_location = ""
         self.possible_states = json.load(open(state_file, 'r'))
         self.next_state('connection')
-        self.react("n/a")
         self.begin_shopping = False
-        self.moving = False
 
         # For testing "AppAccepted" message from server
         # self.next_state("identify")
@@ -72,7 +70,7 @@ class SpeechInteractor:
         self.connected_event = threading.Event()
 
         self.work_queue = work_queue
-        t1 = WorkerThread("SpeechInteractorThread", self, self.work_queue, self.listen_event)
+        t1 = WorkerThread("SpeechInteractorThread", self, self.work_queue)
         t1.start()
 
         t2 = threading.Thread(name="ListenThread", target=self.listen)
@@ -109,47 +107,40 @@ class SpeechInteractor:
         #     self.scanned(self.scanned_product)
 
     def listen(self, *arg):
-        # Wait until we are connected to the server
-        self.connected_event.wait()
-
         for sphrase in speech:
+            # Only perform SR logic if listen event is set.
             if self.listen_event.isSet():
                 self.listen_event.clear()
 
-            while self.moving:
-                continue
+                phrase = str(sphrase).lower().split()
+                word = self.find_word(phrase)
+                print("You said:", word)
 
-            phrase = str(sphrase).lower().split()
-            word = self.find_word(phrase)
-            print("You said:", word)
+                # Logs the word/words that PocketSphinx has detected
+                if self.logging is True:
+                    with open(self.log_filepath, 'a') as f:
+                        if "multiple" in word:
+                            f.write("## Keyword detection error ##\n")
+                            f.write(
+                                "Multiple keywords detected: {:}\n".format(phrase))
+                        else:
+                            f.write("Keyword detected: {:}\n".format(word))
 
-            # Logs the word/words that PocketSphinx has detected
-            if self.logging is True:
-                with open(self.log_filepath, 'a') as f:
-                    if "multiple" in word:
-                        f.write("## Keyword detection error ##\n")
-                        f.write(
-                            "Multiple keywords detected: {:}\n".format(phrase))
-                    else:
-                        f.write("Keyword detected: {:}\n".format(word))
-
-            if "repeat" in word:
-                print("repeating")
-                self.work_queue.put(("say", self.last_reply))
-            elif "options" in word:
-                self.work_queue.put("list_options")
-            elif "multiple" in word:
-                print("Multiple keywords detected")
-                say_this = "Sorry, I have heard more than one possible option. Can you confirm your option?"
-                self.work_queue.put(("say", say_this))
-            elif "n/a" in word:
-                print("no keyword detected")
-                self.work_queue.put("list_options")
-            else:
-                print(word, "detected")
-                self.work_queue.put(("react", word))
-
-            self.listen_event.wait()
+                if "repeat" in word:
+                    print("repeating")
+                    self.work_queue.put(("say", self.last_reply, "True"))
+                elif "options" in word:
+                    self.work_queue.put("list_options")
+                elif "multiple" in word:
+                    print("Multiple keywords detected")
+                    say_this = "Sorry, I have heard more than one possible option. Can you confirm your option?"
+                    self.work_queue.put(("say", say_this, "True"))
+                elif "n/a" in word:
+                    print("no keyword detected")
+                    self.work_queue.put("list_options")
+                else:
+                    print(word, "detected")
+                    self.work_queue.put(("react", word))
 
     def find_word(self, phrase):
         valid_words = set(phrase) & (set(self.options) | universal_phrases)
@@ -162,7 +153,7 @@ class SpeechInteractor:
 
     def list_options(self):
         self.say("Your options are: %s, and repeat."
-                 % ", ".join(str(o) for o in self.options))
+                 % ", ".join(str(o) for o in self.options), "True")
 
     def react(self, word):
         if "cart" in self.state and (word == "yes" or word == "no"):
@@ -172,7 +163,7 @@ class SpeechInteractor:
         elif "continue" in self.state and word == "yes":
             self.continue_shopping()
         else:
-            self.say(self.options[word]['reply'])
+            self.say(self.options[word]['reply'], self.options[word]['listen'])
             self.last_reply = self.options[word]['reply']
             self.next_state(self.options[word]['nextState'])
 
@@ -180,16 +171,28 @@ class SpeechInteractor:
             self.react("n/a")
             self.connected_event.set()
 
-    def say(self, string):
-        # Logs the string that is given to the TTS engine
-        if self.logging is True:
-            with open(self.log_filepath, 'a') as f:
-                f.write("{:}\n".format(string))
+    def say(self, string, listen):
+        if string != "":
+            # Logs the string that is given to the TTS engine
+            if self.logging is True:
+                with open(self.log_filepath, 'a') as f:
+                    f.write("{:}\n".format(string))
 
-        engine = pyttsx.init()
-        engine.setProperty('voices', 2)
-        engine.say(string)
-        engine.runAndWait()
+            engine = pyttsx.init()
+
+            # Only set listen event when we are asking a question
+            if listen == "True":
+                engine.connect("finished-utterance", self.onFinishUtterance)
+            else:
+                print("Utterance doesn't require user response.")
+
+            engine.setProperty('voices', 2)
+            engine.say(string)
+            engine.runAndWait()
+
+    def onFinishUtterance(self, name, completed):
+        print("Finishing utterance and setting listen event flag.")
+        self.listen_event.set()
 
     def speak_to_me(self, string):
         # Logs the string that is given to the TTS engine
@@ -203,7 +206,7 @@ class SpeechInteractor:
         response = self.options['arrived']['reply'] + item.get_name() + \
             self.options['arrived']['second'] + \
             shelf + self.options['arrived']['prompt']
-        self.say(response)
+        self.say(response, self.options['arrived']['listen'])
         self.last_reply = response
         self.next_state(self.options['arrived']['nextState'])
 
@@ -211,7 +214,7 @@ class SpeechInteractor:
         self.scanned_product = item
         response = self.options['scanned']['reply'] + \
             item.get_name() + self.options['scanned']['prompt']
-        self.say(response)
+        self.say(response, self.options['scanned']['listen'])
         self.last_reply = response
         self.next_state(self.options['scanned']['nextState'])
         
@@ -242,7 +245,7 @@ class SpeechInteractor:
             if not app:
                 self.controller_queue.put(("send_message", "RejectedProduct&", "websocket=True"))
             response = self.options['no']['reply']       
-        self.say(response)
+        self.say(response, self.options[word]['listen'])
         self.last_reply = response
         self.next_state(self.options[word][nextState])
 
@@ -255,7 +258,7 @@ class SpeechInteractor:
                 bool(pence) * ( str(int(pence)) + (" penny" if pence == 1 else " pence") ) + (pounds+pence == 0) * "nothing"
         response = self.options['yes']['price'] + \
             total + self.options['no']['reply']
-        self.say(response)
+        self.say(response, self.options['no']['listen'])
         self.last_reply = response
         self.next_state(self.options['no']['nextState'])
 
@@ -286,7 +289,7 @@ class SpeechInteractor:
             self.next_item = self.ordered_list.get()
             response = self.options['yes']['reply'] + self.next_item.get_name()
             nextState = 'nextState'
-        self.say(response)
+        self.say(response, self.options['yes']['listen'])
         self.last_reply = response
         # self.next_state(self.options['yes'][nextState]) 
         # self.ev3.send("resume-from-stop-marker")
