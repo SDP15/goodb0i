@@ -32,6 +32,11 @@ class ShopConnectionFragment : BaseFragment() {
             check_connecting.isChecked = progress > 0
             check_negotiating_trolley.isChecked = progress > 1
             check_confirming.isChecked = progress > 2
+            if (progress == 1) {
+                check_negotiating_trolley.announceForAccessibility(getString(R.string.accessibility_requesting_trolley))
+            } else if (progress == 2) {
+                check_confirming.announceForAccessibility(getString(R.string.accessibility_prompt_confirm_with_trolley))
+            }
         })
         vm.transitions.observe(this, Observer {
             findNavController().navigate(it)

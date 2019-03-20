@@ -7,18 +7,19 @@ import io.ktor.application.install
 import io.ktor.features.*
 import io.ktor.gson.gson
 import io.ktor.routing.Routing
+import io.ktor.server.engine.applicationEngineEnvironment
+import io.ktor.server.engine.commandLineEnvironment
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.ktor.websocket.WebSockets
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.koin.ktor.ext.getProperty
+import repository.DataProvider
 import repository.DatabaseFactory
-import repository.TestDataProvider
 import repository.exposedTypeAdapters
 import service.*
-import service.routing.Graph
-import service.routing.GenRouteFinder
 import service.routing.IntRouteFinder
 import service.shopping.AppManager
 import service.shopping.SessionManager
@@ -46,40 +47,35 @@ fun Application.module() {
     val shelfService = ShelfService()
     val listService = ListService()
 
-    TestDataProvider.insert()
 
 
-    val routeFinder = IntRouteFinder(listService,
-            Graph.graph {
-                // Test shelves are 3, 1, 5, 7
-                // 1         2         3              4         5       6         7         8
-                //"Dairy", "Bakery", "Fruits", "Vegetables", "Seafood", "Meat", "Sweets", "Food cupboard"
-                10 to 3 cost 5 // Start to fruits
-                3 to 11 cost 5  // Fruits to top left
-                11 to 12 cost 5 // Top left to top right
-                11 to 1 cost 5 // Top left to dairy
-                1 to 5 cost 5 // dairy to seafood
-                5 to 12 cost 5// Seafood to top right
-                12 to 7 cost 5// Top right to sweets
-                7 to 13 cost 5// Sweets to end
 
-            }, start = 10, end = 13)
-    val sessionManager = SessionManager(routeFinder)
-    val trolleyManager = TrolleyManager()
-    val appManager = AppManager(sessionManager)
+    environment.config.apply {
+        val root = System.getProperty("user.dir")
+        val productsPath = propertyOrNull("ktor.resources.products")?.getString() ?:"$root/src/main/resources/products.json"
+        val racksPath = propertyOrNull("ktor.resources.racks")?.getString() ?: "$root/src/main/resources/racks.json"
+        val graphPath =propertyOrNull("ktor.resources.graph")?.getString() ?:"$root/src/main/resources/graph.json"
+        val listsPath = propertyOrNull("ktor.resources.lists")?.getString() ?: "$root/src/main/resources/lists.json"
 
 
-    GlobalScope.launch {
-        delay(3000)
-        routeFinder.plan(7654321)
+        val graph = DataProvider.loadFromFile(productsPath, racksPath, graphPath, listsPath)
+
+        val routeFinder = IntRouteFinder(listService,
+                graph, start = 10, end = 13)
+        val sessionManager = SessionManager(routeFinder)
+        val trolleyManager = TrolleyManager()
+        val appManager = AppManager(sessionManager)
+
+
+        install(Routing) {
+            products(productService)
+            shelves(shelfService)
+            lists(listService)
+            sockets(sessionManager, trolleyManager, appManager)
+        }
+
     }
 
-    install(Routing) {
-        products(productService)
-        shelves(shelfService)
-        lists(listService)
-        sockets(sessionManager, trolleyManager, appManager)
-    }
 
 }
 
@@ -89,7 +85,15 @@ class Main {
 
         @JvmStatic
         fun main(args: Array<String>) {
-            embeddedServer(Netty, port = 8080, watchPaths = listOf("MainKt"), module = Application::module).start()
+            println("Command line args ${args.map { it }}")
+            val clEnv = commandLineEnvironment(args)
+
+//            val env = applicationEngineEnvironment {
+//                config = clEnv.application.environment.config
+//                module(Application::module)
+//            }
+            embeddedServer(Netty, clEnv).start()
+            //embeddedServer(Netty, port = 8080, watchPaths = listOf("MainKt"), module = Application::module).start()
         }
     }
 }

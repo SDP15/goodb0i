@@ -1,0 +1,19 @@
+[
+  {
+    "code": 7654321,
+    "products": [
+      {
+        "product": "bd732d10-94bd-4605-9c9d-136897a22d90",
+        "quantity": 2
+      },
+      {
+        "product": "1f8f1c8f-814b-403f-8cf6-c53ad5694e7b",
+        "quantity": 1
+      },
+      {
+        "product": "60592b2c-518a-47d4-b101-01b8ac896973",
+        "quantity": 3
+      }
+    ]
+  }
+]

@@ -5,6 +5,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import kotlin.reflect.KProperty
 
 /*
  * Dirty static store which allows us to switch out the base URL
@@ -28,11 +29,11 @@ object RetrofitProvider {
             addCallAdapterFactory(CoroutineCallAdapterFactory())
         }.build()
 
-
     private var retrofit = build()
 
-    val rootedRetrofit: Retrofit
-        get() = retrofit
+    operator fun getValue(thisRef: Any?, property: KProperty<*>): Retrofit {
+        return retrofit
+    }
 
 
 }

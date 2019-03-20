@@ -15,7 +15,7 @@ class WebSocket:
         print("initialise websocket")
         websocket.enableTrace(True)
         def run(*args):
-            args[0].run_forever()
+            args[0].run_forever(ping_interval=3)
 
         def on_message(ws, message):
             print("Message: " + str(message))

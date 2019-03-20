@@ -50,7 +50,10 @@ fun Route.sockets(sessionManager: SessionManager,
             incoming.consumeEach { frame ->
                 if (frame is Frame.Text) {
                     trolleyManager.onMessage(nonce, frame.readText())
+                } else if (frame is Frame.Ping) {
+                    println("Received ping from trolley")
                 }
+                println("Received other frame from trolley $frame")
             }
         } finally {
             trolleyManager.removeTrolley(nonce, this)
@@ -71,7 +74,10 @@ fun Route.sockets(sessionManager: SessionManager,
                 incoming.consumeEach { frame ->
                     if (frame is Frame.Text) {
                         appManager.onMessage(nonce, frame.readText())
+                    } else if (frame is Frame.Ping) {
+                        println("Received ping from app")
                     }
+                    println("Received other frame from app$frame")
                 }
             } catch (e: ClosedSendChannelException) {
                 appManager.disconnected(nonce)

@@ -1,6 +1,7 @@
 package com.sdp15.goodb0i
 
 import android.app.Application
+import androidx.preference.PreferenceManager
 import androidx.room.Room
 import com.google.firebase.FirebaseApp
 import com.sdp15.goodb0i.data.navigation.Message
@@ -20,7 +21,6 @@ import com.sdp15.goodb0i.data.store.products.ProductLoader
 import com.sdp15.goodb0i.data.store.products.RetrofitProductLoader
 import com.sdp15.goodb0i.data.store.products.TestDataProductLoader
 import com.sdp15.goodb0i.view.debug.CapturingDebugTree
-import com.sdp15.goodb0i.view.debug.Config
 import com.sdp15.goodb0i.view.list.code.CodeViewModel
 import com.sdp15.goodb0i.view.list.confirmation.ListConfirmationViewModel
 import com.sdp15.goodb0i.view.list.creation.ListViewModel
@@ -34,6 +34,7 @@ import com.sdp15.goodb0i.view.navigation.product.ProductViewModel
 import com.sdp15.goodb0i.view.navigation.scanner.ScannerViewModel
 import com.sdp15.goodb0i.view.welcome.WelcomeViewModel
 import org.koin.android.ext.android.startKoin
+import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.experimental.builder.viewModel
 import org.koin.dsl.module.module
 import org.koin.log.Logger
@@ -75,9 +76,12 @@ class App : Application() {
         },
         module {
             single<ProductLoader> {
+                TestDataProductLoader.initListener(
+                    getString(R.string.config_key_use_test_data),
+                    PreferenceManager.getDefaultSharedPreferences(androidContext())
+                )
                 TestDataProductLoader.DelegateProductLoader(
-                    RetrofitProductLoader,
-                    Config::shouldUseTestData
+                    RetrofitProductLoader
                 )
             }
             single<ListManager> { RetrofitListManager }
@@ -87,7 +91,7 @@ class App : Application() {
             single<ShoppingListStore> {
                 RoomShoppingListStore(
                     Room.databaseBuilder(
-                        applicationContext,
+                        androidContext(),
                         RoomDB::class.java,
                         "db"
                     ).build().listDAO()
@@ -99,4 +103,5 @@ class App : Application() {
             single<PriceComputer> { SimplePriceComputer }
         }
     )
+
 }
