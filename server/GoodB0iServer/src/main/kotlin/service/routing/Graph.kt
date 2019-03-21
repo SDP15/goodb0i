@@ -115,8 +115,15 @@ class Graph<ID> : Collection<Graph.Vertex<ID>> {
     fun edge(from: ID, to: ID, cost: Int, bidirectional: Boolean = false): Edge<ID> {
         val fromNode = Node(from)
         val toNode = Node(to)
-        if (!nodes.contains(fromNode)) nodes.add(fromNode)
-        if (!nodes.contains(toNode)) nodes.add(toNode)
+        println("Edge between $from and $to")
+        if (!nodes.contains(fromNode)) {
+            println("Adding node for $from")
+            nodes.add(fromNode)
+        }
+        if (!nodes.contains(toNode)) {
+            println("Adding node for $to")
+            nodes.add(toNode)
+        }
         return addEdge(fromNode, toNode, cost, bidirectional)
     }
 

@@ -96,7 +96,7 @@ class IntRouteFinder(private val listService: ListService, private val graph: Gr
     }
     
     private fun solver(graph: Graph<Int>, start: Graph.Node<Int>, end: Graph.Node<Int>, waypoints: List<Graph.Node<Int>>): List<Graph.Node<Int>> {
-        println("Running solver from $start to $end")
+        println("Running solver from $start to $end through $waypoints")
         var current = start
         val remaining = waypoints.toMutableList()
         val path = mutableListOf<Graph.Node<Int>>()
@@ -105,6 +105,7 @@ class IntRouteFinder(private val listService: ListService, private val graph: Gr
                 println("Calculating result for point not in cache")
                 dijkstras(current, graph)
             }
+            println("Distances for ${remaining.map { it.toString() + result.distances[it]?.toString() }}")
             val next = remaining.minBy { result.distances[it]!! }!!
             remaining.remove(next)
             var temp = result.previous[next]!! // We don't want to re-add the waypoint

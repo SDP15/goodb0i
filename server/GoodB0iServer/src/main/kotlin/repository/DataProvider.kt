@@ -121,17 +121,20 @@ object DataProvider {
                     "end" -> end(obj.getAsJsonPrimitive(key).asInt)
                     else -> {
                         val outNodes = obj.getAsJsonArray(key)
-                        val chosen = outNodes.take(kotlin.math.min(2, outNodes.size() - 1))
+                        val chosen = outNodes.take(kotlin.math.min(2, outNodes.size()))
                         if (outNodes.size() > 2) {
                             kLogger.error("Too many out nodes from $key. Using ${chosen.first()} and ${chosen[1]} of ${outNodes.map { it.asString }}")
                         }
                         chosen.map { it.asInt }.forEach { outNode ->
                             key.toInt() to outNode cost 5
                         }
+
                         kLogger.info("Adding edges from $key to ${outNodes.map { it.asInt }}")
                     }
+
                 }
             }
+            kLogger.debug("Load complete: nodes ${this.map { it.node.id }}")
         }
     }
 

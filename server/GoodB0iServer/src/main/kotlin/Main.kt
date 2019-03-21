@@ -24,12 +24,13 @@ import service.routing.IntRouteFinder
 import service.shopping.AppManager
 import service.shopping.SessionManager
 import service.shopping.TrolleyManager
+import java.time.Duration
 
 
 fun Application.module() {
     install(DefaultHeaders)
     install(CallLogging) // Log all calls
-    install(WebSockets) // Enable WebSockets
+    install(WebSockets)
 
     // Automatic conversion according to ContentType headers
     install(ContentNegotiation) {
