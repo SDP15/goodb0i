@@ -9,7 +9,6 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.sdp15.goodb0i.R
 import kotlinx.android.synthetic.main.layout_confirmation.*
-import kotlinx.android.synthetic.main.layout_product_display.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ItemConfirmationFragment : Fragment() {
@@ -31,8 +30,8 @@ class ItemConfirmationFragment : Fragment() {
         vm.transitions.observe(this, Observer {
             findNavController().navigate(it)
         })
-        product_help_button.setOnClickListener {
-            vm.requestAssistance()
-        }
+        vm.product.observe(this, Observer { product ->
+            confirmation_title.text = product.name
+        })
     }
 }
