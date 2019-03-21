@@ -92,19 +92,19 @@ object DataProvider {
     private fun loadListsFromFile(listsPath: String) {
         val file = File(listsPath).bufferedReader()
         val arr = Gson().fromJson(file, Array<JSONList>::class.java)
-        arr.forEach {  list ->
+        arr.forEach { list ->
             transaction {
                 ShoppingList.new {
                     code = list.code
                     time = System.currentTimeMillis()
                     products = SizedCollection(
-                        list.products.mapIndexed { i, listItemJSON ->
-                            ListEntry.new {
-                                quantity = listItemJSON.quantity
-                                index = i
-                                product = Product[UUID.fromString((listItemJSON.product))]
+                            list.products.mapIndexed { i, listItemJSON ->
+                                ListEntry.new {
+                                    quantity = listItemJSON.quantity
+                                    index = i
+                                    product = Product[UUID.fromString((listItemJSON.product))]
+                                }
                             }
-                        }
                     )
                 }
             }
@@ -121,7 +121,11 @@ object DataProvider {
                     "end" -> end(obj.getAsJsonPrimitive(key).asInt)
                     else -> {
                         val outNodes = obj.getAsJsonArray(key)
-                        outNodes.map { it.asInt }.forEach { outNode ->
+                        val chosen = outNodes.take(kotlin.math.min(2, outNodes.size() - 1))
+                        if (outNodes.size() > 2) {
+                            kLogger.error("Too many out nodes from $key. Using ${chosen.first()} and ${chosen[1]} of ${outNodes.map { it.asString }}")
+                        }
+                        chosen.map { it.asInt }.forEach { outNode ->
                             key.toInt() to outNode cost 5
                         }
                         kLogger.info("Adding edges from $key to ${outNodes.map { it.asInt }}")
