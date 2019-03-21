@@ -4,6 +4,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import service.routing.GenRouteFinder
 import service.routing.RouteFinder
+import java.awt.Toolkit
 import kotlin.reflect.jvm.jvmName
 
 class Session(
@@ -44,6 +45,7 @@ class Session(
             }
             is Message.IncomingMessage.FromApp.RequestHelp -> {
                 //TODO
+                Toolkit.getDefaultToolkit().beep()
             }
             is Message.IncomingMessage.FromApp.RequestStop -> {
                 //TODO

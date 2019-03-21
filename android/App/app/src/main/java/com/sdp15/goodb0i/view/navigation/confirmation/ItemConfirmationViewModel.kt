@@ -15,6 +15,8 @@ class ItemConfirmationViewModel : BaseViewModel<Any>() {
         sm.state.observeForever(sessionStateObserver)
     }
 
+    fun requestAssistance() = sm.requestAssistance()
+
     private val sessionStateObserver = Observer<ShoppingSessionState> { state ->
         if (state is ShoppingSessionState.NavigatingTo) {
             // Scan accepted, there is another products or tills to go to

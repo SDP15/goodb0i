@@ -95,7 +95,9 @@ class SocketHandler<IN, OUT>(private val transform: SocketMessageTransformer<IN,
         get() = state
 
     fun sendMessage(message: OUT) {
-        socket?.send(transform.transformOutgoing(message))
+        val transformed = transform.transformOutgoing(message)
+        Timber.i("Sending message $transformed")
+        socket?.send(transformed)
     }
 
     /**

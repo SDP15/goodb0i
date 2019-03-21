@@ -20,6 +20,8 @@ class NavigatingToViewModel : BaseViewModel<Any>() {
         sm.state.observeForever(stateObserver)
     }
 
+    fun requestAssistance() = sm.requestAssistance()
+
     private val stateObserver = Observer<ShoppingSessionState> { state ->
         if (state is ShoppingSessionState.NavigatingTo) {
             // TODO: Update progress display
