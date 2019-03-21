@@ -15,7 +15,6 @@ class ShopConnectionViewModel : BaseViewModel<Any>() {
     private lateinit var sm: ShoppingSession
     private lateinit var sl: ShoppingList
 
-    private val builder = StringBuilder()
     val progress = MutableLiveData<Int>()
 
     override fun bind() {
@@ -24,8 +23,8 @@ class ShopConnectionViewModel : BaseViewModel<Any>() {
     fun setShoppingList(list: ShoppingList) {
         sl = list
         sm = sessionManager.startSession()
-        sm.startSession(sl)
         sm.state.observeForever(connectionObserver)
+        sm.startSession(sl)
     }
 
     private val connectionObserver = Observer<ShoppingSessionState> { state ->
@@ -34,11 +33,11 @@ class ShopConnectionViewModel : BaseViewModel<Any>() {
             ShoppingSessionState.Connecting -> {
                 progress.postValue(0)
             }
-            ShoppingSessionState.NegotiatingTrolley -> {
-                progress.postValue(2)
-            }
             ShoppingSessionState.Connected -> {
                 progress.postValue(1)
+            }
+            ShoppingSessionState.NegotiatingTrolley -> {
+                progress.postValue(2)
             }
             ShoppingSessionState.NoSession -> {
                 progress.postValue(-1)

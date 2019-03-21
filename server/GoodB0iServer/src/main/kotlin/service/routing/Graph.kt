@@ -1,11 +1,15 @@
 package service.routing
+
 /**
  * This graph structure is fairly generic. There are probably too many ways to construct a graph
  */
 class Graph<ID> : Collection<Graph.Vertex<ID>> {
     private val nodes: MutableSet<Node<ID>> = mutableSetOf()
     private val edges: MutableMap<Node<ID>, MutableList<Edge<ID>>> = hashMapOf()
-
+    var start: Node<ID>? = null
+        private set
+    var end: Node<ID>? = null
+        private set
     override val size: Int = nodes.size
 
     override fun contains(element: Vertex<ID>) = nodes.contains(element.node)
@@ -83,7 +87,6 @@ class Graph<ID> : Collection<Graph.Vertex<ID>> {
             }
 
 
-
     infix fun ID.cost(cost: Int) = Pair(this, cost)
 
     infix fun Edge<ID>.to(id: ID) = UnweightedEdge(this.to.id, id)
@@ -95,6 +98,18 @@ class Graph<ID> : Collection<Graph.Vertex<ID>> {
         zip(costs).forEach { (ue, cost) ->
             edge(ue.from, ue.to, cost, ue.bidirectional)
         }
+    }
+
+    fun start(id: ID) {
+        val node = Node(id)
+        start = node
+        if (!nodes.contains(node)) nodes.add(node)
+    }
+
+    fun end(id: ID) {
+        val node = Node(id)
+        end = node
+        if (!nodes.contains(node)) nodes.add(node)
     }
 
     fun edge(from: ID, to: ID, cost: Int, bidirectional: Boolean = false): Edge<ID> {
@@ -126,6 +141,7 @@ class Graph<ID> : Collection<Graph.Vertex<ID>> {
         edge(edge.first, edge.second, edge.third)
     }
 
+
     operator fun plusAssign(id: ID) {
         nodes.add(Node(id))
     }
@@ -142,14 +158,6 @@ class Graph<ID> : Collection<Graph.Vertex<ID>> {
         nodes.remove(node)
     }
 
-//    operator fun plusAssign(vertex: Vertex<ID>) {
-//        nodes.add(vertex.node)
-//        if (edges.containsKey(vertex.node)) {
-//            edges[vertex.node]?.addAll(vertex.edges)
-//        } else {
-//            edges[vertex.node] = vertex.edges.toMutableSet()
-//        }
-//    }
 
     operator fun get(id: ID) = edges[Node(id)]
 

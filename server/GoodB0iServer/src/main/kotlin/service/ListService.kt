@@ -74,7 +74,10 @@ class ListService {
                             }
                         }
                 // Create the list with the ListEntries we just created
-                val generatedCode = Random.nextLong(1000000, 9999999)
+                var generatedCode: Long
+                do {
+                    generatedCode = Random.nextLong(1000000, 9999999)
+                } while (!ShoppingList.find { ShoppingLists.code eq generatedCode }.empty())
                 val list = ShoppingList.new {
                     code = generatedCode
                     time = System.currentTimeMillis()

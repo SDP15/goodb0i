@@ -116,11 +116,17 @@ object DataProvider {
         val obj = JsonParser().parse(file).asJsonObject
         return graph {
             obj.keySet().forEach { key ->
-                val outNodes = obj.getAsJsonArray(key)
-                outNodes.map { it.asInt }.forEach { outNode ->
-                    key.toInt() to outNode cost 5
+                when (key) {
+                    "start" -> start(obj.getAsJsonPrimitive(key).asInt)
+                    "end" -> end(obj.getAsJsonPrimitive(key).asInt)
+                    else -> {
+                        val outNodes = obj.getAsJsonArray(key)
+                        outNodes.map { it.asInt }.forEach { outNode ->
+                            key.toInt() to outNode cost 5
+                        }
+                        kLogger.info("Adding edges from $key to ${outNodes.map { it.asInt }}")
+                    }
                 }
-                kLogger.info("Adding edges from $key to ${outNodes.map { it.asInt }}")
             }
         }
     }

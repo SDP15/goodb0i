@@ -7,7 +7,7 @@ import repository.shelves.Shelves
 import service.ListService
 import kotlin.system.measureNanoTime
 
-class IntRouteFinder(private val listService: ListService, private val graph: Graph<Int>, private val start: Int, private val end: Int): RouteFinder {
+class IntRouteFinder(private val listService: ListService, private val graph: Graph<Int>): RouteFinder {
     
     private val cache = HashMap<Graph.Node<Int>, DijkstraResult>()
 
@@ -40,8 +40,8 @@ class IntRouteFinder(private val listService: ListService, private val graph: Gr
             }
 
             val path = convert(graph,
-                    Graph.Node(start),
-                    Graph.Node(end),
+                    graph.start!!,
+                    graph.end!!,
                     rackProductMap,
                     racks.map { rack -> Graph.Node(rack.id.value) })
             println("Generated path $path")

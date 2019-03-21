@@ -60,8 +60,7 @@ fun Application.module() {
 
         val graph = DataProvider.loadFromFile(productsPath, racksPath, graphPath, listsPath)
 
-        val routeFinder = IntRouteFinder(listService,
-                graph, start = 10, end = 13)
+        val routeFinder = IntRouteFinder(listService, graph)
         val sessionManager = SessionManager(routeFinder)
         val trolleyManager = TrolleyManager()
         val appManager = AppManager(sessionManager)
