@@ -61,7 +61,7 @@ fun Route.lists(listService: ListService) {
                     val response = listService.createList(flat)
                     when (response) {
                         is ListService.ListServiceResponse.ListResponse -> {
-                            call.respondText(response.list.code.toString(), status = HttpStatusCode.Created)
+                            call.respondText(response.list.code.toString(), status = HttpStatusCode.OK)
                         }
                         is ListService.ListServiceResponse.ListServiceError.ProductsNotFound -> {
                             call.respond(HttpStatusCode.BadRequest, response.products)

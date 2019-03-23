@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import repository.products.Product
+import java.util.*
 import kotlin.random.Random
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -33,7 +34,7 @@ class ListServiceTest : ServerTest() {
         val contents = products.take(10).shuffled()
         val quantities = contents.map { Random.nextInt(1, 10) }
         val response = service.createList(
-                contents.map {  product -> product.id.value }.zip(quantities)
+                contents.map { product -> product.id.value }.zip(quantities)
         )
         Assertions.assertTrue(response is ListService.ListServiceResponse.ListResponse, "List creation should be successful")
         transaction {
@@ -46,6 +47,36 @@ class ListServiceTest : ServerTest() {
             }
         }
 
+    }
+
+
+    @Test
+    fun testCreateListWithNonExistentProducts() {
+        val contents = products.take(10).shuffled()
+        val ids = contents.map { product -> product.id.value }.toMutableList()
+        val allIds = products.map { product -> product.id.value }
+        val numNonExistent = 5
+        var changed = 0
+        while (changed < numNonExistent) {
+            val new = UUID.randomUUID()
+            if (new !in allIds) { // Very unlikely to happen
+                ids[changed] = new
+                changed++
+            }
+        }
+
+        val quantities = contents.map { Random.nextInt(1, 10) }
+        val response = service.createList(
+                ids.zip(quantities)
+        )
+        Assertions.assertTrue(response is ListService.ListServiceResponse.ListServiceError.ProductsNotFound, "Response should be products not found")
+        transaction {
+            val error = response as ListService.ListServiceResponse.ListServiceError.ProductsNotFound
+            Assertions.assertEquals(numNonExistent, error.products.size, "Non existent count should match those sent")
+            ids.subList(0, numNonExistent).forEach { uuid ->
+                Assertions.assertTrue(uuid in error.products, "Error products list should contain uuid $uuid")
+            }
+        }
     }
 
     @Test
@@ -83,5 +114,6 @@ class ListServiceTest : ServerTest() {
         val updated = service.editList(-1, listOf())
         Assertions.assertTrue(updated is ListService.ListServiceResponse.ListServiceError.ListNotFound, "Update of non-existent list should fail")
     }
+
 
 }
