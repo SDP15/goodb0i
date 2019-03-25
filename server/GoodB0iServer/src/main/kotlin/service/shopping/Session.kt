@@ -3,6 +3,8 @@ package service.shopping
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.koin.standalone.KoinComponent
+import org.koin.standalone.inject
 import repository.shelves.Shelf
 import repository.shelves.ShelfRack
 import repository.shelves.Shelves
@@ -12,12 +14,12 @@ import service.routing.RouteFinder
 import java.awt.Toolkit
 
 class Session(
-        private val listService: ListService,
-        private val routeFinder: RouteFinder,
         private val appOut: SessionManager.AppMessageSender,
         private val trolleyOut: SessionManager.TrolleyMessageSender
-) : IncomingMessageListener {
+) : IncomingMessageListener, KoinComponent {
 
+    private val routeFinder: RouteFinder by inject()
+    private val listService: ListService by inject()
 
     private var trolleyReceivedRoute = false
     private var appReceivedRoute = false

@@ -12,11 +12,12 @@ import io.ktor.routing.Route
 import io.ktor.routing.get
 import io.ktor.routing.post
 import io.ktor.routing.route
+import org.koin.ktor.ext.inject
 import service.ListService
 import java.util.*
 
-fun Route.lists(listService: ListService) {
-
+fun Route.lists() {
+    val listService: ListService by inject()
     route("/lists") {
 
         post("/new") {
