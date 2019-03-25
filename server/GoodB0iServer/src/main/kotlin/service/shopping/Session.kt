@@ -2,12 +2,17 @@ package service.shopping
 
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import service.routing.GenRouteFinder
+import org.jetbrains.exposed.sql.transactions.transaction
+import repository.shelves.Shelf
+import repository.shelves.ShelfRack
+import repository.shelves.Shelves
+import service.ListService
+import service.routing.Graph
 import service.routing.RouteFinder
 import java.awt.Toolkit
-import kotlin.reflect.jvm.jvmName
 
 class Session(
+        private val listService: ListService,
         private val routeFinder: RouteFinder,
         private val appOut: SessionManager.AppMessageSender,
         private val trolleyOut: SessionManager.TrolleyMessageSender
@@ -19,10 +24,41 @@ class Session(
 
     private fun plan(code: Long) {
         sendToTrolley(Message.OutgoingMessage.ToTrolley.AssignedToApp(code.toString()))
-        val plan = routeFinder.plan(code)
 
-        sendToApp(Message.OutgoingMessage.ToApp.Route(plan))
-        sendToTrolley(Message.OutgoingMessage.ToTrolley.RouteCalculated(plan))
+        val listResponse = listService.loadList(code)
+        when (listResponse) {
+            is ListService.ListServiceResponse.ListResponse -> {
+                val list = listResponse.list
+                transaction {
+                    val shelves = Shelf.find { Shelves.product inList list.products.map { it.product.id } }
+                    val racks = shelves.map { shelf -> ShelfRack[shelf.rack] }.toSet()
+
+                    val rackProductMap = racks.associate { rack ->
+                        Graph.Node(rack.id.value) to rack.shelves.mapNotNull { shelf ->
+                            val index = list.products.indexOfFirst { it.product == shelf.product }
+                            if (index == -1) null else index
+                        }
+                    }
+                    val path = routeFinder.plan(racks.map { rack ->
+                        Graph.Node(rack.id.value)
+                    })
+                    when (path) {
+                        is RouteFinder.RoutingResult.Route -> {
+                            val routeString = Message.Transformer.routeToString(path, rackProductMap)
+
+                            sendToApp(Message.OutgoingMessage.ToApp.Route(routeString))
+                            sendToTrolley(Message.OutgoingMessage.ToTrolley.RouteCalculated(routeString))
+                        }
+                        is RouteFinder.RoutingResult.RoutingError -> {
+
+                        }
+                    }
+                }
+            }
+            is ListService.ListServiceResponse.ListServiceError -> {
+
+            }
+        }
     }
 
     override fun onAppMessage(message: Message.IncomingMessage.FromApp) {

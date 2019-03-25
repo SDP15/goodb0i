@@ -43,7 +43,7 @@ class Graph<ID> : Collection<Graph.Vertex<ID>> {
         return "Graph(${nodes.map { "$it : ${edges[it]}\n" }})"
     }
 
-    data class Vertex<ID>(val node: Node<ID>, val edges: List<Edge<ID>>)
+    data class Vertex<ID>(val node: Node<ID>, val edges: List<Edge<ID>>) : List<Edge<ID>> by edges
 
     data class Node<ID>(val id: ID)
 
@@ -169,6 +169,8 @@ class Graph<ID> : Collection<Graph.Vertex<ID>> {
     operator fun get(id: ID) = edges[Node(id)]
 
     operator fun get(node: Node<ID>) = edges[node]
+
+    operator fun get(vertex: Vertex<ID>) = edges[vertex.node]
 
 }
 

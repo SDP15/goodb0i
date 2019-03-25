@@ -1,5 +1,8 @@
 package service.shopping
 
+import service.routing.Graph
+import service.routing.RouteFinder
+
 sealed class Message {
 
     sealed class IncomingMessage(val body: String) : Message() {
@@ -133,6 +136,46 @@ sealed class Message {
             is OutgoingMessage.ToTrolley.AssignedToApp -> "Assigned$DELIM${message.code}"
             is OutgoingMessage.ToTrolley.RouteCalculated -> "RouteCalculated$DELIM${message.route}"
             is OutgoingMessage.ToTrolley.ConfirmMessage -> "ConfirmMessage$DELIM${message.message}"
+        }
+
+        fun routeToString(route: RouteFinder.RoutingResult.Route,
+                          productMap: Map<Graph.Node<Int>, List<Int>>): String {
+            val builder = StringBuilder()
+            val sep = ','
+            val delim = '%'
+            var previous = route.first()
+            route.forEach { vertex ->
+                if (vertex == route.first()) {
+                    builder.append("start")
+                } else if (vertex == route.last()) {
+                    builder.append("end$delim${vertex.node.id}")
+                } else {
+                    // Add a turn if there's more than one way to get to the next node
+                    val edges = previous.edges
+                    if (edges.size > 1) {
+                        val index = edges.indexOfFirst { edge -> edge.to == vertex.node }
+                        println("Node $vertex Edges are $edges. Index is $index")
+                        when (index) {
+                            //0 -> builder.append("left")
+                            0 -> builder.append("forward")
+                            1 -> builder.append("right")
+                        }
+                        builder.append(sep)
+                    }
+                    if (vertex.node in productMap.keys) {
+                        builder.append("stop$delim${vertex.node.id}")
+                        val products = productMap[vertex.node]
+                        builder.append(products?.joinToString(separator = "$delim", prefix = "$delim"))
+                    } else {
+                        builder.append("pass$delim${vertex.node.id}")
+                    }
+                }
+
+                builder.append(sep)
+                previous = vertex
+            }
+            builder.setLength(builder.length - 1) // Remove last comma
+            return builder.toString()
         }
     }
 
