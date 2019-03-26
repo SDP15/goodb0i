@@ -24,6 +24,9 @@ class Session(
     private var trolleyReceivedRoute = false
     private var appReceivedRoute = false
 
+    private var lastTrolleyPing = System.currentTimeMillis()
+    private var lastAppPing = System.currentTimeMillis()
+
     private fun plan(code: Long) {
         sendToTrolley(Message.OutgoingMessage.ToTrolley.AssignedToApp(code.toString()))
 
@@ -64,6 +67,7 @@ class Session(
     }
 
     override fun onAppMessage(message: Message.IncomingMessage.FromApp) {
+        lastAppPing = System.currentTimeMillis()
         println("IN: $message")
         when (message) {
             is Message.IncomingMessage.FromApp.PlanRoute -> {
@@ -95,6 +99,7 @@ class Session(
     }
 
     override fun onTrolleyMessage(message: Message.IncomingMessage.FromTrolley) {
+        lastTrolleyPing = System.currentTimeMillis()
         println("IN: $message")
         when (message) {
             is Message.IncomingMessage.FromTrolley.ReceivedRoute -> {

@@ -21,6 +21,8 @@ sealed class Message {
 
             class ReachedPoint(body: String, val id: String) : FromTrolley(body)
 
+            class Ping(body: String) : FromTrolley(body)
+
             data class InvalidMessage(val message: String) : FromTrolley(message)
         }
 
@@ -43,6 +45,8 @@ sealed class Message {
             class RequestHelp(body: String) : FromApp(body)
 
             class RequestStop(body: String) : FromApp(body)
+
+            class Ping(body: String) : FromApp(body)
 
             data class InvalidMessage(val message: String) : FromApp(message)
 
@@ -104,6 +108,7 @@ sealed class Message {
                 "Stop" -> IncomingMessage.FromApp.RequestStop(message)
                 "ReceivedRoute" -> IncomingMessage.FromApp.ReceivedRoute(message)
                 "PlanRoute" -> IncomingMessage.FromApp.PlanRoute(message, message.substringAfter(DELIM).toLong())
+                "Ping" -> IncomingMessage.FromApp.Ping(message)
                 else -> IncomingMessage.FromApp.InvalidMessage(message)
             }
         }
@@ -117,6 +122,7 @@ sealed class Message {
                 "SkippedProduct" -> IncomingMessage.FromTrolley.TrolleySkippedProduct(message)
                 "UserReady" -> IncomingMessage.FromTrolley.UserReady(message)
                 "ReceivedRoute" -> IncomingMessage.FromTrolley.ReceivedRoute(message)
+                "Ping" -> IncomingMessage.FromTrolley.Ping(message)
                 else -> IncomingMessage.FromTrolley.InvalidMessage(message)
             }
         }
