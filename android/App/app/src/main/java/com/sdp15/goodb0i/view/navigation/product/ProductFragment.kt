@@ -39,6 +39,9 @@ class ProductFragment : Fragment() {
         product_button_skip.setOnClickListener {
             vm.skip()
         }
+        product_help_button.setOnClickListener {
+            vm.requestAssistance()
+        }
         vm.transitions.observe(this, Observer {
             findNavController().navigate(it)
         })

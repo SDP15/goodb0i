@@ -1,11 +1,15 @@
 package service.routing
+
 /**
  * This graph structure is fairly generic. There are probably too many ways to construct a graph
  */
 class Graph<ID> : Collection<Graph.Vertex<ID>> {
     private val nodes: MutableSet<Node<ID>> = mutableSetOf()
     private val edges: MutableMap<Node<ID>, MutableList<Edge<ID>>> = hashMapOf()
-
+    var start: Node<ID>? = null
+        private set
+    var end: Node<ID>? = null
+        private set
     override val size: Int = nodes.size
 
     override fun contains(element: Vertex<ID>) = nodes.contains(element.node)
@@ -39,7 +43,7 @@ class Graph<ID> : Collection<Graph.Vertex<ID>> {
         return "Graph(${nodes.map { "$it : ${edges[it]}\n" }})"
     }
 
-    data class Vertex<ID>(val node: Node<ID>, val edges: List<Edge<ID>>)
+    data class Vertex<ID>(val node: Node<ID>, val edges: List<Edge<ID>>) : List<Edge<ID>> by edges
 
     data class Node<ID>(val id: ID)
 
@@ -83,7 +87,6 @@ class Graph<ID> : Collection<Graph.Vertex<ID>> {
             }
 
 
-
     infix fun ID.cost(cost: Int) = Pair(this, cost)
 
     infix fun Edge<ID>.to(id: ID) = UnweightedEdge(this.to.id, id)
@@ -97,11 +100,30 @@ class Graph<ID> : Collection<Graph.Vertex<ID>> {
         }
     }
 
+    fun start(id: ID) {
+        val node = Node(id)
+        start = node
+        if (!nodes.contains(node)) nodes.add(node)
+    }
+
+    fun end(id: ID) {
+        val node = Node(id)
+        end = node
+        if (!nodes.contains(node)) nodes.add(node)
+    }
+
     fun edge(from: ID, to: ID, cost: Int, bidirectional: Boolean = false): Edge<ID> {
         val fromNode = Node(from)
         val toNode = Node(to)
-        if (!nodes.contains(fromNode)) nodes.add(fromNode)
-        if (!nodes.contains(toNode)) nodes.add(toNode)
+        println("Edge between $from and $to")
+        if (!nodes.contains(fromNode)) {
+            println("Adding node for $from")
+            nodes.add(fromNode)
+        }
+        if (!nodes.contains(toNode)) {
+            println("Adding node for $to")
+            nodes.add(toNode)
+        }
         return addEdge(fromNode, toNode, cost, bidirectional)
     }
 
@@ -126,6 +148,7 @@ class Graph<ID> : Collection<Graph.Vertex<ID>> {
         edge(edge.first, edge.second, edge.third)
     }
 
+
     operator fun plusAssign(id: ID) {
         nodes.add(Node(id))
     }
@@ -142,18 +165,12 @@ class Graph<ID> : Collection<Graph.Vertex<ID>> {
         nodes.remove(node)
     }
 
-//    operator fun plusAssign(vertex: Vertex<ID>) {
-//        nodes.add(vertex.node)
-//        if (edges.containsKey(vertex.node)) {
-//            edges[vertex.node]?.addAll(vertex.edges)
-//        } else {
-//            edges[vertex.node] = vertex.edges.toMutableSet()
-//        }
-//    }
 
     operator fun get(id: ID) = edges[Node(id)]
 
     operator fun get(node: Node<ID>) = edges[node]
+
+    operator fun get(vertex: Vertex<ID>) = edges[vertex.node]
 
 }
 

@@ -26,7 +26,7 @@ class GenRouteFinder(private val listService: ListService, private val graph: Gr
     }
 
     fun plan(code: Long): String {
-        val list = listService.loadList(code)!!
+        val list = (listService.loadList(code) as ListService.ListServiceResponse.ListResponse).list
         // Fruits, Dairy, Seafood, Sweets
         return transaction {
             val shelves = Shelf.find { Shelves.product inList list.products.map { it.product.id } }

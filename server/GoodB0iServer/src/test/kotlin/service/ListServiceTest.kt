@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import repository.products.Product
+import java.util.*
 import kotlin.random.Random
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -31,31 +32,72 @@ class ListServiceTest : ServerTest() {
     @Test
     fun testCreateList() {
         val contents = products.take(10).shuffled()
-        val list = service.createList(
-                contents.map { product ->
-                    product.id.value.toString() to Random.nextInt(1, 10)
-                }
+        val quantities = contents.map { Random.nextInt(1, 10) }
+        val response = service.createList(
+                contents.map { product -> product.id.value }.zip(quantities)
         )
-        Assertions.assertNotNull(list, "List should be created")
+        Assertions.assertTrue(response is ListService.ListServiceResponse.ListResponse, "List creation should be successful")
+        transaction {
+            val entries = (response as ListService.ListServiceResponse.ListResponse).list.orderedProducts
+            println("Sent products ${contents.map { it.id.value.toString() }}")
+            println("Returned products ${entries.map { it.product.id.value.toString() }}")
+            entries.zip(contents.zip(quantities)).forEach { (entry, sent) ->
+                Assertions.assertEquals(sent.first.id.value, entry.product.id.value, "Response product should match sent product")
+                Assertions.assertEquals(sent.second, entry.quantity, "Response quantity should match sent quantity")
+            }
+        }
+
+    }
+
+
+    @Test
+    fun testCreateListWithNonExistentProducts() {
+        val contents = products.take(10).shuffled()
+        val ids = contents.map { product -> product.id.value }.toMutableList()
+        val allIds = products.map { product -> product.id.value }
+        val numNonExistent = 5
+        var changed = 0
+        while (changed < numNonExistent) {
+            val new = UUID.randomUUID()
+            if (new !in allIds) { // Very unlikely to happen
+                ids[changed] = new
+                changed++
+            }
+        }
+
+        val quantities = contents.map { Random.nextInt(1, 10) }
+        val response = service.createList(
+                ids.zip(quantities)
+        )
+        Assertions.assertTrue(response is ListService.ListServiceResponse.ListServiceError.ProductsNotFound, "Response should be products not found")
+        transaction {
+            val error = response as ListService.ListServiceResponse.ListServiceError.ProductsNotFound
+            Assertions.assertEquals(numNonExistent, error.products.size, "Non existent count should match those sent")
+            ids.subList(0, numNonExistent).forEach { uuid ->
+                Assertions.assertTrue(uuid in error.products, "Error products list should contain uuid $uuid")
+            }
+        }
     }
 
     @Test
     fun testUpdateList() {
         val contents = products.take(10).shuffled()
-        val list = service.createList(
+        val response = service.createList(
                 contents.map { product ->
-                    product.id.value.toString() to Random.nextInt(1, 10)
+                    product.id.value to Random.nextInt(1, 10)
                 }
         )
-        Assertions.assertNotNull(list, "List should be created")
+        Assertions.assertTrue(response is ListService.ListServiceResponse.ListResponse, "Response should be successful")
         transaction {
-            val newContents = list!!.products.map {
-                it.product.id.value.toString() to kotlin.math.max(1, it.quantity + Random.nextInt(-5, 5))
+            val list = (response as ListService.ListServiceResponse.ListResponse).list
+            val newContents = list.products.map { entry ->
+                entry.product.id.value to kotlin.math.max(1, entry.quantity + Random.nextInt(-5, 5))
             }.shuffled().take(6)
-            val newList = service.editList(list.code, newContents)
-            Assertions.assertNotNull(newList, "New list should not be null")
-            newContents.zip(newList!!.products).forEach { (contents, entry) ->
-                Assertions.assertEquals(contents.first, entry.product.id.value.toString(), "${contents.first} should match ${entry.product.name}")
+            val updateResponse = service.editList(list.code, newContents)
+            Assertions.assertTrue(updateResponse is ListService.ListServiceResponse.ListResponse, "Update should be successful")
+            val newList = (updateResponse as ListService.ListServiceResponse.ListResponse).list
+            newContents.zip(newList.products).forEach { (contents, entry) ->
+                Assertions.assertEquals(contents.first, entry.product.id.value, "${contents.first} should match ${entry.product.name}")
                 Assertions.assertEquals(contents.second, entry.quantity, "${contents.first} quantity should match")
             }
         }
@@ -63,14 +105,15 @@ class ListServiceTest : ServerTest() {
 
     @Test
     fun testLoadNonExistentList() {
-        val list = service.loadList(-1)
-        Assertions.assertNull(list, "Non existent list should be null")
+        val response = service.loadList(-1)
+        Assertions.assertTrue(response is ListService.ListServiceResponse.ListServiceError.ListNotFound, "Non existent list should not be found")
     }
 
     @Test
     fun testUpdateNonExistentList() {
         val updated = service.editList(-1, listOf())
-        Assertions.assertNull(updated, "Updated of non-existent list should be null")
+        Assertions.assertTrue(updated is ListService.ListServiceResponse.ListServiceError.ListNotFound, "Update of non-existent list should fail")
     }
+
 
 }

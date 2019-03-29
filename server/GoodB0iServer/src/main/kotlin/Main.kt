@@ -15,21 +15,25 @@ import io.ktor.websocket.WebSockets
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.koin.core.Koin
 import org.koin.ktor.ext.getProperty
+import org.koin.ktor.ext.installKoin
 import repository.DataProvider
 import repository.DatabaseFactory
 import repository.exposedTypeAdapters
 import service.*
 import service.routing.IntRouteFinder
+import service.routing.RouteFinder
 import service.shopping.AppManager
 import service.shopping.SessionManager
 import service.shopping.TrolleyManager
+import java.time.Duration
 
 
 fun Application.module() {
     install(DefaultHeaders)
     install(CallLogging) // Log all calls
-    install(WebSockets) // Enable WebSockets
+    install(WebSockets)
 
     // Automatic conversion according to ContentType headers
     install(ContentNegotiation) {
@@ -40,12 +44,8 @@ fun Application.module() {
         gzip()
     }
 
-
     DatabaseFactory.init()
 
-    val productService = ProductService()
-    val shelfService = ShelfService()
-    val listService = ListService()
 
 
 
@@ -60,17 +60,21 @@ fun Application.module() {
 
         val graph = DataProvider.loadFromFile(productsPath, racksPath, graphPath, listsPath)
 
-        val routeFinder = IntRouteFinder(listService,
-                graph, start = 10, end = 13)
-        val sessionManager = SessionManager(routeFinder)
+        installKoin(listOf(
+                ServiceModule,
+                org.koin.dsl.module.module {
+                    single<RouteFinder> { IntRouteFinder(graph)}
+                }
+        ))
+
+        val sessionManager = SessionManager()
         val trolleyManager = TrolleyManager()
         val appManager = AppManager(sessionManager)
 
-
         install(Routing) {
-            products(productService)
-            shelves(shelfService)
-            lists(listService)
+            products()
+            shelves()
+            lists()
             sockets(sessionManager, trolleyManager, appManager)
         }
 

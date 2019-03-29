@@ -3,23 +3,24 @@ package service.shopping
 import io.ktor.http.cio.websocket.Frame
 import io.ktor.http.cio.websocket.WebSocketSession
 import kotlinx.coroutines.isActive
+import org.koin.standalone.KoinComponent
+import org.koin.standalone.inject
+import service.ListService
 import service.routing.GenRouteFinder
 import service.routing.RouteFinder
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
-class SessionManager(private val routeFinder: RouteFinder) {
-
+class SessionManager : KoinComponent {
+    private val listService: ListService by inject()
+    private val routeFinder: RouteFinder by inject()
     private val sessions = ConcurrentHashMap<String, Session>()
     private val outs = ConcurrentHashMap<String, QueuedMessageSender>()
 
     fun createSession(id: String, appSocket: WebSocketSession, trolleySession: WebSocketSession): Session {
         val appOut = QueuedMessageSender(appSocket)
         outs[id] = appOut
-        val session = Session(
-                routeFinder,
-                appOut,
-                SimpleMessageSender(trolleySession)
+        val session = Session(appOut, SimpleMessageSender(trolleySession)
         )
         sessions[id] = session
         return session

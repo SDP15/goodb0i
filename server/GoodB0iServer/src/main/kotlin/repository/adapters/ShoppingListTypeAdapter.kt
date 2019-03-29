@@ -1,12 +1,9 @@
 package repository.adapters
 
-import com.google.gson.Gson
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
-import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.transactions.transaction
-import repository.lists.ListEntries
 import repository.lists.ShoppingList
 
 object ShoppingListTypeAdapter : TypeAdapter<ShoppingList>() {
@@ -22,7 +19,7 @@ object ShoppingListTypeAdapter : TypeAdapter<ShoppingList>() {
             out.beginArray()
             println("Writing products to JSON ${shoppingList.products.map { it.product.name + "|" + it.product.id}}")
             // Order by the original user index here
-            shoppingList.products.orderBy(ListEntries.index to SortOrder.ASC).forEach { listProduct ->
+            shoppingList.orderedProducts.forEach { listProduct ->
                 out.beginObject()
                 out.name("quantity")
                 out.value(listProduct.quantity)

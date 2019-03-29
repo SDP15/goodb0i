@@ -30,5 +30,8 @@ class ItemConfirmationFragment : Fragment() {
         vm.transitions.observe(this, Observer {
             findNavController().navigate(it)
         })
+        vm.product.observe(this, Observer { product ->
+            confirmation_title.text = product.name
+        })
     }
 }

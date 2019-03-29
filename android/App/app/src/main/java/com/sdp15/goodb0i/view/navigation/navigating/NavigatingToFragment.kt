@@ -47,6 +47,9 @@ class NavigatingToFragment : BaseFragment() {
         vm.transitions.observe(this, Observer {
             findNavController().navigate(it)
         })
+        navigation_help_button.setOnClickListener {
+            vm.requestAssistance()
+        }
     }
 
     sealed class NavigationDestination(val distance: Int, val progress: Int) {

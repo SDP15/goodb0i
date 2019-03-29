@@ -4,10 +4,11 @@ import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
 import io.ktor.response.respond
 import io.ktor.routing.*
+import org.koin.ktor.ext.inject
 import service.ProductService
 
-fun Route.products(productService: ProductService) {
-
+fun Route.products() {
+    val productService: ProductService by inject()
     route("/products") {
 
         get("/") {

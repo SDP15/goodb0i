@@ -6,7 +6,6 @@ import okhttp3.*
 import okhttp3.logging.HttpLoggingInterceptor
 import okio.ByteString
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
 /*
@@ -24,8 +23,7 @@ class SocketHandler<IN, OUT>(private val transform: SocketMessageTransformer<IN,
     fun start(url: String) {
         val request = Request.Builder().url(url).build()
         val client = OkHttpClient.Builder()
-            .addInterceptor(HttpLoggingInterceptor())
-            .pingInterval(3, TimeUnit.SECONDS).build()
+            .addInterceptor(HttpLoggingInterceptor()).build()
         Timber.i("Starting websocket for $url")
         socket = client.newWebSocket(request, SocketListener())
     }
@@ -97,7 +95,9 @@ class SocketHandler<IN, OUT>(private val transform: SocketMessageTransformer<IN,
         get() = state
 
     fun sendMessage(message: OUT) {
-        socket?.send(transform.transformOutgoing(message))
+        val transformed = transform.transformOutgoing(message)
+        Timber.i("Sending message $transformed")
+        socket?.send(transformed)
     }
 
     /**
