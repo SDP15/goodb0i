@@ -8,10 +8,8 @@ import time
 import requests
 import serial
 
-from button import Button
-from qr_scanner_live import QRDetection
 from speech_interactor import SpeechInteractor
-from utils.custom_threads import WorkerThread, ButtonThread
+from utils.custom_threads import WorkerThread, ButtonThread, QRThread
 from utils.product import Product
 from utils.sockets import WebSocket, TCPSocket
 
