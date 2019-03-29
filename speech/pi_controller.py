@@ -36,16 +36,6 @@ class PiController:
         t1 = WorkerThread("PiControllerThread", self, controller_queue)
         t1.start()
 
-        # t2 = threading.Thread(name="CheckMovementThread", target=self.poll_ev3)
-        # t2.start()
-
-        # # To test receiving messages from WebSocket/to EV3
-        # time.sleep(3)
-        # self.ws.send("RouteCalculated&start,stop%3%0,pass%11")
-
-        # time.sleep(2)
-        # self.ws.send("ConfirmMessage&UserReady")
-
     def on_message(self, message):
         if "AppAcceptedProduct" in message:
             self.speech_interactor_queue.put(("next_state", "cart"))
