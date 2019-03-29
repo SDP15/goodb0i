@@ -41,7 +41,7 @@ class Session(
                     val rackProductMap = racks.associate { rack ->
                         Graph.Node(rack.id.value) to rack.shelves.mapNotNull { shelf ->
                             val index = list.products.indexOfFirst { it.product == shelf.product }
-                            if (index == -1) null else index
+                            if (index == -1) null else Pair(index, shelf.position)
                         }
                     }
                     val path = routeFinder.plan(racks.map { rack ->
@@ -55,13 +55,13 @@ class Session(
                             sendToTrolley(Message.OutgoingMessage.ToTrolley.RouteCalculated(routeString))
                         }
                         is RouteFinder.RoutingResult.RoutingError -> {
-
+                            println("Routing error $path")
                         }
                     }
                 }
             }
             is ListService.ListServiceResponse.ListServiceError -> {
-
+                println("List service error $listResponse")
             }
         }
     }

@@ -30,8 +30,8 @@ class Route private constructor(
                     "forward" -> points.add(RoutePoint.TurnForward)
                     "stop" -> {
                         val id = body.substringBefore(delim) // First int value
-                        val indices = body.substringAfter(delim).split(delim).map { it.toInt() }
-                        points.add(RoutePoint.IndexPoint.IdentifiedPoint.Stop(++index, id, indices))
+                        val indices = body.substringAfter(delim).split(delim).map { it.toInt() }.chunked(2)
+                        points.add(RoutePoint.IndexPoint.IdentifiedPoint.Stop(++index, id, indices.map { it.first() }, indices.map { it[1] }))
                     }
                     "pass" -> points.add(RoutePoint.IndexPoint.IdentifiedPoint.Pass(++index, body))
                 }
@@ -55,7 +55,7 @@ class Route private constructor(
                 class Pass(index: Int, id: String) : IdentifiedPoint(index, id)
 
                 // A point at which to stop
-                class Stop(index: Int, id: String, val productIndices: List<Int>) : IdentifiedPoint(index, id)
+                class Stop(index: Int, id: String, val productIndices: List<Int>, val shelfPositions: List<Int>) : IdentifiedPoint(index, id)
 
                 class End(index: Int, id: String) : IdentifiedPoint(index, id)
             }

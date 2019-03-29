@@ -145,7 +145,7 @@ sealed class Message {
         }
 
         fun routeToString(route: RouteFinder.RoutingResult.Route,
-                          productMap: Map<Graph.Node<Int>, List<Int>>): String {
+                          productMap: Map<Graph.Node<Int>, List<Pair<Int, Int>>>): String {
             val builder = StringBuilder()
             val sep = ','
             val delim = '%'
@@ -170,7 +170,7 @@ sealed class Message {
                     }
                     if (vertex.node in productMap.keys) {
                         builder.append("stop$delim${vertex.node.id}")
-                        val products = productMap[vertex.node]
+                        val products = productMap[vertex.node]?.map { "${it.first}$delim${it.second}" }
                         builder.append(products?.joinToString(separator = "$delim", prefix = "$delim"))
                     } else {
                         builder.append("pass$delim${vertex.node.id}")
