@@ -61,10 +61,6 @@ class SpeechInteractor:
         self.next_state('connection')
         self.begin_shopping = False
 
-        # For testing "AppAccepted" message from server
-        # self.next_state("identify")
-        # self.react("no")
-
         self.location_event = threading.Event()
         self.listen_event = threading.Event()
         self.connected_event = threading.Event()
@@ -193,14 +189,6 @@ class SpeechInteractor:
     def onFinishUtterance(self, name, completed):
         print("Finishing utterance and setting listen event flag.")
         self.listen_event.set()
-
-    def speak_to_me(self, string):
-        # Logs the string that is given to the TTS engine
-        if self.logging is True:
-            with open(self.log_filepath, 'a') as f:
-                f.write("{:}\n".format(string))
-
-        sp.run(["mimic/mimic", "-t", string, "-voice", "awb"])
 
     def arrived(self, item, shelf):
         response = self.options['arrived']['reply'] + item.get_name() + \
