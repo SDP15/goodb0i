@@ -8,6 +8,7 @@ import time
 import requests
 import serial
 
+from button import Button
 from speech_interactor import SpeechInteractor
 from utils.custom_threads import WorkerThread
 from utils.product import Product
@@ -31,7 +32,10 @@ class PiController:
         self.ev3_commands = []
 
         SpeechInteractor(self.speech_interactor_queue, controller_queue)
-        
+
+        self.button_pressed = 0
+        Button(controller_queue)
+
         # Thread runs a given function and it's arguments (if given any) from the work queue
         t1 = WorkerThread("PiControllerThread", self, controller_queue)
         t1.start()
@@ -117,6 +121,8 @@ class PiController:
 
             if "stop" in message:
                 self.speech_interactor_queue.put("on_location_change")
+        # elif "moving =" in message:
+        #     self.is_cart_moving(message)
 
     def send_message(self, msg, websocket=False, ev3=False):
         if websocket:
@@ -180,6 +186,19 @@ class PiController:
 
     # def scanned_qr_code(self, qr_code):
     #     print(qr_code)
+
+    def is_button_pressed(self, pressed):
+        self.button_pressed = pressed
+        if not pressed:
+            # self.ev3.send("moving?")
+            self.ev3.send("stop")
+        else:
+            self.ev3.send("start")
+        
+    # def is_cart_moving(self, message):
+    #     if "moving = 1" in message:
+    #         self.ev3.send("stop")
+
 
 
 PiController()
