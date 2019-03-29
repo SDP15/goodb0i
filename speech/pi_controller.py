@@ -9,17 +9,17 @@ import requests
 import serial
 
 from button import Button
+from qr_scanner_live import QRDetection
 from speech_interactor import SpeechInteractor
-from utils.custom_threads import WorkerThread
+from utils.custom_threads import WorkerThread, ButtonThread
 from utils.product import Product
 from utils.sockets import WebSocket, TCPSocket
-# from qr_scanner_live import QRDetection
 
 
 class PiController:
     def __init__(self):
         # Data structures for worker threads
-        controller_queue = queue.Queue()
+        self.controller_queue = queue.Queue()
         self.speech_interactor_queue = queue.Queue()
 
         self.ip_port = "127.0.0.1:8080"
@@ -27,28 +27,18 @@ class PiController:
         # self.ev3_port = 6081
         self.ev3_ip = "localhost"
         self.ev3_port = 4000
-        self.ws = WebSocket(self.ip_port, controller_queue).get_instance()
-        self.ev3 = TCPSocket(self.ev3_ip, self.ev3_port, controller_queue)
+        self.ws = WebSocket(self.ip_port, self.controller_queue).get_instance()
+        self.ev3 = TCPSocket(self.ev3_ip, self.ev3_port, self.controller_queue)
         self.ev3_commands = []
 
-        SpeechInteractor(self.speech_interactor_queue, controller_queue)
-
-        self.button_pressed = 0
-        Button(controller_queue)
-
+        SpeechInteractor(self.speech_interactor_queue, self.controller_queue)
+        
         # Thread runs a given function and it's arguments (if given any) from the work queue
-        t1 = WorkerThread("PiControllerThread", self, controller_queue)
+        t1 = WorkerThread("PiControllerThread", self, self.controller_queue)
         t1.start()
 
-        # t2 = threading.Thread(name="CheckMovementThread", target=self.poll_ev3)
-        # t2.start()
-
-        # # To test receiving messages from WebSocket/to EV3
-        # time.sleep(3)
-        # self.ws.send("RouteCalculated&start,stop%3%0,pass%11")
-
-        # time.sleep(2)
-        # self.ws.send("ConfirmMessage&UserReady")
+        # Controls whether user is allowed to press the start/stop button.
+        self.button_event = threading.Event()
 
     def on_message(self, message):
         if "AppAcceptedProduct" in message:
@@ -112,6 +102,13 @@ class PiController:
                 self.ev3.send(command)
 
             self.ev3.send("start")
+
+            # Start ButtonThread to listen for button presses to start/stop trolley
+            t2 = ButtonThread("ButtonThread", self.controller_queue, self.button_event)
+            t2.start()
+            t3 = QRDetection("QRDetectionThread", self.controller_queue, self.qr_event)
+            t3.start()
+            
         elif "detected-marker" in message:
             command = self.route_queue.get()
 
@@ -120,6 +117,8 @@ class PiController:
                 self.ws.send("ReachedPoint&" + marker_num)
 
             if "stop" in message:
+                # Prevents button from being pressed when robot stops at a marker.
+                self.button_event.set()
                 self.speech_interactor_queue.put("on_location_change")
         # elif "moving =" in message:
         #     self.is_cart_moving(message)
@@ -128,6 +127,8 @@ class PiController:
         if websocket:
             self.ws.send(msg)
         elif ev3:
+            if "resume-from-stop-marker" in msg:
+                self.button_event.clear()
             self.ev3.send(msg)
 
     #the request parameter has to be in the correct format e.g. /lists/load/7654321
@@ -186,18 +187,6 @@ class PiController:
 
     # def scanned_qr_code(self, qr_code):
     #     print(qr_code)
-
-    def is_button_pressed(self, pressed):
-        self.button_pressed = pressed
-        if not pressed:
-            # self.ev3.send("moving?")
-            self.ev3.send("stop")
-        else:
-            self.ev3.send("start")
-        
-    # def is_cart_moving(self, message):
-    #     if "moving = 1" in message:
-    #         self.ev3.send("stop")
 
 
 
