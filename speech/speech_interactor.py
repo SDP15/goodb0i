@@ -227,7 +227,6 @@ class SpeechInteractor:
             quantity = self.next_item.get_quantity()
 
             if self.next_item.get_id() == self.scanned_product.get_id():
-                print("Entering this if statement")
                 quantity-=1
                 self.next_item.set_quantity(quantity)
             if quantity >= 1:
@@ -271,9 +270,6 @@ class SpeechInteractor:
         #self.scanned_product = scanned_product
         # TODO: Assumes item scanned by app is correct
         self.scanned_product = self.next_item
-
-    def set_moving(self):
-        self.moving = True
 
     # Only called if the user decides to go to the next item
     # Sets the current item to the next item on the list and informs the user what item they are
