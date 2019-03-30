@@ -46,6 +46,8 @@ sealed class Message {
 
             class RequestStop(body: String) : FromApp(body)
 
+            class SessionComplete(body: String) : FromApp(body)
+
             class Ping(body: String) : FromApp(body)
 
             data class InvalidMessage(val message: String) : FromApp(message)
@@ -69,6 +71,8 @@ sealed class Message {
             object AppRejectedProduct : ToTrolley()
 
             object AppSkippedProduct : ToTrolley()
+
+            object SessionComplete : ToTrolley()
 
             data class ConfirmMessage(val message: String) : ToTrolley()
         }
@@ -108,6 +112,7 @@ sealed class Message {
                 "Stop" -> IncomingMessage.FromApp.RequestStop(message)
                 "ReceivedRoute" -> IncomingMessage.FromApp.ReceivedRoute(message)
                 "PlanRoute" -> IncomingMessage.FromApp.PlanRoute(message, message.substringAfter(DELIM).toLong())
+                "SessionComplete" -> IncomingMessage.FromApp.SessionComplete(message)
                 "Ping" -> IncomingMessage.FromApp.Ping(message)
                 else -> IncomingMessage.FromApp.InvalidMessage(message)
             }
@@ -142,6 +147,7 @@ sealed class Message {
             is OutgoingMessage.ToTrolley.AssignedToApp -> "Assigned$DELIM${message.code}"
             is OutgoingMessage.ToTrolley.RouteCalculated -> "RouteCalculated$DELIM${message.route}"
             is OutgoingMessage.ToTrolley.ConfirmMessage -> "ConfirmMessage$DELIM${message.message}"
+            is OutgoingMessage.ToTrolley.SessionComplete -> "SessionComplete$DELIM"
         }
 
         fun routeToString(route: RouteFinder.RoutingResult.Route,

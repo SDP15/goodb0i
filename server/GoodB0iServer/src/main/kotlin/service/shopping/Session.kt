@@ -109,6 +109,10 @@ class Session(
             is Message.IncomingMessage.FromApp.AppSkippedProduct -> {
                 sendToTrolley(Message.OutgoingMessage.ToTrolley.AppSkippedProduct)
             }
+            is Message.IncomingMessage.FromApp.SessionComplete -> {
+                //TODO: Close and dispose of session
+                sendToTrolley(Message.OutgoingMessage.ToTrolley.SessionComplete)
+            }
         }
     }
 
