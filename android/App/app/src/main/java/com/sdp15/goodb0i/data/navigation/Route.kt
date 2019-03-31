@@ -6,7 +6,7 @@ import timber.log.Timber
  * A route is a list of RoutePoints
  */
 class Route private constructor(
-    points: List<RoutePoint>
+    private val points: MutableList<RoutePoint>
 ) : List<Route.RoutePoint> by points {
 
 
@@ -39,8 +39,19 @@ class Route private constructor(
             return Route(points)
         }
 
-        fun emptyRoute() = Route(emptyList())
+        fun emptyRoute() = Route(mutableListOf())
 
+    }
+
+    fun replaceSubRoute(route: Route) {
+        val startIndex = indexOf(route.first())
+        if (startIndex == -1) throw IllegalArgumentException("Subroute start point ${route.first()} not in route")
+        val endIndex = indexOf(route.last())
+        if (endIndex == -1) throw IllegalArgumentException("Subroute end point ${route.last()} not in route")
+        if (startIndex >= endIndex) throw IllegalArgumentException("Subroute start index $startIndex must be less than subroute end index $endIndex")
+        val newRoute = points.subList(0, startIndex) + route + points.subList(endIndex+1, points.size)
+        points.clear()
+        points.addAll(newRoute)
     }
 
     sealed class RoutePoint {

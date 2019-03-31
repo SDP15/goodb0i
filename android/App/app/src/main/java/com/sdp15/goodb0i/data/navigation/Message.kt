@@ -21,6 +21,8 @@ sealed class Message {
 
         data class RouteCalculated(val route: Route) : IncomingMessage()
 
+        data class Replan(val subRoute: Route) : IncomingMessage()
+
         /**
          *  Trolley has reached a tag
          *  TODO: More information
@@ -80,6 +82,8 @@ sealed class Message {
 
         object ReceivedRoute : OutgoingMessage()
 
+        object SessionComplete : OutgoingMessage()
+
         enum class StopReason(val code: Int) {
             HelpRequest(1)
         }
@@ -98,6 +102,12 @@ sealed class Message {
                 "RouteCalculated" -> {
                     val route = Route.fromString(message.substringAfter(delim))
                     if (route != null) IncomingMessage.RouteCalculated(route) else IncomingMessage.InvalidMessage(
+                        message
+                    )
+                }
+                "Replan" -> {
+                    val route = Route.fromString(message.substringAfter(delim))
+                    if (route != null) IncomingMessage.Replan(route) else IncomingMessage.InvalidMessage(
                         message
                     )
                 }
@@ -122,6 +132,7 @@ sealed class Message {
                 is OutgoingMessage.RequestHelp -> "RequestHelp$delim"
                 is OutgoingMessage.Stop -> "Stop$delim${message.reason.code}"
                 is OutgoingMessage.ReceivedRoute -> "ReceivedRoute$delim"
+                is OutgoingMessage.SessionComplete -> "SessionComplete$delim"
             }
         }
     }

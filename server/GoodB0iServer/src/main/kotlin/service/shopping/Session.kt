@@ -2,7 +2,6 @@ package service.shopping
 
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.h2.mvstore.ConcurrentArrayList
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.koin.standalone.KoinComponent
 import org.koin.standalone.inject
@@ -13,7 +12,6 @@ import service.ListService
 import service.routing.Graph
 import service.routing.RouteFinder
 import java.awt.Toolkit
-import java.lang.IllegalArgumentException
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -31,6 +29,7 @@ class Session(
     private var lastTrolleyPing = System.currentTimeMillis()
     private var lastAppPing = System.currentTimeMillis()
 
+    private lateinit var route: RouteFinder.RoutingResult.Route
     private val receivedMessages = ArrayList<Message.IncomingMessage>()
     private var lastScannedProduct: String? = null
     private val collectedProducts = ArrayList<UUID>()
@@ -56,6 +55,7 @@ class Session(
                     })
                     when (path) {
                         is RouteFinder.RoutingResult.Route -> {
+                            route = path
                             val routeString = Message.Transformer.routeToString(path, rackProductMap)
 
                             sendToApp(Message.OutgoingMessage.ToApp.Route(routeString))
@@ -71,6 +71,11 @@ class Session(
                 println("List service error $listResponse")
             }
         }
+    }
+
+    private fun replanSection(from: Int, to: Int) {
+        val subPlan = routeFinder.plan(Graph.Node(from), Graph.Node(to), emptyList())
+        val routeString = Message.Transformer.routeToString(subPlan, emptyMap())
     }
 
     override fun onAppMessage(message: Message.IncomingMessage.FromApp) {
@@ -144,6 +149,9 @@ class Session(
             }
             is Message.IncomingMessage.FromTrolley.TrolleySkippedProduct -> {
                 sendToApp(Message.OutgoingMessage.ToApp.TrolleySkippedProduct)
+            }
+            is Message.IncomingMessage.FromTrolley.RequestReplan -> {
+                replanSection(message.from, message.to)
             }
         }
     }

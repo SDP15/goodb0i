@@ -65,6 +65,12 @@
     <string name="accessibility_requesting_trolley">Searching for available trollies</string>
     <string name="accessibility_prompt_confirm_with_trolley">Please begin shopping through the trolley</string>
 
+
+    <!-- Checkout screen-->
+    <string name="action_confirm">Confirm</string>
+    <string name="title_checkout_list">Your items</string>
+    <string name="label_edit">Edit</string>
+
     <!-- Config screen -->
     <string name="config_label_server_address">Server address</string>
     <string name="config_key_server_address">server_address</string>

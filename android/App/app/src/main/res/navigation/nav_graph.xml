@@ -41,7 +41,7 @@
         android:id="@+id/list_creation_fragment"
         android:name="com.sdp15.goodb0i.view.list.creation.ListPagingFragment"
         android:label="list_creation_fragment"
-        tools:layout="@layout/layout_shoppinglist">
+        tools:layout="@layout/layout_list_editing">
 
 
         <action
@@ -161,7 +161,7 @@
     </fragment>
     <fragment
         android:id="@+id/completeFragment"
-        android:name="com.sdp15.goodb0i.view.navigation.complete.CompleteFragment"
+        android:name="com.sdp15.goodb0i.view.navigation.complete.CheckoutFragment"
         android:label="CompleteFragment"
         tools:layout="@layout/layout_done"/>
     <fragment

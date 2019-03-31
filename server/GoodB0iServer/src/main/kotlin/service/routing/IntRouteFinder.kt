@@ -1,6 +1,5 @@
 package service.routing
 
-import service.ListService
 import kotlin.system.measureNanoTime
 
 class IntRouteFinder(private val graph: Graph<Int>): RouteFinder {
@@ -29,6 +28,7 @@ class IntRouteFinder(private val graph: Graph<Int>): RouteFinder {
     override fun plan(start: Graph.Node<Int>, end: Graph.Node<Int>, waypoints: Collection<Graph.Node<Int>>): RouteFinder.RoutingResult.Route {
         var current = start
         val remaining = waypoints.toMutableList()
+        if (remaining.isEmpty()) remaining.add(end)
         val path = mutableListOf<Graph.Node<Int>>()
         while (remaining.isNotEmpty()) {
             val result = cache.getOrPut(current) {

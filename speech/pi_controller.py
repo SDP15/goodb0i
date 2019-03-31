@@ -42,9 +42,11 @@ class PiController:
 
     def on_message(self, message):
         if "AppAcceptedProduct" in message:
+            self.speech_interactor_queue.put("clear_listen_event")
             self.speech_interactor_queue.put(("next_state", "cart"))
             self.speech_interactor_queue.put(("cart", "yes", "app=True"))
         elif "AppRejectedProject" in message:
+            self.speech_interactor_queue.put("clear_listen_event")
             self.speech_interactor_queue.put(("cart", "no", "app=True"))
         elif "AppScannedProduct" in message:
             item = message.split("&")
@@ -123,8 +125,9 @@ class PiController:
                 # Prevents button from being pressed when robot stops at a marker.
                 self.button_event.set()
                 self.speech_interactor_queue.put("on_location_change")
-                elif "RouteReplan" in message:
-            self.ev3.send("dump-queue")
+
+        # elif "RouteReplan" in message:
+        #     self.ev3.send("dump-queue")
 
         # may have to store the new commands if they are returned here
         # elif "Queue:" in message:
@@ -152,7 +155,7 @@ class PiController:
                 self.button_event.clear()
             self.ev3.send(msg)
 
-    #the request parameter has to be in the correct format e.g. /lists/load/7654321
+    # The request parameter has to be in the correct format e.g. /lists/load/7654321
     def query_web_server(self, request):
         r = requests.get("http://"+self.ip_port + request)
         list_json = r.json()

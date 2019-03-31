@@ -40,6 +40,7 @@ class WebSocketShoppingSession(
 
     private var shoppingList: ShoppingList = ShoppingList.emptyList()
     private var lastScannedProduct: Product? = null
+    private val collectedProducts = ArrayList<ListItem>()
 
     private val incomingMessages = MutableLiveData<Message.IncomingMessage>()
     // Products to collect from the current rack
@@ -47,6 +48,7 @@ class WebSocketShoppingSession(
 
     private val movingStates = CircularArray<ShoppingSessionState>(10)
     private fun setState(state: ShoppingSessionState) {
+        Timber.i("Switching to state $state")
         sessionState.postValue(state)
         if (state is ShoppingSessionState.NavigatingTo || state is ShoppingSessionState.Scanning || state is ShoppingSessionState.Confirming || state is ShoppingSessionState.Checkout) {
             movingStates.addLast(state)
@@ -100,6 +102,12 @@ class WebSocketShoppingSession(
                 is Message.IncomingMessage.TrolleySkippedProduct -> {
                     if (state.value is ShoppingSessionState.Scanning) skipProductInternal()
                 }
+                is Message.IncomingMessage.Replan -> {
+                    route.replaceSubRoute(message.subRoute)
+                    if (state.value is ShoppingSessionState.NavigatingTo) {
+                        postMovingState()
+                    }
+                }
             }
             if (!consume) incomingMessages.postValue(message)
         }
@@ -118,6 +126,8 @@ class WebSocketShoppingSession(
     override fun endSession() {
         uid = ""
         sh.stop()
+        // We expect to be destroyed immediately, so this might not be necessary
+        sessionState.postValue(ShoppingSessionState.NoSession)
     }
 
     /*
@@ -134,7 +144,6 @@ class WebSocketShoppingSession(
             return true
         } else if (point is Route.RoutePoint.IndexPoint.IdentifiedPoint.Pass) {
             // We don't want to change state if a tag scan is triggered while we are scanning
-
             if (sessionState.value !is ShoppingSessionState.Scanning && sessionState.value !is ShoppingSessionState.Confirming) {
                 index = pointIndex
                 // We should already be in a NavigatingTo state at this point
@@ -145,8 +154,8 @@ class WebSocketShoppingSession(
                 )
             }
         } else if (point is Route.RoutePoint.IndexPoint.IdentifiedPoint.End) {
-            Timber.i("At other at $point")
-            setState(ShoppingSessionState.Checkout)
+            Timber.i("At end point $point")
+            setState(ShoppingSessionState.Checkout(collectedProducts))
         }
         return false
     }
@@ -218,13 +227,24 @@ class WebSocketShoppingSession(
      Either by the app or via message from trolley
      */
     private fun productAcceptedInternal() {
+
+        val accepted = lastScannedProduct!!
+        val count = collectedProducts.indexOfFirst { item -> item.product == accepted }
+        if (count == -1) {
+            collectedProducts += ListItem(accepted)
+        } else {
+            collectedProducts[count] = collectedProducts[count] + 1
+        }
+
         val current = remainingRackProducts.first()
-        // Decrement quantity of current products
-        Timber.i("Decrementing quantity for $current")
-        remainingRackProducts[0] = current.copy(quantity = current.quantity - 1)
-        if (remainingRackProducts.first().quantity == 0) {
-            Timber.i("Removing products with quantity 0")
-            remainingRackProducts.removeAt(0)
+        if (accepted == current.product) {
+            // Decrement quantity of current products
+            Timber.i("Decrementing quantity for $current")
+            remainingRackProducts[0] = current - 1
+            if (remainingRackProducts.first().quantity == 0) {
+                Timber.i("Removing products with quantity 0")
+                remainingRackProducts.removeAt(0)
+            }
         }
         switchToNextListItem()
     }
