@@ -25,20 +25,20 @@ class Product:
     def get_shelf_position(self):
         return self.shelf_position
 
-    def set_id(self):
-        return self.id
+    def set_id(self, id):
+        self.id = id
 
-    def set_quantity(self):
-        return self.quantity
+    def set_quantity(self, quantity):
+        self.quantity = quantity
     
-    def set_name(self):
-        return self.name
+    def set_name(self, name):
+        self.name = name
 
-    def set_price(self):
-        return self.price
+    def set_price(self, price):
+        self.price = price
 
-    def set_shelf_number(self):
-        return self.shelf_number
+    def set_shelf_number(self, shelf_number):
+        self.shelf_number = shelf_number
 
-    def set_shelf_position(self):
-        return self.shelf_position
+    def set_shelf_position(self, shelf_position):
+        self.shelf_position = shelf_position
