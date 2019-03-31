@@ -37,9 +37,8 @@ class CheckoutFragment : BaseFragment() {
     override fun onBackPressed(): Boolean {
         if (list_viewpager.currentItem == 1) {
             list_viewpager.setCurrentItem(0, true)
-            return true
         }
-        return false
+        return true
     }
 
     private class ViewPagerAdapter(fragmentManager: FragmentManager) : FragmentPagerAdapter(fragmentManager) {
