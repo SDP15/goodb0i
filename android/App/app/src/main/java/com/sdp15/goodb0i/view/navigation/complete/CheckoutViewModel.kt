@@ -23,10 +23,6 @@ class CheckoutViewModel : BaseViewModel<Any>() {
 
     val totalPrice = MutableLiveData<Double>()
 
-    init {
-        Timber.e("\n\n\nInstantiating viewmodel\n\n\n")
-    }
-
     override fun bind() {
         session.state.observeForever(observer)
     }
@@ -49,6 +45,7 @@ class CheckoutViewModel : BaseViewModel<Any>() {
         session.state.removeObserver(observer)
         session.endSession()
         sessionManager.closeSession()
+        transitions.postValue(CheckoutFragmentDirections.actionCompleteFragmentToWelcomeFragment())
     }
 
     fun incrementItem(product: Product) {

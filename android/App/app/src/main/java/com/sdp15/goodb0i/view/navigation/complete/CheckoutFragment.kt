@@ -7,6 +7,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
+import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import com.sdp15.goodb0i.R
 import com.sdp15.goodb0i.view.BaseFragment
 import kotlinx.android.synthetic.main.layout_checkout.*
@@ -32,6 +34,9 @@ class CheckoutFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         vm.bind()
+        vm.transitions.observe(this, Observer {
+            findNavController().navigate(it)
+        })
     }
 
     override fun onBackPressed(): Boolean {
