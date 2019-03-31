@@ -59,14 +59,11 @@ class ShoppingListFragment : Fragment() {
                 target: RecyclerView.ViewHolder
             ): Boolean {
                 vm.moveProduct(viewHolder.adapterPosition, target.adapterPosition)
-
                 return true
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
-        }) {
-
-    }
+        }) {}
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

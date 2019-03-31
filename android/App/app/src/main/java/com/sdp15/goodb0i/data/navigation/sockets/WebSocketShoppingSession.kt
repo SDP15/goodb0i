@@ -48,6 +48,7 @@ class WebSocketShoppingSession(
 
     private val movingStates = CircularArray<ShoppingSessionState>(10)
     private fun setState(state: ShoppingSessionState) {
+        Timber.i("Switching to state $state")
         sessionState.postValue(state)
         if (state is ShoppingSessionState.NavigatingTo || state is ShoppingSessionState.Scanning || state is ShoppingSessionState.Confirming || state is ShoppingSessionState.Checkout) {
             movingStates.addLast(state)
@@ -119,6 +120,8 @@ class WebSocketShoppingSession(
     override fun endSession() {
         uid = ""
         sh.stop()
+        // We expect to be destroyed immediately, so this might not be necessary
+        sessionState.postValue(ShoppingSessionState.NoSession)
     }
 
     /*
@@ -135,7 +138,6 @@ class WebSocketShoppingSession(
             return true
         } else if (point is Route.RoutePoint.IndexPoint.IdentifiedPoint.Pass) {
             // We don't want to change state if a tag scan is triggered while we are scanning
-
             if (sessionState.value !is ShoppingSessionState.Scanning && sessionState.value !is ShoppingSessionState.Confirming) {
                 index = pointIndex
                 // We should already be in a NavigatingTo state at this point
@@ -146,8 +148,8 @@ class WebSocketShoppingSession(
                 )
             }
         } else if (point is Route.RoutePoint.IndexPoint.IdentifiedPoint.End) {
-            Timber.i("At other at $point")
-            setState(ShoppingSessionState.Checkout(TODO()))
+            Timber.i("At end point $point")
+            setState(ShoppingSessionState.Checkout(collectedProducts))
         }
         return false
     }

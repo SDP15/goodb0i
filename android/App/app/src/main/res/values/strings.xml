@@ -69,6 +69,7 @@
     <!-- Checkout screen-->
     <string name="action_confirm">Confirm</string>
     <string name="title_checkout_list">Your items</string>
+    <string name="label_edit">Edit</string>
 
     <!-- Config screen -->
     <string name="config_label_server_address">Server address</string>
