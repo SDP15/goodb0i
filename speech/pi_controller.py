@@ -9,7 +9,8 @@ import requests
 import serial
 
 from speech_interactor import SpeechInteractor
-from utils.custom_threads import WorkerThread, ButtonThread, QRThread
+# from utils.custom_threads import WorkerThread, ButtonThread, QRThread
+from utils.custom_threads import WorkerThread
 from utils.product import Product
 from utils.sockets import WebSocket, TCPSocket
 
@@ -102,10 +103,10 @@ class PiController:
             self.ev3.send("start")
 
             # Start ButtonThread to listen for button presses to start/stop trolley
-            t2 = ButtonThread("ButtonThread", self.controller_queue, self.button_event)
-            t2.start()
-            t3 = QRDetection("QRDetectionThread", self.controller_queue, self.qr_event)
-            t3.start()
+            # t2 = ButtonThread("ButtonThread", self.controller_queue, self.button_event)
+            # t2.start()
+            # t3 = QRDetection("QRDetectionThread", self.controller_queue, self.qr_event)
+            # t3.start()
             
         elif "detected-marker" in message:
             command = self.route_queue.get()
@@ -174,11 +175,11 @@ class PiController:
         route_trace[-1] = end_command
 
         # Replace "pass" commands with "forward"
-        for command in route_trace:
+        for index,command in enumerate(route_trace):
             if "pass" in command:
                 split_command = command.split("%")
                 split_command[0] = "forward"
-                command = "%".join(split_command)
+                route_trace[index] = "%".join(split_command)
 
         print("New route trace: {:}".format(route_trace))
         return route_trace
