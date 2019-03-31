@@ -3,8 +3,6 @@ import errno
 from subprocess import STDOUT, check_output
 from socket import error as socket_error
 
-
-
 # this function scans all IP addresses present in the network and pings each of them individually at port 8080/products.
 # if it can download some data, it returns this IP address, assumed to be the one of the server. It returns 0 otherwise
 def get_server():
@@ -31,7 +29,6 @@ def get_server():
                 print("hurray")
                 return ip
           except Exception:
-            #print("No data available at this port")
             continue
        except socket_error as serr:
           if serr.errno == 13:
@@ -47,7 +44,6 @@ def get_server():
               sock.close()
               continue
 
-            # make a GET request to /check
     return 0
 
 def main():
