@@ -41,9 +41,11 @@ class PiController:
 
     def on_message(self, message):
         if "AppAcceptedProduct" in message:
+            self.speech_interactor_queue.put("clear_listen_event")
             self.speech_interactor_queue.put(("next_state", "cart"))
             self.speech_interactor_queue.put(("cart", "yes", "app=True"))
         elif "AppRejectedProject" in message:
+            self.speech_interactor_queue.put("clear_listen_event")
             self.speech_interactor_queue.put(("cart", "no", "app=True"))
         elif "AppScannedProduct" in message:
             item = message.split("&")

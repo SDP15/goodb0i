@@ -63,7 +63,7 @@
 
     "arrival": 
         {"scanned":
-            {"reply": "You have scanned in the ", "prompt": " Would you like to hear more information about this product?", "listen": "True", "nextState": "identify"}},
+            {"reply": "You have scanned in the ", "diff_item": " This item is not on your list", "prompt": " Would you like to hear more information about this product?", "listen": "True", "nextState": "identify"}},
 
     "identify":
         {"yes":
@@ -74,8 +74,9 @@
     "cart":
         {"yes": 
             {"reply_quantity0": "Shall we proceed to the next item on the list?", "nextState_quantity0": "continue", 
-            "reply_quantity+": "You have ", "prompt": " more of this item on your list. Do you want to proceed and try to scan these items?",
-             "nextState_quantity+": "scan", "listen": "True"},
+            "reply_quantity+": "You have ", "prompt": " more of this item on your list. Do you want to proceed and try to scan these items?", "nextState_quantity+": "scan",
+            "reply_diff_item": "The next item on your list is on the shelf next to you. It is on the ", "reply_diff_item2": " shelf. Please try and scan in this item.", "nextState_diff_item": "arrival",
+            "listen": "True"},
         "no":
             {"reply": "Please return the item. Do you want to scan another item?", "listen": "True", "nextState": "scan"}},
              
