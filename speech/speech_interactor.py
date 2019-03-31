@@ -264,12 +264,8 @@ class SpeechInteractor:
         if self.next_item.get_quantity() > 0:
             self.controller_queue.put(("send_message", "SkippedProduct&", "websocket=True"))
 
-<<<<<<< HEAD
-        if len(self.ordered_list) == 0:
-=======
         # Checks if we have any items left on our shopping list
         if self.ordered_list.qsize() == 0:
->>>>>>> a8ebb5a72ce330cccebba6652e154fda13dbadb0
             response = self.options['yes']['reply_finished']
             nextState = 'finishedState'
         else:
