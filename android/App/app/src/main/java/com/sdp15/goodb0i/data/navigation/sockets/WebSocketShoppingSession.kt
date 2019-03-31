@@ -33,7 +33,7 @@ class WebSocketShoppingSession(
     private var route: Route = Route.emptyRoute()
     private var index = 0 // Index within the route
     private var lastStopLocation: Route.RoutePoint.IndexPoint =
-        Route.RoutePoint.IndexPoint.Start // Last rack we stopped at
+        Route.RoutePoint.IndexPoint.IdentifiedPoint.Start(0, "") // Last rack we stopped at
     private val nextStopPoint: Route.RoutePoint.IndexPoint
         get() = route.subList(fromIndex = index + 1, toIndex = route.size)
             .firstOrNull { point -> point is Route.RoutePoint.IndexPoint.IdentifiedPoint.Stop || point is Route.RoutePoint.IndexPoint.IdentifiedPoint.End } as Route.RoutePoint.IndexPoint
