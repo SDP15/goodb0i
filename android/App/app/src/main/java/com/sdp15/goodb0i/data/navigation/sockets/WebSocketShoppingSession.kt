@@ -40,6 +40,7 @@ class WebSocketShoppingSession(
 
     private var shoppingList: ShoppingList = ShoppingList.emptyList()
     private var lastScannedProduct: Product? = null
+    private val collectedProducts = ArrayList<ListItem>()
 
     private val incomingMessages = MutableLiveData<Message.IncomingMessage>()
     // Products to collect from the current rack
@@ -146,7 +147,7 @@ class WebSocketShoppingSession(
             }
         } else if (point is Route.RoutePoint.IndexPoint.IdentifiedPoint.End) {
             Timber.i("At other at $point")
-            setState(ShoppingSessionState.Checkout)
+            setState(ShoppingSessionState.Checkout(TODO()))
         }
         return false
     }
@@ -218,13 +219,24 @@ class WebSocketShoppingSession(
      Either by the app or via message from trolley
      */
     private fun productAcceptedInternal() {
+
+        val accepted = lastScannedProduct!!
+        val count = collectedProducts.indexOfFirst { item -> item.product == accepted }
+        if (count == -1) {
+            collectedProducts += ListItem(accepted)
+        } else {
+            collectedProducts[count] = collectedProducts[count] + 1
+        }
+
         val current = remainingRackProducts.first()
-        // Decrement quantity of current products
-        Timber.i("Decrementing quantity for $current")
-        remainingRackProducts[0] = current.copy(quantity = current.quantity - 1)
-        if (remainingRackProducts.first().quantity == 0) {
-            Timber.i("Removing products with quantity 0")
-            remainingRackProducts.removeAt(0)
+        if (accepted == current.product) {
+            // Decrement quantity of current products
+            Timber.i("Decrementing quantity for $current")
+            remainingRackProducts[0] = current - 1
+            if (remainingRackProducts.first().quantity == 0) {
+                Timber.i("Removing products with quantity 0")
+                remainingRackProducts.removeAt(0)
+            }
         }
         switchToNextListItem()
     }

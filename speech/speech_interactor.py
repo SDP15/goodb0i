@@ -106,7 +106,7 @@ class SpeechInteractor:
         for sphrase in speech:
             # Only perform SR logic if listen event is set.
             if self.listen_event.isSet():
-                self.listen_event.clear()
+                self.listen_event.u()
 
                 phrase = str(sphrase).lower().split()
                 word = self.find_word(phrase)

@@ -39,7 +39,7 @@ sealed class ShoppingSessionState {
     data class Confirming(val product: Product) : ShoppingSessionState()
 
     // Reached end route at
-    object Checkout : ShoppingSessionState()
+    data class Checkout(val products: List<ListItem>) : ShoppingSessionState()
 
     // User has requested help
     object AwaitingHelp : ShoppingSessionState()

@@ -115,21 +115,31 @@ object DataProvider {
         val file = File(graphPath).bufferedReader()
         val obj = JsonParser().parse(file).asJsonObject
         return graph {
+            val defaultCost = 5
             obj.keySet().forEach { key ->
                 when (key) {
                     "start" -> start(obj.getAsJsonPrimitive(key).asInt)
                     "end" -> end(obj.getAsJsonPrimitive(key).asInt)
                     else -> {
-                        val outNodes = obj.getAsJsonArray(key)
-                        val chosen = outNodes.take(kotlin.math.min(2, outNodes.size()))
-                        if (outNodes.size() > 2) {
-                            kLogger.error("Too many out nodes from $key. Using ${chosen.first()} and ${chosen[1]} of ${outNodes.map { it.asString }}")
-                        }
-                        chosen.map { it.asInt }.forEach { outNode ->
-                            key.toInt() to outNode cost 5
+                        val out = obj.get(key)
+                        when {
+                            out.isJsonPrimitive -> key.toInt() center out.asInt cost defaultCost
+                            out.isJsonObject -> out.asJsonObject.let { outs ->
+                                if (outs.has("left")) {
+                                    key.toInt() left outs.get("left").asInt cost defaultCost
+                                }
+                                if (outs.has("right")) {
+                                    key.toInt() right outs.get("right").asInt cost defaultCost
+                                }
+                                if (outs.has("forward")) {
+                                    key.toInt() center outs.get("forward").asInt cost defaultCost
+                                }
+                            }
+                            else -> kLogger.error("Out value $out not valid")
                         }
 
-                        kLogger.info("Adding edges from $key to ${outNodes.map { it.asInt }}")
+
+                        kLogger.info("Adding edges from $key to $out")
                     }
 
                 }

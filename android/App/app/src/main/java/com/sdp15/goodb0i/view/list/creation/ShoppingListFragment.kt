@@ -10,7 +10,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.sdp15.goodb0i.R
-import kotlinx.android.synthetic.main.layout_shoppinglist.*
+import kotlinx.android.synthetic.main.layout_list_editing.*
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 class ShoppingListFragment : Fragment() {
@@ -72,7 +72,7 @@ class ShoppingListFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.layout_shoppinglist, container, false)
+        return inflater.inflate(R.layout.layout_list_editing, container, false)
     }
 
 }

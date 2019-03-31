@@ -25,7 +25,7 @@ import com.sdp15.goodb0i.view.list.code.CodeViewModel
 import com.sdp15.goodb0i.view.list.confirmation.ListConfirmationViewModel
 import com.sdp15.goodb0i.view.list.creation.ListViewModel
 import com.sdp15.goodb0i.view.list.saved.SavedListsViewModel
-import com.sdp15.goodb0i.view.navigation.complete.CompleteViewModel
+import com.sdp15.goodb0i.view.navigation.complete.CheckoutViewModel
 import com.sdp15.goodb0i.view.navigation.confirmation.ItemConfirmationViewModel
 import com.sdp15.goodb0i.view.navigation.connecting.ShopConnectionViewModel
 import com.sdp15.goodb0i.view.navigation.error.ErrorViewModel
@@ -72,7 +72,7 @@ class App : Application() {
             viewModel<NavigatingToViewModel>()
             viewModel<ShopConnectionViewModel>()
             viewModel<ErrorViewModel>()
-            viewModel<CompleteViewModel>()
+            viewModel<CheckoutViewModel>()
         },
         module {
             single<ProductLoader> {
