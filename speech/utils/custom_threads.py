@@ -1,6 +1,14 @@
 import threading
 import RPi.GPIO as GPIO
 
+from pyzbar import pyzbar
+from imutils.video import VideoStream 
+import argparse
+import datetime
+import imutils
+import time
+import cv2
+
 class WorkerThread(threading.Thread):
     def __init__(self, name, object_instance, work_queue, event_flag=None):
         threading.Thread.__init__(self, name=name)
@@ -51,5 +59,37 @@ class ButtonThread(threading.Thread):
             elif self.prev_command == "stop":
                 self.controller_queue.put(("send_message", "start", "ev3=True"))
                 self.prev_command = "start"
+
+class QRThread(threading.Thread):
+    def __init__(self, name, controller_queue, event_flag):
+        threading.Thread.__init__(self, name=name)
+        self.controller_queue = controller_queue
+        self.prev_qr = ""
+        self.event_flag = event_flag
+
+        def run(self,detectQR = True):
+            print("[INFO] starting video stream...")
+            try:
+                cam = VideoStream(src=0).start()
+                print("[INFO] Camera started")
+                time.sleep(1.0)
+
+                while detectQR:
+                    frame = cam.read()
+                    frame = imutils.resize(frame, width=400)
+                    barcodeData = "No data"
+                    barcodes = pyzbar.decode(frame)
+                    for barcode in barcodes:
+                        print("barcode detected")
+                        barcodeData = str(barcode.data.decode("utf-8"))
+                        barcodeType = barcode.type
+                        print(barcodeData)
+                        if barcodeData != "No data" and self.prev_qr != barcodeData:
+                            self.prev_qr = barcodeData
+                            self.controller_queue.put(("scanned_qr_code", barcodeData))
+                    print("[INFO] Done running")
+            except:
+                print("[ERROR] An error occured while scanning QRs from camera")
+                cam.stop()
 
 

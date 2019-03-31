@@ -9,10 +9,9 @@ import requests
 import serial
 
 from speech_interactor import SpeechInteractor
-from utils.custom_threads import WorkerThread, ButtonThread
+from utils.custom_threads import WorkerThread, ButtonThread, QRThread
 from utils.product import Product
 from utils.sockets import WebSocket, TCPSocket
-# from qr_scanner_live import QRDetection
 
 
 class PiController:
@@ -105,6 +104,9 @@ class PiController:
             # Start ButtonThread to listen for button presses to start/stop trolley
             t2 = ButtonThread("ButtonThread", self.controller_queue, self.button_event)
             t2.start()
+            t3 = QRDetection("QRDetectionThread", self.controller_queue, self.qr_event)
+            t3.start()
+            
         elif "detected-marker" in message:
             command = self.route_queue.get()
 
@@ -116,6 +118,8 @@ class PiController:
                 # Prevents button from being pressed when robot stops at a marker.
                 self.button_event.set()
                 self.speech_interactor_queue.put("on_location_change")
+        # elif "moving =" in message:
+        #     self.is_cart_moving(message)
 
     def send_message(self, msg, websocket=False, ev3=False):
         if websocket:
@@ -181,6 +185,7 @@ class PiController:
 
     # def scanned_qr_code(self, qr_code):
     #     print(qr_code)
+
 
 
 PiController()
