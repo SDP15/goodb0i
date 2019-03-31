@@ -17,6 +17,10 @@ using namespace std;
 using namespace std::chrono_literals;
 using namespace ev3dev;
 
+constexpr int DEFAULT_SPEED{70};
+constexpr int DEFAULT_SLIGHT_TURN_RATIO{60};
+constexpr int DEFAULT_TURN_RATIO{90};
+
 enum DriveNumber : int {
   DRIVE_LEFT_BACK = 0,
   DRIVE_LEFT_FRONT,
@@ -47,8 +51,8 @@ void connectEv3Devices() {
   drives[DRIVE_LEFT_FRONT] = make_unique<evutil::Drive>(OUTPUT_B, failed);
   drives[DRIVE_RIGHT_BACK] = make_unique<evutil::Drive>(OUTPUT_C, failed);
   drives[DRIVE_RIGHT_FRONT] = make_unique<evutil::Drive>(OUTPUT_D, failed);
-  drives[DRIVE_LEFT_BACK]->setReversed();
-  drives[DRIVE_RIGHT_BACK]->setReversed();
+  drives[DRIVE_LEFT_FRONT]->setReversed();
+  drives[DRIVE_RIGHT_FRONT]->setReversed();
 
   leftColor = make_unique<evutil::ColorSensor>(INPUT_1, failed);
   midColor = make_unique<evutil::ColorSensor>(INPUT_2, failed);
@@ -158,7 +162,7 @@ public:
     commands.push_front(cmd);
   }
 
-  int forwardBaseSpeed{40};
+  int forwardBaseSpeed{DEFAULT_SPEED};
 
 private:
   int currentTurnAngle{0}, currentSpeed{0};
@@ -357,7 +361,7 @@ private:
 
 public:
   bool turningOn{true};
-  int slightTurnRatio{150}, maxTurnRatio{150};
+  int slightTurnRatio{DEFAULT_SLIGHT_TURN_RATIO}, maxTurnRatio{DEFAULT_TURN_RATIO};
 
   LineFollowSubsystem(SteeringSubsystem *sysSteering) {
     this->sysSteering = sysSteering;
@@ -430,9 +434,9 @@ protected:
       } else if (seeingMarker) {
         seeingMarker = false;
         // make the robot blind to the marker
-        lcol = evutil::Color::line;
+        lcol = evutil::Color::bg;
         mcol = evutil::Color::line;
-        rcol = evutil::Color::line;
+        rcol = evutil::Color::bg;
       }
     }
 
@@ -705,7 +709,7 @@ private:
                    sysSteering.forwardBaseSpeed);
           rsend(wbuf);
         } else if (cmd.find("set-speed") == 0) {
-          int spd{40};
+          int spd{DEFAULT_SPEED};
           sscanf(cmd.c_str(), "set-speed %d", &spd);
           if (spd < 5) {
             spd = 5;
@@ -723,7 +727,7 @@ private:
                    sysLine.maxTurnRatio, sysLine.slightTurnRatio);
           rsend(wbuf);
         } else if (cmd.find("set-slight-turn-ratio") == 0) {
-          int tr{150};
+          int tr{DEFAULT_SLIGHT_TURN_RATIO};
           sscanf(cmd.c_str(), "set-slight-turn-ratio %d", &tr);
           if (tr < 5) {
             tr = 5;
@@ -736,7 +740,7 @@ private:
           sysLine.slightTurnRatio = tr;
           rsend(wbuf);
         } else if (cmd.find("set-max-turn-ratio") == 0) {
-          int tr{150};
+          int tr{DEFAULT_TURN_RATIO};
           sscanf(cmd.c_str(), "set-max-turn-ratio %d", &tr);
           if (tr < 5) {
             tr = 5;
