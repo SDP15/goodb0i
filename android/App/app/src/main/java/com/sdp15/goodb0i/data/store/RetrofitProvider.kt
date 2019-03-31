@@ -1,10 +1,12 @@
 package com.sdp15.goodb0i.data.store
 
-import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
+import okhttp3.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import timber.log.Timber
+import java.io.IOException
 import kotlin.reflect.KProperty
 
 /*
@@ -21,12 +23,23 @@ object RetrofitProvider {
 
     private fun build() : Retrofit =
         Retrofit.Builder().apply {
-            client(OkHttpClient().newBuilder().addInterceptor(HttpLoggingInterceptor().apply {
-                level = HttpLoggingInterceptor.Level.BODY
+            client(OkHttpClient().newBuilder().addInterceptor(object : Interceptor {
+                @Throws(IOException::class)
+                override fun intercept(chain: Interceptor.Chain): Response {
+                    try {
+                        return chain.proceed(chain.request())
+                    } catch (e: Throwable) {
+                        Timber.e(e, "Intercepted")
+                        if (e is IOException) {
+                            throw e
+                        } else {
+                            throw IOException(e)
+                        }
+                    }
+                }
             }).build())
             baseUrl(root)
             addConverterFactory(GsonConverterFactory.create())
-            addCallAdapterFactory(CoroutineCallAdapterFactory())
         }.build()
 
     private var retrofit = build()

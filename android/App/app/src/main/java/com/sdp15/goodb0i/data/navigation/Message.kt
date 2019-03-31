@@ -21,6 +21,8 @@ sealed class Message {
 
         data class RouteCalculated(val route: Route) : IncomingMessage()
 
+        data class Replan(val subRoute: Route) : IncomingMessage()
+
         /**
          *  Trolley has reached a tag
          *  TODO: More information
@@ -100,6 +102,12 @@ sealed class Message {
                 "RouteCalculated" -> {
                     val route = Route.fromString(message.substringAfter(delim))
                     if (route != null) IncomingMessage.RouteCalculated(route) else IncomingMessage.InvalidMessage(
+                        message
+                    )
+                }
+                "Replan" -> {
+                    val route = Route.fromString(message.substringAfter(delim))
+                    if (route != null) IncomingMessage.Replan(route) else IncomingMessage.InvalidMessage(
                         message
                     )
                 }

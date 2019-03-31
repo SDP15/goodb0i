@@ -57,6 +57,7 @@ class App : Application() {
 
             override fun info(msg: String) = Timber.i(msg)
         })
+        RetrofitProductLoader.toString()
     }
 
     private val modules = listOf(
