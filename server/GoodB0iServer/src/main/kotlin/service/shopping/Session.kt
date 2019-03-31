@@ -76,6 +76,8 @@ class Session(
     private fun replanSection(from: Int, to: Int) {
         val subPlan = routeFinder.plan(Graph.Node(from), Graph.Node(to), emptyList())
         val routeString = Message.Transformer.routeToString(subPlan, emptyMap())
+        sendToTrolley(Message.OutgoingMessage.ToTrolley.ReplanCalculated(routeString))
+        sendToApp(Message.OutgoingMessage.ToApp.Replan(routeString))
     }
 
     override fun onAppMessage(message: Message.IncomingMessage.FromApp) {

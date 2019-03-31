@@ -49,7 +49,8 @@ class Route private constructor(
         val endIndex = indexOf(route.last())
         if (endIndex == -1) throw IllegalArgumentException("Subroute end point ${route.last()} not in route")
         if (startIndex >= endIndex) throw IllegalArgumentException("Subroute start index $startIndex must be less than subroute end index $endIndex")
-        val newRoute = points.subList(0, startIndex) + route.subList(0, route.size-1) + points.subList(endIndex, points.size)
+        val newRoute = points.subList(0, startIndex) + route.subList(0, route.size) + points.subList(endIndex, points.size)
+        Timber.i("Inserted sub route $route ")
         points.clear()
         points.addAll(newRoute)
     }

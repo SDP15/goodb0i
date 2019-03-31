@@ -163,7 +163,7 @@
         android:id="@+id/completeFragment"
         android:name="com.sdp15.goodb0i.view.navigation.complete.CheckoutFragment"
         android:label="CompleteFragment"
-        tools:layout="@layout/layout_done"/>
+        tools:layout="@layout/layout_checkout"/>
     <fragment
         android:id="@+id/errorFragment"
         android:name="com.sdp15.goodb0i.view.navigation.error.ErrorFragment"
