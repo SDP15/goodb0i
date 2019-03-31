@@ -85,14 +85,6 @@ class SpeechInteractor:
                 self.next_item = self.ordered_list[0]
                 del ordered_list[0]
 
-            # # Start thread to listen for location changes
-            # t2 = threading.Thread(name='LocationListenerThread', target=self.on_location_change, args=(self.next_item,))
-            # t2.start()
-            
-            # # Block current thread while waiting for location change
-            # self.location_event.wait()
-            # self.location_event.clear()
-
             # Need to replace shelf position with that from the JSON
             # self.arrived(self.next_item, "middle")
 
