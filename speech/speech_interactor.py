@@ -82,7 +82,8 @@ class SpeechInteractor:
             if not self.begin_shopping:
                 self.controller_queue.put(("send_message", "UserReady&", "websocket=True"))
                 self.begin_shopping = True
-                self.next_item = self.ordered_list.get()
+                self.next_item = self.ordered_list[0]
+                del ordered_list[0]
 
             # # Start thread to listen for location changes
             # t2 = threading.Thread(name='LocationListenerThread', target=self.on_location_change, args=(self.next_item,))
@@ -266,11 +267,12 @@ class SpeechInteractor:
         if self.next_item.get_quantity() > 0:
             self.controller_queue.put(("send_message", "SkippedProduct&", "websocket=True"))
 
-        if self.ordered_list.qsize() == 0:
+        if len(self.ordered_list) == 0:
             response = self.options['yes']['reply_finished']
             nextState = 'finishedState'
         else:
-            self.next_item = self.ordered_list.get()
+            self.next_item = self.ordered_list[0]
+            del self.ordered_list[0]
             response = self.options['yes']['reply'] + self.next_item.get_name()
             nextState = 'nextState'
         self.say(response, self.options['yes']['listen'])
