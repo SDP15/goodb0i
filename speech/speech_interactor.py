@@ -80,8 +80,7 @@ class SpeechInteractor:
             if not self.begin_shopping:
                 self.controller_queue.put(("send_message", "UserReady&", "websocket=True"))
                 self.begin_shopping = True
-                self.next_item = self.ordered_list[0]
-                del ordered_list[0]
+                self.next_item = self.ordered_list.get()
 
     def listen(self, *arg):
         for sphrase in speech:
@@ -269,8 +268,7 @@ class SpeechInteractor:
             response = self.options['yes']['reply_finished']
             nextState = 'finishedState'
         else:
-            self.next_item = self.ordered_list[0]
-            del self.ordered_list[0]
+            self.next_item = self.ordered_list.get()
             response = self.options['yes']['reply'] + self.next_item.get_name()
             nextState = 'nextState'
 
