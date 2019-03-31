@@ -11,11 +11,11 @@ import com.sdp15.goodb0i.R
 import com.sdp15.goodb0i.view.BaseFragment
 import kotlinx.android.synthetic.main.layout_checkout.*
 import kotlinx.android.synthetic.main.layout_list_creation.*
-import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class CheckoutFragment : BaseFragment() {
 
-    private val vm: CheckoutViewModel by inject()
+    private val vm: CheckoutViewModel by viewModel()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -29,8 +29,8 @@ class CheckoutFragment : BaseFragment() {
         checkout_viewpager.adapter = ViewPagerAdapter(childFragmentManager)
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         vm.bind()
     }
 

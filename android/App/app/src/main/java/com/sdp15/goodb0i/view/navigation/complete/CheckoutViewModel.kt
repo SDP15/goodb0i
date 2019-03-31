@@ -23,6 +23,10 @@ class CheckoutViewModel : BaseViewModel<Any>() {
 
     val totalPrice = MutableLiveData<Double>()
 
+    init {
+        Timber.e("\n\n\nInstantiating viewmodel\n\n\n")
+    }
+
     override fun bind() {
         session.state.observeForever(observer)
     }
@@ -37,7 +41,7 @@ class CheckoutViewModel : BaseViewModel<Any>() {
             currentProducts.addAll(state.products)
             Timber.i("Checkout out with products $products")
             totalPrice.postValue(price)
-            products.postValue(ListDiff.All(state.products))
+            products.postValue(ListDiff.All(currentProducts))
         }
     }
 

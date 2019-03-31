@@ -129,7 +129,7 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(),
         val i = currentList.indexOfFirst { it.product.id == product.id }
         val diff: ListDiff<ListItem>
         if (i == -1) { // Add products to list as it isn't there already
-            val ci = ListItem(product, 1)
+            val ci = ListItem(product)
             currentList.add(ci)
             diff = ListDiff.Add(currentList, ci)
         } else { // Update count and post to update adapter

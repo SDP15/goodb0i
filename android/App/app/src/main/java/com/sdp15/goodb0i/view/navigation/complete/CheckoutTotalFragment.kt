@@ -9,6 +9,7 @@ import com.sdp15.goodb0i.R
 import com.sdp15.goodb0i.view.BaseFragment
 import kotlinx.android.synthetic.main.layout_checkout_total.*
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
+import timber.log.Timber
 
 class CheckoutTotalFragment : BaseFragment() {
 
@@ -24,6 +25,7 @@ class CheckoutTotalFragment : BaseFragment() {
     override fun onResume() {
         super.onResume()
         vm.totalPrice.observe(this, Observer { price ->
+            Timber.i("Observed price $price")
             confirmation_list_cost.text = getString(R.string.label_total_price, price)
         })
         confirmation_button_pay.setOnClickListener {
