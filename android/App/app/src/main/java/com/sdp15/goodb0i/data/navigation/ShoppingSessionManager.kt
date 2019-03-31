@@ -8,7 +8,6 @@ interface ShoppingSessionManager {
 
     operator fun getValue(thisRef: Any?, property: KProperty<*>): ShoppingSession
 
-
     fun closeSession()
 
 }

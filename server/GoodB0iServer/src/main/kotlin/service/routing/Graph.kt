@@ -47,58 +47,32 @@ class Graph<ID> : Collection<Graph.Vertex<ID>> {
 
     data class Node<ID>(val id: ID)
 
-    data class Edge<ID>(val from: Node<ID>, val to: Node<ID>, val cost: Int) {
-
-        fun reverse() = Edge(to, from, cost)
-
+    data class Edge<ID>(val from: Node<ID>, val to: Node<ID>, val cost: Int, val direction: Direction)
+    enum class Direction {
+        LEFT, RIGHT, FORWARD
     }
 
     // Builder functions
 
-    data class UnweightedEdge<ID>(val from: ID, val to: ID, var bidirectional: Boolean = false)
-
-    infix fun ID.to(ids: Collection<Pair<ID, Int>>) {
-        ids.forEach { (to, cost) ->
-            edge(this, to, cost)
-        }
-    }
-
-    infix fun ID.toFrom(ids: Collection<Pair<ID, Int>>) {
-        ids.forEach { (to, cost) ->
-            edge(this, to, cost, true)
-        }
-    }
-
-    infix fun ID.to(ids: Collection<ID>) = ids.map { UnweightedEdge(this, it) }
-
-    infix fun ID.toFrom(ids: Collection<ID>) = ids.map { UnweightedEdge(this, it, true) }
-
-    infix fun ID.to(id: ID) = UnweightedEdge(this, id)
-
-    infix fun ID.toFrom(id: ID) = UnweightedEdge(this, id, true)
+    data class UnweightedEdge<ID>(val from: ID, val to: ID, val direction: Direction)
 
 
-    infix fun UnweightedEdge<ID>.cost(cost: Int): Edge<ID> = edge(from, to, cost, bidirectional)
+    infix fun ID.left(id: ID) = UnweightedEdge(this, id, Direction.LEFT)
 
 
-    infix fun List<UnweightedEdge<ID>>.cost(cost: Int): List<Edge<ID>> =
-            map {
-                edge(it.from, it.to, cost, it.bidirectional)
-            }
+    infix fun ID.right(id: ID) = UnweightedEdge(this, id, Direction.RIGHT)
 
 
-    infix fun ID.cost(cost: Int) = Pair(this, cost)
+    infix fun ID.center(id: ID) = UnweightedEdge(this, id, Direction.FORWARD)
 
-    infix fun Edge<ID>.to(id: ID) = UnweightedEdge(this.to.id, id)
 
-    infix fun Edge<ID>.toFrom(id: ID) = UnweightedEdge(this.to.id, id, true)
+    infix fun UnweightedEdge<ID>.cost(cost: Int): Edge<ID> = edge(from, to, cost, direction)
 
-    infix fun List<UnweightedEdge<ID>>.costs(costs: Collection<Int>) {
-        assert(size == costs.size) { "Must have one cost for each edge. $size edges. ${costs.size} costs" }
-        zip(costs).forEach { (ue, cost) ->
-            edge(ue.from, ue.to, cost, ue.bidirectional)
-        }
-    }
+    infix fun Edge<ID>.left(id: ID) = UnweightedEdge(this.to.id, id, Direction.LEFT)
+
+    infix fun Edge<ID>.right(id: ID) = UnweightedEdge(this.to.id, id, Direction.RIGHT)
+
+    infix fun Edge<ID>.center(id: ID) = UnweightedEdge(this.to.id, id, Direction.FORWARD)
 
     fun start(id: ID) {
         val node = Node(id)
@@ -112,7 +86,7 @@ class Graph<ID> : Collection<Graph.Vertex<ID>> {
         if (!nodes.contains(node)) nodes.add(node)
     }
 
-    fun edge(from: ID, to: ID, cost: Int, bidirectional: Boolean = false): Edge<ID> {
+    fun edge(from: ID, to: ID, cost: Int, direction: Direction): Edge<ID> {
         val fromNode = Node(from)
         val toNode = Node(to)
         println("Edge between $from and $to")
@@ -124,28 +98,17 @@ class Graph<ID> : Collection<Graph.Vertex<ID>> {
             println("Adding node for $to")
             nodes.add(toNode)
         }
-        return addEdge(fromNode, toNode, cost, bidirectional)
+        return addEdge(fromNode, toNode, cost, direction)
     }
 
-    private fun addEdge(fromNode: Node<ID>, toNode: Node<ID>, cost: Int, bidirectional: Boolean): Edge<ID> {
-        val edge = Edge(fromNode, toNode, cost)
+    private fun addEdge(fromNode: Node<ID>, toNode: Node<ID>, cost: Int, direction: Direction): Edge<ID> {
+        val edge = Edge(fromNode, toNode, cost, direction)
         if (edges.containsKey(fromNode)) {
             edges[fromNode]?.add(edge)
         } else {
             edges[fromNode] = mutableListOf(edge)
         }
-        if (bidirectional) {
-            if (edges.containsKey(toNode)) {
-                edges[toNode]?.add(edge.reverse())
-            } else {
-                edges[toNode] = mutableListOf(edge.reverse())
-            }
-        }
         return edge
-    }
-
-    operator fun plusAssign(edge: Triple<ID, ID, Int>) {
-        edge(edge.first, edge.second, edge.third)
     }
 
 

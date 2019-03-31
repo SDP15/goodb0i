@@ -165,13 +165,13 @@ sealed class Message {
                     // Add a turn if there's more than one way to get to the next node
                     val edges = previous.edges
                     if (edges.size > 1) {
-                        val index = edges.indexOfFirst { edge -> edge.to == vertex.node }
-                        println("Node $vertex Edges are $edges. Index is $index")
-                        when (index) {
-                            //0 -> builder.append("left")
-                            0 -> builder.append("forward")
-                            1 -> builder.append("right")
+                        val edge = edges.first { edge -> edge.to == vertex.node }
+                        when (edge.direction) {
+                            Graph.Direction.FORWARD -> builder.append("forward")
+                            Graph.Direction.LEFT -> builder.append("left")
+                            Graph.Direction.RIGHT -> builder.append("right")
                         }
+
                         builder.append(sep)
                     }
                     if (vertex.node in productMap.keys) {

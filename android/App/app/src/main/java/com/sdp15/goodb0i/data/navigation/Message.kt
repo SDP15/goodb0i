@@ -80,6 +80,8 @@ sealed class Message {
 
         object ReceivedRoute : OutgoingMessage()
 
+        object SessionComplete : OutgoingMessage()
+
         enum class StopReason(val code: Int) {
             HelpRequest(1)
         }
@@ -122,6 +124,7 @@ sealed class Message {
                 is OutgoingMessage.RequestHelp -> "RequestHelp$delim"
                 is OutgoingMessage.Stop -> "Stop$delim${message.reason.code}"
                 is OutgoingMessage.ReceivedRoute -> "ReceivedRoute$delim"
+                is OutgoingMessage.SessionComplete -> "SessionComplete$delim"
             }
         }
     }
