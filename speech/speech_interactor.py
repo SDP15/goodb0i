@@ -80,13 +80,14 @@ class SpeechInteractor:
             if not self.begin_shopping:
                 self.controller_queue.put(("send_message", "UserReady&", "websocket=True"))
                 self.begin_shopping = True
-                self.next_item = self.ordered_list.get()
+                self.next_item = self.ordered_list[0]
+                del ordered_list[0]
 
     def listen(self, *arg):
         for sphrase in speech:
             # Only perform SR logic if listen event is set.
             if self.listen_event.isSet():
-                self.listen_event.u()
+                self.listen_event.clear()
 
                 phrase = str(sphrase).lower().split()
                 word = self.find_word(phrase)
@@ -158,7 +159,7 @@ class SpeechInteractor:
 
             # Only set listen event when we are asking a question
             if listen == "True":
-                engine.connect("finished-utterance", self.onFinishUtterance)
+                engine.connect("finished-utterance", self.on_finish_utterance)
             else:
                 print("Utterance doesn't require user response.")
 
@@ -166,9 +167,14 @@ class SpeechInteractor:
             engine.say(string)
             engine.runAndWait()
 
-    def onFinishUtterance(self, name, completed):
+    def on_finish_utterance(self, name, completed):
         print("Finishing utterance and setting listen event flag.")
         self.listen_event.set()
+
+    # Used to clear listen event if user responds using app
+    def clear_listen_event(self):
+        if self.listen_event.isSet():
+            self.listen_event.clear()
 
     def arrived(self, item, same_shelf=False):
         if same_shelf:
@@ -185,14 +191,21 @@ class SpeechInteractor:
 
     def scanned(self, item):
         self.scanned_product = item
-        response = self.options['scanned']['reply'] + \
-            item.get_name() + self.options['scanned']['prompt']
+
+        # Check if the item we have scanned is on our shopping list so we can respond appropriately
+        if self.scanned_product.get_id() == self.next_item.get_id():
+            response = self.options['scanned']['reply'] + \
+                item.get_name() + self.options['scanned']['prompt']
+        else:
+            response = self.options['scanned']['reply'] + item.get_name() + \
+                self.options['scanned']['diff_item'] + self.options['scanned']['prompt']
         self.say(response, self.options['scanned']['listen'])
         self.last_reply = response
         self.next_state(self.options['scanned']['nextState'])
-        
 
     def cart(self, word, app=False):
+        listen = self.options[word]['listen']
+
         if "yes" in word:
             if not app:
                 self.controller_queue.put(("send_message", "AcceptedProduct&", "websocket=True"))
@@ -202,22 +215,26 @@ class SpeechInteractor:
             if self.next_item.get_id() == self.scanned_product.get_id():
                 quantity-=1
                 self.next_item.set_quantity(quantity)
+            else:
+                # Reminds user of where the item they are looking for is on the shelf next to them
+                nextState = 'nextState_diff_item'
+                response = self.options['yes']['reply_diff_item'] + self.next_item.get_shelf_position() + \
+                    self.options['yes']['reply_diff_item2']
+                listen = "False"
+
             if quantity >= 1:
                 nextState = 'nextState_quantity+'
                 response = self.options['yes']['reply_quantity+'] + \
                     str(quantity) + " more " + self.next_item.get_name() + self.options['yes']['prompt']
             else:
                 nextState = 'nextState_quantity0'
-                print("Current state: {:}".format(self.state))
-                print("Options: \n")
-                print(self.options)
                 response = self.options['yes']['reply_quantity0']
 
         else:
             if not app:
                 self.controller_queue.put(("send_message", "RejectedProduct&", "websocket=True"))
             response = self.options['no']['reply']       
-        self.say(response, self.options[word]['listen'])
+        self.say(response, listen)
         self.last_reply = response
         self.next_state(self.options[word][nextState])
 
@@ -238,12 +255,6 @@ class SpeechInteractor:
     def set_list(self, ordered_list):
         self.ordered_list = ordered_list
 
-
-    def set_scanned_product(self, scanned_product=None):
-        #self.scanned_product = scanned_product
-        # TODO: Assumes item scanned by app is correct
-        self.scanned_product = self.next_item
-
     # Only called if the user decides to go to the next item
     # Sets the current item to the next item on the list and informs the user what item they are
     # going to collect next. 
@@ -258,7 +269,8 @@ class SpeechInteractor:
             response = self.options['yes']['reply_finished']
             nextState = 'finishedState'
         else:
-            self.next_item = self.ordered_list.get()
+            self.next_item = self.ordered_list[0]
+            del self.ordered_list[0]
             response = self.options['yes']['reply'] + self.next_item.get_name()
             nextState = 'nextState'
 
