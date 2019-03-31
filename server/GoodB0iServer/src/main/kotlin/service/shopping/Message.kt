@@ -21,6 +21,8 @@ sealed class Message {
 
             class ReachedPoint(body: String, val id: String) : FromTrolley(body)
 
+            class RequestReplan(body: String, val from: Int, val to: Int) : FromTrolley(body)
+
             class Ping(body: String) : FromTrolley(body)
 
             data class InvalidMessage(val message: String) : FromTrolley(message)
@@ -64,6 +66,8 @@ sealed class Message {
 
             data class RouteCalculated(val route: String) : ToTrolley()
 
+            data class ReplanCalculated(val subRoute: String) : ToTrolley()
+
             data class AppScannedProduct(val id: String) : ToTrolley()
 
             object AppAcceptedProduct : ToTrolley()
@@ -84,6 +88,8 @@ sealed class Message {
             object UserReady : ToApp()
 
             data class Route(val route: String) : ToApp()
+
+            data class Replan(val subRoute: String) : ToApp()
 
             data class ReachedPoint(val point: String) : ToApp()
 
@@ -128,6 +134,10 @@ sealed class Message {
                 "UserReady" -> IncomingMessage.FromTrolley.UserReady(message)
                 "ReceivedRoute" -> IncomingMessage.FromTrolley.ReceivedRoute(message)
                 "Ping" -> IncomingMessage.FromTrolley.Ping(message)
+                "RequestReplan" -> {
+                    val points = message.substringAfter(DELIM).split(DELIM)
+                    IncomingMessage.FromTrolley.RequestReplan(message, points[0].toInt(), points[1].toInt())
+                }
                 else -> IncomingMessage.FromTrolley.InvalidMessage(message)
             }
         }
@@ -138,6 +148,7 @@ sealed class Message {
             is OutgoingMessage.ToApp.TrolleyRejectedProduct -> "TrolleyRejectedProduct$DELIM"
             is OutgoingMessage.ToApp.TrolleySkippedProduct -> "TrolleySkippedProduct$DELIM"
             is OutgoingMessage.ToApp.Route -> "RouteCalculated$DELIM${message.route}"
+            is OutgoingMessage.ToApp.Replan -> "Replan$DELIM${message.subRoute}"
             is OutgoingMessage.ToApp.TrolleyAssigned -> "TrolleyAssigned$DELIM"
             is OutgoingMessage.ToApp.UserReady -> "UserReady$DELIM"
             is OutgoingMessage.ToTrolley.AppAcceptedProduct -> "AppAcceptedProduct$DELIM"
@@ -147,6 +158,7 @@ sealed class Message {
             is OutgoingMessage.ToTrolley.AssignedToApp -> "Assigned$DELIM${message.code}"
             is OutgoingMessage.ToTrolley.RouteCalculated -> "RouteCalculated$DELIM${message.route}"
             is OutgoingMessage.ToTrolley.ConfirmMessage -> "ConfirmMessage$DELIM${message.message}"
+            is OutgoingMessage.ToTrolley.ReplanCalculated -> "ReplanCalculated$DELIM${message.subRoute}"
             is OutgoingMessage.ToTrolley.SessionComplete -> "SessionComplete$DELIM"
         }
 

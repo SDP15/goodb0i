@@ -4,16 +4,10 @@ import io.ktor.http.cio.websocket.Frame
 import io.ktor.http.cio.websocket.WebSocketSession
 import kotlinx.coroutines.isActive
 import org.koin.standalone.KoinComponent
-import org.koin.standalone.inject
-import service.ListService
-import service.routing.GenRouteFinder
-import service.routing.RouteFinder
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 class SessionManager : KoinComponent {
-    private val listService: ListService by inject()
-    private val routeFinder: RouteFinder by inject()
     private val sessions = ConcurrentHashMap<String, Session>()
     private val outs = ConcurrentHashMap<String, QueuedMessageSender>()
 

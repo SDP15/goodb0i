@@ -1,6 +1,5 @@
 package com.sdp15.goodb0i.data.store
 
-import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Response
@@ -41,7 +40,6 @@ object RetrofitProvider {
             }).build())
             baseUrl(root)
             addConverterFactory(GsonConverterFactory.create())
-            addCallAdapterFactory(CoroutineCallAdapterFactory())
         }.build()
 
     private var retrofit = build()

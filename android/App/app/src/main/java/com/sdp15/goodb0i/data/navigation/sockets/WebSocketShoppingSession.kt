@@ -102,6 +102,12 @@ class WebSocketShoppingSession(
                 is Message.IncomingMessage.TrolleySkippedProduct -> {
                     if (state.value is ShoppingSessionState.Scanning) skipProductInternal()
                 }
+                is Message.IncomingMessage.Replan -> {
+                    route.replaceSubRoute(message.subRoute)
+                    if (state.value is ShoppingSessionState.NavigatingTo) {
+                        postMovingState()
+                    }
+                }
             }
             if (!consume) incomingMessages.postValue(message)
         }
