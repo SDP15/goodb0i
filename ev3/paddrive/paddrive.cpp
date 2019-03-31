@@ -36,9 +36,11 @@ int main(int argc, char **argv) {
   SDL_Init(SDL_INIT_GAMECONTROLLER | SDL_INIT_EVENTS);
 
   SDL_GameController *gc{nullptr};
+  int gc_i{};
   for (int i = 0; i < SDL_NumJoysticks(); ++i) {
     if (SDL_IsGameController(i)) {
       gc = SDL_GameControllerOpen(i);
+      gc_i = i;
       if (gc != nullptr)
         break;
     }
@@ -86,11 +88,27 @@ int main(int argc, char **argv) {
     this_thread::sleep_for(10ms);
     SDL_Event ev;
 
-    bool clrQueue{SDL_GameControllerGetButton(
-                      gc, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER) == 0};
+    bool clrQueue{gc != nullptr
+                      ? SDL_GameControllerGetButton(
+                            gc, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER) == 0
+                      : true};
 
     while (SDL_PollEvent(&ev)) {
       switch (ev.type) {
+      case SDL_CONTROLLERDEVICEREMOVED:
+        if (ev.cdevice.which == gc_i) {
+          SDL_GameControllerClose(gc);
+          gc = nullptr;
+        }
+        break;
+      case SDL_CONTROLLERDEVICEADDED:
+        if (gc == nullptr) {
+          gc = SDL_GameControllerOpen(ev.cdevice.which);
+          if (gc != nullptr) {
+            gc_i = ev.cdevice.which;
+          }
+        }
+        break;
       case SDL_CONTROLLERBUTTONUP:
         switch (ev.cbutton.button) {
         case SDL_CONTROLLER_BUTTON_START:
