@@ -58,7 +58,8 @@
 
     "shopping0": 
         {"arrived":
-            {"reply": "You have arrived at the ", "second": " this item is on the ", "prompt": " shelf. Please try and scan in this item.", "listen": "False", "nextState": "arrival"}}, 
+            {"reply": "You have arrived at the ", "reply_ss": "The next item on your list ", "reply_ss2": " is on the shelf you are currently at.", "second": " This item is on the ", "prompt": " shelf. Please try and scan in this item.", 
+                "listen": "False", "nextState": "arrival"}}, 
 
     "arrival": 
         {"scanned":

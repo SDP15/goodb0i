@@ -13,7 +13,7 @@ class WebSocket:
 
     def initialise_websocket(self):
         print("initialise websocket")
-        websocket.enableTrace(True)
+        websocket.enableTrace(False)
         def run(*args):
             args[0].run_forever(ping_interval=3)
 
