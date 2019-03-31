@@ -2,13 +2,24 @@ package com.sdp15.goodb0i.data.store
 
 import com.sdp15.goodb0i.BuildConfig
 import kotlinx.coroutines.Deferred
+import retrofit2.Call
 import retrofit2.Response
+import retrofit2.await
 import timber.log.Timber
 
 /*
  * Awaits a deferred result, catching any errors
  */
 suspend fun <T, U> Deferred<T>.awaitCatching(success: (T) -> U, failure: (Throwable) -> U): U {
+    return try {
+        success(await())
+    } catch (t: Throwable) {
+        failure(t)
+    }
+}
+
+
+suspend fun <T : Any, U> Call<T>.awaitCatching(success: (T) -> U, failure: (Throwable) -> U): U {
     return try {
         success(await())
     } catch (t: Throwable) {

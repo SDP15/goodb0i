@@ -108,7 +108,7 @@ dependencies {
     kapt "androidx.room:room-compiler:$room_version"
     implementation "androidx.room:room-coroutines:$room_version"
 
-    def retrofit_version = "2.5.0"
+    def retrofit_version = "2.5.1-SNAPSHOT"
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
     implementation "com.google.code.gson:gson:2.8.5"
     implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
