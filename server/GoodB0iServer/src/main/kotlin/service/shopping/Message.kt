@@ -135,7 +135,7 @@ sealed class Message {
                 "ReceivedRoute" -> IncomingMessage.FromTrolley.ReceivedRoute(message)
                 "Ping" -> IncomingMessage.FromTrolley.Ping(message)
                 "RequestReplan" -> {
-                    val points = message.substringAfter(DELIM).split(DELIM)
+                    val points = message.substringAfter(DELIM).split('%')
                     IncomingMessage.FromTrolley.RequestReplan(message, points[0].toInt(), points[1].toInt())
                 }
                 else -> IncomingMessage.FromTrolley.InvalidMessage(message)

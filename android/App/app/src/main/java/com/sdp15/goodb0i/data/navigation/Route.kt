@@ -49,7 +49,7 @@ class Route private constructor(
         val endIndex = indexOf(route.last())
         if (endIndex == -1) throw IllegalArgumentException("Subroute end point ${route.last()} not in route")
         if (startIndex >= endIndex) throw IllegalArgumentException("Subroute start index $startIndex must be less than subroute end index $endIndex")
-        val newRoute = points.subList(0, startIndex) + route + points.subList(endIndex+1, points.size)
+        val newRoute = points.subList(0, startIndex) + route.subList(0, route.size-1) + points.subList(endIndex, points.size)
         points.clear()
         points.addAll(newRoute)
     }
