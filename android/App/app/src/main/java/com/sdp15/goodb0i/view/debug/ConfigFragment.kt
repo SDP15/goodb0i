@@ -31,6 +31,8 @@ class ConfigFragment : PreferenceFragmentCompat() {
                     Retrofit.Builder().apply {
                         baseUrl(value)
                     }
+                    Timber.i("Attempting change to root value $value")
+                    RetrofitProvider.root = value
                     true
                 } catch (iae: IllegalArgumentException) {
                     Timber.e(iae, "Invalid base url")
