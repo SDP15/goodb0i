@@ -250,7 +250,6 @@ class SpeechInteractor:
         self.last_reply = response
         self.next_state(self.options['no']['nextState'])
 
-
     def set_list(self, ordered_list):
         self.ordered_list = ordered_list
 
@@ -259,6 +258,7 @@ class SpeechInteractor:
     # going to collect next. 
     def continue_shopping(self):
         prev_item = self.next_item
+        print("Prev item: {:}".format(prev_item.get_name()))
 
         if self.next_item.get_quantity() > 0:
             self.controller_queue.put(("send_message", "SkippedProduct&", "websocket=True"))
@@ -269,13 +269,14 @@ class SpeechInteractor:
             nextState = 'finishedState'
         else:
             self.next_item = self.ordered_list.get()
+            print("Get next item from ordered list: {:}".format(self.next_item.get_name()))
             response = self.options['yes']['reply'] + self.next_item.get_name()
             nextState = 'nextState'
 
         self.next_state(self.options['yes'][nextState])
 
         # Checks if the prev item and the next item on our list is on the same shelf
-        if prev_item.get_shelf_number == self.next_item.get_shelf_number:
+        if prev_item.get_shelf_number() == self.next_item.get_shelf_number() and nextState != 'finishedState':
             self.arrived(self.next_item, same_shelf=True)
         else:
             self.say(response, self.options['yes']['listen'])

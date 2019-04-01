@@ -20,11 +20,12 @@ class PiController:
         self.controller_queue = queue.Queue()
         self.speech_interactor_queue = queue.Queue()
 
-        self.ip_port = "127.0.0.1:8080"
-        # self.ev3_ip = "192.168.105.108"
-        # self.ev3_port = 6081
-        self.ev3_ip = "localhost"
-        self.ev3_port = 4000
+        # self.ip_port = "127.0.0.1:8080"
+        self.ip_port = "192.168.105.125:8080"
+        self.ev3_ip = "192.168.105.108"
+        self.ev3_port = 6081
+        # self.ev3_ip = "localhost"
+        # self.ev3_port = 4000
         self.ws = WebSocket(self.ip_port, self.controller_queue).get_instance()
         self.ev3 = TCPSocket(self.ev3_ip, self.ev3_port, self.controller_queue)
         self.ev3_commands = []
@@ -83,9 +84,11 @@ class PiController:
                 if len(command) > 2:
                     self.stop_markers.append(command[1])
                     self.set_shelf_attrs(command, route_trace)
-                    for index in command[2:]:
-                        self.ordered_list.put(self.unordered_list[int(index)])
-                
+                    product_indices = range(2,len(command)-1,2)
+                    for i in product_indices:
+                        product_idx = command[i]
+                        self.ordered_list.put(self.unordered_list[int(product_idx)])
+                        
             self.speech_interactor_queue.put(("set_list", self.ordered_list))
             self.ws.send("ReceivedRoute&")
             self.speech_interactor_queue.put(("react", "connected"))
