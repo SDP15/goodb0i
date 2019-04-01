@@ -170,7 +170,7 @@ sealed class Message {
             var previous = route.first()
             route.forEach { vertex ->
                 if (vertex == route.first()) {
-                    builder.append("start")
+                    builder.append("start$delim${vertex.node.id}")
                 } else if (vertex == route.last()) {
                     builder.append("end$delim${vertex.node.id}")
                 } else {

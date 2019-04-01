@@ -87,13 +87,20 @@
         android:label="confirmation_fragment"
         tools:layout="@layout/layout_confirmation">
 
-        <action android:id="@+id/action_confirmation_fragment_to_scanner_fragment"
-                app:destination="@id/scanner_fragment" app:popUpTo="@+id/scanner_fragment"/>
-        <action android:id="@+id/action_confirmation_fragment_to_item_fragment" app:destination="@id/item_fragment"
-                app:popUpTo="@+id/item_fragment"/>
-        <action android:id="@+id/action_confirmation_fragment_to_navigatingToFragment"
-                app:destination="@id/navigatingToFragment" app:popUpToInclusive="false"
-                app:popUpTo="@+id/navigatingToFragment"/>
+        <action
+            android:id="@+id/action_confirmation_fragment_to_scanner_fragment"
+            app:destination="@id/scanner_fragment"
+            app:popUpTo="@+id/scanner_fragment" />
+        <action
+            android:id="@+id/action_confirmation_fragment_to_item_fragment"
+            app:destination="@id/item_fragment"
+            app:popUpTo="@+id/item_fragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_confirmation_fragment_to_navigatingToFragment"
+            app:destination="@id/navigatingToFragment"
+            app:popUpTo="@+id/navigatingToFragment"
+            app:popUpToInclusive="false" />
         <action
             android:id="@+id/action_confirmation_fragment_to_errorFragment"
             app:destination="@id/errorFragment" />
@@ -130,7 +137,9 @@
             app:destination="@id/list_creation_fragment" />
         <action
             android:id="@+id/action_list_confirmation_fragment_to_shopConnectionFragment"
-            app:destination="@id/shopConnectionFragment" />
+            app:destination="@id/shopConnectionFragment"
+            app:popUpTo="@+id/list_confirmation_fragment"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/navigatingToFragment"
@@ -139,10 +148,14 @@
         tools:layout="@layout/layout_navigating_to">
         <action
             android:id="@+id/action_navigatingToFragment_to_item_fragment"
-            app:destination="@id/item_fragment" />
+            app:destination="@id/item_fragment"
+            app:popUpTo="@+id/navigatingToFragment"
+            app:popUpToInclusive="true" />
         <action
             android:id="@+id/action_navigatingToFragment_to_completeFragment"
-            app:destination="@id/completeFragment" />
+            app:destination="@id/completeFragment"
+            app:popUpTo="@+id/completeFragment"
+            app:popUpToInclusive="true" />
         <action
             android:id="@+id/action_navigatingToFragment_to_errorFragment"
             app:destination="@id/errorFragment" />
@@ -157,18 +170,26 @@
             app:argType="com.sdp15.goodb0i.data.store.lists.ShoppingList" />
         <action
             android:id="@+id/action_shopConnectionFragment_to_navigatingToFragment"
-            app:destination="@id/navigatingToFragment" />
+            app:destination="@id/navigatingToFragment"
+            app:popUpTo="@+id/shopConnectionFragment"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/completeFragment"
         android:name="com.sdp15.goodb0i.view.navigation.complete.CheckoutFragment"
         android:label="CompleteFragment"
-        tools:layout="@layout/layout_done"/>
+        tools:layout="@layout/layout_checkout" >
+        <action
+            android:id="@+id/action_completeFragment_to_welcome_fragment"
+            app:destination="@id/welcome_fragment"
+            app:popUpTo="@+id/welcome_fragment"
+            app:popUpToInclusive="true" />
+    </fragment>
     <fragment
         android:id="@+id/errorFragment"
         android:name="com.sdp15.goodb0i.view.navigation.error.ErrorFragment"
         android:label="ErrorFragment"
-        tools:layout="@layout/layout_error"/>
+        tools:layout="@layout/layout_error" />
 
 
 </navigation>

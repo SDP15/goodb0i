@@ -125,6 +125,7 @@ class WebSocketShoppingSession(
 
     override fun endSession() {
         uid = ""
+        sh.sendMessage(Message.OutgoingMessage.SessionComplete)
         sh.stop()
         // We expect to be destroyed immediately, so this might not be necessary
         sessionState.postValue(ShoppingSessionState.NoSession)
