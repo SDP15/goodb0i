@@ -32,6 +32,8 @@ class WebSocketShoppingSession(
     private var uid: String = "" // Server session id
     private var route: Route = Route.emptyRoute()
     private var index = 0 // Index within the route
+    private val currentPoint: Route.RoutePoint
+        get() = route[index]
     private var lastStopLocation: Route.RoutePoint.IndexPoint =
         Route.RoutePoint.IndexPoint.IdentifiedPoint.Start(0, "") // Last rack we stopped at
     private val nextStopPoint: Route.RoutePoint.IndexPoint
@@ -103,7 +105,7 @@ class WebSocketShoppingSession(
                     if (state.value is ShoppingSessionState.Scanning) skipProductInternal()
                 }
                 is Message.IncomingMessage.Replan -> {
-                    route.replaceSubRoute(message.subRoute)
+                    route.insertSubRoute(currentPoint, message.subRoute)
                     if (state.value is ShoppingSessionState.NavigatingTo) {
                         postMovingState()
                     }
@@ -171,7 +173,7 @@ class WebSocketShoppingSession(
             remainingRackProducts.addAll(shoppingList.products.slice(indices))
             setState(
                 ShoppingSessionState.NavigatingTo(
-                    from = lastStopLocation, to = point, at = route[index] as Route.RoutePoint.IndexPoint,
+                    from = lastStopLocation, to = point, at = currentPoint as Route.RoutePoint.IndexPoint,
                     products = remainingRackProducts
                 )
             )
@@ -179,7 +181,7 @@ class WebSocketShoppingSession(
             remainingRackProducts.clear()
             setState(
                 ShoppingSessionState.NavigatingTo(
-                    from = lastStopLocation, at = route[index] as Route.RoutePoint.IndexPoint, to = point,
+                    from = lastStopLocation, at = currentPoint as Route.RoutePoint.IndexPoint, to = point,
                     products = remainingRackProducts
                 )
             )
@@ -261,7 +263,7 @@ class WebSocketShoppingSession(
             Timber.i("Products remaining on rack $remainingRackProducts")
             setState(
                 ShoppingSessionState.Scanning(
-                    route[index] as Route.RoutePoint.IndexPoint.IdentifiedPoint.Stop, remainingRackProducts
+                    currentPoint as Route.RoutePoint.IndexPoint.IdentifiedPoint.Stop, remainingRackProducts
                 )
             )
         }
@@ -275,7 +277,7 @@ class WebSocketShoppingSession(
     private fun productRejectedInternal() {
         setState(
             ShoppingSessionState.Scanning(
-                route[index] as Route.RoutePoint.IndexPoint.IdentifiedPoint.Stop,
+                currentPoint as Route.RoutePoint.IndexPoint.IdentifiedPoint.Stop,
                 remainingRackProducts
             )
         )

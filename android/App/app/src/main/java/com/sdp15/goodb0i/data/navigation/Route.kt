@@ -43,18 +43,16 @@ class Route private constructor(
 
     }
 
-    fun replaceSubRoute(route: Route) {
-        val first = route.first() as RoutePoint.IndexPoint.IdentifiedPoint
-        val startIndex = indexOfFirst { point -> point is RoutePoint.IndexPoint.IdentifiedPoint && first.id  == point.id }
-        if (startIndex == -1) throw IllegalArgumentException("Subroute start point ${route.first()} not in route")
-        val end = route.last() as RoutePoint.IndexPoint.IdentifiedPoint
-        val endIndex = indexOfFirst { point -> point is RoutePoint.IndexPoint.IdentifiedPoint && end.id == point.id }
-        if (endIndex == -1) throw IllegalArgumentException("Subroute end point ${route.last()} not in route")
-        if (startIndex >= endIndex) throw IllegalArgumentException("Subroute start index $startIndex must be less than subroute end index $endIndex")
-        val newRoute = points.subList(0, startIndex) + route.subList(0, route.size) + points.subList(endIndex, points.size)
-        Timber.i("Inserted sub route $route ")
+    fun insertSubRoute(from: RoutePoint, subRoute: Route) {
+        val startIndex = indexOf(from)
+        val toIndex = indexOf(subRoute.last())
+        if (startIndex == -1) throw IllegalArgumentException("from point $from not in route")
+        if (toIndex == -1) throw IllegalArgumentException("Subroute $subRoute does not end in route")
+        // Up to and including current point, to subroute minus end point
+        val newRoute = points.subList(0, startIndex+1) + subRoute.subList(1, subRoute.size-1) + subList(toIndex, size)
         points.clear()
         points.addAll(newRoute)
+        Timber.i("Inserted subroute $subRoute. Route now $points")
     }
 
     sealed class RoutePoint {
