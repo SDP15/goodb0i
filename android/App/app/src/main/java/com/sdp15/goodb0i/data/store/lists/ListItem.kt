@@ -14,7 +14,7 @@ import kotlinx.android.parcel.Parcelize
 @Entity
 data class ListItem(
     @Embedded @SerializedName("product") var product: Product,
-    @SerializedName("quantity") var quantity: Int = 0
+    @SerializedName("quantity") var quantity: Int = 1
 ) : Parcelable {
 
     operator fun plus(quantityIncrease: Int): ListItem = ListItem(product, quantity + quantityIncrease)

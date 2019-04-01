@@ -62,12 +62,11 @@ class ButtonThread(threading.Thread):
 
 
 class QRThread(threading.Thread):
-    def __init__(self, name, controller_queue, event_flag):
+    def __init__(self, name, controller_queue):
         print("QR thread starting")
         threading.Thread.__init__(self, name=name)
         self.controller_queue = controller_queue
         self.prev_qr = ""
-        self.event_flag = event_flag
 
     def run(self,detectQR = True):
         print("[INFO] starting video stream...")
@@ -83,7 +82,6 @@ class QRThread(threading.Thread):
                 barcodes = pyzbar.decode(frame)
                 for barcode in barcodes:
                     barcodeData = str(barcode.data.decode("utf-8"))
-                    barcodeType = barcode.type
                     print(barcodeData)
                     if barcodeData != "No data" and self.prev_qr != barcodeData:
                         self.prev_qr = barcodeData

@@ -1,10 +1,12 @@
 package controller.sockets
 
-import io.ktor.http.cio.websocket.CloseReason
+import io.ktor.application.call
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.cio.websocket.Frame
-import io.ktor.http.cio.websocket.close
 import io.ktor.http.cio.websocket.readText
+import io.ktor.response.respond
 import io.ktor.routing.Route
+import io.ktor.routing.get
 import io.ktor.util.generateNonce
 import io.ktor.websocket.webSocket
 import kotlinx.coroutines.ObsoleteCoroutinesApi
@@ -13,8 +15,6 @@ import kotlinx.coroutines.channels.consumeEach
 import service.shopping.AppManager
 import service.shopping.SessionManager
 import service.shopping.TrolleyManager
-import java.nio.charset.StandardCharsets
-import java.util.concurrent.TimeUnit
 
 @UseExperimental(ObsoleteCoroutinesApi::class)
 fun Route.sockets(sessionManager: SessionManager,
@@ -113,6 +113,10 @@ fun Route.sockets(sessionManager: SessionManager,
         } catch (e: Exception) {
             println("Ping exception $e")
         }
+    }
+
+    get("/check") {
+        call.respond(HttpStatusCode.OK)
     }
 
 }

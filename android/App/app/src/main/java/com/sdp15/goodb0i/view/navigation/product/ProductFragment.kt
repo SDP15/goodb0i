@@ -4,14 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.sdp15.goodb0i.R
+import com.sdp15.goodb0i.view.BaseFragment
 import kotlinx.android.synthetic.main.layout_product_display.*
 import org.koin.android.ext.android.inject
 
-class ProductFragment : Fragment() {
+class ProductFragment : BaseFragment() {
 
     private val vm: ProductViewModel by inject()
 
@@ -46,4 +46,6 @@ class ProductFragment : Fragment() {
             findNavController().navigate(it)
         })
     }
+
+    override fun onBackPressed(): Boolean = true
 }

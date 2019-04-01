@@ -37,7 +37,7 @@ class CheckoutViewModel : BaseViewModel<Any>() {
             currentProducts.addAll(state.products)
             Timber.i("Checkout out with products $products")
             totalPrice.postValue(price)
-            products.postValue(ListDiff.All(state.products))
+            products.postValue(ListDiff.All(currentProducts))
         }
     }
 
@@ -45,6 +45,7 @@ class CheckoutViewModel : BaseViewModel<Any>() {
         session.state.removeObserver(observer)
         session.endSession()
         sessionManager.closeSession()
+        transitions.postValue(CheckoutFragmentDirections.actionCompleteFragmentToWelcomeFragment())
     }
 
     fun incrementItem(product: Product) {

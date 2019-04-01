@@ -7,15 +7,17 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
+import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import com.sdp15.goodb0i.R
 import com.sdp15.goodb0i.view.BaseFragment
 import kotlinx.android.synthetic.main.layout_checkout.*
 import kotlinx.android.synthetic.main.layout_list_creation.*
-import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class CheckoutFragment : BaseFragment() {
 
-    private val vm: CheckoutViewModel by inject()
+    private val vm: CheckoutViewModel by viewModel()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -29,17 +31,19 @@ class CheckoutFragment : BaseFragment() {
         checkout_viewpager.adapter = ViewPagerAdapter(childFragmentManager)
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         vm.bind()
+        vm.transitions.observe(this, Observer {
+            findNavController().navigate(it)
+        })
     }
 
     override fun onBackPressed(): Boolean {
         if (list_viewpager.currentItem == 1) {
             list_viewpager.setCurrentItem(0, true)
-            return true
         }
-        return false
+        return true
     }
 
     private class ViewPagerAdapter(fragmentManager: FragmentManager) : FragmentPagerAdapter(fragmentManager) {

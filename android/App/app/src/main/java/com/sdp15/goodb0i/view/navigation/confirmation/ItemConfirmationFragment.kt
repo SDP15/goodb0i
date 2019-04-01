@@ -4,14 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.sdp15.goodb0i.R
+import com.sdp15.goodb0i.view.BaseFragment
 import kotlinx.android.synthetic.main.layout_confirmation.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class ItemConfirmationFragment : Fragment() {
+class ItemConfirmationFragment : BaseFragment() {
 
     private val vm: ItemConfirmationViewModel by viewModel()
 
@@ -34,4 +34,6 @@ class ItemConfirmationFragment : Fragment() {
             confirmation_title.text = product.name
         })
     }
+
+    override fun onBackPressed(): Boolean = true
 }

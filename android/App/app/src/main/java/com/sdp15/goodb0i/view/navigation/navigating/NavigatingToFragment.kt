@@ -52,6 +52,8 @@ class NavigatingToFragment : BaseFragment() {
         }
     }
 
+    override fun onBackPressed(): Boolean = true
+
     sealed class NavigationDestination(val distance: Int, val progress: Int) {
 
         class ShelfRack(distance: Int, progress: Int, val toCollect: List<ListItem>) : NavigationDestination(distance, progress)

@@ -23,7 +23,7 @@ class Route private constructor(
                 val body = point.substringAfter(delim)
                 Timber.i("Type $type id $body")
                 when (type) {
-                    "start" -> points.add(RoutePoint.IndexPoint.Start)
+                    "start" -> points.add(RoutePoint.IndexPoint.IdentifiedPoint.Start(++index, body))
                     "end" -> points.add(RoutePoint.IndexPoint.IdentifiedPoint.End(++index, body))
                     "left" -> points.add(RoutePoint.TurnLeft)
                     "right" -> points.add(RoutePoint.TurnRight)
@@ -43,24 +43,26 @@ class Route private constructor(
 
     }
 
-    fun replaceSubRoute(route: Route) {
-        val startIndex = indexOf(route.first())
-        if (startIndex == -1) throw IllegalArgumentException("Subroute start point ${route.first()} not in route")
-        val endIndex = indexOf(route.last())
-        if (endIndex == -1) throw IllegalArgumentException("Subroute end point ${route.last()} not in route")
-        if (startIndex >= endIndex) throw IllegalArgumentException("Subroute start index $startIndex must be less than subroute end index $endIndex")
-        val newRoute = points.subList(0, startIndex) + route + points.subList(endIndex+1, points.size)
+    fun insertSubRoute(from: RoutePoint, subRoute: Route) {
+        val startIndex = indexOf(from)
+        val toIndex = indexOf(subRoute.last())
+        if (startIndex == -1) throw IllegalArgumentException("from point $from not in route")
+        if (toIndex == -1) throw IllegalArgumentException("Subroute $subRoute does not end in route")
+        // Up to and including current point, to subroute minus end point
+        val newRoute = points.subList(0, startIndex+1) + subRoute.subList(1, subRoute.size-1) + subList(toIndex, size)
         points.clear()
         points.addAll(newRoute)
+        Timber.i("Inserted subroute $subRoute. Route now $points")
     }
 
     sealed class RoutePoint {
 
         sealed class IndexPoint(val index: Int) : RoutePoint() {
-            // Constant start at
-            object Start : IndexPoint(0)
+            // Constant start
 
             sealed class IdentifiedPoint(index: Int, val id: String) : IndexPoint(index) {
+
+                class Start(index: Int, id: String) : IdentifiedPoint(index, id)
 
                 // A point to be passed through (only used to ensure that we are still on track)
                 class Pass(index: Int, id: String) : IdentifiedPoint(index, id)
@@ -70,10 +72,9 @@ class Route private constructor(
 
                 class End(index: Int, id: String) : IdentifiedPoint(index, id)
             }
-
-
         }
-
+        //TODO: Does the app actually need to know about these points? It doesn't react to them and only makes the
+        // types complicated
         object TurnLeft : RoutePoint()
 
         object TurnRight : RoutePoint()

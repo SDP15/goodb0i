@@ -42,4 +42,8 @@ class ShopConnectionFragment : BaseFragment() {
             findNavController().navigate(it)
         })
     }
+
+    //TODO: Allow cancelling session from here
+    override fun onBackPressed(): Boolean = true
+
 }
