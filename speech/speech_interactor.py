@@ -276,7 +276,7 @@ class SpeechInteractor:
         self.next_state(self.options['yes'][nextState])
 
         # Checks if the prev item and the next item on our list is on the same shelf
-        if prev_item.get_shelf_number == self.next_item.get_shelf_number:
+        if prev_item.get_shelf_number() == self.next_item.get_shelf_number() and nextState != 'finishedState':
             self.arrived(self.next_item, same_shelf=True)
         else:
             self.say(response, self.options['yes']['listen'])
