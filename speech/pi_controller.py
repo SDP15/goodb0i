@@ -191,7 +191,7 @@ class PiController:
         print("Original route trace: {:}".format(route_trace))
 
         # We can ignore the "start" command
-        route_trace.remove("start")
+        route_trace.pop(0)
 
         # Replace "end" command with "stop"
         end_command = route_trace[-1]
