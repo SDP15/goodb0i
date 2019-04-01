@@ -327,6 +327,7 @@ protected:
                                : mem_fn(&Subsystem::resume));
       if (nowSeesObstacle) {
         sysSteering->requestStop(SUBSYS_AVOIDANCE);
+        ev3dev::sound::beep("-f 2000 -l 500 -r 3", false);
       } else {
         sysSteering->cancelStopRequest(SUBSYS_AVOIDANCE);
       }
@@ -361,7 +362,8 @@ private:
 
 public:
   bool turningOn{true};
-  int slightTurnRatio{DEFAULT_SLIGHT_TURN_RATIO}, maxTurnRatio{DEFAULT_TURN_RATIO};
+  int slightTurnRatio{DEFAULT_SLIGHT_TURN_RATIO},
+      maxTurnRatio{DEFAULT_TURN_RATIO};
 
   LineFollowSubsystem(SteeringSubsystem *sysSteering) {
     this->sysSteering = sysSteering;
