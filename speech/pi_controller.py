@@ -125,6 +125,7 @@ class PiController:
             if "stop" in message:
                 # Prevents button from being pressed when robot stops at a marker.
                 self.button_event.set()
+                print("Set button event - stops button from being pressed")
                 self.speech_interactor_queue.put("on_location_change")
 
         # elif "RouteReplan" in message:
@@ -156,6 +157,7 @@ class PiController:
             print("Send message to EV3: {:}".format(msg))
             if "resume-from-stop-marker" in msg:
                 self.button_event.clear()
+                print("Clear button event so user can push button.")
             self.ev3.send(msg)
 
     # The request parameter has to be in the correct format e.g. /lists/load/7654321

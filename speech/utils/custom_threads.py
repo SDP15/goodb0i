@@ -1,4 +1,5 @@
 import threading
+import collections
 import RPi.GPIO as GPIO
 
 from pyzbar import pyzbar
@@ -42,23 +43,30 @@ class ButtonThread(threading.Thread):
         self.controller_queue = controller_queue
         self.prev_command = "start"
         self.event_flag = event_flag
+        self.circular_buffer = collections.deque([0,0,0],maxlen=3)
+        self.pin = 24
 
         GPIO.setmode(GPIO.BCM)
-        GPIO.setup(27, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+        GPIO.setup(self.pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
     def run(self):
-        GPIO.add_event_detect(27, GPIO.RISING, callback=self.button_callback, bouncetime=1000)
         while True:
-            pass
-    
-    def button_callback(self, channel):
-        if not self.event_flag.isSet():
-            if self.prev_command == "start":
-                self.controller_queue.put(("send_message", "stop", "ev3=True"))
-                self.prev_command = "stop"
-            elif self.prev_command == "stop":
-                self.controller_queue.put(("send_message", "start", "ev3=True"))
-                self.prev_command = "start"
+            # Get input and append it to end of buffer
+            input = GPIO.input(self.pin)
+            self.circular_buffer.append(input)
+            time.sleep(0.2)
+
+            # Check if buffer is full of 1s (indicating button press)
+            if self.circular_buffer.count(1) == 3:
+                button_press = True
+
+            if not self.event_flag.isSet() and button_press:
+                if self.prev_command == "start":
+                    self.controller_queue.put(("send_message", "stop"))
+                    self.prev_command = "stop"
+                elif self.prev_command == "stop":
+                    self.controller_queue.put(("send_message", "start"))
+                    self.prev_command = "start"
                 
 
 class QRThread(threading.Thread):
