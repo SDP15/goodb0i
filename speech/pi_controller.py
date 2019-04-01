@@ -126,25 +126,31 @@ class PiController:
                 self.button_event.set()
                 self.speech_interactor_queue.put("on_location_change")
 
-        # elif "RouteReplan" in message:
-        #     self.ev3.send("dump-queue")
-
-        # may have to store the new commands if they are returned here
-        # elif "Queue:" in message:
-        #     # delete all the commands before the next stop and add the new route recieved
-        #     stop_index = -1
-        #     new_ev3_route = message.split(" ")
-        #     for index, command in enumerate(new_ev3_route):
-        #         if "stop" in command:
-        #             stop_index = index
-        #             break 
+        elif "ReplanCalculated&" in message:
+            self.ev3.send("dump-queue")
+            self.replanned_route = calculate_route_trace(message)
+        elif "Queue:" in message:
+            # delete all the commands before the next stop and add the new route recieved
+            self.ev3.send("clear-queue")
+            stop_index = -1
+            new_ev3_route = message.split(" ")
+            for index, command in enumerate(new_ev3_route):
+                if "stop" in command:
+                    stop_index = index
+                    break 
             
-        #     # if there is a stop marker then add the new replanned route to the next stop then continue
-        #     # from there
-        #     if stop_index >= 0:
-        #         new_route_plan = replan_queue + new_ev3_route[stop_index:]
-        #         for marker in new_route_plan:
-        #             self.new_ev3_route.append("enqueue-" + marker)
+            # if there is a stop marker then add the new replanned route to the next stop then continue
+            # from there
+            if stop_index >= 0:
+                new_route_plan = replan_queue + new_ev3_route[stop_index+1:]
+                print("New replanned route trace: {:}".format(new_route_plan))
+                for marker in new_route_plan:
+                    self.ev3.send("enqueue-" + marker)
+        elif "SessionComplete&" in message:
+            #Clear everything that we store
+            self.marker_list = []
+            self.ordered_shelves = []
+            self.stop_markers = []
 
 
     def send_message(self, msg, websocket=False, ev3=False):
@@ -209,8 +215,10 @@ class PiController:
         print("New route trace: {:}".format(route_trace))
         return route_trace
 
+    def replan_route():
+
     
-     def scanned_qr_code(self, qr_code):
+    def scanned_qr_code(self, qr_code):
         self.qr_detected = qr_code
         print("[QR CODE detected]: " + qr_code)
 
@@ -229,11 +237,11 @@ class PiController:
             elif index_qr > index_next:
                 print("Passed a stop marker")
                 #replan
-                self.ws.send("RouteReplan&" + index_qr)
+                self.ws.send("RequestReplan&" + index_qr + "%" + next_stop_marker)
                 
         else:
             print("QR not in the list")
-            self.ws.send("RouteReplan&" + index_qr)
+            self.ws.send("RequestReplan&" + index_qr + "%" + next_stop_marker)
 
 
     def set_shelf_attrs(self, command, route_trace):
