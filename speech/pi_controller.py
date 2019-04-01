@@ -4,6 +4,8 @@ import socket
 import sys
 import threading
 import time
+import getopt
+import subprocess
 
 import requests
 import serial
@@ -17,17 +19,18 @@ from utils.sockets import WebSocket, TCPSocket
 
 class PiController:
     def __init__(self):
+        self.server_address = "192.168.105.125:8080"
+        self.ev3_ip = "192.168.105.108"
+        self.ev3_port = 6081
+
+        # Parse command line options/arguments
+        self.parse_opts()
+
         # Data structures for worker threads
         self.controller_queue = queue.Queue()
         self.speech_interactor_queue = queue.Queue()
 
-        # self.ip_port = "127.0.0.1:8080"
-        self.ip_port = "192.168.105.125:8080"
-        self.ev3_ip = "192.168.105.108"
-        self.ev3_port = 6081
-        # self.ev3_ip = "localhost"
-        # self.ev3_port = 4000
-        self.ws = WebSocket(self.ip_port, self.controller_queue).get_instance()
+        self.ws = WebSocket(self.server_address, self.controller_queue).get_instance()
         self.ev3 = TCPSocket(self.ev3_ip, self.ev3_port, self.controller_queue)
         self.ev3_commands = []
 
@@ -174,13 +177,13 @@ class PiController:
 
     # The request parameter has to be in the correct format e.g. /lists/load/7654321
     def query_web_server(self, request):
-        r = requests.get("http://"+self.ip_port + request)
+        r = requests.get("http://"+self.server_address + request)
         list_json = r.json()
         return list_json
      
     # Retrieves all the items and quantities on the shopping list.
     def get_shopping_list(self, list_file):
-        r = requests.get("http://" + self.ip_port + "/lists/load/" + list_file)
+        r = requests.get("http://" + self.server_address + "/lists/load/" + list_file)
         json  = r.json()
         self.unordered_list = []
         for products in json['products']:
@@ -304,6 +307,33 @@ class PiController:
             self.ev3.send(command)
 
         self.ev3.send("start")
+
+    def parse_opts(self):
+        if len(sys.argv) > 1:
+            try:
+                long_options = ["skiptut", "mock-ev3", "local-server","server-address=","help"]
+                opts, _ = getopt.getopt(sys.argv[1:], "", long_options)
+            except getopt.GetoptError as err:
+                # print help information and exit:
+                print(str(err))  # will print something like "option -a not recognized"
+                sys.exit()
+            for opt, arg in opts:
+                if opt in "--skiptut":
+                    print("Skipping tutorial...")
+                elif opt in "--mock-ev3":
+                    print("Mocking EV3")
+                    subprocess.Popen(['nc','-l','4000'])
+                    self.ev3_ip = "localhost"
+                    self.ev3_port = 4000
+                elif opt in "--local-server":
+                    self.server_address = "127.0.0.1:8080"
+                elif opt in "--server-address":
+                    self.server_address = arg
+                elif opt in "--help":
+                    print("Options: {:}".format(long_options))
+                    print("Options must be prepended with \"--\".")
+                    print("Additionally, options with an \"=\" require an argument to be given after the option flag.")
+                    sys.exit()
 
 
 PiController()
