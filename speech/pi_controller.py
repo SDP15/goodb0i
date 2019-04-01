@@ -148,10 +148,12 @@ class PiController:
         #             self.new_ev3_route.append("enqueue-" + marker)
 
 
-    def send_message(self, msg, websocket=False, ev3=False):
+    def send_message(self, msg, websocket=False):
         if websocket:
+            print("Send message to server(WebSocket): {:}".format(msg))
             self.ws.send(msg)
-        elif ev3:
+        else:
+            print("Send message to EV3: {:}".format(msg))
             if "resume-from-stop-marker" in msg:
                 self.button_event.clear()
             self.ev3.send(msg)
