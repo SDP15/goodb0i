@@ -54,7 +54,7 @@ class ButtonThread(threading.Thread):
             # Get input and append it to end of buffer
             input = GPIO.input(self.pin)
             self.circular_buffer.append(input)
-            time.sleep(0.1)
+            time.sleep(0.025)
 
             # Check if buffer is full of 1s (indicating button press)
             if self.circular_buffer.count(1) == 3:
@@ -69,7 +69,7 @@ class ButtonThread(threading.Thread):
                 elif self.prev_command == "stop":
                     self.controller_queue.put(("send_message", "start"))
                     self.prev_command = "start"
-                time.sleep(1)
+                time.sleep(0.25)
                 
 
 class QRThread(threading.Thread):
