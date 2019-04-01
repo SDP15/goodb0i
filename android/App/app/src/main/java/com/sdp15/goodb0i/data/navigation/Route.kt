@@ -72,10 +72,9 @@ class Route private constructor(
 
                 class End(index: Int, id: String) : IdentifiedPoint(index, id)
             }
-
-
         }
-
+        //TODO: Does the app actually need to know about these points? It doesn't react to them and only makes the
+        // types complicated
         object TurnLeft : RoutePoint()
 
         object TurnRight : RoutePoint()
