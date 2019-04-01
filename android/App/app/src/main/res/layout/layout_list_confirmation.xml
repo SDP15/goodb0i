@@ -11,7 +11,7 @@
         style="@style/TitleText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/goodboi"
+        android:text="@string/app_name"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -71,13 +71,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/action_edit_list"
-        app:layout_constraintBottom_toTopOf="@+id/confirmation_button_Pay"
+        app:layout_constraintBottom_toTopOf="@+id/confirmation_button_navigate"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/navigation_info_container" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/confirmation_button_Pay"
+        android:id="@+id/confirmation_button_navigate"
         style="@style/BorderedButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

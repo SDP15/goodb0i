@@ -1,15 +1,17 @@
 package com.sdp15.goodb0i.view.navigation.scanner
 
+import android.os.Build
 import androidx.lifecycle.MutableLiveData
-import com.sdp15.goodb0i.data.navigation.Message
+import androidx.lifecycle.Observer
+import com.sdp15.goodb0i.data.navigation.ShoppingSession
 import com.sdp15.goodb0i.data.navigation.ShoppingSessionManager
+import com.sdp15.goodb0i.data.navigation.ShoppingSessionState
 import com.sdp15.goodb0i.data.navigation.scanner.BarcodeReader
 import com.sdp15.goodb0i.data.navigation.scanner.BarcodeReaderCallback
 import com.sdp15.goodb0i.data.navigation.scanner.BarcodeReading
 import com.sdp15.goodb0i.view.BaseViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.koin.standalone.get
 import org.koin.standalone.inject
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
@@ -17,7 +19,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 class ScannerViewModel : BaseViewModel<Any>(),
     ScannerFragment.ScannerFragmentInteractor {
 
-    private val sm: ShoppingSessionManager<Message.IncomingMessage> by inject()
+    private val sm: ShoppingSession by get<ShoppingSessionManager>()
 
     private val reader: BarcodeReader by inject()
     private val isRunning = AtomicBoolean(false)
@@ -27,6 +29,27 @@ class ScannerViewModel : BaseViewModel<Any>(),
     override fun bind() {
         // Restart scanning on bind
         isRunning.set(false)
+        // Test code for emulator runs.
+        // Automatically 'scans' the correct product
+        sm.state.observeForever(object: Observer<ShoppingSessionState> {
+            override fun onChanged(state: ShoppingSessionState) {
+                if (state is ShoppingSessionState.Scanning) {
+                    if(Build.FINGERPRINT.startsWith("generic")
+                        || Build.FINGERPRINT.startsWith("unknown")
+                        || Build.MODEL.contains("google_sdk")
+                        || Build.MODEL.contains("Emulator")
+                        || Build.MODEL.contains("Android SDK built for x86")
+                        || Build.MANUFACTURER.contains("Genymotion")
+                        || (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic"))
+                        || "google_sdk".equals(Build.PRODUCT)) {
+                        onRead(state.toScan.first().product.id)
+                    }
+                    sm.state.removeObserver(this)
+                } else if (state is ShoppingSessionState.Disconnected) {
+                    transitions.postValue(ScannerFragmentDirections.actionScannerFragmentToErrorFragment())
+                }
+            }
+        })
     }
 
     private fun onRead(code: String) {
