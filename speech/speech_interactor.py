@@ -279,7 +279,7 @@ class SpeechInteractor:
         if prev_item.get_shelf_number() == self.next_item.get_shelf_number() and nextState != 'finishedState':
             self.arrived(self.next_item, same_shelf=True)
         else:
-            self.say(response, self.options['yes']['listen'])
+            self.say(response, "False")
             self.last_reply = response
     
     def on_location_change(self):
