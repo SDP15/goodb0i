@@ -143,7 +143,7 @@ class SpeechInteractor:
             self.last_reply = self.options[word]['reply']
             self.next_state(self.options[word]['nextState'])
 
-        if "connected" in word:
+        if word == "connected":
             self.react("n/a")
             self.connected_event.set()
 

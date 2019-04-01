@@ -22,6 +22,7 @@ class PiController:
         self.server_address = "192.168.105.125:8080"
         self.ev3_ip = "192.168.105.108"
         self.ev3_port = 6081
+        self.skip_tut = False
 
         # Parse command line options/arguments
         self.parse_opts()
@@ -43,6 +44,8 @@ class PiController:
         # Controls whether user is allowed to press the start/stop button.
         self.button_event = threading.Event()
         self.qr_event = threading.Event()
+
+        warnings.filterwarnings("ignore", message="ReferenceError")
 
     def on_message(self, message):
         if "AppAcceptedProduct" in message:
@@ -99,7 +102,12 @@ class PiController:
             print("Stop marker list: {:}".format(self.stop_markers))    
             self.speech_interactor_queue.put(("set_list", self.ordered_list))
             self.ws.send("ReceivedRoute&")
-            self.speech_interactor_queue.put(("react", "connected"))
+
+            # Check if option has been given to skip tutorial
+            if self.skip_tut:
+                self.speech_interactor_queue.put(("react", "connected_skip_tut"))
+            else:
+                self.speech_interactor_queue.put(("react", "connected"))
         elif "Assigned" in message:
             self.list_downloaded = False
             list_message = message.split("&")
@@ -306,6 +314,9 @@ class PiController:
         for command in self.ev3_commands:
             self.ev3.send(command)
 
+        if self.skip_tut:
+            input("Please hit enter to begin.")
+            
         self.ev3.send("start")
 
     def parse_opts(self):
@@ -320,6 +331,7 @@ class PiController:
             for opt, arg in opts:
                 if opt in "--skiptut":
                     print("Skipping tutorial...")
+                    self.skip_tut = True
                 elif opt in "--mock-ev3":
                     print("Mocking EV3")
                     subprocess.Popen(['nc','-l','4000'])
