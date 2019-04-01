@@ -21,12 +21,12 @@ class PiController:
         self.controller_queue = queue.Queue()
         self.speech_interactor_queue = queue.Queue()
 
-        self.ip_port = "127.0.0.1:8080"
-        # self.ip_port = "192.168.105.125:8080"
-        # self.ev3_ip = "192.168.105.108"
-        # self.ev3_port = 6081
-        self.ev3_ip = "localhost"
-        self.ev3_port = 4000
+        # self.ip_port = "127.0.0.1:8080"
+        self.ip_port = "192.168.105.125:8080"
+        self.ev3_ip = "192.168.105.108"
+        self.ev3_port = 6081
+        # self.ev3_ip = "localhost"
+        # self.ev3_port = 4000
         self.ws = WebSocket(self.ip_port, self.controller_queue).get_instance()
         self.ev3 = TCPSocket(self.ev3_ip, self.ev3_port, self.controller_queue)
         self.ev3_commands = []
@@ -104,7 +104,7 @@ class PiController:
             self.get_shopping_list(list_id)
         elif "ConfirmMessage&UserReady" in message:
             # Server & pi ready to go => queue commands on EV3
-            
+            self.enqueue_ev3_commands()
 
             # Start ButtonThread to listen for button presses to start/stop trolley
             t2 = ButtonThread("ButtonThread", self.controller_queue, self.button_event)
