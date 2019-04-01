@@ -281,6 +281,7 @@ class SpeechInteractor:
         else:
             self.say(response, "False")
             self.last_reply = response
+            self.controller_queue.put(("send_message", "resume-from-stop-marker", "ev3=True"))
     
     def on_location_change(self):
         self.arrived(self.next_item)
