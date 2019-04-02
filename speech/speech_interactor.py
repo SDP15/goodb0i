@@ -58,7 +58,6 @@ class SpeechInteractor:
             log("Conversation is being logged in: {:}".format(
                 self.log_filepath))
 
-        self.current_location = ""
         self.possible_states = json.load(open(state_file, 'r'))
         self.next_state('connection')
         self.begin_shopping = False
@@ -73,6 +72,15 @@ class SpeechInteractor:
 
         t2 = threading.Thread(name="ListenThread", target=self.listen)
         t2.start()
+
+    def reset(self):
+        self.next_state('connection')
+        self.begin_shopping = False
+        
+        # Clear event flags
+        self.location_event.clear()
+        self.listen_event.clear()
+        self.connected_event.clear()
 
     def next_state(self, state):
         self.state = state
@@ -110,11 +118,9 @@ class SpeechInteractor:
                 elif "options" in word:
                     self.work_queue.put("list_options")
                 elif "multiple" in word:
-                    log("Multiple keywords detected")
                     say_this = "Sorry, I have heard more than one possible option. Can you confirm your option?"
                     self.work_queue.put(("say", say_this, "True"))
                 elif "n/a" in word:
-                    log("no keyword detected")
                     self.work_queue.put("list_options")
                 else:
                     log("{:} detected".format(word))
@@ -231,13 +237,16 @@ class SpeechInteractor:
                 response = self.options['yes']['reply_quantity+'] + \
                     str(quantity) + " more " + self.next_item.get_name() + self.options['yes']['prompt']
             else:
+                t3 = threading.Thread(name="ContinueEventThread", target=self.not_same_shelf)
+                t3.start()
                 nextState = 'nextState_quantity0'
                 response = self.options['yes']['reply_quantity0']
-
+                listen = "False"
         else:
             if not app:
                 self.controller_queue.put(("send_message", "RejectedProduct&", "websocket=True"))
-            response = self.options['no']['reply']       
+            response = self.options['no']['reply']
+
         self.say(response, listen)
         self.last_reply = response
         self.next_state(self.options[word][nextState])
@@ -286,8 +295,22 @@ class SpeechInteractor:
         else:
             self.say(response, "False")
             self.last_reply = response
-            self.controller_queue.put(("send_message", "resume-from-stop-marker"))
+            # self.controller_queue.put(("send_message", "resume-from-stop-marker"))
     
     def on_location_change(self):
         self.arrived(self.next_item)
+
+    def not_same_shelf(self):
+        copyoflist = self.ordered_list
+        prev_item = self.next_item
+        next_item = copyoflist.get()
+
+        if prev_item.get_shelf_number() != self.next_item.get_shelf_number():
+            log("Clear continue event")
+            self.controller_queue.put("clear_continue_event")
+
+
+
+
+
         

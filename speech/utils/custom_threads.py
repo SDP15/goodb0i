@@ -40,11 +40,12 @@ class WorkerThread(threading.Thread):
                 self.event_flag.set()
 
 class ButtonThread(threading.Thread):
-    def __init__(self, name, controller_queue, event_flag):
+    def __init__(self, name, controller_queue, event_flag, continue_flag):
         threading.Thread.__init__(self, name=name)
         self.controller_queue = controller_queue
         self.prev_command = "start"
         self.event_flag = event_flag
+        self.continue_flag = continue_flag
         self.circular_buffer = collections.deque([0,0,0],maxlen=3)
         self.pin = 24
 
@@ -71,6 +72,12 @@ class ButtonThread(threading.Thread):
                 elif self.prev_command == "stop":
                     self.controller_queue.put(("send_message", "start"))
                     self.prev_command = "start"
+                time.sleep(0.25)
+
+            if not self.continue_flag.isSet() and button_press:
+                self.controller_queue.put(("send_message","resume-from-stop-marker"))
+                self.prev_command = "start"
+                self.continue_flag.set()
                 time.sleep(0.25)
                 
 
