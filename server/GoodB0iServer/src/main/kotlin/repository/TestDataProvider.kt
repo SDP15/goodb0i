@@ -175,10 +175,11 @@ object TestDataProvider {
             val dairy = Shelf.find { Shelves.rack eq 1}.first().product
             val seafood = Shelf.find { Shelves.rack eq 5}.first().product
             val sweets = Shelf.find { Shelves.rack eq 7}.first().product
+            val sweets2 = Shelf.find { Shelves.rack eq 7}.toList()[1].product
             ShoppingList.new {
                 code = 7654321
                 time = System.currentTimeMillis()
-                products = SizedCollection(listOf(fruits, sweets).mapIndexed { i, p ->
+                products = SizedCollection(listOf(fruits, sweets, sweets2).mapIndexed { i, p ->
                     ListEntry.new {
                         index = i
                         product = p
@@ -201,7 +202,7 @@ object TestDataProvider {
     }
 
     private fun getTestData(): Array<Item> {
-        val path = System.getProperty("user.dir") + "/src/main/resources/items.json"
+        val path = System.getProperty("user.dir") + "/src/main/resources/products.json"
         kLogger.debug("Reading test products data from $path")
         val file = File(path).bufferedReader()
         val gson = Gson()
@@ -212,11 +213,11 @@ object TestDataProvider {
 data class Item(
         @SerializedName("id") val id: Long = -1,
         @SerializedName("name") val name: String,
-        @SerializedName("AverageSellingUnitWeight") val averageSellingUnitWeight: Double,
-        @SerializedName("ContentsMeasureType") val contentsMeasureType: String,
+        @SerializedName("averageSellingUnitWeight") val averageSellingUnitWeight: Double,
+        @SerializedName("contentsMeasureType") val contentsMeasureType: String,
         @SerializedName("contentsQuantity") val contentsQuantity: Double,
-        @SerializedName("UnitOfSale") val unitOfSale: Int,
-        @SerializedName("UnitQuantity") val unitQuantity: String,
+        @SerializedName("unitOfSale") val unitOfSale: Int,
+        @SerializedName("unitQuantity") val unitQuantity: String,
         @SerializedName("department") val department: String,
         @SerializedName("description") val description: kotlin.collections.List<String>,
         @SerializedName("price") val price: Double,

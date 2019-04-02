@@ -6,17 +6,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import com.otaliastudios.cameraview.Audio
 import com.otaliastudios.cameraview.Gesture
 import com.otaliastudios.cameraview.GestureAction
 import com.sdp15.goodb0i.R
+import com.sdp15.goodb0i.view.BaseFragment
 import kotlinx.android.synthetic.main.layout_scanner.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
-class ScannerFragment : Fragment() {
+class ScannerFragment : BaseFragment() {
 
     private val vm: ScannerViewModel by viewModel()
     private lateinit var mp: MediaPlayer
@@ -27,10 +28,14 @@ class ScannerFragment : Fragment() {
     }
 
     private fun bindViewModel() {
+        vm.bind()
         vm.reading.observe(this, Observer {
             mp = MediaPlayer.create(this.requireContext(), R.raw.pop_up)
             mp.start ()
             Toast.makeText(context, "Reading: ${it.value}", Toast.LENGTH_SHORT).show()
+        })
+        vm.transitions.observe(this, Observer {
+            findNavController().navigate(it)
         })
     }
 
@@ -53,7 +58,7 @@ class ScannerFragment : Fragment() {
         camera_view.mapGesture(Gesture.TAP, GestureAction.FOCUS_WITH_MARKER)
     }
 
-
+    override fun onBackPressed(): Boolean = true
     interface ScannerFragmentInteractor {
 
         fun onImageCaptured(ba: ByteArray, rotation: Int, width: Int, height: Int)

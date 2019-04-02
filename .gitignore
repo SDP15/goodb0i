@@ -1,6 +1,7 @@
 
 mnt
 teams
+*.stl
 
 # Created by https://www.gitignore.io/api/c++,linux,windows,visualstudiocode
 # Edit at https://www.gitignore.io/?templates=c++,linux,windows,visualstudiocode
@@ -98,5 +99,6 @@ $RECYCLE.BIN/
 
 # Python
 __pycache__
+*.pyc
 
 # End of https://www.gitignore.io/api/c++,linux,windows,visualstudiocode

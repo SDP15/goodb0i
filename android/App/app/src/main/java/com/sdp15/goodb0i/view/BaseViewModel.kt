@@ -5,13 +5,13 @@ import androidx.navigation.NavDirections
 import com.sdp15.goodb0i.data.SingleLiveData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import org.koin.standalone.KoinComponent
 import kotlin.coroutines.CoroutineContext
 
 abstract class BaseViewModel<T> : ViewModel(), KoinComponent, CoroutineScope {
 
-    private val job = Job()
+    private val job = SupervisorJob()
 
     override val coroutineContext: CoroutineContext = Dispatchers.Main + job
     /**

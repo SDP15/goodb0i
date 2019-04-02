@@ -1,15 +1,15 @@
 package com.sdp15.goodb0i.view
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.view.KeyEvent
+import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.collection.CircularIntArray
 import androidx.navigation.findNavController
-import com.sdp15.goodb0i.view.debug.Config
+import com.sdp15.goodb0i.view.debug.ConfigActivity
 import kotlinx.android.synthetic.main.activity_main.*
-import android.app.Activity
-import android.R
-import android.view.inputmethod.InputMethodManager
 
 
 class MainActivity : AppCompatActivity() {
@@ -48,7 +48,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
-            Config.showDialog(this)
+            startActivity(Intent(this, ConfigActivity::class.java))
+            //Config.showDialog(this)
             return true
         }
         return super.onKeyDown(keyCode, event)

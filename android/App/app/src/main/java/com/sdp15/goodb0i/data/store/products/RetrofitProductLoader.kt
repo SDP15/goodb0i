@@ -1,44 +1,46 @@
 package com.sdp15.goodb0i.data.store.products
 
 import com.sdp15.goodb0i.data.store.Result
-import com.sdp15.goodb0i.data.store.RetrofitProvider
 import com.sdp15.goodb0i.data.store.awaitCatching
-import com.sdp15.goodb0i.data.store.toResult
-import kotlinx.coroutines.Deferred
-import retrofit2.Response
+import org.koin.standalone.KoinComponent
+import org.koin.standalone.inject
+import retrofit2.Call
+import retrofit2.Retrofit
 import retrofit2.http.GET
 import retrofit2.http.Path
 
-object RetrofitProductLoader : ProductLoader {
+object RetrofitProductLoader : ProductLoader, KoinComponent {
 
-    private val retrofit = RetrofitProvider.rootedRetrofit
+    private val retrofit: Retrofit by inject()
 
     private val api = retrofit.create(KTORProductAPI::class.java)
 
+    
+    
     override suspend fun loadProduct(id: String): Result<Product> = api.getProductAsync(id).awaitCatching(
-        success = { it.toResult() },
+        success = { Result.Success(it) },
         failure = { Result.Failure(Exception(it.message)) }
     )
 
     override suspend fun loadCategory(category: String): Result<List<Product>> =
         api.searchAsync(category).awaitCatching(
-            success = { it.toResult() },
+            success = { Result.Success(it) },
             failure = { Result.Failure(Exception(it.message)) }
         )
 
     override suspend fun loadProductsForShelfRack(shelfId: Int): Result<List<Product>> =
         api.getProductsForShelfRackAsync(shelfId).awaitCatching(
-            success = { it.toResult() },
+            success = { Result.Success(it) },
             failure = { Result.Failure(Exception(it.message)) }
         )
 
     override suspend fun search(query: String): Result<List<Product>> = api.searchAsync(query).awaitCatching(
-        success = { it.toResult() },
+        success = { Result.Success(it) },
         failure = { Result.Failure(Exception(it.message)) }
     )
 
     override suspend fun loadAll(): Result<List<Product>> = api.getAllAsync().awaitCatching(
-        success = { it.toResult() },
+        success = { Result.Success(it) },
         failure = { Result.Failure(java.lang.Exception(it.message)) }
     )
 }
@@ -46,15 +48,15 @@ object RetrofitProductLoader : ProductLoader {
 interface KTORProductAPI {
 
     @GET("/products/{id}")
-    fun getProductAsync(@Path("id") id: String): Deferred<Response<Product>>
+    fun getProductAsync(@Path("id") id: String): Call<Product>
 
     @GET("/products")
-    fun getAllAsync(): Deferred<Response<List<Product>>>
+    fun getAllAsync(): Call<List<Product>>
 
     @GET("/products/search/{query}")
-    fun searchAsync(@Path("query") query: String): Deferred<Response<List<Product>>>
+    fun searchAsync(@Path("query") query: String): Call<List<Product>>
 
     @GET("/shelves/{id}")
-    fun getProductsForShelfRackAsync(@Path("id") id: Int): Deferred<Response<List<Product>>>
+    fun getProductsForShelfRackAsync(@Path("id") id: Int): Call<List<Product>>
 
 }

@@ -1,0 +1,106 @@
+{"connection":
+    {"connected":
+        {"reply": "", "listen": "False", "nextState": "init"},
+     "connected_skip_tut":
+        {"reply": "Skipping tutorial", "listen": "False", "nextState": "shopping0"},
+     "n/a": 
+        {"reply": "", "listen": "False", "nextState":"connection"}},
+
+    "init": 
+    {"start": 
+        {"reply": "Hello, my name is Iona Trolley. Have you ever used good boy before?", "listen": "True", "nextState": "beginning0"},
+    "n/a": {"reply": "Hello there, in order to use good boy, please say: start.", "listen": "True", "nextState": "init"}}, 
+
+    "beginning0": 
+        {"yes": 
+            {"reply": "Would you like to go shopping?", "listen": "True", "nextState": "beginning1"},
+        "no": 
+            {"reply": "Would you like to do a quick tutorial?", "listen": "True", "nextState": "beginning2"}},
+                 
+    "beginning1":
+        {"yes": 
+            {"reply": "Here we go!", "listen": "False", "nextState": "shopping0"},
+        "no": 
+            {"reply": "Would you like to do a quick tutorial?", "listen": "True", "nextState": "beginning2"}},
+             
+    "beginning2": 
+        {"yes": 
+            {"reply": "Perfect. Today I will be guiding you around the shop. You can give me a list of items or simply browse the shop. Would you like more information about this service?", "listen": "True", "nextState": "tutorial0"}, 
+        "no": 
+            {"reply": "Would you like to go shopping?", "listen": "True", "nextState": "beginning1"}},
+    
+    "tutorial0": 
+        {"yes": 
+            {"reply": "I am a shopping trolley that follows a route around the shop to help you pick up items. To give me a list simply attach your smartphone and send me the list... I will tell you when we have arrived at an item. In this shop, the items will always be on your right. I will then tell you what item you have arrived at, and what shelf the item is on. Would you like an example?", "listen": "True", "nextState": "tutorial1"}, 
+        "no": 
+            {"reply": "I will tell you when we have arrived at an item. In this shop, the items will always be on your right. I will then tell you what item you have arrived at, and what shelf the item is on. Would you like an example?", "listen": "True", "nextState": "tutorial1"}}, 
+            
+    "tutorial1": 
+        {"yes": 
+            {"reply": "The Garlic Bread is on the middle shelf... Once you have selected an item, you can scan its barcode using the camera on your phone.Once you have scanned the item, I can tell you information about the item you have picked up. Does this make sense?", "listen": "True", "nextState": "tutorial2"}, 
+        "no": 
+            {"reply": "Once you have selected an item, you can scan its barcode using the camera on your phone.Once you have scanned the item, I can tell you information about the item you have picked up. Does this make sense?", "listen": "True", "nextState": "tutorial2"}}, 
+            
+    "tutorial2": 
+        {"yes": 
+            {"reply": "Once we have finished your list, you can continue to browse, or you may go to the checkout. Shall we start shopping?", "listen": "True", "nextState": "tutorial3"}, 
+        "no": 
+            {"reply": "That is not an option. Please try another option. To hear your options, say: options.", "listen": "True", "nextState": "tutorial2"}}, 
+            
+    "tutorial3": 
+        {"yes": 
+            {"reply": "Here we go!", "listen": "False", "nextState": "shopping0"}, 
+        "no": 
+            {"reply": "Okay. When you are ready to start shopping, say: shopping.To begin the tutorial, say: tutorial.", "listen": "True", "nextState": "limbo0"}},
+             
+    "limbo0": 
+        {"shopping": 
+            {"reply": "Would you like to go shopping?", "listen": "True", "nextState": "beginning1"}, 
+        "tutorial": 
+            {"reply": "Would you like to do a quick tutorial?", "listen": "True", "nextState": "beginning2"}},
+
+    "shopping0": 
+        {"arrived":
+            {"reply": "You have arrived at the ", "reply_ss": "The next item on your list ", "reply_ss2": " is on the shelf you are currently at.", "second": " This item is on the ", "prompt": " shelf. Please try and scan in this item.", 
+                "listen": "False", "nextState": "arrival"}}, 
+
+    "arrival": 
+        {"scanned":
+            {"reply": "You have scanned in the ", "diff_item": " This item is not on your list", "prompt": " Would you like to hear more information about this product?", "listen": "True", "nextState": "identify"}},
+
+    "identify":
+        {"yes":
+            {"price": "The price of this item is ", "listen": "False"},
+        "no":
+            {"reply":"Would you like to add this item to the cart?", "listen": "True", "nextState": "cart"}},
+        
+    "cart":
+        {"yes": 
+            {"reply_quantity0": "Shall we proceed to the next item on the list?", "nextState_quantity0": "continue", 
+            "reply_quantity+": "You have ", "prompt": " more of this item on your list. Do you want to proceed and try to scan these items?", "nextState_quantity+": "scan",
+            "reply_diff_item": "The next item on your list is on the shelf next to you. It is on the ", "reply_diff_item2": " shelf. Please try and scan in this item.", "nextState_diff_item": "arrival",
+            "listen": "True"},
+        "no":
+            {"reply": "Please return the item. Do you want to scan another item?", "listen": "True", "nextState": "scan"}},
+             
+    "continue": 
+        {"yes": 
+            {"reply": "Okay lets go and find the ", "nextState": "shopping0",
+             "reply_finished": "The shopping list is finished. We are now going to the tills.",
+             "finishedState":"finished", "listen": "False"},
+        "no": 
+            {
+              "reply": "Do you want to scan more items?", "listen": "True", "nextState": "scan"}},
+
+    "scan":
+        {"yes":{
+            "reply": "Please scan another item.", "listen": "True", "nextState": "arrival"},
+        "no":{
+            "reply": "Would you like to continue to the next item", "listen": "True", "nextState": "continue"}},
+
+    "finished":
+        {"exit":{
+            "reply": "Thank you for shopping with good boy. Have a good day.", "listen": "False"
+        }},
+
+    "errorMessage": "Sorry, I couldn't recognise your command."}

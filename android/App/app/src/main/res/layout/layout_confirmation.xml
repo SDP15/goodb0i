@@ -6,11 +6,11 @@
     android:orientation="vertical">
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/navigation_title"
+        android:id="@+id/confirmation_title"
         style="@style/TitleText"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
+        android:textAlignment="center"
         android:layout_marginBottom="@dimen/default_margin_bottom"
         tools:text="Fresh Milk 1L" />
 
@@ -21,7 +21,7 @@
         android:layout_height="match_parent"
         android:layout_weight="0.4"
         android:background="@color/colorPositive"
-        tools:text="Add to cart" />
+        android:text="@string/action_add_to_cart" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/confirmation_button_negative"
@@ -29,6 +29,6 @@
         android:layout_height="match_parent"
         android:layout_weight="0.4"
         android:background="@color/colorNegative"
-        tools:text="Don't add" />
+        android:text="@string/action_dont_add_to_art" />
 
 </androidx.appcompat.widget.LinearLayoutCompat>

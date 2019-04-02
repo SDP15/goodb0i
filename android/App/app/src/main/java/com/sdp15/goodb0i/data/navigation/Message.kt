@@ -21,6 +21,8 @@ sealed class Message {
 
         data class RouteCalculated(val route: Route) : IncomingMessage()
 
+        data class Replan(val subRoute: Route) : IncomingMessage()
+
         /**
          *  Trolley has reached a tag
          *  TODO: More information
@@ -33,6 +35,8 @@ sealed class Message {
         object TrolleyAcceptedProduct : IncomingMessage()
 
         object TrolleyRejectedProduct : IncomingMessage()
+
+        object TrolleySkippedProduct : IncomingMessage()
 
         object NoAvailableTrolley : IncomingMessage()
 
@@ -58,14 +62,16 @@ sealed class Message {
         data class ProductScanned(val id: String) : OutgoingMessage()
 
         /*
-         * User has accepted the product
+         * User has accepted the products
          */
-        data class ProductAccepted(val id: String) : OutgoingMessage()
+        data class AcceptedProduct(val id: String) : OutgoingMessage()
 
         /*
-         * User has rejected the product
+         * User has rejected the products
          */
-        data class ProductRejected(val id: String) : OutgoingMessage()
+        data class RejectedProduct(val id: String) : OutgoingMessage()
+
+        object SkippedProduct : OutgoingMessage()
 
         /*
          * Request stopping the trolley
@@ -74,7 +80,9 @@ sealed class Message {
 
         object RequestHelp : OutgoingMessage()
 
-        object RouteReceived : OutgoingMessage()
+        object ReceivedRoute : OutgoingMessage()
+
+        object SessionComplete : OutgoingMessage()
 
         enum class StopReason(val code: Int) {
             HelpRequest(1)
@@ -97,9 +105,18 @@ sealed class Message {
                         message
                     )
                 }
+                "Replan" -> {
+                    val route = Route.fromString(message.substringAfter(delim))
+                    if (route != null) IncomingMessage.Replan(route) else IncomingMessage.InvalidMessage(
+                        message
+                    )
+                }
                 "ReachedPoint" -> IncomingMessage.ReachedPoint(message.substringAfter(delim))
                 "UserReady" -> IncomingMessage.UserReady
                 "NoAvailableTrolley" -> IncomingMessage.NoAvailableTrolley
+                "TrolleyAcceptedProduct" -> IncomingMessage.TrolleyAcceptedProduct
+                "TrolleyRejectedProduct" -> IncomingMessage.TrolleyRejectedProduct
+                "TrolleySkippedProduct" -> IncomingMessage.TrolleySkippedProduct
                 else -> IncomingMessage.InvalidMessage(message)
             }
         }
@@ -109,11 +126,13 @@ sealed class Message {
                 is OutgoingMessage.PlanRoute -> "PlanRoute$delim${message.code}"
                 is OutgoingMessage.Reconnect -> "Reconnect$delim${message.oldId}"
                 is OutgoingMessage.ProductScanned -> "ProductScanned$delim${message.id}"
-                is OutgoingMessage.ProductAccepted -> "ProductAccepted$delim${message.id}"
-                is OutgoingMessage.ProductRejected -> "ProductRejected$delim${message.id}"
+                is OutgoingMessage.AcceptedProduct -> "AcceptedProduct$delim${message.id}"
+                is OutgoingMessage.RejectedProduct -> "RejectedProduct$delim${message.id}"
+                is OutgoingMessage.SkippedProduct -> "SkippedProduct$delim"
                 is OutgoingMessage.RequestHelp -> "RequestHelp$delim"
                 is OutgoingMessage.Stop -> "Stop$delim${message.reason.code}"
-                is OutgoingMessage.RouteReceived -> "RouteReceived$delim"
+                is OutgoingMessage.ReceivedRoute -> "ReceivedRoute$delim"
+                is OutgoingMessage.SessionComplete -> "SessionComplete$delim"
             }
         }
     }

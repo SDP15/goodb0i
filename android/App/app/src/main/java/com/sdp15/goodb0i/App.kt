@@ -1,14 +1,16 @@
 package com.sdp15.goodb0i
 
 import android.app.Application
+import androidx.preference.PreferenceManager
 import androidx.room.Room
 import com.google.firebase.FirebaseApp
 import com.sdp15.goodb0i.data.navigation.Message
+import com.sdp15.goodb0i.data.navigation.SessionManagerImpl
 import com.sdp15.goodb0i.data.navigation.ShoppingSessionManager
 import com.sdp15.goodb0i.data.navigation.scanner.BarcodeReader
 import com.sdp15.goodb0i.data.navigation.scanner.MLKitScanner
-import com.sdp15.goodb0i.data.navigation.sockets.SessionManager
 import com.sdp15.goodb0i.data.navigation.sockets.SocketHandler
+import com.sdp15.goodb0i.data.store.RetrofitProvider
 import com.sdp15.goodb0i.data.store.RoomDB
 import com.sdp15.goodb0i.data.store.cache.RoomShoppingListStore
 import com.sdp15.goodb0i.data.store.cache.ShoppingListStore
@@ -20,21 +22,25 @@ import com.sdp15.goodb0i.data.store.products.ProductLoader
 import com.sdp15.goodb0i.data.store.products.RetrofitProductLoader
 import com.sdp15.goodb0i.data.store.products.TestDataProductLoader
 import com.sdp15.goodb0i.view.debug.CapturingDebugTree
-import com.sdp15.goodb0i.view.debug.Config
 import com.sdp15.goodb0i.view.list.code.CodeViewModel
 import com.sdp15.goodb0i.view.list.confirmation.ListConfirmationViewModel
 import com.sdp15.goodb0i.view.list.creation.ListViewModel
 import com.sdp15.goodb0i.view.list.saved.SavedListsViewModel
+import com.sdp15.goodb0i.view.navigation.complete.CheckoutViewModel
 import com.sdp15.goodb0i.view.navigation.confirmation.ItemConfirmationViewModel
 import com.sdp15.goodb0i.view.navigation.connecting.ShopConnectionViewModel
+import com.sdp15.goodb0i.view.navigation.error.ErrorViewModel
 import com.sdp15.goodb0i.view.navigation.navigating.NavigatingToViewModel
 import com.sdp15.goodb0i.view.navigation.product.ProductViewModel
 import com.sdp15.goodb0i.view.navigation.scanner.ScannerViewModel
 import com.sdp15.goodb0i.view.welcome.WelcomeViewModel
 import org.koin.android.ext.android.startKoin
+import org.koin.android.ext.koin.androidApplication
+import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.experimental.builder.viewModel
 import org.koin.dsl.module.module
 import org.koin.log.Logger
+import retrofit2.Retrofit
 import timber.log.Timber
 
 class App : Application() {
@@ -54,6 +60,7 @@ class App : Application() {
 
             override fun info(msg: String) = Timber.i(msg)
         })
+        RetrofitProductLoader.toString()
     }
 
     private val modules = listOf(
@@ -68,12 +75,20 @@ class App : Application() {
             viewModel<SavedListsViewModel>()
             viewModel<NavigatingToViewModel>()
             viewModel<ShopConnectionViewModel>()
+            viewModel<ErrorViewModel>()
+            viewModel<CheckoutViewModel>()
         },
         module {
+            single<Retrofit> {
+                RetrofitProvider.buildRetrofit(androidApplication())
+            }
             single<ProductLoader> {
+                TestDataProductLoader.initListener(
+                    getString(R.string.config_key_use_test_data),
+                    PreferenceManager.getDefaultSharedPreferences(androidContext())
+                )
                 TestDataProductLoader.DelegateProductLoader(
-                    RetrofitProductLoader,
-                    Config::shouldUseTestData
+                    RetrofitProductLoader
                 )
             }
             single<ListManager> { RetrofitListManager }
@@ -83,16 +98,17 @@ class App : Application() {
             single<ShoppingListStore> {
                 RoomShoppingListStore(
                     Room.databaseBuilder(
-                        applicationContext,
+                        androidContext(),
                         RoomDB::class.java,
                         "db"
                     ).build().listDAO()
                 )
             }
-            single<ShoppingSessionManager<Message.IncomingMessage>> {
-                SessionManager(SocketHandler(transform = Message.Transformer), get())
+            single<ShoppingSessionManager> {
+                SessionManagerImpl(get(), SocketHandler(transform = Message.Transformer))
             }
             single<PriceComputer> { SimplePriceComputer }
         }
     )
+
 }

@@ -25,7 +25,8 @@ enum DriveNumber : int {
 };
 array<unique_ptr<evutil::Drive>, 4> drives;
 unique_ptr<evutil::ColorSensor> leftColor, midColor, rightColor;
-unique_ptr<ev3dev::ultrasonic_sensor> sonar;
+unique_ptr<ev3dev::infrared_sensor> sonar;
+power_supply battery{"lego-ev3-battery"};
 
 ofstream sensorLog;
 
@@ -54,8 +55,8 @@ void connectEv3Devices() {
   rightColor = make_unique<evutil::ColorSensor>(INPUT_3, failed);
 
   sonar =
-      evutil::createConnectedDevice<ev3dev::ultrasonic_sensor>(INPUT_4, failed);
-  sonar->set_mode(sonar->mode_us_dist_cm);
+      evutil::createConnectedDevice<ev3dev::infrared_sensor>(INPUT_4, failed);
+  sonar->set_mode(sonar->mode_ir_prox);
 
   if (failed) {
     throw runtime_error("Error initializing EV3 connections.");
@@ -72,6 +73,14 @@ void openLogFile() {
   sensorLog = ofstream(logName, ios_base::out | ios_base::app);
   if (!sensorLog.good()) {
     throw runtime_error("Could not open logfile.");
+  }
+}
+
+set<int> connectionFds;
+
+void sendToAllClients(string msg) {
+  for (int fd : connectionFds) {
+    ::send(fd, msg.c_str(), msg.size(), 0);
   }
 }
 
@@ -149,8 +158,9 @@ public:
     commands.push_front(cmd);
   }
 
-private:
   int forwardBaseSpeed{30};
+
+private:
   int currentTurnAngle{0}, currentSpeed{0};
 
   array<int, 4> currentMotorSpeeds{{0, 0, 0, 0}},
@@ -272,30 +282,29 @@ protected:
 
 class AvoidanceSubsystem : public Subsystem {
 private:
-  int obstacleDistanceCm{45};
   bool seenObstacle{false};
   vector<Subsystem *> systemsToPause;
   SteeringSubsystem *sysSteering;
 
 public:
+  int obstacleDistancePct{60};
   AvoidanceSubsystem(SteeringSubsystem *sysSteering) {
     this->sysSteering = sysSteering;
-    sonar->distance_centimeters(true);
   }
 
   void registerSystemToPause(Subsystem *sys) { systemsToPause.push_back(sys); }
 
   virtual void dump(ostream &os) {
     os << "Avoidance subsystem:";
-    os << "\n * Distance cm: " << obstacleDistanceCm;
+    os << "\n * Distance %: " << obstacleDistancePct;
     os << "\n * Seeing obstacle: " << seenObstacle;
+    os << "\n * Raw value: " << sonar->proximity(false);
     os << "\n";
   }
 
 protected:
   void process() {
-    bool nowSeesObstacle{sonar->distance_centimeters(false) <
-                         obstacleDistanceCm};
+    bool nowSeesObstacle{sonar->proximity(false) < obstacleDistancePct};
     if (nowSeesObstacle != seenObstacle) {
       seenObstacle = nowSeesObstacle;
       for_each(systemsToPause.begin(), systemsToPause.end(),
@@ -337,6 +346,7 @@ private:
 
 public:
   bool turningOn{true};
+  int slightTurnRatio{110}, maxTurnRatio{110};
 
   LineFollowSubsystem(SteeringSubsystem *sysSteering) {
     this->sysSteering = sysSteering;
@@ -395,17 +405,18 @@ protected:
     evutil::Color rcol{rightColor->getColor()};
 
     auto rrcol{rightColor->getRawRGB()};
-    constexpr int STEER_ANGLE{110};
-    constexpr int SMALL_STEER_ANGLE{90};
 
     bool seeingMarker{lcol == evutil::Color::turnRight ||
                       mcol == evutil::Color::turnRight ||
                       rcol == evutil::Color::turnRight};
+
+    led::set_color(led::right, seeingMarker ? led::green : led::black);
+
     if (ignoreMarker) {
       if (markerIgnoreStopwatch.elapsedMilliseconds() >= markerIgnoreMs) {
         ignoreMarker = false;
         markerIgnoreStopwatch.pause();
-      } else {
+      } else if (seeingMarker) {
         seeingMarker = false;
         // make the robot blind to the marker
         lcol = evutil::Color::line;
@@ -422,6 +433,7 @@ protected:
       if (queuedActions.empty()) {
         if (state != State::waitingForCommand) {
           log() << "MISSING QUEUE ACTION, HALTING" << endl;
+          sendToAllClients("detected-marker queue-empty OK\n");
           state = State::waitingForCommand;
         }
       } else {
@@ -430,20 +442,24 @@ protected:
         switch (A) {
         case QueuedAction::stop:
           log() << "Stop marker" << endl;
+          sendToAllClients("detected-marker stop OK\n");
           state = State::stoppedAtMarker;
           break;
         case QueuedAction::goStraight:
           log() << "Straight marker" << endl;
+          sendToAllClients("detected-marker forward OK\n");
           state = State::turningAtMarker;
           turnBias = Direction::middle;
           break;
         case QueuedAction::turnLeft:
           log() << "Left marker" << endl;
+          sendToAllClients("detected-marker left OK\n");
           state = State::turningAtMarker;
           turnBias = Direction::left;
           break;
         case QueuedAction::turnRight:
           log() << "Right marker" << endl;
+          sendToAllClients("detected-marker right OK\n");
           state = State::turningAtMarker;
           turnBias = Direction::right;
           break;
@@ -497,11 +513,11 @@ protected:
 
       if (lcol == evutil::Color::line && rcol != evutil::Color::line) {
         // LMr -> adjust slightly left
-        lineAngle = -SMALL_STEER_ANGLE;
+        lineAngle = -slightTurnRatio;
         lastLineDir = Direction::left;
       } else if (lcol != evutil::Color::line && rcol == evutil::Color::line) {
         // lMR -> adjust slightly right
-        lineAngle = SMALL_STEER_ANGLE;
+        lineAngle = slightTurnRatio;
         lastLineDir = Direction::right;
       } else {
         // lMr/LMR -> going straight
@@ -510,26 +526,26 @@ protected:
     } else {
       if (lcol == evutil::Color::line && rcol != evutil::Color::line) {
         // Lmr -> adjust left
-        lineAngle = -STEER_ANGLE;
+        lineAngle = -maxTurnRatio;
         lastLineDir = Direction::left;
       } else if (lcol != evutil::Color::line && rcol == evutil::Color::line) {
         // lmR -> adjust right
-        lineAngle = STEER_ANGLE;
+        lineAngle = maxTurnRatio;
         lastLineDir = Direction::right;
       } else if (state != State::turningAtMarker &&
                  lcol != evutil::Color::line) {
         // lmr -> turn to the predicted line
         lineAngle =
-            (lastLineDir == Direction::left) ? -STEER_ANGLE : STEER_ANGLE;
+            (lastLineDir == Direction::left) ? -maxTurnRatio : maxTurnRatio;
       } else {
         // LmR -> turn to bias line if turning
-        lineAngle = (turnBias == Direction::right) ? STEER_ANGLE : -STEER_ANGLE;
+        lineAngle =
+            (turnBias == Direction::right) ? maxTurnRatio : -maxTurnRatio;
         lastLineDir =
             (turnBias == Direction::right) ? Direction::right : Direction::left;
       }
     }
-    // Rolling average to smooth out steering
-    avgLineAngle = (avgLineAngle + 7 * lineAngle) / 8;
+    avgLineAngle = lineAngle;
 
     sysSteering->pushCommand(
         {SteeringSubsystem::Command::CommandType::setTurnAngle, 0, 0,
@@ -550,7 +566,6 @@ private:
 
   mutex accessMutex;
   int socketFd{-1};
-  set<int> connectionFds;
 
   void spawnNewConnThread() { new thread(&Robot::socketThreadFn, this); }
 
@@ -573,100 +588,175 @@ private:
     led::set_color(led::left, led::amber);
     char rbuf[64];
     char wbuf[64];
+    string cmdbuf;
     int rlen;
     while ((rlen = recv(connectFd, rbuf, sizeof rbuf, 0)) > 0) {
-      if (rbuf[rlen - 1] == '\n') {
-        --rlen;
-      }
-      if (rlen == 0) {
-        continue;
-      }
-      lock_guard<mutex> _l{accessMutex};
-      // Implemented TCP commands
-      if (strncmp(rbuf, "help", rlen) == 0) {
-        rsend("Supported commands: help stop start moving? enqueue-stop "
-              "enqueue-forward enqueue-left enqueue-right queue-status "
-              "dump-queue clear-queue resume-from-stop-marker dump dump-hsv "
-              "disconnect\n");
-      } else if (strncmp(rbuf, "stop", rlen) == 0) {
-        if (!halted) {
-          sysSteering.requestStop(SUBSYS_ROBOT);
-          halted = true;
-        }
-        rsend("stop OK\n");
-      } else if (strncmp(rbuf, "start", rlen) == 0) {
-        if (halted) {
-          sysSteering.cancelStopRequest(SUBSYS_ROBOT);
-          halted = false;
-        }
-        rsend("start OK\n");
-      } else if (strncmp(rbuf, "moving?", rlen) == 0) {
-        snprintf(wbuf, sizeof wbuf, "moving = %d\n",
-                 sysSteering.isMoving() ? 1 : 0);
-        rsend(wbuf);
-      } else if (strncmp(rbuf, "dump", rlen) == 0) {
-        rsend("EV3DUMP START\n");
-        stringstream ss;
-        sysSteering.dump(ss);
-        sysAvoid.dump(ss);
-        sysLine.dump(ss);
-        rsend(ss.str().c_str());
-        rsend("\nEV3DUMP END\n");
-      } else if (strncmp(rbuf, "enqueue-stop", rlen) == 0) {
-        sysLine.enqueueAction(LineFollowSubsystem::QueuedAction::stop);
-        rsend("enqueue-stop OK\n");
-      } else if (strncmp(rbuf, "enqueue-forward", rlen) == 0) {
-        sysLine.enqueueAction(LineFollowSubsystem::QueuedAction::goStraight);
-        rsend("enqueue-forward OK\n");
-      } else if (strncmp(rbuf, "enqueue-left", rlen) == 0) {
-        sysLine.enqueueAction(LineFollowSubsystem::QueuedAction::turnLeft);
-        rsend("enqueue-left OK\n");
-      } else if (strncmp(rbuf, "enqueue-right", rlen) == 0) {
-        sysLine.enqueueAction(LineFollowSubsystem::QueuedAction::turnRight);
-        rsend("enqueue-right OK\n");
-      } else if (strncmp(rbuf, "resume-from-stop-marker", rlen) == 0) {
-        sysLine.resumeFromStopMarker();
-        rsend("resume-from-stop-marker OK\n");
-      } else if (strncmp(rbuf, "dump-queue", rlen) == 0) {
-        stringstream ss;
-        ss << "Queue: ";
-        for (auto action : sysLine) {
-          switch (action) {
-          case LineFollowSubsystem::QueuedAction::stop:
-            ss << "stop ";
-            break;
-          case LineFollowSubsystem::QueuedAction::turnLeft:
-            ss << "left ";
-            break;
-          case LineFollowSubsystem::QueuedAction::turnRight:
-            ss << "right ";
-            break;
-          case LineFollowSubsystem::QueuedAction::goStraight:
-            ss << "forward ";
-            break;
+      cmdbuf.append(rbuf, rlen);
+      int splitPoint = cmdbuf.npos;
+      while ((splitPoint = cmdbuf.find('\n')) != cmdbuf.npos) {
+        // found a command
+        string cmd = cmdbuf.substr(0, splitPoint);
+        cmdbuf = cmdbuf.substr(splitPoint + 1);
+
+        lock_guard<mutex> _l{accessMutex};
+        // Implemented TCP commands
+        if (cmd == "help") {
+          rsend("Supported commands: help stop start moving? enqueue-stop "
+                "enqueue-forward enqueue-left enqueue-right queue-status "
+                "dump-queue clear-queue resume-from-stop-marker dump dump-hsv "
+                "battery `set-speed 100` get-speed `set-max-turn-ratio 110` "
+                "`set-slight-turn-ratio 90` get-turn-ratios disconnect\n");
+        } else if (cmd == "stop") {
+          if (!halted) {
+            sysSteering.requestStop(SUBSYS_ROBOT);
+            halted = true;
           }
-        }
-        ss << "OK\n";
-        rsend(ss.str().c_str());
-      } else if (strncmp(rbuf, "clear-queue", rlen) == 0) {
-        sysLine.forceClearQueue();
-        rsend("clear-queue OK\n");
-      } else if (strncmp(rbuf, "queue-status", rlen) == 0) {
-        if (sysLine.isWaitingOnQueue()) {
-          rsend("waiting-for-command OK\n");
-        } else if (sysLine.queueEmpty()) {
-          rsend("empty OK\n");
+          rsend("stop OK\n");
+        } else if (cmd == "start") {
+          if (halted) {
+            sysSteering.cancelStopRequest(SUBSYS_ROBOT);
+            halted = false;
+          }
+          rsend("start OK\n");
+        } else if (cmd == "moving?") {
+          snprintf(wbuf, sizeof wbuf, "moving = %d\n",
+                   sysSteering.isMoving() ? 1 : 0);
+          rsend(wbuf);
+        } else if (cmd == "dump") {
+          rsend("EV3DUMP START\n");
+          stringstream ss;
+          sysSteering.dump(ss);
+          sysAvoid.dump(ss);
+          sysLine.dump(ss);
+          rsend(ss.str().c_str());
+          rsend("\nEV3DUMP END\n");
+        } else if (cmd == "enqueue-stop") {
+          sysLine.enqueueAction(LineFollowSubsystem::QueuedAction::stop);
+          rsend("enqueue-stop OK\n");
+        } else if (cmd == "enqueue-forward") {
+          sysLine.enqueueAction(LineFollowSubsystem::QueuedAction::goStraight);
+          rsend("enqueue-forward OK\n");
+        } else if (cmd == "enqueue-left") {
+          sysLine.enqueueAction(LineFollowSubsystem::QueuedAction::turnLeft);
+          rsend("enqueue-left OK\n");
+        } else if (cmd == "enqueue-right") {
+          sysLine.enqueueAction(LineFollowSubsystem::QueuedAction::turnRight);
+          rsend("enqueue-right OK\n");
+        } else if (cmd == "resume-from-stop-marker") {
+          sysLine.resumeFromStopMarker();
+          rsend("resume-from-stop-marker OK\n");
+        } else if (cmd == "dump-queue") {
+          stringstream ss;
+          ss << "Queue: ";
+          for (auto action : sysLine) {
+            switch (action) {
+            case LineFollowSubsystem::QueuedAction::stop:
+              ss << "stop ";
+              break;
+            case LineFollowSubsystem::QueuedAction::turnLeft:
+              ss << "left ";
+              break;
+            case LineFollowSubsystem::QueuedAction::turnRight:
+              ss << "right ";
+              break;
+            case LineFollowSubsystem::QueuedAction::goStraight:
+              ss << "forward ";
+              break;
+            }
+          }
+          ss << "OK\n";
+          rsend(ss.str().c_str());
+        } else if (cmd == "clear-queue") {
+          sysLine.forceClearQueue();
+          rsend("clear-queue OK\n");
+        } else if (cmd == "queue-status") {
+          if (sysLine.isWaitingOnQueue()) {
+            rsend("waiting-for-command OK\n");
+          } else if (sysLine.queueEmpty()) {
+            rsend("empty OK\n");
+          } else {
+            rsend("in-progress OK\n");
+          }
+        } else if (cmd == "dump-hsv") {
+          hsvDump = !hsvDump;
+          rsend("dump-hsv OK\n");
+        } else if (cmd == "disconnect") {
+          rsend("disconnect OK\n");
+          break;
+        } else if (cmd == "battery") {
+          float V{battery.measured_volts()};
+          float A{battery.measured_amps()};
+          snprintf(wbuf, sizeof wbuf, "battery volt %.3f max 8.4 amp %.6f OK\n",
+                   V, A);
+          rsend(wbuf);
+        } else if (cmd == "get-speed") {
+          snprintf(wbuf, sizeof wbuf, "speed %d OK\n",
+                   sysSteering.forwardBaseSpeed);
+          rsend(wbuf);
+        } else if (cmd.find("set-speed") == 0) {
+          int spd{30};
+          sscanf(cmd.c_str(), "set-speed %d", &spd);
+          if (spd < 5) {
+            spd = 5;
+          }
+          if (spd > 100) {
+            spd = 100;
+          }
+          snprintf(wbuf, sizeof wbuf, "set-speed %d (old %d ) OK\n", spd,
+                   sysSteering.forwardBaseSpeed);
+          sysSteering.forwardBaseSpeed = spd;
+          rsend(wbuf);
+        } else if (cmd == "get-turn-ratios") {
+          snprintf(wbuf, sizeof wbuf,
+                   "max-turn-ratio %d slight-turn-ratio %d OK\n",
+                   sysLine.maxTurnRatio, sysLine.slightTurnRatio);
+          rsend(wbuf);
+        } else if (cmd.find("set-slight-turn-ratio") == 0) {
+          int tr{110};
+          sscanf(cmd.c_str(), "set-slight-turn-ratio %d", &tr);
+          if (tr < 5) {
+            tr = 5;
+          }
+          if (tr > 300) {
+            tr = 300;
+          }
+          snprintf(wbuf, sizeof wbuf, "set-slight-turn-ratio %d (old %d ) OK\n",
+                   tr, sysLine.slightTurnRatio);
+          sysLine.slightTurnRatio = tr;
+          rsend(wbuf);
+        } else if (cmd.find("set-max-turn-ratio") == 0) {
+          int tr{110};
+          sscanf(cmd.c_str(), "set-max-turn-ratio %d", &tr);
+          if (tr < 5) {
+            tr = 5;
+          }
+          if (tr > 300) {
+            tr = 300;
+          }
+          snprintf(wbuf, sizeof wbuf, "set-max-turn-ratio %d (old %d ) OK\n",
+                   tr, sysLine.maxTurnRatio);
+          sysLine.maxTurnRatio = tr;
+          rsend(wbuf);
+        } else if (cmd == "get-stop-distance") {
+          snprintf(wbuf, sizeof wbuf, "stop-distance %d OK\n",
+                   sysAvoid.obstacleDistancePct);
+          rsend(wbuf);
+        } else if (cmd.find("set-stop-distance") == 0) {
+          int spd{60};
+          sscanf(cmd.c_str(), "set-stop-distance %d", &spd);
+          if (spd < 0) {
+            spd = 0;
+          }
+          if (spd > 100) {
+            spd = 100;
+          }
+          snprintf(wbuf, sizeof wbuf, "set-stop-distance %d (old %d ) OK\n",
+                   spd, sysAvoid.obstacleDistancePct);
+          sysAvoid.obstacleDistancePct = spd;
+          rsend(wbuf);
         } else {
-          rsend("in-progress OK\n");
+          rsend("unknown command FAIL\n");
         }
-      } else if (strncmp(rbuf, "dump-hsv", rlen) == 0) {
-        hsvDump = !hsvDump;
-        rsend("dump-hsv OK\n");
-      } else if (strncmp(rbuf, "disconnect", rlen) == 0) {
-        rsend("disconnect OK\n");
-        break;
-      } else {
-        rsend("unknown command FAIL\n");
       }
     }
 
