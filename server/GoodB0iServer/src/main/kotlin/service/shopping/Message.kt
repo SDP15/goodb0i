@@ -168,6 +168,7 @@ sealed class Message {
             val sep = ','
             val delim = '%'
             var previous = route.first()
+            val stoppedAt = HashSet<Graph.Vertex<Int>>()
             route.forEach { vertex ->
                 if (vertex == route.first()) {
                     builder.append("start$delim${vertex.node.id}")
@@ -186,7 +187,7 @@ sealed class Message {
 
                         builder.append(sep)
                     }
-                    if (vertex.node in productMap.keys) {
+                    if (vertex.node in productMap.keys && vertex !in stoppedAt) {
                         builder.append("stop$delim${vertex.node.id}")
                         val products = productMap[vertex.node]?.map { "${it.first}$delim${it.second}" }
                         builder.append(products?.joinToString(separator = "$delim", prefix = "$delim"))

@@ -3,7 +3,8 @@
     "code": 7654321,
     "products": [
       {
-        "product": "bd732d10-94bd-4605-9c9d-136897a22d90",
+        "product": "45c48cce-2e2d-3fbd-aa1a-fc51c7c6ad26",
+        "product2": "bd732d10-94bd-4605-9c9d-136897a22d90",
         "quantity": 2
       },
       {

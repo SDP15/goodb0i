@@ -35,6 +35,7 @@ class ScannerFragment : BaseFragment() {
             Toast.makeText(context, "Reading: ${it.value}", Toast.LENGTH_SHORT).show()
         })
         vm.transitions.observe(this, Observer {
+            camera_view.close()
             findNavController().navigate(it)
         })
     }
@@ -53,7 +54,6 @@ class ScannerFragment : BaseFragment() {
         camera_view.addFrameProcessor { frame ->
             vm.onImageCaptured(frame.data, frame.rotation, frame.size.width, frame.size.height)
         }
-
         camera_view.audio = Audio.OFF
         camera_view.mapGesture(Gesture.TAP, GestureAction.FOCUS_WITH_MARKER)
     }

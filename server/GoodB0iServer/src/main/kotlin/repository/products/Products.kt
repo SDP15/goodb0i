@@ -4,6 +4,7 @@ import org.jetbrains.exposed.dao.UUIDTable
 
 object Products : UUIDTable() {
     val name = varchar("name", 255)
+    //val gtin = varchar("gtin", 13)
     val averageSellingUnitWeight = double("averageSellingUnitWeight")
     val contentsMeasureType = varchar("ContentsMeasureType", 20)
     val contentsQuantity = double("contentsQuantity")

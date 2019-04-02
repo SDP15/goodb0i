@@ -116,6 +116,12 @@ class Session(
             is Message.IncomingMessage.FromApp.AppSkippedProduct -> {
                 sendToTrolley(Message.OutgoingMessage.ToTrolley.AppSkippedProduct)
             }
+            is Message.IncomingMessage.FromApp.Reconnect -> {
+                val lastPoint = receivedMessages.last { message -> message is Message.IncomingMessage.FromTrolley.ReachedPoint } as? Message.IncomingMessage.FromTrolley.ReachedPoint
+                if(lastPoint != null) {
+                    sendToApp(Message.OutgoingMessage.ToApp.ReachedPoint(lastPoint.id))
+                }
+            }
             is Message.IncomingMessage.FromApp.SessionComplete -> {
                 //TODO: Close and dispose of session
                 sendToTrolley(Message.OutgoingMessage.ToTrolley.SessionComplete)

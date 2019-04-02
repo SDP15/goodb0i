@@ -30,12 +30,14 @@ class IntRouteFinder(private val graph: Graph<Int>): RouteFinder {
         val remaining = waypoints.toMutableList()
         if (remaining.isEmpty()) remaining.add(end)
         val path = mutableListOf<Graph.Node<Int>>()
+        println("Edges are ${graph.flatMap { it.edges }}")
+        println("Calculating route through $waypoints from $start to $end")
         while (remaining.isNotEmpty()) {
             val result = cache.getOrPut(current) {
                 println("Calculating result for point not in cache")
                 dijkstras(current, graph)
             }
-            println("Distances for ${remaining.map { it.toString() + result.distances[it]?.toString() }}")
+            println("Distances from $current ${remaining.map { it.toString() + result.distances[it]?.toString() }}")
             val next = remaining.minBy { result.distances[it]!! }!!
             remaining.remove(next)
             var temp = result.previous[next]!! // We don't want to re-add the waypoint

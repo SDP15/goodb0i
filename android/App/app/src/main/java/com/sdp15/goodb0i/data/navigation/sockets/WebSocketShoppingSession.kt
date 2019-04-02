@@ -13,8 +13,8 @@ import com.sdp15.goodb0i.data.store.lists.ListItem
 import com.sdp15.goodb0i.data.store.lists.ShoppingList
 import com.sdp15.goodb0i.data.store.products.Product
 import com.sdp15.goodb0i.data.store.products.ProductLoader
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -297,16 +297,20 @@ class WebSocketShoppingSession(
     }
 
     // Repeatedly attempt to reconnect to the server
+    private var isReconnecting = false
     private fun attemptReconnection() {
         //TODO: How to scope this
-        GlobalScope.launch {
+        if(isReconnecting) return
+        GlobalScope.launch(Dispatchers.IO) {
             //TODO: Break after some number of reconnection attempts
+            isReconnecting = true
             while (!sh.isConnected) {
                 sh.start(RetrofitProvider.root + "/app")
                 sh.sendMessage(Message.OutgoingMessage.Reconnect(uid))
-                delay(500)
+                Thread.sleep(500)
             }
             setState(movingStates.last)
+            isReconnecting = false
             Timber.i("Socket reconnected")
         }
     }
