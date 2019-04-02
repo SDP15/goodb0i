@@ -152,7 +152,7 @@ class WebSocketShoppingSession(
         } else if (point is Route.RoutePoint.IndexPoint.IdentifiedPoint.Pass) {
             // I haven't seen this happen, but we REALLY don't want to change to a navigating state
             // while we are in the process of scanning
-            if (sessionState.value !is ShoppingSessionState.Scanning && sessionState.value !is ShoppingSessionState.Confirming) {
+            if (sessionState.value is ShoppingSessionState.NavigatingTo) {
                 index = pointIndex
                 // We should already be in a NavigatingTo state at this point, because we only switch to
                 // NavigatingTo once a shelf rack has been completed

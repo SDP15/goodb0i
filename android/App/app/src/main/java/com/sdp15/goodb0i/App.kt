@@ -10,6 +10,7 @@ import com.sdp15.goodb0i.data.navigation.ShoppingSessionManager
 import com.sdp15.goodb0i.data.navigation.scanner.BarcodeReader
 import com.sdp15.goodb0i.data.navigation.scanner.MLKitScanner
 import com.sdp15.goodb0i.data.navigation.sockets.SocketHandler
+import com.sdp15.goodb0i.data.store.RetrofitProvider
 import com.sdp15.goodb0i.data.store.RoomDB
 import com.sdp15.goodb0i.data.store.cache.RoomShoppingListStore
 import com.sdp15.goodb0i.data.store.cache.ShoppingListStore
@@ -34,10 +35,12 @@ import com.sdp15.goodb0i.view.navigation.product.ProductViewModel
 import com.sdp15.goodb0i.view.navigation.scanner.ScannerViewModel
 import com.sdp15.goodb0i.view.welcome.WelcomeViewModel
 import org.koin.android.ext.android.startKoin
+import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.experimental.builder.viewModel
 import org.koin.dsl.module.module
 import org.koin.log.Logger
+import retrofit2.Retrofit
 import timber.log.Timber
 
 class App : Application() {
@@ -76,6 +79,9 @@ class App : Application() {
             viewModel<CheckoutViewModel>()
         },
         module {
+            single<Retrofit> {
+                RetrofitProvider.buildRetrofit(androidApplication())
+            }
             single<ProductLoader> {
                 TestDataProductLoader.initListener(
                     getString(R.string.config_key_use_test_data),

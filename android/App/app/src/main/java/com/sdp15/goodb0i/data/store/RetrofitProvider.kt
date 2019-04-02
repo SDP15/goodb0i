@@ -1,5 +1,7 @@
 package com.sdp15.goodb0i.data.store
 
+import android.content.Context
+import androidx.preference.PreferenceManager
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Response
@@ -17,9 +19,15 @@ object RetrofitProvider {
 
     var root = "http://10.0.2.2:8080" // Machine localhost
         set(value) {
+            Timber.i("Changing root url to $value")
             field = value
             retrofit = build()
         }
+
+    fun buildRetrofit(context: Context): Retrofit {
+        root = PreferenceManager.getDefaultSharedPreferences(context).getString("server_address", "http://10.0.2.2:8080")!!
+        return retrofit
+    }
 
     private fun build() : Retrofit =
         Retrofit.Builder().apply {

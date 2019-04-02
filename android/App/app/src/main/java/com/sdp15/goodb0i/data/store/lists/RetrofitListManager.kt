@@ -1,8 +1,9 @@
 package com.sdp15.goodb0i.data.store.lists
 
 import com.sdp15.goodb0i.data.store.Result
-import com.sdp15.goodb0i.data.store.RetrofitProvider
 import com.sdp15.goodb0i.data.store.awaitCatching
+import org.koin.standalone.KoinComponent
+import org.koin.standalone.inject
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.http.Body
@@ -10,9 +11,9 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
 
-object RetrofitListManager : ListManager {
+object RetrofitListManager : ListManager, KoinComponent {
 
-    private val retrofit: Retrofit by RetrofitProvider
+    private val retrofit: Retrofit by inject()
 
     private val api = retrofit.create(KTORListAPI::class.java)
 
