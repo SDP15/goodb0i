@@ -2,6 +2,7 @@
 
       {
         "id": "cfcd2084-95d5-35ef-a6e7-dff9f98764da",
+        "gtin": "4444444",
         "id2": "af4e8397-a6c7-4d63-8769-8cddee97e960",
         "superDepartment": "Fresh Food",
         "contentsMeasureType": "L",
@@ -17,6 +18,7 @@
       },
       {
         "id": "4bd820e4-5ecc-4393-94c0-178b99f9edbb",
+        "gtin": "0766661366748",
         "superDepartment": "Fresh Food",
         "contentsMeasureType": "G",
         "name": "Grated 30% Reduced Fat Mature Cheese 250G",
@@ -31,6 +33,7 @@
       },
       {
         "id": "e5809854-d401-46a7-97d7-a4b680e6837d",
+        "gtin": "1780261326741",
         "superDepartment": "Fresh Food",
         "contentsMeasureType": "G",
         "name": "Lurpak Unsalted Block Butter 250G",
@@ -45,6 +48,7 @@
       },
       {
         "id": "d2dbb3f2-28e4-41c0-be61-a8530d74fa6e",
+        "gtin": "3780261326749",
         "superDepartment": "Fresh Food",
         "contentsMeasureType": "G",
         "name": "British Chicken Breast Portions 650G",
@@ -59,6 +63,7 @@
       },
       {
         "id": "adf91ea8-5696-4040-9052-8439c4ed23b4",
+        "gtin": "0744441344742",
         "superDepartment": "Fresh Food",
         "contentsMeasureType": "G",
         "name": "8 Pork Loin Steaks 1.08Kg",
@@ -73,6 +78,7 @@
       },
       {
         "id": "4b35123c-794d-416c-a1b3-c16a6a7afd53",
+        "gtin": "0788861366748",
         "superDepartment": "Fresh Food",
         "contentsMeasureType": "G",
         "name": "Boswell Farms Beef Mince 500G 20% Fat",
@@ -87,6 +93,7 @@
       },
       {
         "id": "f10a798c-5b6a-4b93-8c93-bbeaee696301",
+        "gtin": "2780261326740",
         "superDepartment": "Fresh Food",
         "contentsMeasureType": "G",
         "name": "Sweet Vine Ripened Tomatoes 230G",
@@ -101,6 +108,7 @@
       },
       {
         "id": "5881be71-e955-4f16-9899-ac1b202df912",
+        "gtin": "2222222222222",
         "superDepartment": "Fresh Food",
         "contentsMeasureType": "SNGL",
         "name": "Bunched Carrots Bag",
@@ -115,6 +123,7 @@
       },
       {
         "id" : "f08ec330-d44f-4b25-86af-0f1d2e9f8eca",
+        "gtin": 4780261326748,
         "superDepartment": "Fresh Food",
         "contentsMeasureType": "G",
         "name": "Broccoli Florets 240G",
@@ -129,6 +138,7 @@
       },
       {
         "id" : "45c48cce-2e2d-3fbd-aa1a-fc51c7c6ad26",
+        "gtin": "7780261326745",
         "id2": "bd732d10-94bd-4605-9c9d-136897a22d90",
         "superDepartment": "Fresh Food",
         "contentsMeasureType": "SNGL",
@@ -144,6 +154,7 @@
       },
       {
         "id": "b896b077-f017-4b0c-9a8b-568c2dc16a54",
+        "gtin": "5780261326747",
         "superDepartment": "Fresh Food",
         "contentsMeasureType": "SNGL",
         "name": "Jaffa Red Oranges Minimum 5 Pack",
@@ -158,6 +169,7 @@
       },
       {
         "id": "8211f5e1-d28b-4525-91f5-76e07d17b82f",
+        "gtin": "9780261326743",
         "superDepartment": "Fresh Food",
         "contentsMeasureType": "KG",
         "name": "Red Seedless Grapes 500G",
@@ -172,6 +184,7 @@
       },
       {
         "id": "9305d331-f7c8-45f3-a0dc-a444e6864602",
+        "gtin": "9780201379266",
         "superDepartment": "Bakery",
         "contentsMeasureType": "SNGL",
         "name": "New York Bakery Plain Bagels 5 Pack",
@@ -186,6 +199,7 @@
       },
       {
         "id": "75c81d25-3bae-470c-975f-73a9b2cfe853",
+        "gtin": "4646464646468",
         "superDepartment": "Bakery",
         "contentsMeasureType": "G",
         "name": "Stay Fresh White Medium Bread 800G",
@@ -200,6 +214,7 @@
       },
       {
         "id": "d2036958-7e7b-4135-b044-6bf04d028cd3",
+        "gtin": "9780201379624",
         "superDepartment": "Bakery",
         "contentsMeasureType": "SNGL",
         "name": "Weetabix Apricot And Oat Breakfast Muffin 4 Pack",
@@ -214,6 +229,7 @@
       },
       {
         "id": "d536042f-552d-4618-9ffe-33413378c1bd",
+        "gtin": "1111111111123",
         "superDepartment": "Fresh Food",
         "contentsMeasureType": "G",
         "name": "Smoked Salmon 240G",
@@ -228,6 +244,7 @@
       },
       {
         "id": "91c779de-d660-4dda-ba86-8b8c53dd8725",
+        "gtin": "2424242424246",
         "superDepartment": "Frozen Food",
         "contentsMeasureType": "KG",
         "name": "4 Breaded Cod Fillets 500G",
@@ -242,6 +259,7 @@
       },
       {
         "id": "aa5ba893-35c5-4590-8893-00a84256e325",
+        "gtin": "8888888888888",
         "superDepartment": "Fresh Food",
         "contentsMeasureType": "G",
         "name": "Finest Cooked Jumbo King Prawns 150G",
@@ -256,6 +274,7 @@
       },
       {
         "id": "b85dd74b-4f31-4493-9a46-e692d706514a",
+        "gtin": "6666666666666",
         "superDepartment": "Food Cupboard",
         "contentsMeasureType": "G",
         "name": "Kelloggs All Bran Cereal 500G",
@@ -270,6 +289,7 @@
       },
       {
         "id": "7596e4bb-76da-4822-ba40-d4f8238c6b02",
+        "gtin": "0780261326742",
         "superDepartment": "Food Cupboard",
         "contentsMeasureType": "G",
         "name": "Everyday Value Tomato Ketchup 550G",
@@ -285,6 +305,7 @@
 
       {
         "id": "7b4adf2b-084d-4844-bce6-e0c3a2bcc93a",
+        "gtin": "6780261326746",
         "superDepartment": "Food Cupboard",
         "contentsMeasureType": "G",
         "name": "Napolina Fusilli Pasta 500G",
@@ -299,6 +320,7 @@
       },
       {
         "id": "1f8f1c8f-814b-403f-8cf6-c53ad5694e7b",
+        "gtin": "0788861326742",
         "superDepartment": "Food Cupboard",
         "contentsMeasureType": "G",
         "name": "Galaxy Chocolate Multipack 4 X42g",
@@ -313,6 +335,7 @@
       },
       {
         "id": "60592b2c-518a-47d4-b101-01b8ac896973",
+        "gtin": "8780261326744",
         "superDepartment": "Food Cupboard",
         "contentsMeasureType": "G",
         "name": "Haribo Jelly Babies 180G",
@@ -327,6 +350,7 @@
       },
       {
         "id": "388b76ca-44fa-4218-9e39-218cea676e64",
+        "gtin": "9780201326741",
         "superDepartment": "Food Cupboard",
         "contentsMeasureType": "G",
         "name": "Metcalfes Skinny Cinema Sweet Popcorn 70 G",

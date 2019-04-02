@@ -41,7 +41,13 @@ object RetrofitProductLoader : ProductLoader, KoinComponent {
 
     override suspend fun loadAll(): Result<List<Product>> = api.getAllAsync().awaitCatching(
         success = { Result.Success(it) },
-        failure = { Result.Failure(java.lang.Exception(it.message)) }
+        failure = { Result.Failure(Exception(it.message)) }
+    )
+
+    override suspend fun searchBarcode(bardcode: String): Result<Product> = api.searchBarcodeAsync(bardcode).awaitCatching(
+        success = { Result.Success(it) },
+        failure = { Result.Failure(Exception(it.message))}
+
     )
 }
 
@@ -49,6 +55,9 @@ interface KTORProductAPI {
 
     @GET("/products/{id}")
     fun getProductAsync(@Path("id") id: String): Call<Product>
+
+    @GET("/products/barcode/{barcode}")
+    fun searchBarcodeAsync(@Path("barcode") bardcode: String): Call<Product>
 
     @GET("/products")
     fun getAllAsync(): Call<List<Product>>

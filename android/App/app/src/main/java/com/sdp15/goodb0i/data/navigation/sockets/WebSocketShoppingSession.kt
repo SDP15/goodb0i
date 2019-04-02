@@ -17,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import kotlin.math.max
 
 /**
  * Manages state across a shopping session
@@ -142,8 +143,11 @@ class WebSocketShoppingSession(
 
      */
     private fun reachedPoint(id: String) {
-        val pointIndex = route.indexOfFirst { rp -> rp is Route.RoutePoint.IndexPoint.IdentifiedPoint && rp.id == id }
-        val point = route.getOrNull(pointIndex)
+        Timber.i("Searching for $id")
+        val remaining = route.subList(max(0, index-1), route.size)
+        val pointIndex = remaining.indexOfFirst { rp -> rp is Route.RoutePoint.IndexPoint.IdentifiedPoint && rp.id == id }
+        val point = remaining.getOrNull(pointIndex)
+        Timber.i("Found $point at $pointIndex")
         if (point is Route.RoutePoint.IndexPoint.IdentifiedPoint.Stop) {
             index = pointIndex
             Timber.i("At stop at $id")
@@ -205,9 +209,9 @@ class WebSocketShoppingSession(
      */
     override suspend fun checkScannedCode(code: String): Product? {
         sh.sendMessage(Message.OutgoingMessage.ProductScanned(code))
-        var product = shoppingList.products.firstOrNull { item -> item.product.id == code }?.product
+        var product = shoppingList.products.firstOrNull { item -> item.product.gtin == code }?.product
         if (product == null) {
-            val fromServer = productLoader.loadProduct(code)
+            val fromServer = productLoader.searchBarcode(code)
             if (fromServer is Result.Success) {
                 product = fromServer.data
             }

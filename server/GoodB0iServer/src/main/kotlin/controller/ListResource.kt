@@ -3,7 +3,6 @@ package controller
 import com.google.gson.internal.LinkedTreeMap
 import io.ktor.application.call
 import io.ktor.features.toLogString
-import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.request.receiveOrNull
 import io.ktor.response.respond
@@ -59,7 +58,7 @@ fun Route.lists() {
                         Pair(UUID.fromString(it.values.elementAt(0) as String), // UUID string
                                 (it.values.elementAt(1) as Double).toInt())  // Quantity
                     }
-                    val response = listService.createList(flat)
+                    val response = listService.editList(code, flat)
                     when (response) {
                         is ListService.ListServiceResponse.ListResponse -> {
                             call.respondText(response.list.code.toString(), status = HttpStatusCode.OK)

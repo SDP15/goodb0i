@@ -10,6 +10,8 @@ abstract class BaseFragment : Fragment() {
      */
     open fun onBackPressed(): Boolean = false
 
+    open fun onVolumeUpPressed() {}
+
     val baseActivity: MainActivity
         get() = activity as MainActivity
 
