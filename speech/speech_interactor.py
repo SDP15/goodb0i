@@ -143,7 +143,7 @@ class SpeechInteractor:
             self.last_reply = self.options[word]['reply']
             self.next_state(self.options[word]['nextState'])
 
-        if "connected" in word:
+        if word == "connected":
             self.react("n/a")
             self.connected_event.set()
 
@@ -172,6 +172,7 @@ class SpeechInteractor:
 
     # Used to clear listen event if user responds using app
     def clear_listen_event(self):
+        print("User has responded using app - clear listen event.")
         if self.listen_event.isSet():
             self.listen_event.clear()
 
@@ -279,8 +280,9 @@ class SpeechInteractor:
         if prev_item.get_shelf_number() == self.next_item.get_shelf_number() and nextState != 'finishedState':
             self.arrived(self.next_item, same_shelf=True)
         else:
-            self.say(response, self.options['yes']['listen'])
+            self.say(response, "False")
             self.last_reply = response
+            self.controller_queue.put(("send_message", "resume-from-stop-marker"))
     
     def on_location_change(self):
         self.arrived(self.next_item)

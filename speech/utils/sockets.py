@@ -18,7 +18,7 @@ class WebSocket:
             args[0].run_forever(ping_interval=3)
 
         def on_message(ws, message):
-            print("Message: " + str(message))
+            print("[Server -> RPi]: {:}".format(str(message)))
             self.controller_queue.put(("on_message", message))
 
         def on_error(ws, error):
@@ -59,9 +59,17 @@ class TCPSocket:
             data = self.sock.recv(8192)
             if not data: break
             msg = data.decode('utf-8')
+
+            # Check if we are receiving several messages
+            if len(msg.split("\n")) > 2:
+                split_msg = msg.split("\n")
+                split_msg.remove("")
+                for msg in split_msg:
+                    print("[EV3 -> RPi]: {:}".format(msg))
             self.controller_queue.put(("on_message", msg))
 
     def send(self, msg):
+        print("[RPi -> EV3]: {:}".format(msg))
         msg += "\n"
         msg = msg.encode()
         self.sock.send(msg)

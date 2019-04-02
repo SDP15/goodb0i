@@ -1,7 +1,10 @@
 {"connection":
     {"connected":
-        {"reply": "", "listen": "False", "nextState":"init"},
-    "n/a": {"reply": "", "listen": "False", "nextState":"connection"}},
+        {"reply": "", "listen": "False", "nextState": "init"},
+     "connected_skip_tut":
+        {"reply": "Skipping tutorial", "listen": "False", "nextState": "shopping0"},
+     "n/a": 
+        {"reply": "", "listen": "False", "nextState":"connection"}},
 
     "init": 
     {"start": 
