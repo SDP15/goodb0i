@@ -17,10 +17,10 @@ using namespace std;
 using namespace std::chrono_literals;
 using namespace ev3dev;
 
-constexpr int DEFAULT_SPEED{70};
-constexpr int DEFAULT_SLIGHT_TURN_RATIO{60};
+constexpr int DEFAULT_SPEED{90};
+constexpr int DEFAULT_SLIGHT_TURN_RATIO{80};
 constexpr int DEFAULT_TURN_RATIO{90};
-constexpr int TURN_TIMEOUT_MS{5000};
+constexpr int TURN_TIMEOUT_MS{3000};
 constexpr int MARKER_TIMEOUT_MS{3000};
 
 enum DriveNumber : int {
