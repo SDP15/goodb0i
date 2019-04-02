@@ -63,6 +63,10 @@ class PiController:
             name = item_json['name']
             price = item_json['price']
             new_product = Product(id, 1, name, price)
+
+            # Hopefully this should allow user to use app v quickly
+            self.speech_interactor_queue.put(("next_state", "arrival"))
+            
             self.speech_interactor_queue.put(("scanned", new_product))
         elif "RouteCalculated" in message:
             self.ordered_list = queue.Queue()
@@ -211,8 +215,6 @@ class PiController:
         message = message.split("&")
         route_trace = message[1].split(",")
 
-        log("Original route trace: {:}".format(route_trace))
-
         # Replace "start" command with "forward"
         start_command = route_trace[0]
         start_command = start_command.split("%")
@@ -234,7 +236,7 @@ class PiController:
                 split_command[0] = "forward"
                 route_trace[index] = "%".join(split_command)
 
-        log("New route trace: {:}".format(route_trace))
+        log("Route trace: {:}".format(route_trace))
         return route_trace
 
     # This has to be done after a route has been recalculated
@@ -337,7 +339,7 @@ class PiController:
                 elif opt in "--local-server":
                     self.server_address = "127.0.0.1:8080"
                 elif opt in "--server-address":
-                    self.server_address = arg
+                    self.server_address = str(arg)
                 elif opt in "--help":
                     print("Options: {:}".format(long_options))
                     print("Options must be prepended with \"--\".")

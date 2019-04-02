@@ -18,6 +18,7 @@ from utils.custom_threads import WorkerThread
 from utils.product import Product
 from utils.logger import log
 
+script_path = os.path.dirname(os.path.abspath(__file__))
 model_path = get_model_path()
 now = datetime.datetime.now()
 universal_phrases = {'repeat', 'options'}
@@ -31,12 +32,12 @@ speech = LiveSpeech(
     hmm=os.path.join(model_path, 'en-us'),
     lm=False,
     dic=os.path.join(model_path, 'cmudict-en-us.dict'),
-    kws='resources/kws.list',
+    kws=os.path.join(script_path, 'resources/kws.list'),
 )
 
 
 class SpeechInteractor:
-    def __init__(self, work_queue, controller_queue, state_file='resources/interactor_states.json'):
+    def __init__(self, work_queue, controller_queue, state_file=os.path.join(script_path, 'resources/interactor_states.json')):
         self.controller_queue = controller_queue
         
         log_filename = now.strftime("%Y-%m-%d-%H%M%S")
@@ -154,6 +155,8 @@ class SpeechInteractor:
             if self.logging is True:
                 with open(self.log_filepath, 'a') as f:
                     f.write("{:}\n".format(string))
+
+            log("The robot said: {:}".format(string))
 
             engine = pyttsx.init()
 
