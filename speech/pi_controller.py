@@ -45,8 +45,6 @@ class PiController:
         self.button_event = threading.Event()
         self.qr_event = threading.Event()
 
-        warnings.filterwarnings("ignore", message="ReferenceError")
-
     def on_message(self, message):
         if "AppAcceptedProduct" in message:
             self.speech_interactor_queue.put("clear_listen_event")
@@ -97,11 +95,10 @@ class PiController:
 
                 if command[0] == "stop":
                     self.stop_markers.append(command[1])
-                        
-            print("Marker list: {:}".format(self.marker_list))
-            print("Stop marker list: {:}".format(self.stop_markers))    
+                      
             self.speech_interactor_queue.put(("set_list", self.ordered_list))
             self.ws.send("ReceivedRoute&")
+
 
             # Check if option has been given to skip tutorial
             if self.skip_tut:
@@ -174,10 +171,8 @@ class PiController:
 
     def send_message(self, msg, websocket=False):
         if websocket:
-            print("Send message to server(WebSocket): {:}".format(msg))
             self.ws.send(msg)
         else:
-            print("Send message to EV3: {:}".format(msg))
             if "resume-from-stop-marker" in msg:
                 self.button_event.clear()
                 print("Clear button event so user can push button.")
@@ -315,6 +310,7 @@ class PiController:
             self.ev3.send(command)
 
         if self.skip_tut:
+            time.sleep(1)
             input("Please hit enter to begin.")
             
         self.ev3.send("start")
