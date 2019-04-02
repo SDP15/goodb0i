@@ -1,7 +1,8 @@
 [
 
       {
-        "id": "af4e8397-a6c7-4d63-8769-8cddee97e960",
+        "id": "cfcd2084-95d5-35ef-a6e7-dff9f98764da",
+        "id2": "af4e8397-a6c7-4d63-8769-8cddee97e960",
         "superDepartment": "Fresh Food",
         "contentsMeasureType": "L",
         "name": "British Whole Milk 3.408L, 6 Pints",
@@ -127,7 +128,8 @@
         "unitPrice": 5.42
       },
       {
-        "id": "bd732d10-94bd-4605-9c9d-136897a22d90",
+        "id" : "45c48cce-2e2d-3fbd-aa1a-fc51c7c6ad26",
+        "id2": "bd732d10-94bd-4605-9c9d-136897a22d90",
         "superDepartment": "Fresh Food",
         "contentsMeasureType": "SNGL",
         "name": "Organic Small Bananas 6 Pack",

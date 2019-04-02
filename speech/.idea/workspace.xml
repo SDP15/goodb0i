@@ -1,15 +1,189 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="feaf4a92-df38-4fc5-a593-6c5404a60160" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/../android/App/app/src/main/java/com/sdp15/goodb0i/view/navigation/complete/CheckoutFragment.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../android/App/app/src/main/java/com/sdp15/goodb0i/view/navigation/complete/CheckoutListFragment.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../android/App/app/src/main/java/com/sdp15/goodb0i/view/navigation/complete/CheckoutTotalFragment.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../android/App/app/src/main/java/com/sdp15/goodb0i/view/navigation/complete/CheckoutViewModel.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../android/App/app/src/main/res/layout/layout_checkout.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../android/App/app/src/main/res/layout/layout_checkout_list.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../android/App/app/src/main/java/com/sdp15/goodb0i/App.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../android/App/app/src/main/java/com/sdp15/goodb0i/App.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../android/App/app/src/main/java/com/sdp15/goodb0i/data/navigation/Message.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../android/App/app/src/main/java/com/sdp15/goodb0i/data/navigation/Message.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../android/App/app/src/main/java/com/sdp15/goodb0i/data/navigation/ShoppingSessionState.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../android/App/app/src/main/java/com/sdp15/goodb0i/data/navigation/ShoppingSessionState.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../android/App/app/src/main/java/com/sdp15/goodb0i/data/navigation/sockets/WebSocketShoppingSession.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../android/App/app/src/main/java/com/sdp15/goodb0i/data/navigation/sockets/WebSocketShoppingSession.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../android/App/app/src/main/java/com/sdp15/goodb0i/data/store/lists/ListItem.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../android/App/app/src/main/java/com/sdp15/goodb0i/data/store/lists/ListItem.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../android/App/app/src/main/java/com/sdp15/goodb0i/view/list/creation/SearchFragment.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../android/App/app/src/main/java/com/sdp15/goodb0i/view/list/creation/SearchFragment.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../android/App/app/src/main/java/com/sdp15/goodb0i/view/list/creation/ShoppingListFragment.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../android/App/app/src/main/java/com/sdp15/goodb0i/view/list/creation/ShoppingListFragment.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../android/App/app/src/main/java/com/sdp15/goodb0i/view/navigation/complete/CompleteFragment.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../android/App/app/src/main/java/com/sdp15/goodb0i/view/navigation/complete/CompleteViewModel.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../android/App/app/src/main/res/layout/layout_checkout_screen.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../android/App/app/src/main/res/layout/layout_checkout_total.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../android/App/app/src/main/res/layout/layout_search.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../android/App/app/src/main/res/layout/layout_list_product_search.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../android/App/app/src/main/res/layout/layout_shoppinglist.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../android/App/app/src/main/res/layout/layout_list_editing.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../android/App/app/src/main/res/navigation/nav_graph.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../android/App/app/src/main/res/navigation/nav_graph.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../android/App/app/src/main/res/values/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../android/App/app/src/main/res/values/strings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../server/GoodB0iServer/src/main/kotlin/service/routing/Graph.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../server/GoodB0iServer/src/main/kotlin/service/routing/Graph.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/speech_interactor.py" beforeDir="false" afterPath="$PROJECT_DIR$/speech_interactor.py" afterDir="false" />
+    </list>
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/pi_controller.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="733">
+              <caret line="80" column="51" selection-start-line="80" selection-start-column="51" selection-end-line="80" selection-end-column="51" />
+              <folding>
+                <element signature="e#0#9#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/speech_interactor.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="462">
+              <caret line="108" column="35" selection-start-line="108" selection-start-column="35" selection-end-line="108" selection-end-column="35" />
+              <folding>
+                <element signature="e#0#15#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>unord</find>
+    </findStrings>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/speech_interactor.py" />
+      </list>
+    </option>
+  </component>
   <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="-2" />
     <option name="y" value="-17" />
     <option name="width" value="2564" />
     <option name="height" value="1079" />
   </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectView">
+    <navigator proportions="" version="1">
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="speech" type="b2602c69:ProjectViewProjectNode" />
+              <item name="speech" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+      <pane id="Scope" />
+    </panes>
+  </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="feaf4a92-df38-4fc5-a593-6c5404a60160" name="Default Changelist" comment="" />
+      <created>1554031375470</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1554031375470</updated>
+      <workItem from="1554031377535" duration="1382000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TimeTrackingManager">
+    <option name="totallyTimeSpent" value="1382000" />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="-3" y="16" width="3206" height="1787" extended-state="6" />
+    <layout>
+      <window_info id="Favorites" side_tool="true" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.24984026" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info anchor="bottom" id="Docker" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Database Changes" />
+      <window_info anchor="bottom" id="Version Control" />
+      <window_info anchor="bottom" id="Python Console" />
+      <window_info anchor="bottom" id="Terminal" />
+      <window_info anchor="bottom" id="Event Log" side_tool="true" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info active="true" anchor="bottom" id="Find" order="1" visible="true" weight="0.43867335" />
+      <window_info anchor="bottom" id="Run" order="2" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="right" id="SciView" />
+      <window_info anchor="right" id="Database" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+    </layout>
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/speech_interactor.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="462">
+          <caret line="108" column="35" selection-start-line="108" selection-start-column="35" selection-end-line="108" selection-end-column="35" />
+          <folding>
+            <element signature="e#0#15#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pi_controller.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="733">
+          <caret line="80" column="51" selection-start-line="80" selection-start-column="51" selection-end-line="80" selection-end-column="51" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
   </component>
 </project>

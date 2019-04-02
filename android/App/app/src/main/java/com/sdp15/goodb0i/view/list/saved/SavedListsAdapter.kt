@@ -36,7 +36,8 @@ class SavedListsAdapter(val onClick: (ShoppingList) -> Unit) :
     private suspend fun deleteList(pos: Int) {
         listStore.deleteList(lists[pos])
         lists.removeAt(pos)
-        notifyItemRemoved(pos)
+
+        GlobalScope.launch(Dispatchers.Main) {notifyItemRemoved(pos) }
     }
 
 

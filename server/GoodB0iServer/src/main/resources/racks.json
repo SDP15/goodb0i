@@ -1,11 +1,12 @@
 [
   {
-    "id": 1,
+    "id": 10,
     "capacity": 10,
     "info": "Dairy",
     "shelves": [
       {
-        "product": "af4e8397-a6c7-4d63-8769-8cddee97e960",
+        "product" : "cfcd2084-95d5-35ef-a6e7-dff9f98764da",
+        "product2": "af4e8397-a6c7-4d63-8769-8cddee97e960",
         "position": "0"
       },
       {
@@ -19,7 +20,7 @@
     ]
   },
   {
-    "id": 2,
+    "id": 11,
     "capacity": 10,
     "info": "Bakery",
     "shelves": [
@@ -38,12 +39,13 @@
     ]
   },
   {
-    "id": 3,
+    "id": 12,
     "capacity": 10,
     "info": "Fruit",
     "shelves": [
       {
-        "product": "bd732d10-94bd-4605-9c9d-136897a22d90",
+        "product": "45c48cce-2e2d-3fbd-aa1a-fc51c7c6ad26",
+        "product2": "bd732d10-94bd-4605-9c9d-136897a22d90",
         "position": "0"
       },
       {
@@ -57,7 +59,7 @@
     ]
   },
   {
-    "id": 4,
+    "id": 13,
     "capacity": 10,
     "info": "Vegetables",
     "shelves": [
@@ -76,7 +78,7 @@
     ]
   },
   {
-    "id": 5,
+    "id": 14,
     "capacity": 10,
     "info": "Seafood",
     "shelves": [
@@ -95,7 +97,7 @@
     ]
   },
   {
-    "id": 6,
+    "id": 15,
     "capacity": 10,
     "info": "Meat",
     "shelves": [
@@ -114,7 +116,7 @@
     ]
   },
   {
-    "id": 7,
+    "id": 16,
     "capacity": 10,
     "info": "Sweets",
     "shelves": [
@@ -133,7 +135,7 @@
     ]
   },
   {
-    "id": 8,
+    "id": 17,
     "capacity": 10,
     "info": "Cupboard",
     "shelves": [
