@@ -36,7 +36,8 @@ class PiController:
         self.ev3 = TCPSocket(self.ev3_ip, self.ev3_port, self.controller_queue)
         self.ev3_commands = []
 
-        self.speech_interactor = SpeechInteractor(self.speech_interactor_queue, self.controller_queue)
+        self.app_accepted_event = threading.Event()
+        self.speech_interactor = SpeechInteractor(self.speech_interactor_queue, self.controller_queue, self.app_accepted_event)
         
         # Thread runs a given function and it's arguments (if given any) from the work queue
         t1 = WorkerThread("PiControllerThread", self, self.controller_queue)
@@ -50,6 +51,7 @@ class PiController:
 
     def on_message(self, message):
         if "AppAcceptedProduct" in message:
+            self.app_accepted_event.set()
             self.speech_interactor_queue.put("clear_listen_event")
             self.speech_interactor_queue.put(("next_state", "cart"))
             self.speech_interactor_queue.put(("cart", "yes", "app=True"))

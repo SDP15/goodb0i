@@ -37,7 +37,8 @@ speech = LiveSpeech(
 
 
 class SpeechInteractor:
-    def __init__(self, work_queue, controller_queue, state_file=os.path.join(script_path, 'resources/interactor_states.json')):
+    def __init__(self, work_queue, controller_queue, app_accepted_event):
+        state_file = os.path.join(script_path, 'resources/interactor_states.json')
         self.controller_queue = controller_queue
         
         log_filename = now.strftime("%Y-%m-%d-%H%M%S")
@@ -65,6 +66,7 @@ class SpeechInteractor:
         self.location_event = threading.Event()
         self.listen_event = threading.Event()
         self.connected_event = threading.Event()
+        self.app_accepted_event = app_accepted_event
 
         self.work_queue = work_queue
         t1 = WorkerThread("SpeechInteractorThread", self, self.work_queue)
@@ -169,17 +171,17 @@ class SpeechInteractor:
 
             log("The robot said: {:}".format(string))
 
-            engine = pyttsx.init()
+            self.engine = pyttsx.init()
 
             # Only set listen event when we are asking a question
             if listen == "True":
-                engine.connect("finished-utterance", self.on_finish_utterance)
+                self.engine.connect("finished-utterance", self.on_finish_utterance)
             else:
                 log("Utterance doesn't require user response.")
 
-            engine.setProperty('voices', 2)
-            engine.say(string)
-            engine.runAndWait()
+            self.engine.setProperty('voices', 2)
+            self.engine.say(string)
+            self.engine.runAndWait()
 
     def on_finish_utterance(self, name, completed):
         log("Finishing utterance and setting listen event flag.")
@@ -206,17 +208,24 @@ class SpeechInteractor:
 
     def scanned(self, item):
         self.scanned_product = item
+        
+        time.sleep(1)
 
         # Check if the item we have scanned is on our shopping list so we can respond appropriately
         if self.scanned_product.get_id() == self.next_item.get_id():
-            response = self.options['scanned']['reply'] + \
-                item.get_name() + self.options['scanned']['prompt']
+            if self.app_accepted_event.isSet():
+                response = self.options['scanned']['add_to_cart1'] + item.get_name() + self.options['scanned']['add_to_cart2']
+            else:
+                response = self.options['scanned']['reply'] + \
+                    item.get_name() + self.options['scanned']['prompt']
         else:
             response = self.options['scanned']['reply'] + item.get_name() + \
                 self.options['scanned']['diff_item'] + self.options['scanned']['prompt']
         self.say(response, self.options['scanned']['listen'])
         self.last_reply = response
         self.next_state(self.options['scanned']['nextState'])
+
+        self.app_accepted_event.clear()
 
     def cart(self, word, app=False):
         listen = self.options[word]['listen']

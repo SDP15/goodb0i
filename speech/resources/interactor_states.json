@@ -66,7 +66,7 @@
 
     "arrival": 
         {"scanned":
-            {"reply": "You have scanned in the ", "diff_item": " This item is not on your list", "prompt": " Would you like to hear more information about this product?", "listen": "True", "nextState": "identify"}},
+            {"reply": "You have scanned in the ", "diff_item": " This item is not on your list", "prompt": " Would you like to hear more information about this product?", "add_to_cart1": "You have added the ", "add_to_cart2": " to your cart.", "listen": "True", "nextState": "identify"}},
 
     "identify":
         {"yes":
