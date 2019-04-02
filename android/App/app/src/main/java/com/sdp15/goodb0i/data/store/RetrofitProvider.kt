@@ -37,7 +37,6 @@ object RetrofitProvider {
                     try {
                         return chain.proceed(chain.request())
                     } catch (e: Throwable) {
-                        Timber.e(e, "Intercepted")
                         if (e is IOException) {
                             throw e
                         } else {
