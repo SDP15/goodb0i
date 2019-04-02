@@ -10,6 +10,8 @@ import imutils
 import time
 import cv2
 
+from utils.logger import log
+
 class WorkerThread(threading.Thread):
     def __init__(self, name, object_instance, work_queue, event_flag=None):
         threading.Thread.__init__(self, name=name)
@@ -74,16 +76,16 @@ class ButtonThread(threading.Thread):
 
 class QRThread(threading.Thread):
     def __init__(self, name, controller_queue):
-        print("QR thread starting")
+        log("QR thread starting")
         threading.Thread.__init__(self, name=name)
         self.controller_queue = controller_queue
         self.prev_qr = ""
 
     def run(self,detectQR = True):
-        print("[INFO] starting video stream...")
+        log("[INFO] starting video stream...")
         try:
             cam = VideoStream(src=0).start()
-            print("[INFO] Camera started")
+            log("[INFO] Camera started")
             time.sleep(1.0)
 
             while detectQR:
@@ -93,12 +95,12 @@ class QRThread(threading.Thread):
                 barcodes = pyzbar.decode(frame)
                 for barcode in barcodes:
                     barcodeData = str(barcode.data.decode("utf-8"))
-                    print(barcodeData)
+                    log(barcodeData)
                     if barcodeData != "No data" and self.prev_qr != barcodeData:
                         self.prev_qr = barcodeData
                         self.controller_queue.put(("scanned_qr_code", barcodeData))
         except:
-            print("[ERROR] An error occured while scanning QRs from camera")
+            log("[ERROR] An error occured while scanning QRs from camera")
             cam.stop()
 
 
