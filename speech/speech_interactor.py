@@ -16,6 +16,7 @@ from pocketsphinx import LiveSpeech, get_model_path
 
 from utils.custom_threads import WorkerThread
 from utils.product import Product
+from utils.logger import log
 
 model_path = get_model_path()
 now = datetime.datetime.now()
@@ -53,7 +54,7 @@ class SpeechInteractor:
             self.log_filepath = "logs/{:}.txt".format(log_filename)
 
         if self.logging is True:
-            print("Conversation is being logged in: {:}".format(
+            log("Conversation is being logged in: {:}".format(
                 self.log_filepath))
 
         self.current_location = ""
@@ -90,7 +91,7 @@ class SpeechInteractor:
 
                 phrase = str(sphrase).lower().split()
                 word = self.find_word(phrase)
-                print("You said:", word)
+                log("You said:", word)
 
                 # Logs the word/words that PocketSphinx has detected
                 if self.logging is True:
@@ -103,19 +104,19 @@ class SpeechInteractor:
                             f.write("Keyword detected: {:}\n".format(word))
 
                 if "repeat" in word:
-                    print("repeating")
+                    log("repeating")
                     self.work_queue.put(("say", self.last_reply, "True"))
                 elif "options" in word:
                     self.work_queue.put("list_options")
                 elif "multiple" in word:
-                    print("Multiple keywords detected")
+                    log("Multiple keywords detected")
                     say_this = "Sorry, I have heard more than one possible option. Can you confirm your option?"
                     self.work_queue.put(("say", say_this, "True"))
                 elif "n/a" in word:
-                    print("no keyword detected")
+                    log("no keyword detected")
                     self.work_queue.put("list_options")
                 else:
-                    print(word, "detected")
+                    log(word, "detected")
                     self.work_queue.put(("react", word))
 
     def find_word(self, phrase):
@@ -160,19 +161,19 @@ class SpeechInteractor:
             if listen == "True":
                 engine.connect("finished-utterance", self.on_finish_utterance)
             else:
-                print("Utterance doesn't require user response.")
+                log("Utterance doesn't require user response.")
 
             engine.setProperty('voices', 2)
             engine.say(string)
             engine.runAndWait()
 
     def on_finish_utterance(self, name, completed):
-        print("Finishing utterance and setting listen event flag.")
+        log("Finishing utterance and setting listen event flag.")
         self.listen_event.set()
 
     # Used to clear listen event if user responds using app
     def clear_listen_event(self):
-        print("User has responded using app - clear listen event.")
+        log("User has responded using app - clear listen event.")
         if self.listen_event.isSet():
             self.listen_event.clear()
 
@@ -259,7 +260,7 @@ class SpeechInteractor:
     # going to collect next. 
     def continue_shopping(self):
         prev_item = self.next_item
-        print("Prev item: {:}".format(prev_item.get_name()))
+        log("Prev item: {:}".format(prev_item.get_name()))
 
         if self.next_item.get_quantity() > 0:
             self.controller_queue.put(("send_message", "SkippedProduct&", "websocket=True"))
@@ -270,7 +271,7 @@ class SpeechInteractor:
             nextState = 'finishedState'
         else:
             self.next_item = self.ordered_list.get()
-            print("Get next item from ordered list: {:}".format(self.next_item.get_name()))
+            log("Get next item from ordered list: {:}".format(self.next_item.get_name()))
             response = self.options['yes']['reply'] + self.next_item.get_name()
             nextState = 'nextState'
 

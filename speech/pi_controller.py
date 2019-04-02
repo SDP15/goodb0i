@@ -15,6 +15,7 @@ from utils.custom_threads import WorkerThread, ButtonThread, QRThread
 from utils.custom_threads import WorkerThread
 from utils.product import Product
 from utils.sockets import WebSocket, TCPSocket
+from utils.logger import log
 
 
 class PiController:
@@ -130,7 +131,7 @@ class PiController:
             if "stop" in message:
                 # Prevents button from being pressed when robot stops at a marker.
                 self.button_event.set()
-                print("Set button event - stops button from being pressed")
+                log("Set button event - stops button from being pressed")
                 self.speech_interactor_queue.put("on_location_change")
         elif "ReplanCalculated&" in message:
             self.replanned_route = self.calculate_route_trace(message)
@@ -156,7 +157,7 @@ class PiController:
             # from there
             if stop_index >= 0:
                 new_route_trace = self.replanned_route + ev3_command_queue[stop_index+1:]
-                print("New replanned route trace: {:}".format(new_route_trace))
+                log("New replanned route trace: {:}".format(new_route_trace))
 
                 # Update data structures that rely upon the route trace
                 self.update_route_data_structs(new_route_trace)
@@ -175,7 +176,7 @@ class PiController:
         else:
             if "resume-from-stop-marker" in msg:
                 self.button_event.clear()
-                print("Clear button event so user can push button.")
+                log("Clear button event so user can push button.")
             self.ev3.send(msg)
 
     # The request parameter has to be in the correct format e.g. /lists/load/7654321
@@ -210,7 +211,7 @@ class PiController:
         message = message.split("&")
         route_trace = message[1].split(",")
 
-        print("Original route trace: {:}".format(route_trace))
+        log("Original route trace: {:}".format(route_trace))
 
         # Replace "start" command with "forward"
         start_command = route_trace[0]
@@ -233,7 +234,7 @@ class PiController:
                 split_command[0] = "forward"
                 route_trace[index] = "%".join(split_command)
 
-        print("New route trace: {:}".format(route_trace))
+        log("New route trace: {:}".format(route_trace))
         return route_trace
 
     # This has to be done after a route has been recalculated
@@ -255,7 +256,7 @@ class PiController:
 
     def scanned_qr_code(self, qr_code):
         self.qr_detected = qr_code
-        print("[QR CODE detected]: " + qr_code)
+        log("[QR CODE detected]: " + qr_code)
 
         if qr_code in self.marker_list:
             #TODO: get rid of stop markers as we go.
@@ -264,18 +265,18 @@ class PiController:
             index_qr = self.marker_list.index(qr_code)
 
             if qr_code == self.marker_list[0]:
-                print("correct location")
+                log("correct location")
             elif index_qr < index_next:
                 #get rid of everything before the 
                 for i in range(index_qr):
                     del(self.marker_list[i])
             elif index_qr > index_next:
-                print("Passed a stop marker")
+                log("Passed a stop marker")
                 #replan
                 self.ws.send("RequestReplan&" + index_qr + "%" + next_stop_marker)
                 
         else:
-            print("QR not in the list")
+            log("QR not in the list")
             self.ws.send("RequestReplan&" + index_qr + "%" + next_stop_marker)
 
 
@@ -298,7 +299,7 @@ class PiController:
             elif shelf_pos == "2":
                 shelf_pos = "top"
             else:
-                print("ERROR: Invalid shelf position given in route trace")
+                log("ERROR: Invalid shelf position given in route trace")
             product.set_shelf_position(shelf_pos)
 
     def enqueue_ev3_commands(self):
@@ -326,10 +327,10 @@ class PiController:
                 sys.exit()
             for opt, arg in opts:
                 if opt in "--skiptut":
-                    print("Skipping tutorial...")
+                    log("Skipping tutorial...")
                     self.skip_tut = True
                 elif opt in "--mock-ev3":
-                    print("Mocking EV3")
+                    log("Mocking EV3")
                     subprocess.Popen(['nc','-l','4000'])
                     self.ev3_ip = "localhost"
                     self.ev3_port = 4000
