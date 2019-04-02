@@ -20,6 +20,8 @@ using namespace ev3dev;
 constexpr int DEFAULT_SPEED{70};
 constexpr int DEFAULT_SLIGHT_TURN_RATIO{60};
 constexpr int DEFAULT_TURN_RATIO{90};
+constexpr int TURN_TIMEOUT_MS{5000};
+constexpr int MARKER_TIMEOUT_MS{3000};
 
 enum DriveNumber : int {
   DRIVE_LEFT_BACK = 0,
@@ -358,7 +360,6 @@ private:
   bool ignoreMarker{false};
   evutil::Stopwatch markerIgnoreStopwatch;
   int markerIgnoreMs{0};
-  static constexpr int MARKER_IGNORE_MS{2000};
 
 public:
   bool turningOn{true};
@@ -397,7 +398,7 @@ public:
   void resumeFromStopMarker() {
     if (state == State::stoppedAtMarker) {
       ignoreMarker = true;
-      markerIgnoreMs = MARKER_IGNORE_MS;
+      markerIgnoreMs = MARKER_TIMEOUT_MS;
       markerIgnoreStopwatch.restart();
       state = State::following;
     }
@@ -444,7 +445,7 @@ protected:
 
     if (seeingMarker || state == State::waitingForCommand) {
       ignoreMarker = true;
-      markerIgnoreMs = MARKER_IGNORE_MS;
+      markerIgnoreMs = MARKER_TIMEOUT_MS;
       markerIgnoreStopwatch.restart();
       log() << "Seen marker: ";
       if (queuedActions.empty()) {
@@ -473,12 +474,14 @@ protected:
           sendToAllClients("detected-marker left OK\n");
           state = State::turningAtMarker;
           turnBias = Direction::left;
+          markerIgnoreMs = TURN_TIMEOUT_MS;
           break;
         case QueuedAction::turnRight:
           log() << "Right marker" << endl;
           sendToAllClients("detected-marker right OK\n");
           state = State::turningAtMarker;
           turnBias = Direction::right;
+          markerIgnoreMs = TURN_TIMEOUT_MS;
           break;
         }
       }
