@@ -21,7 +21,8 @@ constexpr int DEFAULT_SPEED{90};
 constexpr int DEFAULT_SLIGHT_TURN_RATIO{80};
 constexpr int DEFAULT_TURN_RATIO{90};
 constexpr int TURN_TIMEOUT_MS{3000};
-constexpr int MARKER_TIMEOUT_MS{3000};
+constexpr int MARKER_TIMEOUT_MS{1500};
+constexpr int DEFAULT_OBSTACLE_DISTANCE{30};
 
 enum DriveNumber : int {
   DRIVE_LEFT_BACK = 0,
@@ -304,7 +305,7 @@ private:
   SteeringSubsystem *sysSteering;
 
 public:
-  int obstacleDistancePct{60};
+  int obstacleDistancePct{DEFAULT_OBSTACLE_DISTANCE};
   AvoidanceSubsystem(SteeringSubsystem *sysSteering) {
     this->sysSteering = sysSteering;
   }
