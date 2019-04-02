@@ -208,6 +208,7 @@ class SpeechInteractor:
 
     def scanned(self, item):
         self.scanned_product = item
+        listen = "True"
         
         time.sleep(1)
 
@@ -215,13 +216,14 @@ class SpeechInteractor:
         if self.scanned_product.get_id() == self.next_item.get_id():
             if self.app_accepted_event.isSet():
                 response = self.options['scanned']['add_to_cart1'] + item.get_name() + self.options['scanned']['add_to_cart2']
+                listen = "False"
             else:
                 response = self.options['scanned']['reply'] + \
                     item.get_name() + self.options['scanned']['prompt']
         else:
             response = self.options['scanned']['reply'] + item.get_name() + \
                 self.options['scanned']['diff_item'] + self.options['scanned']['prompt']
-        self.say(response, self.options['scanned']['listen'])
+        self.say(response, listen)
         self.last_reply = response
         self.next_state(self.options['scanned']['nextState'])
 
