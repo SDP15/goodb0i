@@ -36,7 +36,7 @@ class PiController:
         self.ev3 = TCPSocket(self.ev3_ip, self.ev3_port, self.controller_queue)
         self.ev3_commands = []
 
-        SpeechInteractor(self.speech_interactor_queue, self.controller_queue)
+        self.speech_interactor = SpeechInteractor(self.speech_interactor_queue, self.controller_queue)
         
         # Thread runs a given function and it's arguments (if given any) from the work queue
         t1 = WorkerThread("PiControllerThread", self, self.controller_queue)
@@ -45,6 +45,8 @@ class PiController:
         # Controls whether user is allowed to press the start/stop button.
         self.button_event = threading.Event()
         self.qr_event = threading.Event()
+        self.continue_event = threading.Event()
+        self.continue_event.set()
 
     def on_message(self, message):
         if "AppAcceptedProduct" in message:
@@ -66,7 +68,7 @@ class PiController:
 
             # Hopefully this should allow user to use app v quickly
             self.speech_interactor_queue.put(("next_state", "arrival"))
-            
+
             self.speech_interactor_queue.put(("scanned", new_product))
         elif "RouteCalculated" in message:
             self.ordered_list = queue.Queue()
@@ -120,7 +122,7 @@ class PiController:
             self.enqueue_ev3_commands()
 
             # Start ButtonThread to listen for button presses to start/stop trolley
-            t2 = ButtonThread("ButtonThread", self.controller_queue, self.button_event)
+            t2 = ButtonThread("ButtonThread", self.controller_queue, self.button_event, self.continue_event)
             t2.start()
             t3 = QRThread("QRDetectionThread", self.controller_queue)
             t3.start()
@@ -311,10 +313,6 @@ class PiController:
 
         for command in self.ev3_commands:
             self.ev3.send(command)
-
-        if self.skip_tut:
-            time.sleep(1)
-            input("Please hit enter to begin.")
             
         self.ev3.send("start")
 
@@ -345,6 +343,23 @@ class PiController:
                     print("Options must be prepended with \"--\".")
                     print("Additionally, options with an \"=\" require an argument to be given after the option flag.")
                     sys.exit()
+
+    def clear_continue_event(self):
+        self.continue_event.clear()
+        log("Continue event cleared")
+
+    def reset(self):
+        # Clear speech interactor queue
+        self.clear_queue(self.speech_interactor_queue)
+        
+        # Reset speech interactor
+        self.speech_interactor.reset()
+        
+    def clear_queue(self, queue):
+        if not queue.empty():
+            while queue.qsize != 0:
+                queue.get()
+            
 
 
 PiController()

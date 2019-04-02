@@ -76,7 +76,7 @@
         
     "cart":
         {"yes": 
-            {"reply_quantity0": "Shall we proceed to the next item on the list?", "nextState_quantity0": "continue", 
+            {"reply_quantity0": "Please push the button on the trolley to continue to the next item.", "nextState_quantity0": "continue", 
             "reply_quantity+": "You have ", "prompt": " more of this item on your list. Do you want to proceed and try to scan these items?", "nextState_quantity+": "scan",
             "reply_diff_item": "The next item on your list is on the shelf next to you. It is on the ", "reply_diff_item2": " shelf. Please try and scan in this item.", "nextState_diff_item": "arrival",
             "listen": "True"},
