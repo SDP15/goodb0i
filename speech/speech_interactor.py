@@ -91,7 +91,7 @@ class SpeechInteractor:
 
                 phrase = str(sphrase).lower().split()
                 word = self.find_word(phrase)
-                log("You said:", word)
+                log("You said: {:}".format(word))
 
                 # Logs the word/words that PocketSphinx has detected
                 if self.logging is True:
@@ -116,7 +116,7 @@ class SpeechInteractor:
                     log("no keyword detected")
                     self.work_queue.put("list_options")
                 else:
-                    log(word, "detected")
+                    log("{:} detected".format(word))
                     self.work_queue.put(("react", word))
 
     def find_word(self, phrase):
