@@ -191,6 +191,7 @@ sealed class Message {
                         builder.append("stop$delim${vertex.node.id}")
                         val products = productMap[vertex.node]?.map { "${it.first}$delim${it.second}" }
                         builder.append(products?.joinToString(separator = "$delim", prefix = "$delim"))
+                        stoppedAt += vertex
                     } else {
                         builder.append("pass$delim${vertex.node.id}")
                     }
