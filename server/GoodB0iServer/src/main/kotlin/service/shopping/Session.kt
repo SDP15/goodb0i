@@ -16,6 +16,8 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class Session(
+        private val id: String,
+        private val sessionManager: SessionManager,
         private val appOut: SessionManager.AppMessageSender,
         private val trolleyOut: SessionManager.TrolleyMessageSender
 ) : IncomingMessageListener, KoinComponent {
@@ -124,6 +126,7 @@ class Session(
             }
             is Message.IncomingMessage.FromApp.SessionComplete -> {
                 //TODO: Close and dispose of session
+                sessionManager.closeSession(id)
                 sendToTrolley(Message.OutgoingMessage.ToTrolley.SessionComplete)
             }
         }
