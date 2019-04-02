@@ -86,7 +86,7 @@
     "continue": 
         {"yes": 
             {"reply": "Okay lets go and find the ", "nextState": "shopping0",
-             "reply_finished": "The shopping list is finished. We are now going to the tills.",
+             "reply_finished": "The shopping list is finished. Please push the button to continue to the tills.",
              "finishedState":"finished", "listen": "False"},
         "no": 
             {

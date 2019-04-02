@@ -75,6 +75,7 @@ class ButtonThread(threading.Thread):
                 time.sleep(0.25)
 
             if not self.continue_flag.isSet() and button_press:
+                log("Button pushed! Continue shopping/go to tills.")
                 self.controller_queue.put(("send_message","resume-from-stop-marker"))
                 self.prev_command = "start"
                 self.continue_flag.set()

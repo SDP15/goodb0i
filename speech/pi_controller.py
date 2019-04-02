@@ -135,10 +135,15 @@ class PiController:
                 self.ws.send("ReachedPoint&" + marker_num)
 
             if "stop" in message:
+                # TODO: Remove this hardcoded session complete
+                if "%9" in command:
+                    log("Session completed")
+                else:
+                     self.speech_interactor_queue.put("on_location_change")
+
                 # Prevents button from being pressed when robot stops at a marker.
                 self.button_event.set()
                 log("Set button event - stops button from being pressed")
-                self.speech_interactor_queue.put("on_location_change")
         elif "ReplanCalculated&" in message:
             self.replanned_route = self.calculate_route_trace(message)
             self.ev3.send("dump-queue")
