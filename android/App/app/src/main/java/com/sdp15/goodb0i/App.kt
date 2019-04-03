@@ -1,9 +1,10 @@
 package com.sdp15.goodb0i
 
 import android.app.Application
-import androidx.preference.PreferenceManager
 import androidx.room.Room
 import com.google.firebase.FirebaseApp
+import com.sdp15.goodb0i.data.ConfigProvider
+import com.sdp15.goodb0i.data.PrefsConfigProvider
 import com.sdp15.goodb0i.data.navigation.Message
 import com.sdp15.goodb0i.data.navigation.SessionManagerImpl
 import com.sdp15.goodb0i.data.navigation.ShoppingSessionManager
@@ -79,15 +80,13 @@ class App : Application() {
             viewModel<CheckoutViewModel>()
         },
         module {
+            single<ConfigProvider> { PrefsConfigProvider(androidApplication()) }
             single<Retrofit> {
                 RetrofitProvider.buildRetrofit(androidApplication())
             }
             single<ProductLoader> {
-                TestDataProductLoader.initListener(
-                    getString(R.string.config_key_use_test_data),
-                    PreferenceManager.getDefaultSharedPreferences(androidContext())
-                )
                 TestDataProductLoader.DelegateProductLoader(
+                    get(),
                     RetrofitProductLoader
                 )
             }
@@ -110,5 +109,6 @@ class App : Application() {
             single<PriceComputer> { SimplePriceComputer }
         }
     )
+
 
 }

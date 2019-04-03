@@ -313,7 +313,7 @@ class WebSocketShoppingSession(
                 sh.sendMessage(Message.OutgoingMessage.Reconnect(uid))
                 Thread.sleep(500)
             }
-            setState(movingStates.last)
+            if(!movingStates.isEmpty) setState(movingStates.last)
             isReconnecting = false
             Timber.i("Socket reconnected")
         }
