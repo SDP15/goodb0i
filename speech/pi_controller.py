@@ -139,6 +139,7 @@ class PiController:
             if "stop" in message:
                 # TODO: Remove this hardcoded session complete
                 if "%9" in command:
+                    self.speech_interactor_queue.put("clear_listen_event")
                     log("Session completed")
                 else:
                      self.speech_interactor_queue.put("on_location_change")

@@ -189,7 +189,7 @@ class SpeechInteractor:
 
     # Used to clear listen event if user responds using app
     def clear_listen_event(self):
-        log("User has responded using app - clear listen event.")
+        log("Clear listen event.")
         if self.listen_event.isSet():
             self.listen_event.clear()
 
