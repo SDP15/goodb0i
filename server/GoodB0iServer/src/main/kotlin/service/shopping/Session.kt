@@ -111,6 +111,7 @@ class Session(
             is Message.IncomingMessage.FromApp.RequestHelp -> {
                 //TODO
                 Toolkit.getDefaultToolkit().beep()
+                Runtime.getRuntime().exec("paplay /usr/share/sounds/gnome/default/alerts/bark.ogg ")
             }
             is Message.IncomingMessage.FromApp.RequestStop -> {
                 //TODO

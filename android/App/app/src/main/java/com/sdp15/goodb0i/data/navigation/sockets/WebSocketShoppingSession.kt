@@ -208,7 +208,6 @@ class WebSocketShoppingSession(
      TODO: Check against cached products for the current shelf
      */
     override suspend fun checkScannedCode(code: String): Product? {
-        sh.sendMessage(Message.OutgoingMessage.ProductScanned(code))
         var product = shoppingList.products.firstOrNull { item -> item.product.gtin == code }?.product
         if (product == null) {
             val fromServer = productLoader.searchBarcode(code)
@@ -218,6 +217,7 @@ class WebSocketShoppingSession(
         }
         if (product != null) {
             lastScannedProduct = product
+            sh.sendMessage(Message.OutgoingMessage.ProductScanned(product.id))
             setState(ShoppingSessionState.Confirming(product))
         }
         return product
