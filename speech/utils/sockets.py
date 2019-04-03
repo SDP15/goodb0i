@@ -74,3 +74,27 @@ class TCPSocket:
         msg += "\n"
         msg = msg.encode()
         self.sock.send(msg)
+
+# class TCPServer:
+#     def __init__(self, ip_addr):
+#         TCP_PORT = 5005
+#         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#         self.sock.bind((ip_addr, TCP_PORT))
+#         self.closed = False
+
+#         # Listens for connections to TCP server
+#         t3 = threading.Thread(name="TCPServerListenThread", target=self.listen_for_connection)
+#         t3.start()
+
+#     def listen_for_connection(self):
+#         while True:
+#             self.sock.listen(1)
+#             t4 = threading.Thread(name="TCPServerSendThread", target=self.send)
+#             t4.start()
+
+#     def send(self, msg):
+#         try:
+#             #code here
+#         except KeyboardInterrupt:
+#             self.sock.close()
+

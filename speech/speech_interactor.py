@@ -37,7 +37,8 @@ speech = LiveSpeech(
 
 
 class SpeechInteractor:
-    def __init__(self, work_queue, controller_queue, state_file=os.path.join(script_path, 'resources/interactor_states.json')):
+    def __init__(self, work_queue, controller_queue, app_accepted_event):
+        state_file = os.path.join(script_path, 'resources/interactor_states.json')
         self.controller_queue = controller_queue
         
         log_filename = now.strftime("%Y-%m-%d-%H%M%S")
@@ -65,6 +66,7 @@ class SpeechInteractor:
         self.location_event = threading.Event()
         self.listen_event = threading.Event()
         self.connected_event = threading.Event()
+        self.app_accepted_event = app_accepted_event
 
         self.work_queue = work_queue
         t1 = WorkerThread("SpeechInteractorThread", self, self.work_queue)
@@ -83,6 +85,7 @@ class SpeechInteractor:
         self.connected_event.clear()
 
     def next_state(self, state):
+        log("State: {:}".format(state))
         self.state = state
         self.options = self.possible_states[state]
 
@@ -148,7 +151,6 @@ class SpeechInteractor:
             self.continue_shopping()
         else:
             self.say(self.options[word]['reply'], self.options[word]['listen'])
-            self.last_reply = self.options[word]['reply']
             self.next_state(self.options[word]['nextState'])
 
         if word == "connected":
@@ -156,7 +158,12 @@ class SpeechInteractor:
             self.connected_event.set()
 
     def say(self, string, listen):
+        # An ugly way of making sure that we don't say push the button when two items are on same shelf.
+        if "Please push the button on the trolley to continue to the next item." in string and self.state != "continue":
+            return
+        
         if string != "":
+            self.last_reply = string
             # Logs the string that is given to the TTS engine
             if self.logging is True:
                 with open(self.log_filepath, 'a') as f:
@@ -164,17 +171,17 @@ class SpeechInteractor:
 
             log("The robot said: {:}".format(string))
 
-            engine = pyttsx.init()
+            self.engine = pyttsx.init()
 
             # Only set listen event when we are asking a question
             if listen == "True":
-                engine.connect("finished-utterance", self.on_finish_utterance)
+                self.engine.connect("finished-utterance", self.on_finish_utterance)
             else:
                 log("Utterance doesn't require user response.")
 
-            engine.setProperty('voices', 2)
-            engine.say(string)
-            engine.runAndWait()
+            self.engine.setProperty('voices', 2)
+            self.engine.say(string)
+            self.engine.runAndWait()
 
     def on_finish_utterance(self, name, completed):
         log("Finishing utterance and setting listen event flag.")
@@ -201,20 +208,30 @@ class SpeechInteractor:
 
     def scanned(self, item):
         self.scanned_product = item
+        listen = "True"
+        
+        time.sleep(1)
 
         # Check if the item we have scanned is on our shopping list so we can respond appropriately
         if self.scanned_product.get_id() == self.next_item.get_id():
-            response = self.options['scanned']['reply'] + \
-                item.get_name() + self.options['scanned']['prompt']
+            if self.app_accepted_event.isSet():
+                response = self.options['scanned']['add_to_cart1'] + item.get_name() + self.options['scanned']['add_to_cart2']
+                listen = "False"
+            else:
+                response = self.options['scanned']['reply'] + \
+                    item.get_name() + self.options['scanned']['prompt']
         else:
             response = self.options['scanned']['reply'] + item.get_name() + \
                 self.options['scanned']['diff_item'] + self.options['scanned']['prompt']
-        self.say(response, self.options['scanned']['listen'])
+        self.say(response, listen)
         self.last_reply = response
         self.next_state(self.options['scanned']['nextState'])
 
+        self.app_accepted_event.clear()
+
     def cart(self, word, app=False):
         listen = self.options[word]['listen']
+        be_quiet = False
 
         if "yes" in word:
             if not app:
@@ -232,47 +249,38 @@ class SpeechInteractor:
                     self.options['yes']['reply_diff_item2']
                 listen = "False"
 
+            # If we have no more of an item left to collect, we want to continue shopping
             if quantity >= 1:
                 nextState = 'nextState_quantity+'
                 response = self.options['yes']['reply_quantity+'] + \
                     str(quantity) + " more " + self.next_item.get_name() + self.options['yes']['prompt']
             else:
-                t3 = threading.Thread(name="ContinueEventThread", target=self.not_same_shelf)
-                t3.start()
                 nextState = 'nextState_quantity0'
                 response = self.options['yes']['reply_quantity0']
                 listen = "False"
+                self.work_queue.put(("say", response, listen))
+                be_quiet = True
+
+                # Go to continue shopping before prompting user to push button to continue
+                self.next_state(self.options[word][nextState])
+                self.continue_shopping()
+                return
+
         else:
             if not app:
                 self.controller_queue.put(("send_message", "RejectedProduct&", "websocket=True"))
             response = self.options['no']['reply']
 
-        self.say(response, listen)
-        self.last_reply = response
-        self.next_state(self.options[word][nextState])
-
-    def describe_item(self):
-        cost = self.scanned_product.get_price()
-        # Format the output to tell the user the price in pounds and pence.
-        pounds = int(cost)
-        pence = round((cost - pounds) * 100)
-        total = bool(pounds) * (str(pounds) + " pound" + (pounds >= 2)*"s") + bool(pounds)*bool(pence) * (" and ") + \
-                bool(pence) * ( str(int(pence)) + (" penny" if pence == 1 else " pence") ) + (pounds+pence == 0) * "nothing"
-        response = self.options['yes']['price'] + \
-            total + self.options['no']['reply']
-        self.say(response, self.options['no']['listen'])
-        self.last_reply = response
-        self.next_state(self.options['no']['nextState'])
-
-    def set_list(self, ordered_list):
-        self.ordered_list = ordered_list
+        # Only say something if we aren't going to continue shopping
+        if not be_quiet:
+            self.say(response, listen)
+            self.next_state(self.options[word][nextState])
 
     # Only called if the user decides to go to the next item
     # Sets the current item to the next item on the list and informs the user what item they are
     # going to collect next. 
     def continue_shopping(self):
         prev_item = self.next_item
-        log("Prev item: {:}".format(prev_item.get_name()))
 
         if self.next_item.get_quantity() > 0:
             self.controller_queue.put(("send_message", "SkippedProduct&", "websocket=True"))
@@ -293,21 +301,26 @@ class SpeechInteractor:
         if prev_item.get_shelf_number() == self.next_item.get_shelf_number() and nextState != 'finishedState':
             self.arrived(self.next_item, same_shelf=True)
         else:
-            self.say(response, "False")
-            self.last_reply = response
-            # self.controller_queue.put(("send_message", "resume-from-stop-marker"))
-    
+            self.controller_queue.put(("clear_continue_event"))
+            self.work_queue.put(("say", response, "False"))
+
+    def describe_item(self):
+        cost = self.scanned_product.get_price()
+        # Format the output to tell the user the price in pounds and pence.
+        pounds = int(cost)
+        pence = round((cost - pounds) * 100)
+        total = bool(pounds) * (str(pounds) + " pound" + (pounds >= 2)*"s") + bool(pounds)*bool(pence) * (" and ") + \
+                bool(pence) * ( str(int(pence)) + (" penny" if pence == 1 else " pence") ) + (pounds+pence == 0) * "nothing"
+        response = self.options['yes']['price'] + \
+            total + self.options['no']['reply']
+        self.say(response, self.options['no']['listen'])
+        self.next_state(self.options['no']['nextState'])
+
+    def set_list(self, ordered_list):
+        self.ordered_list = ordered_list
+
     def on_location_change(self):
         self.arrived(self.next_item)
-
-    def not_same_shelf(self):
-        copyoflist = self.ordered_list
-        prev_item = self.next_item
-        next_item = copyoflist.get()
-
-        if prev_item.get_shelf_number() != self.next_item.get_shelf_number():
-            log("Clear continue event")
-            self.controller_queue.put("clear_continue_event")
 
 
 

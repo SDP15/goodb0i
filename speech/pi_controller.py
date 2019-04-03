@@ -36,7 +36,8 @@ class PiController:
         self.ev3 = TCPSocket(self.ev3_ip, self.ev3_port, self.controller_queue)
         self.ev3_commands = []
 
-        self.speech_interactor = SpeechInteractor(self.speech_interactor_queue, self.controller_queue)
+        self.app_accepted_event = threading.Event()
+        self.speech_interactor = SpeechInteractor(self.speech_interactor_queue, self.controller_queue, self.app_accepted_event)
         
         # Thread runs a given function and it's arguments (if given any) from the work queue
         t1 = WorkerThread("PiControllerThread", self, self.controller_queue)
@@ -50,6 +51,7 @@ class PiController:
 
     def on_message(self, message):
         if "AppAcceptedProduct" in message:
+            self.app_accepted_event.set()
             self.speech_interactor_queue.put("clear_listen_event")
             self.speech_interactor_queue.put(("next_state", "cart"))
             self.speech_interactor_queue.put(("cart", "yes", "app=True"))
@@ -124,8 +126,8 @@ class PiController:
             # Start ButtonThread to listen for button presses to start/stop trolley
             t2 = ButtonThread("ButtonThread", self.controller_queue, self.button_event, self.continue_event)
             t2.start()
-            t3 = QRThread("QRDetectionThread", self.controller_queue)
-            t3.start()
+            # t3 = QRThread("QRDetectionThread", self.controller_queue)
+            # t3.start()
         elif "detected-marker" in message:
             command = self.route_queue.get()
 
@@ -135,10 +137,15 @@ class PiController:
                 self.ws.send("ReachedPoint&" + marker_num)
 
             if "stop" in message:
+                # TODO: Remove this hardcoded session complete
+                if "%9" in command:
+                    log("Session completed")
+                else:
+                     self.speech_interactor_queue.put("on_location_change")
+
                 # Prevents button from being pressed when robot stops at a marker.
                 self.button_event.set()
                 log("Set button event - stops button from being pressed")
-                self.speech_interactor_queue.put("on_location_change")
         elif "ReplanCalculated&" in message:
             self.replanned_route = self.calculate_route_trace(message)
             self.ev3.send("dump-queue")
