@@ -36,6 +36,7 @@ class Route private constructor(
                     "pass" -> points.add(RoutePoint.IndexPoint.IdentifiedPoint.Pass(++index, body))
                 }
             }
+            Timber.i("Converted string to route $points")
             return Route(points)
         }
 

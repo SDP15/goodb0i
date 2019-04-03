@@ -11,4 +11,8 @@
         android:selectAllOnFocus="true"
         android:singleLine="true"
         android:title="@string/config_label_server_address" />
+
+    <Preference android:title="Session"
+        android:key="@string/config_kill_session"
+        android:summary="Kill session"/>
 </PreferenceScreen>

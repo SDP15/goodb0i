@@ -394,6 +394,11 @@ object TestDataProductLoader : ProductLoader {
         return Result.Success(listOf())
     }
 
+    override suspend fun searchBarcode(bardcode: String): Result<Product> {
+        val prod = PRODUCTS.firstOrNull { product -> product.gtin == bardcode }
+        return if (prod != null) Result.Success(prod) else Result.Failure(Exception("Not found"))
+    }
+
     class DelegateProductLoader(private val other: ProductLoader) : ProductLoader {
 
         override suspend fun loadProduct(id: String): Result<Product> =
@@ -412,6 +417,10 @@ object TestDataProductLoader : ProductLoader {
             if (shouldUseTestData) TestDataProductLoader.loadProductsForShelfRack(shelfId) else other.loadProductsForShelfRack(
                 shelfId
             )
+
+        override suspend fun searchBarcode(bardcode: String): Result<Product> =
+            if (shouldUseTestData) TestDataProductLoader.searchBarcode(bardcode) else other.searchBarcode(bardcode)
+
     }
 
 }

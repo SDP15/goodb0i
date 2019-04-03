@@ -8,5 +8,6 @@
         android:id="@+id/text_error_message"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:text="Reconnecting"
         android:textAppearance="@style/BodyText" />
 </androidx.appcompat.widget.LinearLayoutCompat>

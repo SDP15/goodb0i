@@ -47,5 +47,10 @@ class ProductFragment : BaseFragment() {
         })
     }
 
+    override fun onVolumeUpPressed() {
+        super.onVolumeUpPressed()
+        vm.overrideScan()
+    }
+
     override fun onBackPressed(): Boolean = true
 }

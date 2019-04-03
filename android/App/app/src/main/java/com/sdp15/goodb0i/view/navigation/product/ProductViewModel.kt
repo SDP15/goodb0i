@@ -7,6 +7,7 @@ import com.sdp15.goodb0i.data.navigation.ShoppingSessionManager
 import com.sdp15.goodb0i.data.navigation.ShoppingSessionState
 import com.sdp15.goodb0i.data.store.lists.ListItem
 import com.sdp15.goodb0i.view.BaseViewModel
+import kotlinx.coroutines.launch
 import org.koin.standalone.get
 
 class ProductViewModel : BaseViewModel<Any>() {
@@ -39,6 +40,17 @@ class ProductViewModel : BaseViewModel<Any>() {
         sm.skipProduct()
     }
 
+    fun overrideScan() {
+        launch {
+            val state = sm.state.value as? ShoppingSessionState.Scanning
+            state?.toScan?.first()?.let { product ->
+                sm.checkScannedCode(product.product.id)
+                sm.productAccepted()
+            }
+
+        }
+
+    }
     override fun onCleared() {
         super.onCleared()
         sm.state.removeObserver(stateObserver)

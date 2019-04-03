@@ -40,6 +40,7 @@ object DataProvider {
                 //UUID.nameUUIDFromBytes(index.toString().toByteArray())
                 kLogger.debug("Inserting product with ID $id")
                 Product.new(id) {
+                    gtin = product.gtin
                     name = product.name
                     averageSellingUnitWeight = product.averageSellingUnitWeight
                     contentsMeasureType = product.contentsMeasureType
@@ -150,6 +151,7 @@ object DataProvider {
 
     private data class JSONProduct(
             @SerializedName("id") val id: String? = null,
+            @SerializedName("gtin") val gtin: String,
             @SerializedName("name") val name: String,
             @SerializedName("averageSellingUnitWeight") val averageSellingUnitWeight: Double,
             @SerializedName("contentsMeasureType") val contentsMeasureType: String,
