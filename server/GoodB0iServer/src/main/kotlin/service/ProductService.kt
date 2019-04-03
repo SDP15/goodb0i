@@ -20,7 +20,7 @@ class ProductService {
     }
 
     fun search(query: String?): List<Product> = transaction {
-        val filtered = Search.search(Product.all().toList(), query ?: "", { product -> listOf(product.name, product.description, product.department)}) .toList()
+        val filtered = Search.search(Product.all().toList(), query ?: "", { product -> listOf(product.name, product.gtin, product.description, product.department)}) .toList()
         println("Filtered results $filtered")
         filtered
 //        Product.all().filter {
