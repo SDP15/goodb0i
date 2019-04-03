@@ -145,8 +145,8 @@ class WebSocketShoppingSession(
     private fun reachedPoint(id: String) {
         Timber.i("Searching for $id")
         val remaining = route.subList(max(0, index-1), route.size)
-        val pointIndex = remaining.indexOfFirst { rp -> rp is Route.RoutePoint.IndexPoint.IdentifiedPoint && rp.id == id }
-        val point = remaining.getOrNull(pointIndex)
+        val pointIndex = max(0, index-1) + remaining.indexOfFirst { rp -> rp is Route.RoutePoint.IndexPoint.IdentifiedPoint && rp.id == id }
+        val point = route.getOrNull(pointIndex)
         Timber.i("Found $point at $pointIndex")
         if (point is Route.RoutePoint.IndexPoint.IdentifiedPoint.Stop) {
             index = pointIndex

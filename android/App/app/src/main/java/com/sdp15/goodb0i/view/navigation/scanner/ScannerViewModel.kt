@@ -34,6 +34,7 @@ class ScannerViewModel : BaseViewModel<Any>(),
         sm.state.observeForever(object: Observer<ShoppingSessionState> {
             override fun onChanged(state: ShoppingSessionState) {
                 if (state is ShoppingSessionState.Scanning) {
+                    Timber.i("Fingerprint ${Build.FINGERPRINT}, model ${Build.MODEL}, brand ${Build.BRAND}")
                     if(Build.FINGERPRINT.startsWith("generic")
                         || Build.FINGERPRINT.startsWith("unknown")
                         || Build.MODEL.contains("google_sdk")
@@ -42,7 +43,7 @@ class ScannerViewModel : BaseViewModel<Any>(),
                         || Build.MANUFACTURER.contains("Genymotion")
                         || (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic"))
                         || "google_sdk".equals(Build.PRODUCT)) {
-                        onRead(state.toScan.first().product.id)
+                        onRead(state.toScan.first().product.gtin)
                     }
                     sm.state.removeObserver(this)
                 } else if (state is ShoppingSessionState.Disconnected) {
