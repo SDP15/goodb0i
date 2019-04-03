@@ -126,8 +126,8 @@ class PiController:
             # Start ButtonThread to listen for button presses to start/stop trolley
             t2 = ButtonThread("ButtonThread", self.controller_queue, self.button_event, self.continue_event)
             t2.start()
-            t3 = QRThread("QRDetectionThread", self.controller_queue)
-            t3.start()
+            # t3 = QRThread("QRDetectionThread", self.controller_queue)
+            # t3.start()
         elif "detected-marker" in message:
             command = self.route_queue.get()
 
