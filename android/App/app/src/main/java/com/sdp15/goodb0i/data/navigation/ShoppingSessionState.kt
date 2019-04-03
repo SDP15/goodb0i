@@ -1,6 +1,7 @@
 package com.sdp15.goodb0i.data.navigation
 
 import com.sdp15.goodb0i.data.store.lists.ListItem
+import com.sdp15.goodb0i.data.store.lists.ShoppingList
 import com.sdp15.goodb0i.data.store.products.Product
 
 /*
@@ -39,7 +40,7 @@ sealed class ShoppingSessionState {
     data class Confirming(val product: Product) : ShoppingSessionState()
 
     // Reached end route at
-    data class Checkout(val products: List<ListItem>) : ShoppingSessionState()
+    data class Checkout(val shoppingList: ShoppingList, val products: List<ListItem>) : ShoppingSessionState()
 
     // User has requested help
     object AwaitingHelp : ShoppingSessionState()

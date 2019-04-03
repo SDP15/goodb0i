@@ -10,6 +10,7 @@ import com.sdp15.goodb0i.view.BaseFragment
 import kotlinx.android.synthetic.main.layout_checkout_total.*
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import timber.log.Timber
+import java.util.*
 
 class CheckoutTotalFragment : BaseFragment() {
 
@@ -24,6 +25,11 @@ class CheckoutTotalFragment : BaseFragment() {
 
     override fun onResume() {
         super.onResume()
+        vm.shoppingList.observe(this, Observer { shoppingList ->
+            confirmation_list_code.text = shoppingList.code.toString()
+            confirmation_list_date.text = java.text.SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault()).format(Calendar.getInstance().time)
+
+        })
         vm.totalPrice.observe(this, Observer { price ->
             Timber.i("Observed price $price")
             confirmation_list_cost.text = getString(R.string.label_total_price, price)

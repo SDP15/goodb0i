@@ -167,7 +167,7 @@ class WebSocketShoppingSession(
                 )
             }
         } else if (point is Route.RoutePoint.IndexPoint.IdentifiedPoint.End) {
-            setState(ShoppingSessionState.Checkout(collectedProducts))
+            setState(ShoppingSessionState.Checkout(shoppingList, collectedProducts))
         } else {
             Timber.e("Unknown point $id at index $pointIndex")
         }
