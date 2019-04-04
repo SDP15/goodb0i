@@ -38,7 +38,8 @@ class PiController:
 
         self.app_accepted_event = threading.Event()
         self.app_skipped_event = threading.Event()
-        self.speech_interactor = SpeechInteractor(self.speech_interactor_queue, self.controller_queue, self.app_accepted_event, self.app_skipped_event)
+        self.clear_queue_event = threading.Event()
+        self.speech_interactor = SpeechInteractor(self.speech_interactor_queue, self.controller_queue, self.app_accepted_event, self.app_skipped_event, self.clear_queue_event)
         
         # Thread runs a given function and it's arguments (if given any) from the work queue
         t1 = WorkerThread("PiControllerThread", self, self.controller_queue)
@@ -61,10 +62,13 @@ class PiController:
             self.speech_interactor_queue.put(("cart", "no", "app=True"))
         elif "AppSkippedProduct" in message:
             self.app_skipped_event.set()
-            self.speech_interactor_queue.put("clear_listen_event")
-            self.speech_interactor_queue.put("skip_product")
-            self.speech_interactor_queue.put(("next_state", "continue"))
-            self.speech_interactor_queue.put("continue_shopping")
+            log("Set app_skipped event")
+            self.clear_queue_event.wait()
+            new_queue_items = ["clear_listen_event", "skip_product", ("next_state", "continue"), "continue_shopping"]
+            self.speech_interactor_queue.put(("clear_work_queue", new_queue_items))
+            self.clear_queue_event.clear()
+            self.clear_queue_event.wait()
+            self.clear_queue_event.clear()
         elif "AppScannedProduct" in message:
             item = message.split("&")
             query = "/products/" + item[1]

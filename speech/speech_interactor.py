@@ -37,7 +37,7 @@ speech = LiveSpeech(
 
 
 class SpeechInteractor:
-    def __init__(self, work_queue, controller_queue, app_accepted_event, app_skipped_event):
+    def __init__(self, work_queue, controller_queue, app_accepted_event, app_skipped_event, clear_queue_event):
         state_file = os.path.join(script_path, 'resources/interactor_states.json')
         self.controller_queue = controller_queue
         
@@ -68,6 +68,7 @@ class SpeechInteractor:
         self.connected_event = threading.Event()
         self.app_accepted_event = app_accepted_event
         self.app_skipped_event = app_skipped_event
+        self.clear_queue_event = clear_queue_event
 
         # Initialise TTS engine
         self.tts_engine = pyttsx.init()
@@ -193,20 +194,28 @@ class SpeechInteractor:
 
     def on_finish_utterance(self, name, completed):
         if self.app_skipped_event.isSet():
-            self.clear_work_queue()
-            self.app_skipped_event.clear()
+            self.clear_queue_event.set()
 
         if self.finished_utt_callback:
             log("Finishing utterance and setting listen event flag.")
             self.listen_event.set()
 
-    def clear_work_queue(self):
+    def clear_work_queue(self, queue_items):
         if not self.work_queue.empty():
             while self.work_queue.qsize != 0:
                 self.work_queue.get()
 
         if self.work_queue.empty():
-            log("Work queue EMPTY")
+            for item in queue_items:
+                self.work_queue.put(item)
+
+        # Clear app_skipped event after we finish clearing the queue
+        log("Clear app_skipped event")
+        self.app_skipped_event.clear()
+
+        # Setting clear queue event - new queue created.
+        log("Setting clear queue event - new queue created.")
+        self.clear_queue_event.set()
 
     # Used to clear listen event if user responds using app
     def clear_listen_event(self):
@@ -253,6 +262,9 @@ class SpeechInteractor:
     def cart(self, word, app=False):
         listen = self.options[word]['listen']
         be_quiet = False
+
+        if self.app_skipped_event.isSet():
+            return
 
         if "yes" in word:
             if not app:
