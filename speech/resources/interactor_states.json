@@ -85,7 +85,7 @@
              
     "continue": 
         {"yes": 
-            {"reply": "Okay lets go and find the ", "nextState": "shopping0",
+            {"reply": "Please push the button on the trolley to continue to the next item and go and find the ", "nextState": "shopping0",
              "reply_finished": "The shopping list is finished. Please push the button to continue to the tills.",
              "finishedState":"finished", "listen": "False"},
         "no": 
@@ -94,7 +94,7 @@
 
     "scan":
         {"yes":{
-            "reply": "Please scan another item.", "listen": "True", "nextState": "arrival"},
+            "reply": "Please scan another item.", "listen": "False", "nextState": "arrival"},
         "no":{
             "reply": "Would you like to continue to the next item", "listen": "True", "nextState": "continue"}},
 
