@@ -75,7 +75,7 @@ class PiController:
             item_json = self.query_web_server(query)
 
             id = item_json['id']
-            name = item_json['name']
+            name = item_json['shortName']
             price = item_json['price']
             new_product = Product(id, 1, name, price)
 
@@ -218,7 +218,7 @@ class PiController:
         for products in json['products']:
             id = products['product']['id']
             quantity = products['quantity']
-            name = products['product']['name']
+            name = products['product']['shortName']
             price = products['product']['price']
             new_product = Product(id, quantity, name, price)
             self.unordered_list.append(new_product)
