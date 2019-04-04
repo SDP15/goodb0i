@@ -132,7 +132,7 @@ sealed class Message {
                 "RejectedProduct" -> IncomingMessage.FromTrolley.TrolleyRejectedProduct(message)
                 "SkippedProduct" -> IncomingMessage.FromTrolley.TrolleySkippedProduct(message)
                 "UserReady" -> IncomingMessage.FromTrolley.UserReady(message)
-                "ReceivedRoute" -> IncomingMessage.FromTrolley.ReceivedRoute(message)
+                "RouteReceived" -> IncomingMessage.FromTrolley.ReceivedRoute(message)
                 "Ping" -> IncomingMessage.FromTrolley.Ping(message)
                 "RequestReplan" -> {
                     val points = message.substringAfter(DELIM).split('%')

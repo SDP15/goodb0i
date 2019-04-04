@@ -22,7 +22,7 @@
     <!-- Product screen -->
     <string name="action_skip">Skip</string>
     <string name="action_scan">Scan</string>
-    <string name="prompt_scan_item">Hold the item in front of the phone camera</string>
+    <string name="prompt_scan_item">Hold the item in front of the phone camera or enter barcode below</string>
 
     <!--Item confirmation screen -->
     <string name="action_add_to_cart">Add to cart</string>

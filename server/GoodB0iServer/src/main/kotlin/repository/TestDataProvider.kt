@@ -7,15 +7,13 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import mu.KotlinLogging
 import org.jetbrains.exposed.sql.SizedCollection
-import org.jetbrains.exposed.sql.SizedIterable
-import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
-import repository.adapters.ShoppingListTypeAdapter
 import repository.lists.ListEntry
 import repository.lists.ShoppingList
+import repository.lists.ShoppingLists
+import repository.products.Product
 import repository.shelves.Shelf
 import repository.shelves.ShelfRack
-import repository.products.Product
 import repository.shelves.Shelves
 import java.io.File
 import java.util.*
@@ -55,6 +53,7 @@ object TestDataProvider {
     private fun createDefaultShelves() {
         // Dairy, bakery, fruits, vegetables, seafood, meat, sweets, food cupboard
         transaction {
+            if (!ShelfRack.all().empty()) return@transaction
             val rackNames = arrayOf("Dairy", "Bakery", "Fruits", "Vegetables", "Seafood", "Meat", "Sweets", "Food cupboard")
             val racks: MutableList<ShelfRack> = mutableListOf()
             val defaultCapacity = 10
@@ -152,6 +151,7 @@ object TestDataProvider {
 
     private fun createTestList() {
         transaction {
+            if (!ShoppingList.find { ShoppingLists.code eq 1234567 }.empty()) return@transaction
             ShoppingList.new {
                 code = 1234567
                 time = System.currentTimeMillis()

@@ -13,6 +13,7 @@ import com.otaliastudios.cameraview.Gesture
 import com.otaliastudios.cameraview.GestureAction
 import com.sdp15.goodb0i.R
 import com.sdp15.goodb0i.view.BaseFragment
+import com.sdp15.goodb0i.watchText
 import kotlinx.android.synthetic.main.layout_scanner.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -56,6 +57,9 @@ class ScannerFragment : BaseFragment() {
         }
         camera_view.audio = Audio.OFF
         camera_view.mapGesture(Gesture.TAP, GestureAction.FOCUS_WITH_MARKER)
+        camera_manual_entry.watchText { code ->
+            vm.manualEntry(code)
+        }
     }
 
     override fun onVolumeUpPressed() = vm.skip()

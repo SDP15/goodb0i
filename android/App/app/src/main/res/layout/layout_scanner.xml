@@ -19,10 +19,16 @@
         android:id="@+id/camera_scan_prompt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/default_margin_bottom"
         android:text="@string/prompt_scan_item"
         android:textAlignment="center"
         android:textSize="30sp"
+        android:layout_above="@+id/camera_manual_entry"
+        />
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/camera_manual_entry"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"/>
 
 </RelativeLayout>

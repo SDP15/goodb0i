@@ -3,25 +3,30 @@ package repository
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.SchemaUtils.create
+import org.jetbrains.exposed.sql.SchemaUtils.createMissingTablesAndColumns
 import org.jetbrains.exposed.sql.transactions.transaction
 import repository.lists.ListContentsTable
 import repository.lists.ShoppingLists
+import repository.products.Products
 import repository.shelves.ShelfRacks
 import repository.shelves.Shelves
-import repository.products.Products
 
 object DatabaseFactory {
 
     fun init() {
         // Database.connect("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1", driver = "org.h2.Driver")
         Database.connect(hikari())
+        //Database.connect("jdbc:sqlite:/home/theo/testdb.db", "org.sqlite.JDBC")
+        //TransactionManager.manager.defaultIsolationLevel = Connection.TRANSACTION_SERIALIZABLE
         transaction {
-            create(Products)
-            create(Shelves)
-            create(ShelfRacks)
-            create(ShoppingLists)
-            create(ListContentsTable)
+            createMissingTablesAndColumns(
+                    Products,
+                    Shelves,
+                    ShelfRacks,
+                    ShoppingLists,
+                    ListContentsTable
+            )
+
         }
     }
 

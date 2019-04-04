@@ -59,6 +59,7 @@ dependencies {
     compile "org.jetbrains.exposed:exposed:$exposed_version"
     compile 'com.zaxxer:HikariCP:3.2.0'
     compile "io.ktor:ktor-gson:$ktor_version"
+    compile "org.xerial:sqlite-jdbc:3.21.0.1"
 
     compile "ch.qos.logback:logback-classic:1.2.1"
     compile 'io.github.microutils:kotlin-logging:1.6.24'
