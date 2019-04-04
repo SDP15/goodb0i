@@ -73,7 +73,6 @@ class SpeechInteractor:
         # Initialise TTS engine
         self.tts_engine = pyttsx.init()
         self.tts_engine.connect("finished-utterance", self.on_finish_utterance)
-        log("Callback connected.")
 
         self.work_queue = work_queue
         t1 = WorkerThread("SpeechInteractorThread", self, self.work_queue)
@@ -193,9 +192,6 @@ class SpeechInteractor:
             self.tts_engine.runAndWait()
 
     def on_finish_utterance(self, name, completed):
-        if self.app_skipped_event.isSet():
-            self.clear_queue_event.set()
-
         if self.finished_utt_callback:
             log("Finishing utterance and setting listen event flag.")
             self.listen_event.set()
@@ -210,7 +206,6 @@ class SpeechInteractor:
                 self.work_queue.put(item)
 
         # Clear app_skipped event after we finish clearing the queue
-        log("Clear app_skipped event")
         self.app_skipped_event.clear()
 
         # Setting clear queue event - new queue created.

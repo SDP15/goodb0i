@@ -62,8 +62,6 @@ class PiController:
             self.speech_interactor_queue.put(("cart", "no", "app=True"))
         elif "AppSkippedProduct" in message:
             self.app_skipped_event.set()
-            log("Set app_skipped event")
-            self.clear_queue_event.wait()
             new_queue_items = ["clear_listen_event", "skip_product", ("next_state", "continue"), "continue_shopping"]
             self.speech_interactor_queue.put(("clear_work_queue", new_queue_items))
             self.clear_queue_event.clear()
@@ -142,14 +140,17 @@ class PiController:
         elif "detected-marker" in message:
             command = self.route_queue.get()
 
+            if len(command.split("%")) > 1:
+                node_num = command.split("%")[1]
+
             if "%" in command:
                 marker_num = self.marker_list[0]
                 del(self.marker_list[0])
                 self.ws.send("ReachedPoint&" + marker_num)
 
             if "stop" in message:
-                # TODO: Remove this hardcoded session complete
-                if "%9" in command:
+                # Check if the node number is the end point
+                if node_num == "9":
                     self.speech_interactor_queue.put("clear_listen_event")
                     log("Session completed")
                 else:
