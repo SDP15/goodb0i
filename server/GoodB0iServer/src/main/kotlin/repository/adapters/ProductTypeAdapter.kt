@@ -14,6 +14,8 @@ object ProductTypeAdapter : TypeAdapter<Product>() {
         out.value(value.gtin)
         out.name("name")
         out.value(value.name)
+        out.value("simpleName")
+        out.value(value.name)
         out.name("superDepartment")
         out.value(value.superDepartment)
         out.name("ContentsMeasureType")
