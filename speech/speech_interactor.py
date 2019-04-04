@@ -37,23 +37,19 @@ speech = LiveSpeech(
 
 
 class SpeechInteractor:
-    def __init__(self, work_queue, controller_queue, app_accepted_event, app_skipped_event, clear_queue_event):
+    def __init__(self, work_queue, controller_queue, app_accepted_event, app_skipped_event, clear_queue_event, logging):
         state_file = os.path.join(script_path, 'resources/interactor_states.json')
         self.controller_queue = controller_queue
         
         log_filename = now.strftime("%Y-%m-%d-%H%M%S")
-        self.logging = False
+        self.logging = logging
 
         # Conversation is logged if -log is specified in cmd line
         if len(sys.argv) > 1 and "-log" in sys.argv[1]:
             self.logging = True
 
-        # Log is placed in folder associated with test number
-        if len(sys.argv) > 2:
-            test_num = sys.argv[2]
-            self.log_filepath = "logs/{:}/{:}.txt".format(test_num, log_filename)
-        else:
-            self.log_filepath = "logs/{:}.txt".format(log_filename)
+        log_string = "logs/{:}.txt".format(log_filename)
+        self.log_filepath = os.path.join(script_path, log_string)
 
         if self.logging is True:
             log("Conversation is being logged in: {:}".format(

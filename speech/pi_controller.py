@@ -24,6 +24,7 @@ class PiController:
         self.ev3_ip = "192.168.105.108"
         self.ev3_port = 6081
         self.skip_tut = False
+        self.logging = False
 
         # Parse command line options/arguments
         self.parse_opts()
@@ -39,7 +40,7 @@ class PiController:
         self.app_accepted_event = threading.Event()
         self.app_skipped_event = threading.Event()
         self.clear_queue_event = threading.Event()
-        self.speech_interactor = SpeechInteractor(self.speech_interactor_queue, self.controller_queue, self.app_accepted_event, self.app_skipped_event, self.clear_queue_event)
+        self.speech_interactor = SpeechInteractor(self.speech_interactor_queue, self.controller_queue, self.app_accepted_event, self.app_skipped_event, self.clear_queue_event, self.logging)
         
         # Thread runs a given function and it's arguments (if given any) from the work queue
         t1 = WorkerThread("PiControllerThread", self, self.controller_queue)
@@ -135,8 +136,8 @@ class PiController:
             # Start ButtonThread to listen for button presses to start/stop trolley
             t2 = ButtonThread("ButtonThread", self.controller_queue, self.button_event, self.continue_event)
             t2.start()
-            # t3 = QRThread("QRDetectionThread", self.controller_queue)
-            # t3.start()
+            t3 = QRThread("QRDetectionThread", self.controller_queue)
+            t3.start()
         elif "detected-marker" in message:
             command = self.route_queue.get()
 
@@ -156,38 +157,54 @@ class PiController:
                 else:
                      self.speech_interactor_queue.put("on_location_change")
 
+                log("Stop marker to delete: {:}".format(self.stop_markers[0]))
+                del(self.stop_markers[0])
+
                 # Prevents button from being pressed when robot stops at a marker.
                 self.button_event.set()
                 log("Set button event - stops button from being pressed")
         elif "ReplanCalculated&" in message:
             self.replanned_route = self.calculate_route_trace(message)
             self.ev3.send("dump-queue")
-        elif "Queue:" in message:
+        elif "Queue: " in message:
             # We want to replace all commands up to and including next "stop" command
-            # Clear current command queue on EV3
-            self.ev3.send("clear-queue")
-
             # Disregard strings that aren't commands
+            log("EV3 Command Queue: {:}".format(message))
             ev3_command_queue = message
             ev3_command_queue = ev3_command_queue.split(" ")
             ev3_command_queue.remove("Queue:")
-            ev3_command_queue.remove("OK")
+            log("ev3_command_queue: {:}".format(ev3_command_queue))
+            ev3_command_queue.remove("OK\n")
+
+            # Clear current command queue on EV3
+            self.ev3.send("clear-queue")
 
             # Find the index of the next stop command
             for index, command in enumerate(ev3_command_queue):
                 if "stop" in command:
                     stop_index = index
-                    break 
+                    break
+
+            route_queue_list = []
+            while self.route_queue.qsize() != 0:
+                route_queue_list.append(self.route_queue.get())
+
+            log("route_queue_list: {:}".format(route_queue_list))
+
+            route_queue_list = route_queue_list[stop_index+1:]
+            log("route_queue_list: {:}".format(route_queue_list))
+
             
             # if there is a stop marker then add the new replanned route to the next stop then continue
             # from there
             if stop_index >= 0:
-                new_route_trace = self.replanned_route + ev3_command_queue[stop_index+1:]
+                new_route_trace = self.replanned_route + route_queue_list
                 log("New replanned route trace: {:}".format(new_route_trace))
 
                 # Update data structures that rely upon the route trace
                 self.update_route_data_structs(new_route_trace)
 
+                log("EV3 commands to queue: {:}".format(self.ev3_commands))
                 # Update command queue on EV3
                 self.enqueue_ev3_commands()
         elif "SessionComplete&" in message:
@@ -264,7 +281,13 @@ class PiController:
     # This has to be done after a route has been recalculated
     def update_route_data_structs(self, route_trace):
         # Update route_queue
+        self.route_queue = ""
         self.calculate_route_queue(route_trace)
+
+        log("Route trace to update data structs with: {:}".format(route_trace))
+        self.ev3_commands = []
+        self.stop_markers = []
+        self.marker_list = []
 
         for commands in route_trace:
             command = commands.split("%")
@@ -281,10 +304,10 @@ class PiController:
     def scanned_qr_code(self, qr_code):
         self.qr_detected = qr_code
         log("[QR CODE detected]: " + qr_code)
+        next_stop_marker = self.stop_markers[0]
 
         if qr_code in self.marker_list:
             #TODO: get rid of stop markers as we go.
-            next_stop_marker = self.stop_markers[0]
             index_next = self.marker_list.index(next_stop_marker)
             index_qr = self.marker_list.index(qr_code)
 
@@ -301,7 +324,7 @@ class PiController:
                 
         else:
             log("QR not in the list")
-            self.ws.send("RequestReplan&" + index_qr + "%" + next_stop_marker)
+            self.ws.send("RequestReplan&" + qr_code + "%" + next_stop_marker)
 
 
     def set_shelf_attrs(self, command, route_trace):
@@ -339,7 +362,7 @@ class PiController:
     def parse_opts(self):
         if len(sys.argv) > 1:
             try:
-                long_options = ["skiptut", "mock-ev3", "local-server","server-address=","help"]
+                long_options = ["skiptut", "mock-ev3", "local-server","server-address=","help","log"]
                 opts, _ = getopt.getopt(sys.argv[1:], "", long_options)
             except getopt.GetoptError as err:
                 # print help information and exit:
@@ -358,6 +381,8 @@ class PiController:
                     self.server_address = "127.0.0.1:8080"
                 elif opt in "--server-address":
                     self.server_address = str(arg)
+                elif opt in "--log":
+                    self.logging = True
                 elif opt in "--help":
                     print("Options: {:}".format(long_options))
                     print("Options must be prepended with \"--\".")
