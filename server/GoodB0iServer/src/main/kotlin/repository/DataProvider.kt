@@ -66,7 +66,7 @@ object DataProvider {
         racks.forEach { rackJSON ->
             // Exposed doesn't seem to like inserting multiple racks in a single transaction
             transaction {
-                if (!ShelfRack.all().empty()) return@transaction
+
                 val rackEntity = ShelfRack.new(rackJSON.id) {
                     info = rackJSON.info
                     capacity = rackJSON.capacity

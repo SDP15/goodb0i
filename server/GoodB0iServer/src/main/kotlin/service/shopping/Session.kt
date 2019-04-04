@@ -2,6 +2,7 @@ package service.shopping
 
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import mu.KotlinLogging
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.koin.standalone.KoinComponent
 import org.koin.standalone.inject
@@ -21,6 +22,8 @@ class Session(
         private val appOut: SessionManager.AppMessageSender,
         private val trolleyOut: SessionManager.TrolleyMessageSender
 ) : IncomingMessageListener, KoinComponent {
+
+    private val kLogger = KotlinLogging.logger {  }
 
     private val routeFinder: RouteFinder by inject()
     private val listService: ListService by inject()
@@ -50,7 +53,8 @@ class Session(
                         Graph.Node(rack.id.value) to rack.shelves.mapNotNull { shelf ->
                             val index = list.products.indexOfFirst { it.product == shelf.product }
                             if (index == -1) null else {
-                                println("Found shelf ${shelf.rack.value} for product ${list.products.toList()[index].product.name}")
+
+                                kLogger.info("Found shelf ${shelf.rack.value} for product ${list.products.toList()[index].product.name}")
                                 Pair(index, shelf.position)
                             }
                         }
@@ -67,13 +71,14 @@ class Session(
                             sendToTrolley(Message.OutgoingMessage.ToTrolley.RouteCalculated(routeString))
                         }
                         is RouteFinder.RoutingResult.RoutingError -> {
-                            println("Routing error $path")
+
+                            kLogger.error("Routing error $path")
                         }
                     }
                 }
             }
             is ListService.ListServiceResponse.ListServiceError -> {
-                println("List service error $listResponse")
+                kLogger.error("List service error $listResponse")
             }
         }
     }
@@ -88,7 +93,7 @@ class Session(
     override fun onAppMessage(message: Message.IncomingMessage.FromApp) {
         receivedMessages += message
         lastAppPing = System.currentTimeMillis()
-        println("IN: $message")
+        kLogger.info("IN: $message")
         when (message) {
             is Message.IncomingMessage.FromApp.PlanRoute -> {
                 plan(message.code)
@@ -104,7 +109,7 @@ class Session(
                 try {
                     collectedProducts.add(UUID.fromString(lastScannedProduct ?: ""))
                 } catch (e: IllegalArgumentException) {
-                    println("App accepted product but ID $lastScannedProduct not valid")
+                    kLogger.error("App accepted product but ID $lastScannedProduct not valid")
                 }
                 sendToTrolley(Message.OutgoingMessage.ToTrolley.AppAcceptedProduct)
             }
@@ -139,7 +144,7 @@ class Session(
     override fun onTrolleyMessage(message: Message.IncomingMessage.FromTrolley) {
         receivedMessages += message
         lastTrolleyPing = System.currentTimeMillis()
-        println("IN: $message")
+        kLogger.info("IN: $message")
         when (message) {
             is Message.IncomingMessage.FromTrolley.ReceivedRoute -> {
                 trolleyReceivedRoute = true
@@ -152,7 +157,7 @@ class Session(
                 try {
                     collectedProducts.add(UUID.fromString(lastScannedProduct ?: ""))
                 } catch (e: IllegalArgumentException) {
-                    println("Trolley accepted product but ID $lastScannedProduct not valid")
+                    kLogger.error("Trolley accepted product but ID $lastScannedProduct not valid")
                 }
                 sendToApp(Message.OutgoingMessage.ToApp.TrolleyAcceptedProduct)
             }
@@ -176,12 +181,12 @@ class Session(
     }
 
     private fun sendToApp(message: Message.OutgoingMessage.ToApp) {
-        println("OUT: $message")
+        kLogger.info("OUT: $message")
         GlobalScope.launch { appOut.sendToApp(message) }
     }
 
     private fun sendToTrolley(message: Message.OutgoingMessage.ToTrolley) {
-        println("OUT: $message")
+        kLogger.info("OUT: $message")
         GlobalScope.launch { trolleyOut.sendToTrolley(message) }
     }
 

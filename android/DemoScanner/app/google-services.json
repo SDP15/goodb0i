@@ -1,0 +1,35 @@
+{
+  "project_info": {
+    "project_number": "108395360385",
+    "firebase_url": "https://demoscanner-5481b.firebaseio.com",
+    "project_id": "demoscanner-5481b",
+    "storage_bucket": "demoscanner-5481b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:108395360385:android:7000047aac38e032",
+        "android_client_info": {
+          "package_name": "com.example.demoscanner"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCVsK4J10g3gzgPUHMR6CM69rsgx3nQXPU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "108395360385-4daa6qfr22pt40e7j5g27h6aoglrrssi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
