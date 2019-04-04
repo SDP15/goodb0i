@@ -145,8 +145,8 @@ class WebSocketShoppingSession(
     private fun reachedPoint(id: String) {
         Timber.i("Searching for $id")
         val remaining = route.subList(max(0, index-1), route.size)
-        val pointIndex = remaining.indexOfFirst { rp -> rp is Route.RoutePoint.IndexPoint.IdentifiedPoint && rp.id == id }
-        val point = remaining.getOrNull(pointIndex)
+        val pointIndex = max(0, index-1) + remaining.indexOfFirst { rp -> rp is Route.RoutePoint.IndexPoint.IdentifiedPoint && rp.id == id }
+        val point = route.getOrNull(pointIndex)
         Timber.i("Found $point at $pointIndex")
         if (point is Route.RoutePoint.IndexPoint.IdentifiedPoint.Stop) {
             index = pointIndex
@@ -167,7 +167,7 @@ class WebSocketShoppingSession(
                 )
             }
         } else if (point is Route.RoutePoint.IndexPoint.IdentifiedPoint.End) {
-            setState(ShoppingSessionState.Checkout(collectedProducts))
+            setState(ShoppingSessionState.Checkout(shoppingList, collectedProducts))
         } else {
             Timber.e("Unknown point $id at index $pointIndex")
         }
@@ -208,7 +208,6 @@ class WebSocketShoppingSession(
      TODO: Check against cached products for the current shelf
      */
     override suspend fun checkScannedCode(code: String): Product? {
-        sh.sendMessage(Message.OutgoingMessage.ProductScanned(code))
         var product = shoppingList.products.firstOrNull { item -> item.product.gtin == code }?.product
         if (product == null) {
             val fromServer = productLoader.searchBarcode(code)
@@ -218,6 +217,7 @@ class WebSocketShoppingSession(
         }
         if (product != null) {
             lastScannedProduct = product
+            sh.sendMessage(Message.OutgoingMessage.ProductScanned(product.id))
             setState(ShoppingSessionState.Confirming(product))
         }
         return product
@@ -313,7 +313,7 @@ class WebSocketShoppingSession(
                 sh.sendMessage(Message.OutgoingMessage.Reconnect(uid))
                 Thread.sleep(500)
             }
-            setState(movingStates.last)
+            if(!movingStates.isEmpty) setState(movingStates.last)
             isReconnecting = false
             Timber.i("Socket reconnected")
         }

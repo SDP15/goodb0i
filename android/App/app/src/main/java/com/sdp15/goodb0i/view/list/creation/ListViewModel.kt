@@ -84,6 +84,7 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(),
         launch {
             val params = currentList.map { Pair(it.product.id, it.quantity) }
             // Create or update a list
+            Timber.i("Creating list with params $params")
             val result =
                 existingList?.let { listManager.updateList(it.code, params) } ?: listManager.createList(params)
             if (result is Result.Success) {

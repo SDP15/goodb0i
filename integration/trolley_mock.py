@@ -40,6 +40,7 @@ def key_listener(ws):
 
 def on_message(ws, message):
     print("On message " + str(message))   
+    global components
     if (str(message).startswith("RouteCalculated")):
         route = message.split("&", 1)[1]
         parts = route.split(",")
@@ -56,6 +57,9 @@ def on_message(ws, message):
                 components.append(("stop", part.split("%")[1]))
         print("Computed route " + str(components))
         ws.send("RouteReceived&")
+    elif (str(message).startswith("SessionComplete")):
+        print("Clearing route")
+        components = []
  
 
 def on_error(ws, error):

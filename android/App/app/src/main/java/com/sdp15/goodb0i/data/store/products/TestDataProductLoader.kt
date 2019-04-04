@@ -2,6 +2,7 @@ package com.sdp15.goodb0i.data.store.products
 
 import android.content.SharedPreferences
 import com.google.gson.Gson
+import com.sdp15.goodb0i.data.ConfigProvider
 import com.sdp15.goodb0i.data.store.Result
 import timber.log.Timber
 
@@ -354,18 +355,6 @@ object TestDataProductLoader : ProductLoader {
         PRODUCTS.addAll(gson.fromJson(json, Array<Product>::class.java))
     }
 
-    
-    private var shouldUseTestData = false
-    private var prefsListener: SharedPreferences.OnSharedPreferenceChangeListener =
-        SharedPreferences.OnSharedPreferenceChangeListener { _, _ -> }
-
-    fun initListener(testConfigKey: String, prefs: SharedPreferences) {
-        prefsListener = SharedPreferences.OnSharedPreferenceChangeListener { prefs, key ->
-            if (key == testConfigKey) shouldUseTestData = prefs.getBoolean(key, shouldUseTestData)
-        }
-        prefs.registerOnSharedPreferenceChangeListener(prefsListener)
-        shouldUseTestData = prefs.getBoolean(testConfigKey, shouldUseTestData)
-    }
 
     override suspend fun loadProduct(id: String): Result<Product> {
         Timber.d("Returning individual products from test data")
@@ -399,27 +388,27 @@ object TestDataProductLoader : ProductLoader {
         return if (prod != null) Result.Success(prod) else Result.Failure(Exception("Not found"))
     }
 
-    class DelegateProductLoader(private val other: ProductLoader) : ProductLoader {
+    class DelegateProductLoader(private val configProvider: ConfigProvider, private val other: ProductLoader) : ProductLoader {
 
         override suspend fun loadProduct(id: String): Result<Product> =
-            if (shouldUseTestData) TestDataProductLoader.loadProduct(id) else other.loadProduct(id)
+            if (configProvider.useTestData) TestDataProductLoader.loadProduct(id) else other.loadProduct(id)
 
         override suspend fun loadCategory(category: String): Result<List<Product>> =
-            if (shouldUseTestData) TestDataProductLoader.loadCategory(category) else other.loadCategory(category)
+            if (configProvider.useTestData) TestDataProductLoader.loadCategory(category) else other.loadCategory(category)
 
         override suspend fun search(query: String): Result<List<Product>> =
-            if (shouldUseTestData) TestDataProductLoader.search(query) else other.search(query)
+            if (configProvider.useTestData) TestDataProductLoader.search(query) else other.search(query)
 
         override suspend fun loadAll(): Result<List<Product>> =
-            if (shouldUseTestData) TestDataProductLoader.loadAll() else other.loadAll()
+            if (configProvider.useTestData) TestDataProductLoader.loadAll() else other.loadAll()
 
         override suspend fun loadProductsForShelfRack(shelfId: Int): Result<List<Product>> =
-            if (shouldUseTestData) TestDataProductLoader.loadProductsForShelfRack(shelfId) else other.loadProductsForShelfRack(
+            if (configProvider.useTestData) TestDataProductLoader.loadProductsForShelfRack(shelfId) else other.loadProductsForShelfRack(
                 shelfId
             )
 
         override suspend fun searchBarcode(bardcode: String): Result<Product> =
-            if (shouldUseTestData) TestDataProductLoader.searchBarcode(bardcode) else other.searchBarcode(bardcode)
+            if (configProvider.useTestData) TestDataProductLoader.searchBarcode(bardcode) else other.searchBarcode(bardcode)
 
     }
 

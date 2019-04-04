@@ -12,6 +12,11 @@
         android:singleLine="true"
         android:title="@string/config_label_server_address" />
 
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="@string/config_key_skip_scanner"
+        android:title="@string/config_label_skip_scanner" />
+
     <Preference android:title="Session"
         android:key="@string/config_kill_session"
         android:summary="Kill session"/>

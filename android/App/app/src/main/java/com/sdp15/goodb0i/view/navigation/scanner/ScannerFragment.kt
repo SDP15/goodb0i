@@ -58,7 +58,8 @@ class ScannerFragment : BaseFragment() {
         camera_view.mapGesture(Gesture.TAP, GestureAction.FOCUS_WITH_MARKER)
     }
 
-    override fun onBackPressed(): Boolean = true
+    override fun onVolumeUpPressed() = vm.skip()
+
     interface ScannerFragmentInteractor {
 
         fun onImageCaptured(ba: ByteArray, rotation: Int, width: Int, height: Int)

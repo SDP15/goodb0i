@@ -28,6 +28,7 @@ fun Route.lists() {
                 //TODO: If this works the same as the implementation of ProductResourceTest,
                 // asking for an Array rather than a List may parse correctly (not a treemap)
                 //TODO: Error handling
+                println("Ids $ids}")
                 val flat = ids.map {
                     Pair(UUID.fromString(it.values.elementAt(0) as String), // UUID string
                             (it.values.elementAt(1) as Double).toInt())  // Quantity
