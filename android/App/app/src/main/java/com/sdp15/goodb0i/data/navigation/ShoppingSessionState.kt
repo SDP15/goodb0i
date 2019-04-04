@@ -1,5 +1,6 @@
 package com.sdp15.goodb0i.data.navigation
 
+import com.sdp15.goodb0i.data.store.lists.ListItem
 import com.sdp15.goodb0i.data.store.products.Product
 
 /*
@@ -22,19 +23,23 @@ sealed class ShoppingSessionState {
     // Asking server to allocate a trolley
     object NegotiatingTrolley : ShoppingSessionState()
 
-    // Moving towards a point
-    data class NavigatingTo(val from: Route.RoutePoint, val point: Route.RoutePoint) : ShoppingSessionState()
+    // Moving towards a at
+    data class NavigatingTo(val from: Route.RoutePoint.IndexPoint,
+                            val to: Route.RoutePoint.IndexPoint,
+                            val at: Route.RoutePoint.IndexPoint,
+                            val products: List<ListItem>) : ShoppingSessionState()
 
     /* Scanning a particular item
        NB: This state covers both ProductFragment and ScannerFragment
       */
-    data class Scanning(val item: Route.RoutePoint.EntryCollectionPoint) : ShoppingSessionState()
+    data class Scanning(val item: Route.RoutePoint.IndexPoint.IdentifiedPoint.Stop,
+                        val toScan: List<ListItem>) : ShoppingSessionState()
 
     // User is being asked to confirm an item
     data class Confirming(val product: Product) : ShoppingSessionState()
 
-    // Reached end route point
-    object Checkout : ShoppingSessionState()
+    // Reached end route at
+    data class Checkout(val products: List<ListItem>) : ShoppingSessionState()
 
     // User has requested help
     object AwaitingHelp : ShoppingSessionState()

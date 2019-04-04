@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.MenuItemCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
@@ -42,7 +43,6 @@ class ListPagingFragment : BaseFragment() {
         val vp = ViewPagerAdapter(childFragmentManager)
         list_viewpager.adapter = vp
         //list_tab_layout.setupWithViewPager(list_viewpager)
-
     }
 
     override fun onResume() {
@@ -54,11 +54,19 @@ class ListPagingFragment : BaseFragment() {
             list_viewpager.currentItem = 1
             shouldCloseOnBack = true
         }
-        floating_search_view.setOnMenuItemClickListener {
+        floating_search_view.setOnMenuItemClickListener { item ->
+
             list_viewpager.apply {
+                MenuItemCompat.setContentDescription(item,
+                    getString(if (currentItem == 0)
+                        R.string.content_description_shopping_list else
+                        R.string.content_description_search
+                    )
+                )
                 setCurrentItem(if (currentItem == 1) 0 else 1, true)
             }
         }
+        floating_search_view.setOnQueryChangeListener(vm::onQueryChange)
         list_viewpager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrollStateChanged(state: Int) {
 

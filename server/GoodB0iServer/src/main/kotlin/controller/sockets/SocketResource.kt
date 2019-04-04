@@ -1,10 +1,12 @@
 package controller.sockets
 
-import io.ktor.http.cio.websocket.CloseReason
+import io.ktor.application.call
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.cio.websocket.Frame
-import io.ktor.http.cio.websocket.close
 import io.ktor.http.cio.websocket.readText
+import io.ktor.response.respond
 import io.ktor.routing.Route
+import io.ktor.routing.get
 import io.ktor.util.generateNonce
 import io.ktor.websocket.webSocket
 import kotlinx.coroutines.ObsoleteCoroutinesApi
@@ -13,11 +15,11 @@ import kotlinx.coroutines.channels.consumeEach
 import service.shopping.AppManager
 import service.shopping.SessionManager
 import service.shopping.TrolleyManager
-import java.nio.charset.StandardCharsets
-import java.util.concurrent.TimeUnit
 
 @UseExperimental(ObsoleteCoroutinesApi::class)
-fun Route.sockets(sessionManager: SessionManager, trolleyManager: TrolleyManager, appManager: AppManager) {
+fun Route.sockets(sessionManager: SessionManager,
+                  trolleyManager: TrolleyManager,
+                  appManager: AppManager) {
 
     /*
     https://ktor.io/servers/features/websockets.html
@@ -37,7 +39,9 @@ fun Route.sockets(sessionManager: SessionManager, trolleyManager: TrolleyManager
 
 
     webSocket("/trolley") {
-        
+
+        println("Trolley Connected")
+
         val nonce = generateNonce()
 
         trolleyManager.joinTrolley(nonce, this)
@@ -46,6 +50,10 @@ fun Route.sockets(sessionManager: SessionManager, trolleyManager: TrolleyManager
             incoming.consumeEach { frame ->
                 if (frame is Frame.Text) {
                     trolleyManager.onMessage(nonce, frame.readText())
+                } else if (frame is Frame.Ping) {
+                    println("Received ping from trolley")
+                } else {
+                    println("Received other frame from trolley $frame")
                 }
             }
         } finally {
@@ -54,6 +62,7 @@ fun Route.sockets(sessionManager: SessionManager, trolleyManager: TrolleyManager
     }
 
     webSocket("/app") {
+        println("Socket with app opened")
         val trolley = trolleyManager.assignAvailableTrolley()
         if (trolley != null) {
             val nonce = generateNonce()
@@ -64,13 +73,21 @@ fun Route.sockets(sessionManager: SessionManager, trolleyManager: TrolleyManager
             trolleyManager.addMessageListener(trolley.first, session)
             try {
                 incoming.consumeEach { frame ->
+                    println("Received frame $frame")
                     if (frame is Frame.Text) {
                         appManager.onMessage(nonce, frame.readText())
+                    } else if (frame is Frame.Ping) {
+                        println("Received ping from app")
+                    } else {
+                        println("Received other frame from app$frame")
                     }
                 }
             } catch (e: ClosedSendChannelException) {
+                appManager.disconnected(nonce)
                 println("ClosedSendChannelException $e")
             } catch (e: Exception) {
+                appManager.disconnected(nonce)
+                e.printStackTrace()
                 println("Other exception $e")
             } finally {
                 println("$nonce closed socket")
@@ -78,8 +95,9 @@ fun Route.sockets(sessionManager: SessionManager, trolleyManager: TrolleyManager
                 appManager.removeApp(nonce, this)
             }
         } else {
+            println("No available trolley")
             outgoing.send(Frame.Text("NT&"))
-            close(CloseReason(CloseReason.Codes.TRY_AGAIN_LATER, "No available trolleys"))
+            //close(CloseReason(CloseReason.Codes.TRY_AGAIN_LATER, "No available trolleys"))
         }
 
 
@@ -95,6 +113,10 @@ fun Route.sockets(sessionManager: SessionManager, trolleyManager: TrolleyManager
         } catch (e: Exception) {
             println("Ping exception $e")
         }
+    }
+
+    get("/check") {
+        call.respond(HttpStatusCode.OK)
     }
 
 }

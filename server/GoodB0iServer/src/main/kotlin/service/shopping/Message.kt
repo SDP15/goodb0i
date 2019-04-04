@@ -1,41 +1,58 @@
 package service.shopping
 
+import service.routing.Graph
+import service.routing.RouteFinder
+
 sealed class Message {
 
-    sealed class IncomingMessage : Message() {
+    sealed class IncomingMessage(val body: String) : Message() {
 
-        sealed class FromTrolley : IncomingMessage() {
+        sealed class FromTrolley(body: String) : IncomingMessage(body) {
 
-            object UserAtTrolley : FromTrolley()
+            class ReceivedRoute(body: String) : FromTrolley(body)
 
-            object ReceivedRoute : FromTrolley()
+            class UserReady(body: String) : FromTrolley(body)
 
-            object TrolleyAcceptedProduct : FromTrolley()
+            class TrolleyAcceptedProduct(body: String) : FromTrolley(body)
 
-            object TrolleyRejectedProduct : FromTrolley()
+            class TrolleyRejectedProduct(body: String) : FromTrolley(body)
 
-            data class ReachedPoint(val id: String) : FromTrolley()
+            class TrolleySkippedProduct(body: String) : FromTrolley(body)
 
-            data class InvalidMessage(val message: String) : FromTrolley()
+            class ReachedPoint(body: String, val id: String) : FromTrolley(body)
+
+            class RequestReplan(body: String, val from: Int, val to: Int) : FromTrolley(body)
+
+            class Ping(body: String) : FromTrolley(body)
+
+            data class InvalidMessage(val message: String) : FromTrolley(message)
         }
 
-        sealed class FromApp : IncomingMessage() {
+        sealed class FromApp(body: String) : IncomingMessage(body) {
 
-            object ReceivedRoute : FromApp()
+            class PlanRoute(body: String, val code: Long) : FromApp(body)
 
-            data class Reconnect(val oldId: String) : FromApp()
+            class ReceivedRoute(body: String) : FromApp(body)
 
-            object ProductScanned : FromApp()
+            class Reconnect(body: String, val oldId: String) : FromApp(body)
 
-            object AppRejectedProduct : FromApp()
+            class ProductScanned(body: String, val id: String) : FromApp(body)
 
-            object AppAcceptedProduct : FromApp()
+            class AppRejectedProduct(body: String) : FromApp(body)
 
-            object RequestHelp : FromApp()
+            class AppAcceptedProduct(body: String) : FromApp(body)
 
-            object RequestStop : FromApp()
+            class AppSkippedProduct(body: String) : FromApp(body)
 
-            data class InvalidMessage(val message: String) : FromApp()
+            class RequestHelp(body: String) : FromApp(body)
+
+            class RequestStop(body: String) : FromApp(body)
+
+            class SessionComplete(body: String) : FromApp(body)
+
+            class Ping(body: String) : FromApp(body)
+
+            data class InvalidMessage(val message: String) : FromApp(message)
 
         }
 
@@ -45,31 +62,42 @@ sealed class Message {
     sealed class OutgoingMessage : Message() {
         sealed class ToTrolley : OutgoingMessage() {
 
-            object AssignedToApp : ToTrolley()
+            data class AssignedToApp(val code: String) : ToTrolley()
 
-            data class Route(val route: String) : ToTrolley()
+            data class RouteCalculated(val route: String) : ToTrolley()
 
-            object AppScannedProduct : ToTrolley()
+            data class ReplanCalculated(val subRoute: String) : ToTrolley()
+
+            data class AppScannedProduct(val id: String) : ToTrolley()
 
             object AppAcceptedProduct : ToTrolley()
 
             object AppRejectedProduct : ToTrolley()
 
+            object AppSkippedProduct : ToTrolley()
+
+            object SessionComplete : ToTrolley()
+
+            data class ConfirmMessage(val message: String) : ToTrolley()
         }
 
         sealed class ToApp : OutgoingMessage() {
 
             object TrolleyAssigned : ToApp()
 
-            object UserAtTrolley : ToApp()
+            object UserReady : ToApp()
 
             data class Route(val route: String) : ToApp()
+
+            data class Replan(val subRoute: String) : ToApp()
 
             data class ReachedPoint(val point: String) : ToApp()
 
             object TrolleyAcceptedProduct : ToApp()
 
             object TrolleyRejectedProduct : ToApp()
+
+            object TrolleySkippedProduct : ToApp()
         }
     }
 
@@ -81,13 +109,17 @@ sealed class Message {
         fun messageFromAppString(message: String): IncomingMessage.FromApp {
             val type = message.substringBefore(DELIM)
             return when (type) {
-                "RC" -> IncomingMessage.FromApp.Reconnect(message.substringAfter(DELIM))
-                "PS" -> IncomingMessage.FromApp.ProductScanned
-                "PA" -> IncomingMessage.FromApp.AppAcceptedProduct
-                "PR" -> IncomingMessage.FromApp.AppRejectedProduct
-                "RH" -> IncomingMessage.FromApp.RequestHelp
-                "SP" -> IncomingMessage.FromApp.RequestStop
-                "RR" -> IncomingMessage.FromApp.ReceivedRoute
+                "Reconnect" -> IncomingMessage.FromApp.Reconnect(message, message.substringAfter(DELIM))
+                "ProductScanned" -> IncomingMessage.FromApp.ProductScanned(message, message.substringAfter(DELIM))
+                "AcceptedProduct" -> IncomingMessage.FromApp.AppAcceptedProduct(message)
+                "RejectedProduct" -> IncomingMessage.FromApp.AppRejectedProduct(message)
+                "SkippedProduct" -> IncomingMessage.FromApp.AppSkippedProduct(message)
+                "RequestHelp" -> IncomingMessage.FromApp.RequestHelp(message)
+                "Stop" -> IncomingMessage.FromApp.RequestStop(message)
+                "ReceivedRoute" -> IncomingMessage.FromApp.ReceivedRoute(message)
+                "PlanRoute" -> IncomingMessage.FromApp.PlanRoute(message, message.substringAfter(DELIM).toLong())
+                "SessionComplete" -> IncomingMessage.FromApp.SessionComplete(message)
+                "Ping" -> IncomingMessage.FromApp.Ping(message)
                 else -> IncomingMessage.FromApp.InvalidMessage(message)
             }
         }
@@ -95,27 +127,79 @@ sealed class Message {
         fun messageFromTrolleyString(message: String): IncomingMessage.FromTrolley {
             val type = message.substringBefore(DELIM)
             return when (type) {
-                "RP" -> IncomingMessage.FromTrolley.ReachedPoint(message.substringAfter(DELIM))
-                "PA" -> IncomingMessage.FromTrolley.TrolleyAcceptedProduct
-                "PR" -> IncomingMessage.FromTrolley.TrolleyRejectedProduct
-                "UT" -> IncomingMessage.FromTrolley.UserAtTrolley
-                "RR" -> IncomingMessage.FromTrolley.ReceivedRoute
+                "ReachedPoint" -> IncomingMessage.FromTrolley.ReachedPoint(message, message.substringAfter(DELIM))
+                "AcceptedProduct" -> IncomingMessage.FromTrolley.TrolleyAcceptedProduct(message)
+                "RejectedProduct" -> IncomingMessage.FromTrolley.TrolleyRejectedProduct(message)
+                "SkippedProduct" -> IncomingMessage.FromTrolley.TrolleySkippedProduct(message)
+                "UserReady" -> IncomingMessage.FromTrolley.UserReady(message)
+                "ReceivedRoute" -> IncomingMessage.FromTrolley.ReceivedRoute(message)
+                "Ping" -> IncomingMessage.FromTrolley.Ping(message)
+                "RequestReplan" -> {
+                    val points = message.substringAfter(DELIM).split('%')
+                    IncomingMessage.FromTrolley.RequestReplan(message, points[0].toInt(), points[1].toInt())
+                }
                 else -> IncomingMessage.FromTrolley.InvalidMessage(message)
             }
         }
 
         fun messageToString(message: OutgoingMessage): String = when (message) {
-            is OutgoingMessage.ToApp.ReachedPoint -> "RP$DELIM${message.point}"
-            is OutgoingMessage.ToApp.TrolleyAcceptedProduct -> "TA"
-            is OutgoingMessage.ToApp.TrolleyRejectedProduct -> "TR"
-            is OutgoingMessage.ToApp.Route -> "RC$DELIM${message.route}"
-            is OutgoingMessage.ToApp.TrolleyAssigned -> "TA$DELIM"
-            is OutgoingMessage.ToApp.UserAtTrolley -> "UT$DELIM"
-            is OutgoingMessage.ToTrolley.AppAcceptedProduct -> "AA"
-            is OutgoingMessage.ToTrolley.AppRejectedProduct -> "AR"
-            is OutgoingMessage.ToTrolley.AppScannedProduct -> "AS"
-            is OutgoingMessage.ToTrolley.AssignedToApp -> "AA$DELIM"
-            is OutgoingMessage.ToTrolley.Route -> "RC$DELIM${message.route}"
+            is OutgoingMessage.ToApp.ReachedPoint -> "ReachedPoint$DELIM${message.point}"
+            is OutgoingMessage.ToApp.TrolleyAcceptedProduct -> "TrolleyAcceptedProduct$DELIM"
+            is OutgoingMessage.ToApp.TrolleyRejectedProduct -> "TrolleyRejectedProduct$DELIM"
+            is OutgoingMessage.ToApp.TrolleySkippedProduct -> "TrolleySkippedProduct$DELIM"
+            is OutgoingMessage.ToApp.Route -> "RouteCalculated$DELIM${message.route}"
+            is OutgoingMessage.ToApp.Replan -> "Replan$DELIM${message.subRoute}"
+            is OutgoingMessage.ToApp.TrolleyAssigned -> "TrolleyAssigned$DELIM"
+            is OutgoingMessage.ToApp.UserReady -> "UserReady$DELIM"
+            is OutgoingMessage.ToTrolley.AppAcceptedProduct -> "AppAcceptedProduct$DELIM"
+            is OutgoingMessage.ToTrolley.AppRejectedProduct -> "AppRejectedProduct$DELIM"
+            is OutgoingMessage.ToTrolley.AppSkippedProduct -> "AppSkippedProduct$DELIM"
+            is OutgoingMessage.ToTrolley.AppScannedProduct -> "AppScannedProduct$DELIM${message.id}"
+            is OutgoingMessage.ToTrolley.AssignedToApp -> "Assigned$DELIM${message.code}"
+            is OutgoingMessage.ToTrolley.RouteCalculated -> "RouteCalculated$DELIM${message.route}"
+            is OutgoingMessage.ToTrolley.ConfirmMessage -> "ConfirmMessage$DELIM${message.message}"
+            is OutgoingMessage.ToTrolley.ReplanCalculated -> "ReplanCalculated$DELIM${message.subRoute}"
+            is OutgoingMessage.ToTrolley.SessionComplete -> "SessionComplete$DELIM"
+        }
+
+        fun routeToString(route: RouteFinder.RoutingResult.Route,
+                          productMap: Map<Graph.Node<Int>, List<Pair<Int, Int>>>): String {
+            val builder = StringBuilder()
+            val sep = ','
+            val delim = '%'
+            var previous = route.first()
+            route.forEach { vertex ->
+                if (vertex == route.first()) {
+                    builder.append("start$delim${vertex.node.id}")
+                } else if (vertex == route.last()) {
+                    builder.append("end$delim${vertex.node.id}")
+                } else {
+                    // Add a turn if there's more than one way to get to the next node
+                    val edges = previous.edges
+                    if (edges.size > 1) {
+                        val edge = edges.first { edge -> edge.to == vertex.node }
+                        when (edge.direction) {
+                            Graph.Direction.FORWARD -> builder.append("forward")
+                            Graph.Direction.LEFT -> builder.append("left")
+                            Graph.Direction.RIGHT -> builder.append("right")
+                        }
+
+                        builder.append(sep)
+                    }
+                    if (vertex.node in productMap.keys) {
+                        builder.append("stop$delim${vertex.node.id}")
+                        val products = productMap[vertex.node]?.map { "${it.first}$delim${it.second}" }
+                        builder.append(products?.joinToString(separator = "$delim", prefix = "$delim"))
+                    } else {
+                        builder.append("pass$delim${vertex.node.id}")
+                    }
+                }
+
+                builder.append(sep)
+                previous = vertex
+            }
+            builder.setLength(builder.length - 1) // Remove last comma
+            return builder.toString()
         }
     }
 

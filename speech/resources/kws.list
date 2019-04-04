@@ -1,0 +1,7 @@
+start /1e-3/
+yes /5e-1/
+no /5e-1/
+shopping /1e-3/
+tutorial /1e-3/
+repeat /1e-2/
+options /1e-3/

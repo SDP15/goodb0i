@@ -24,4 +24,6 @@
         "ev3/util",
         "ev3/glm"
     ]
+    "python.linting.pylintEnabled": true,
+    "python.linting.enabled": true
 }

@@ -40,7 +40,7 @@ open class ServerTest {
         @JvmStatic
         fun startServer() {
             if(!serverStarted) {
-                server = embeddedServer(Netty, 8081, watchPaths = listOf("Main"), module = Application::module)
+                server = embeddedServer(Netty, 8081, module = Application::module)
                 server.start()
                 serverStarted = true
                 RestAssured.baseURI = "http://localhost"

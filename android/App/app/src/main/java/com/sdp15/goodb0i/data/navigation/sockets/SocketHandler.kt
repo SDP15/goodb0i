@@ -3,6 +3,7 @@ package com.sdp15.goodb0i.data.navigation.sockets
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import okhttp3.*
+import okhttp3.logging.HttpLoggingInterceptor
 import okio.ByteString
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
@@ -21,8 +22,9 @@ class SocketHandler<IN, OUT>(private val transform: SocketMessageTransformer<IN,
     // Open the socket
     fun start(url: String) {
         val request = Request.Builder().url(url).build()
-        val client = OkHttpClient()
-        Timber.i("Starting websocket")
+        val client = OkHttpClient.Builder()
+            .addInterceptor(HttpLoggingInterceptor()).build()
+        Timber.i("Starting websocket for $url")
         socket = client.newWebSocket(request, SocketListener())
     }
 
@@ -50,6 +52,7 @@ class SocketHandler<IN, OUT>(private val transform: SocketMessageTransformer<IN,
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
             super.onFailure(webSocket, t, response)
             Timber.e(t, "Socket failure")
+            connected.set(false)
             state.postValue(SocketState.ErrorDisconnect)
         }
 
@@ -92,7 +95,9 @@ class SocketHandler<IN, OUT>(private val transform: SocketMessageTransformer<IN,
         get() = state
 
     fun sendMessage(message: OUT) {
-        socket?.send(transform.transformOutgoing(message))
+        val transformed = transform.transformOutgoing(message)
+        Timber.i("Sending message $transformed")
+        socket?.send(transformed)
     }
 
     /**

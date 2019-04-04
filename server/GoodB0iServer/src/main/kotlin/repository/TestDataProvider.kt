@@ -8,6 +8,7 @@ import kotlinx.coroutines.launch
 import mu.KotlinLogging
 import org.jetbrains.exposed.sql.SizedCollection
 import org.jetbrains.exposed.sql.SizedIterable
+import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import repository.adapters.ShoppingListTypeAdapter
 import repository.lists.ListEntry
@@ -15,6 +16,7 @@ import repository.lists.ShoppingList
 import repository.shelves.Shelf
 import repository.shelves.ShelfRack
 import repository.products.Product
+import repository.shelves.Shelves
 import java.io.File
 import java.util.*
 
@@ -69,7 +71,7 @@ object TestDataProvider {
             Product.all().forEach { stock ->
                 when {
                     arrayOf("Milk", "Cheese").any { stock.department.contains(it) } -> {
-                        kLogger.debug("Inserting dairy shelf for ${stock.department}")
+                        kLogger.debug("Inserting dairy shelf for ${stock.department} ${stock.name}")
                         Shelf.new {
                             position = count % 3
                             quantity = 5
@@ -157,7 +159,42 @@ object TestDataProvider {
                     ListEntry.new {
                         index = i
                         product = p
-                        quantity = i+1
+                        quantity = i + 1
+                    }
+                })
+            }
+            println("Rack ids ${ShelfRack.all().map { it.id.value }}")
+            val available = listOf(1, 3, 5, 7).map { ShelfRack[it] }.map { rack ->
+                Shelf.find { Shelves.rack eq rack.id }.first().product
+            }
+            // 3 Fruits
+            // 1 Dairy
+            // 5 Seafood
+            // 7 sweets
+            val fruits = Shelf.find { Shelves.rack eq 3}.first().product
+            val dairy = Shelf.find { Shelves.rack eq 1}.first().product
+            val seafood = Shelf.find { Shelves.rack eq 5}.first().product
+            val sweets = Shelf.find { Shelves.rack eq 7}.first().product
+            val sweets2 = Shelf.find { Shelves.rack eq 7}.toList()[1].product
+            ShoppingList.new {
+                code = 7654321
+                time = System.currentTimeMillis()
+                products = SizedCollection(listOf(fruits, sweets, sweets2).mapIndexed { i, p ->
+                    ListEntry.new {
+                        index = i
+                        product = p
+                        quantity = i + 1
+                    }
+                })
+            }
+            ShoppingList.new {
+                code = 7654322
+                time = System.currentTimeMillis()
+                products = SizedCollection(listOf(fruits, dairy).mapIndexed { i, p ->
+                    ListEntry.new {
+                        index = i
+                        product = p
+                        quantity = i + 1
                     }
                 })
             }
@@ -165,7 +202,7 @@ object TestDataProvider {
     }
 
     private fun getTestData(): Array<Item> {
-        val path = System.getProperty("user.dir") + "/src/main/resources/items.json"
+        val path = System.getProperty("user.dir") + "/src/main/resources/products.json"
         kLogger.debug("Reading test products data from $path")
         val file = File(path).bufferedReader()
         val gson = Gson()
@@ -176,11 +213,11 @@ object TestDataProvider {
 data class Item(
         @SerializedName("id") val id: Long = -1,
         @SerializedName("name") val name: String,
-        @SerializedName("AverageSellingUnitWeight") val averageSellingUnitWeight: Double,
-        @SerializedName("ContentsMeasureType") val contentsMeasureType: String,
+        @SerializedName("averageSellingUnitWeight") val averageSellingUnitWeight: Double,
+        @SerializedName("contentsMeasureType") val contentsMeasureType: String,
         @SerializedName("contentsQuantity") val contentsQuantity: Double,
-        @SerializedName("UnitOfSale") val unitOfSale: Int,
-        @SerializedName("UnitQuantity") val unitQuantity: String,
+        @SerializedName("unitOfSale") val unitOfSale: Int,
+        @SerializedName("unitQuantity") val unitQuantity: String,
         @SerializedName("department") val department: String,
         @SerializedName("description") val description: kotlin.collections.List<String>,
         @SerializedName("price") val price: Double,

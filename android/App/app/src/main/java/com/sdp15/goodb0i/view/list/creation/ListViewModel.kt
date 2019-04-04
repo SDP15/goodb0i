@@ -7,6 +7,7 @@ import com.sdp15.goodb0i.data.store.cache.ShoppingListStore
 import com.sdp15.goodb0i.data.store.lists.ListItem
 import com.sdp15.goodb0i.data.store.lists.ListManager
 import com.sdp15.goodb0i.data.store.lists.ShoppingList
+import com.sdp15.goodb0i.data.store.price.PriceComputer
 import com.sdp15.goodb0i.data.store.products.Product
 import com.sdp15.goodb0i.data.store.products.ProductLoader
 import com.sdp15.goodb0i.move
@@ -25,6 +26,7 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(),
     private val productLoader: ProductLoader by inject()
     private val listManager: ListManager by inject()
     private val listStore: ShoppingListStore by inject()
+    private val priceComputer: PriceComputer by inject()
 
     private var existingList: ShoppingList? = null
 
@@ -46,11 +48,11 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(),
 
     init {
         search.addSource(list) {
-            // When an product is updated in the list, post an update to that product within the current search results
-            //TODO: Currently ProductAdapter checks if the product is currently visible. Should it be responsible for this?
+            // When an products is updated in the list, post an update to that products within the current search results
+            //TODO: Currently ProductAdapter checks if the products is currently visible. Should it be responsible for this?
             if (it is ListDiff.Update) search.postValue(ListDiff.Update(currentSearchResults, it.updated))
             if (it is ListDiff.Remove) search.postValue(ListDiff.Update(currentSearchResults, it.removed))
-            // Add doesn't matter, as it is only called when we add a new product *from the search results*
+            // Add doesn't matter, as it is only called when we add a new products *from the search results*
 
         }
         search.addSource(retrievedSearchResults) { result ->
@@ -79,7 +81,7 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(),
 
     fun onSaveList() {
         //TODO: Error handling
-        GlobalScope.launch(Dispatchers.IO) {
+        launch {
             val params = currentList.map { Pair(it.product.id, it.quantity) }
             // Create or update a list
             val result =
@@ -120,14 +122,14 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(),
     }
 
     private val price: Double
-        get() = currentList.sumByDouble { it.quantity * it.product.price }
+        get() = priceComputer.itemsPrice(currentList)
 
     fun incrementItem(product: Product) {
         Timber.i("Incrementing added ${product.name}")
         val i = currentList.indexOfFirst { it.product.id == product.id }
         val diff: ListDiff<ListItem>
-        if (i == -1) { // Add product to list as it isn't there already
-            val ci = ListItem(product, 1)
+        if (i == -1) { // Add products to list as it isn't there already
+            val ci = ListItem(product)
             currentList.add(ci)
             diff = ListDiff.Add(currentList, ci)
         } else { // Update count and post to update adapter
@@ -141,7 +143,7 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(),
     fun decrementItem(product: Product) {
         Timber.i("Decrementing added ${product.name}")
         val ci = currentList.firstOrNull { it.product.id == product.id }
-        // If the product doesn't exist in the current list, the user is decrementing an product in search which is at 0
+        // If the products doesn't exist in the current list, the user is decrementing an products in search which is at 0
         ci?.apply {
             quantity--
             if (quantity == 0) {
@@ -154,7 +156,7 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(),
         }
     }
 
-    // Move a product on drag-and-drop
+    // Move a products on drag-and-drop
     fun moveProduct(from: Int, to: Int) {
         if (currentList.move(from, to)) { // Has the item actually moved (from != to)
             list.postValue(ListDiff.Move(currentList, currentList[to], from, to))

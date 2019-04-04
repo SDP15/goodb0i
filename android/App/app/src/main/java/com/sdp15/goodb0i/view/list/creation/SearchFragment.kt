@@ -6,10 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import com.arlib.floatingsearchview.FloatingSearchView
 import com.sdp15.goodb0i.R
 import com.sdp15.goodb0i.switchOnEmpty
-import kotlinx.android.synthetic.main.layout_search.*
+import kotlinx.android.synthetic.main.layout_list_product_search.*
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 class SearchFragment : Fragment() {
@@ -29,8 +28,7 @@ class SearchFragment : Fragment() {
         vm.search.observe(this, Observer {
             adapter.itemsChanged(it)
         })
-        val fsv = parentFragment!!.view!!.findViewById<FloatingSearchView>(R.id.floating_search_view)
-        fsv.setOnQueryChangeListener(vm::onQueryChange)
+
     }
 
     override fun onCreateView(
@@ -38,7 +36,7 @@ class SearchFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Container is the ViewPager. If we ever move SearchFragment out of a ViewPager, this will crash
-        return inflater.inflate(R.layout.layout_search, container, false)
+        return inflater.inflate(R.layout.layout_list_product_search, container, false)
     }
 
     interface SearchFragmentInteractor {

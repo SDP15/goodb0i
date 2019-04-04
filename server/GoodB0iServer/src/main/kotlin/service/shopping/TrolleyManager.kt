@@ -1,6 +1,5 @@
 package service.shopping
 
-import io.ktor.http.cio.websocket.Frame
 import io.ktor.http.cio.websocket.WebSocketSession
 import java.util.concurrent.ConcurrentHashMap
 
@@ -16,7 +15,7 @@ class TrolleyManager {
 
     fun assignAvailableTrolley(): Pair<String, WebSocketSession>? {
         //TODO: Actually track assigned trolleys
-        return members.entries.first().toPair()
+        return members.entries.firstOrNull()?.toPair()
     }
 
     suspend fun onMessage(id: String, message: String) {

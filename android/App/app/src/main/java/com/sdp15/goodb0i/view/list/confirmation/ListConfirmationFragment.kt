@@ -21,8 +21,9 @@ class ListConfirmationFragment : BaseFragment() {
         super.onResume()
         val args = navArgs<ListConfirmationFragmentArgs>()
         Timber.i("Received args $args")
-        vm.setShoppingList(args.value.shoppingList)
-        confirmation_button_Pay.setOnClickListener {
+        val sl = args.value.shoppingList
+        vm.setShoppingList(sl)
+        confirmation_button_navigate.setOnClickListener {
 
         }
         vm.price.observe(this, Observer {
@@ -40,13 +41,17 @@ class ListConfirmationFragment : BaseFragment() {
             } else {
                 findNavController().navigate(
                     ListConfirmationFragmentDirections.actionListConfirmationFragmentToListCreationFragment(
-                        args.value.shoppingList
+                        sl
                     )
                 )
             }
         }
-        confirmation_button_Pay.setOnClickListener {
-            vm.startNavigation()
+        confirmation_button_navigate.setOnClickListener {
+            findNavController().navigate(
+                ListConfirmationFragmentDirections.actionListConfirmationFragmentToShopConnectionFragment(
+                    sl
+                )
+            )
         }
     }
 
@@ -58,7 +63,7 @@ class ListConfirmationFragment : BaseFragment() {
     }
 
     override fun onBackPressed(): Boolean {
-        if(baseActivity.fragmentHistory.first==R.id.list_creation_fragment) {
+        if (baseActivity.fragmentHistory.first == R.id.list_creation_fragment) {
             findNavController().popBackStack(R.id.welcome_fragment, false)
             return true
         }

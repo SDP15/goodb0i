@@ -28,19 +28,19 @@ class ProductAdapter(
     fun itemsChanged(diff: ListDiff<ListItem>) {
         when (diff) {
             is ListDiff.All -> {
-                items = diff.items.toMutableList()
+                items = diff.toMutableList()
                 expanded = items.map { false }.toMutableList()
                 notifyDataSetChanged()
             }
             is ListDiff.Add -> {
-                val i = diff.items.indexOf(diff.added)
-                items = diff.items.toMutableList()
+                val i = diff.indexOf(diff.added)
+                items = diff.toMutableList()
                 expanded.add(i, false)
                 notifyItemInserted(i)
             }
             is ListDiff.Remove -> {
                 val i = items.indexOf(diff.removed)
-                items = diff.items.toMutableList()
+                items = diff.toMutableList()
                 expanded.removeAt(i)
                 notifyItemRemoved(i)
             }
@@ -52,7 +52,7 @@ class ProductAdapter(
                 }
             }
             is ListDiff.Move -> {
-                items = diff.items.toMutableList()
+                items = diff.toMutableList()
                 expanded.move(diff.from, diff.to)
                 notifyItemMoved(diff.from, diff.to)
             }

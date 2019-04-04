@@ -11,7 +11,7 @@
         style="@style/TitleText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/goodboi"
+        android:text="@string/app_name"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -20,9 +20,9 @@
         android:id="@+id/navigation_info_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@drawable/view_border"
         android:layout_margin="@dimen/default_horizontal_margin"
+        android:background="@drawable/view_border"
+        android:orientation="vertical"
         android:padding="@dimen/textview_padding"
         app:layout_constraintBottom_toTopOf="@+id/navigation_help_button"
         app:layout_constraintEnd_toEndOf="parent"
@@ -35,8 +35,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:textSize="@dimen/textview_textsize"
-            android:text="@string/label_navigating_to" />
+            android:text="@string/label_navigating_to"
+            android:textSize="@dimen/textview_textsize" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/navigation_item_name"
@@ -46,6 +46,15 @@
             android:layout_margin="@dimen/default_horizontal_margin"
             android:textColor="@color/colorAccent"
             tools:text="Item 1: Milk 2L" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/navigation_move_progress"
+            style="@style/BodyText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/default_horizontal_margin"
+            android:textColor="@color/colorAccent"
+            tools:text="20% complete" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/navigation_item_up_nex"
@@ -59,13 +68,13 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/navigation_help_button"
+        style="@style/HelpButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/default_margin_bottom"
-        style="@style/HelpButton"
+        android:text="@string/action_assistance"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:text="@string/action_assistance" />
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

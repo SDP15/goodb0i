@@ -55,6 +55,9 @@ teams
 # .nfs files are created when an open file is removed but is still being accessed
 .nfs*
 
+## IntelliJ ##
+.idea/*
+
 ### VisualStudioCode ###
 .vscode/*
 !.vscode/settings.json
@@ -90,5 +93,12 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+# iPython
+.ipynb_checkpoints
+
+# Python
+__pycache__
+*.pyc
 
 # End of https://www.gitignore.io/api/c++,linux,windows,visualstudiocode

@@ -18,6 +18,7 @@ class ListResourceTest : ServerTest() {
 
     private val products: MutableList<Product> = mutableListOf()
 
+
     @BeforeAll
     fun loadProducts() {
         transaction {
@@ -88,20 +89,22 @@ class ListResourceTest : ServerTest() {
 
     @Test
     fun testUpdateList() {
-        val testList = randomListBody(4).toMutableList()
+        // Test list of unique products
+        val testList = randomListBody(10).toMutableList()
+        val initialList = testList.subList(0, 5)
         val response = given()
-                .body(testList)
+                .body(initialList)
                 .When()
                 .contentType(ContentType.JSON)
                 .post("/lists/new")
                 .then()
                 .statusCode(HttpStatusCode.Created.value)
                 .extract()
-        testList.removeAt(0)
-        testList[1] = testList[1].copy(second = 3)
-        testList.addAll(randomListBody(3))
+        val updatedList = initialList
+        updatedList.removeAt(0)
+        updatedList[1] = updatedList[1].copy(second = 3)
         val update = given()
-                .body(testList)
+                .body(updatedList)
                 .When()
                 .contentType(ContentType.JSON)
                 .post("/lists/update/${response.to<String>()}")
