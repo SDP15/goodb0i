@@ -37,7 +37,9 @@ class PiController:
         self.ev3_commands = []
 
         self.app_accepted_event = threading.Event()
-        self.speech_interactor = SpeechInteractor(self.speech_interactor_queue, self.controller_queue, self.app_accepted_event)
+        self.app_skipped_event = threading.Event()
+        self.clear_queue_event = threading.Event()
+        self.speech_interactor = SpeechInteractor(self.speech_interactor_queue, self.controller_queue, self.app_accepted_event, self.app_skipped_event, self.clear_queue_event)
         
         # Thread runs a given function and it's arguments (if given any) from the work queue
         t1 = WorkerThread("PiControllerThread", self, self.controller_queue)
@@ -58,13 +60,22 @@ class PiController:
         elif "AppRejectedProject" in message:
             self.speech_interactor_queue.put("clear_listen_event")
             self.speech_interactor_queue.put(("cart", "no", "app=True"))
+        elif "AppSkippedProduct" in message:
+            self.app_skipped_event.set()
+            log("Set app_skipped event")
+            self.clear_queue_event.wait()
+            new_queue_items = ["clear_listen_event", "skip_product", ("next_state", "continue"), "continue_shopping"]
+            self.speech_interactor_queue.put(("clear_work_queue", new_queue_items))
+            self.clear_queue_event.clear()
+            self.clear_queue_event.wait()
+            self.clear_queue_event.clear()
         elif "AppScannedProduct" in message:
             item = message.split("&")
             query = "/products/" + item[1]
             item_json = self.query_web_server(query)
 
             id = item_json['id']
-            name = item_json['name']
+            name = item_json['shortName']
             price = item_json['price']
             new_product = Product(id, 1, name, price)
 
@@ -139,6 +150,7 @@ class PiController:
             if "stop" in message:
                 # TODO: Remove this hardcoded session complete
                 if "%9" in command:
+                    self.speech_interactor_queue.put("clear_listen_event")
                     log("Session completed")
                 else:
                      self.speech_interactor_queue.put("on_location_change")
@@ -206,7 +218,7 @@ class PiController:
         for products in json['products']:
             id = products['product']['id']
             quantity = products['quantity']
-            name = products['product']['name']
+            name = products['product']['shortName']
             price = products['product']['price']
             new_product = Product(id, quantity, name, price)
             self.unordered_list.append(new_product)
@@ -366,7 +378,9 @@ class PiController:
         if not queue.empty():
             while queue.qsize != 0:
                 queue.get()
-            
+
+        if queue.empty():
+            log("Work queue EMPTY")            
 
 
 PiController()
