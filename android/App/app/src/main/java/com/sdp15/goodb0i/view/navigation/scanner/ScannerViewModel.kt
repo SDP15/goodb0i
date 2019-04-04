@@ -78,7 +78,10 @@ class ScannerViewModel : BaseViewModel<Any>(),
     }
 
     fun manualEntry(code: String) {
-        onRead(code)
+        if (code.length == 13) {
+            onRead(code)
+        }
+
     }
 
     fun skip() {

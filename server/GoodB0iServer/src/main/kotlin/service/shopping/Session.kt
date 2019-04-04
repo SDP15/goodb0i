@@ -49,7 +49,10 @@ class Session(
                     val rackProductMap = racks.associate { rack ->
                         Graph.Node(rack.id.value) to rack.shelves.mapNotNull { shelf ->
                             val index = list.products.indexOfFirst { it.product == shelf.product }
-                            if (index == -1) null else Pair(index, shelf.position)
+                            if (index == -1) null else {
+                                println("Found shelf ${shelf.rack.value} for product ${list.products.toList()[index].product.name}")
+                                Pair(index, shelf.position)
+                            }
                         }
                     }
                     val path = routeFinder.plan(racks.map { rack ->

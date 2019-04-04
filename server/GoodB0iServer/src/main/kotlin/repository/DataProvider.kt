@@ -34,6 +34,7 @@ object DataProvider {
         val file = File(productPath).bufferedReader()
         val products = Gson().fromJson(file, Array<JSONProduct>::class.java)
         transaction {
+            if (!Product.all().empty()) return@transaction
             products.forEachIndexed { index, product ->
 
                 val id = if (product.id == null) UUID.randomUUID() else UUID.fromString(product.id)
@@ -65,6 +66,7 @@ object DataProvider {
         racks.forEach { rackJSON ->
             // Exposed doesn't seem to like inserting multiple racks in a single transaction
             transaction {
+                if (!ShelfRack.all().empty()) return@transaction
                 val rackEntity = ShelfRack.new(rackJSON.id) {
                     info = rackJSON.info
                     capacity = rackJSON.capacity
@@ -95,6 +97,7 @@ object DataProvider {
         val arr = Gson().fromJson(file, Array<JSONList>::class.java)
         arr.forEach { list ->
             transaction {
+                if (!ShoppingList.all().empty()) return@transaction
                 ShoppingList.new {
                     code = list.code
                     time = System.currentTimeMillis()
