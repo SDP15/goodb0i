@@ -626,6 +626,7 @@ private:
                 "enqueue-forward enqueue-left enqueue-right queue-status "
                 "dump-queue clear-queue resume-from-stop-marker dump dump-hsv "
                 "battery `set-speed 100` get-speed `set-max-turn-ratio 110` "
+                "get-stop-distance `set-stop-distance 70` "
                 "`set-slight-turn-ratio 90` get-turn-ratios disconnect\n");
         } else if (cmd == "stop") {
           if (!halted) {
