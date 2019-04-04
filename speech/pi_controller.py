@@ -51,6 +51,7 @@ class PiController:
         self.qr_event = threading.Event()
         self.continue_event = threading.Event()
         self.continue_event.set()
+        self.route_replan_event = threading.Event()
 
     def on_message(self, message):
         if "AppAcceptedProduct" in message:
@@ -134,7 +135,7 @@ class PiController:
             self.enqueue_ev3_commands()
 
             # Start ButtonThread to listen for button presses to start/stop trolley
-            t2 = ButtonThread("ButtonThread", self.controller_queue, self.button_event, self.continue_event)
+            t2 = ButtonThread("ButtonThread", self.controller_queue, self.button_event, self.continue_event, self.route_replan_event)
             t2.start()
             t3 = QRThread("QRDetectionThread", self.controller_queue)
             t3.start()
@@ -207,6 +208,7 @@ class PiController:
                 log("EV3 commands to queue: {:}".format(self.ev3_commands))
                 # Update command queue on EV3
                 self.enqueue_ev3_commands()
+                self.route_replan_event.set()
         elif "SessionComplete&" in message:
             #Clear everything that we store
             self.marker_list = []

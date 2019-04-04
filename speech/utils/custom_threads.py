@@ -40,12 +40,13 @@ class WorkerThread(threading.Thread):
                 self.event_flag.set()
 
 class ButtonThread(threading.Thread):
-    def __init__(self, name, controller_queue, event_flag, continue_flag):
+    def __init__(self, name, controller_queue, event_flag, continue_flag, route_replan_flag):
         threading.Thread.__init__(self, name=name)
         self.controller_queue = controller_queue
         self.prev_command = "start"
         self.event_flag = event_flag
         self.continue_flag = continue_flag
+        self.route_replan_flag = route_replan_flag
         self.circular_buffer = collections.deque([0,0,0],maxlen=3)
         self.pin = 24
 
@@ -64,6 +65,10 @@ class ButtonThread(threading.Thread):
                 button_press = True
             else:
                 button_press = False
+
+            if self.route_replan_flag.isSet():
+                self.route_replan_flag.clear()
+                self.prev_command = "start"
 
             if not self.event_flag.isSet() and button_press:
                 if self.prev_command == "start":
