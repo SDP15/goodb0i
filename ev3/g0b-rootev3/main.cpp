@@ -17,6 +17,13 @@ using namespace std;
 using namespace std::chrono_literals;
 using namespace ev3dev;
 
+constexpr int DEFAULT_SPEED{90};
+constexpr int DEFAULT_SLIGHT_TURN_RATIO{80};
+constexpr int DEFAULT_TURN_RATIO{90};
+constexpr int TURN_TIMEOUT_MS{3000};
+constexpr int MARKER_TIMEOUT_MS{1500};
+constexpr int DEFAULT_OBSTACLE_DISTANCE{30};
+
 enum DriveNumber : int {
   DRIVE_LEFT_BACK = 0,
   DRIVE_LEFT_FRONT,
@@ -47,8 +54,8 @@ void connectEv3Devices() {
   drives[DRIVE_LEFT_FRONT] = make_unique<evutil::Drive>(OUTPUT_B, failed);
   drives[DRIVE_RIGHT_BACK] = make_unique<evutil::Drive>(OUTPUT_C, failed);
   drives[DRIVE_RIGHT_FRONT] = make_unique<evutil::Drive>(OUTPUT_D, failed);
-  drives[DRIVE_LEFT_BACK]->setReversed();
-  drives[DRIVE_RIGHT_BACK]->setReversed();
+  drives[DRIVE_LEFT_FRONT]->setReversed();
+  drives[DRIVE_RIGHT_FRONT]->setReversed();
 
   leftColor = make_unique<evutil::ColorSensor>(INPUT_1, failed);
   midColor = make_unique<evutil::ColorSensor>(INPUT_2, failed);
@@ -158,7 +165,7 @@ public:
     commands.push_front(cmd);
   }
 
-  int forwardBaseSpeed{30};
+  int forwardBaseSpeed{DEFAULT_SPEED};
 
 private:
   int currentTurnAngle{0}, currentSpeed{0};
@@ -172,6 +179,8 @@ private:
 
   /// TurnAngle goes from -100 to 100
   void setTargetSpeedsClassic(int speedPercent, int turnAngle) {
+    // r1/r2~=0.948 or 243/256
+    // r2/r1~=1.054 or 270/256
     int bspeed{forwardBaseSpeed * speedPercent / 100};
     int lspeed{bspeed};
     int rspeed{bspeed};
@@ -179,15 +188,24 @@ private:
       // left turn
       turnAngle = 100 + turnAngle;
       lspeed = lspeed * turnAngle / 100;
+      if (rspeed < 70)
+        rspeed += 15;
     } else if (turnAngle > 0) {
       turnAngle = 100 - turnAngle;
       rspeed = rspeed * turnAngle / 100;
+      if (lspeed < 70)
+        lspeed += 15;
     }
 
     targetMotorSpeeds[DRIVE_LEFT_BACK] = lspeed;
-    targetMotorSpeeds[DRIVE_LEFT_FRONT] = lspeed;
     targetMotorSpeeds[DRIVE_RIGHT_BACK] = rspeed;
-    targetMotorSpeeds[DRIVE_RIGHT_FRONT] = rspeed;
+    if (lspeed == rspeed) {
+      targetMotorSpeeds[DRIVE_LEFT_FRONT] = lspeed;
+      targetMotorSpeeds[DRIVE_RIGHT_FRONT] = rspeed;
+    } else {
+      targetMotorSpeeds[DRIVE_LEFT_FRONT] = lspeed * 243 / 256;
+      targetMotorSpeeds[DRIVE_RIGHT_FRONT] = rspeed * 243 / 256;
+    }
   }
 
   void setTargetSpeedsPivot(int speedPercent, bool turnRight) {
@@ -287,7 +305,7 @@ private:
   SteeringSubsystem *sysSteering;
 
 public:
-  int obstacleDistancePct{60};
+  int obstacleDistancePct{DEFAULT_OBSTACLE_DISTANCE};
   AvoidanceSubsystem(SteeringSubsystem *sysSteering) {
     this->sysSteering = sysSteering;
   }
@@ -312,6 +330,7 @@ protected:
                                : mem_fn(&Subsystem::resume));
       if (nowSeesObstacle) {
         sysSteering->requestStop(SUBSYS_AVOIDANCE);
+        ev3dev::sound::beep("-f 2000 -l 500 -r 3", false);
       } else {
         sysSteering->cancelStopRequest(SUBSYS_AVOIDANCE);
       }
@@ -342,11 +361,11 @@ private:
   bool ignoreMarker{false};
   evutil::Stopwatch markerIgnoreStopwatch;
   int markerIgnoreMs{0};
-  static constexpr int MARKER_IGNORE_MS{2000};
 
 public:
   bool turningOn{true};
-  int slightTurnRatio{110}, maxTurnRatio{110};
+  int slightTurnRatio{DEFAULT_SLIGHT_TURN_RATIO},
+      maxTurnRatio{DEFAULT_TURN_RATIO};
 
   LineFollowSubsystem(SteeringSubsystem *sysSteering) {
     this->sysSteering = sysSteering;
@@ -380,7 +399,7 @@ public:
   void resumeFromStopMarker() {
     if (state == State::stoppedAtMarker) {
       ignoreMarker = true;
-      markerIgnoreMs = MARKER_IGNORE_MS;
+      markerIgnoreMs = MARKER_TIMEOUT_MS;
       markerIgnoreStopwatch.restart();
       state = State::following;
     }
@@ -419,15 +438,15 @@ protected:
       } else if (seeingMarker) {
         seeingMarker = false;
         // make the robot blind to the marker
-        lcol = evutil::Color::line;
+        lcol = evutil::Color::bg;
         mcol = evutil::Color::line;
-        rcol = evutil::Color::line;
+        rcol = evutil::Color::bg;
       }
     }
 
     if (seeingMarker || state == State::waitingForCommand) {
       ignoreMarker = true;
-      markerIgnoreMs = MARKER_IGNORE_MS;
+      markerIgnoreMs = MARKER_TIMEOUT_MS;
       markerIgnoreStopwatch.restart();
       log() << "Seen marker: ";
       if (queuedActions.empty()) {
@@ -456,12 +475,14 @@ protected:
           sendToAllClients("detected-marker left OK\n");
           state = State::turningAtMarker;
           turnBias = Direction::left;
+          markerIgnoreMs = TURN_TIMEOUT_MS;
           break;
         case QueuedAction::turnRight:
           log() << "Right marker" << endl;
           sendToAllClients("detected-marker right OK\n");
           state = State::turningAtMarker;
           turnBias = Direction::right;
+          markerIgnoreMs = TURN_TIMEOUT_MS;
           break;
         }
       }
@@ -605,6 +626,7 @@ private:
                 "enqueue-forward enqueue-left enqueue-right queue-status "
                 "dump-queue clear-queue resume-from-stop-marker dump dump-hsv "
                 "battery `set-speed 100` get-speed `set-max-turn-ratio 110` "
+                "get-stop-distance `set-stop-distance 70` "
                 "`set-slight-turn-ratio 90` get-turn-ratios disconnect\n");
         } else if (cmd == "stop") {
           if (!halted) {
@@ -694,7 +716,7 @@ private:
                    sysSteering.forwardBaseSpeed);
           rsend(wbuf);
         } else if (cmd.find("set-speed") == 0) {
-          int spd{30};
+          int spd{DEFAULT_SPEED};
           sscanf(cmd.c_str(), "set-speed %d", &spd);
           if (spd < 5) {
             spd = 5;
@@ -712,7 +734,7 @@ private:
                    sysLine.maxTurnRatio, sysLine.slightTurnRatio);
           rsend(wbuf);
         } else if (cmd.find("set-slight-turn-ratio") == 0) {
-          int tr{110};
+          int tr{DEFAULT_SLIGHT_TURN_RATIO};
           sscanf(cmd.c_str(), "set-slight-turn-ratio %d", &tr);
           if (tr < 5) {
             tr = 5;
@@ -725,7 +747,7 @@ private:
           sysLine.slightTurnRatio = tr;
           rsend(wbuf);
         } else if (cmd.find("set-max-turn-ratio") == 0) {
-          int tr{110};
+          int tr{DEFAULT_TURN_RATIO};
           sscanf(cmd.c_str(), "set-max-turn-ratio %d", &tr);
           if (tr < 5) {
             tr = 5;
