@@ -37,23 +37,19 @@ speech = LiveSpeech(
 
 
 class SpeechInteractor:
-    def __init__(self, work_queue, controller_queue, app_accepted_event, app_skipped_event, clear_queue_event):
+    def __init__(self, work_queue, controller_queue, app_accepted_event, app_skipped_event, clear_queue_event, logging):
         state_file = os.path.join(script_path, 'resources/interactor_states.json')
         self.controller_queue = controller_queue
         
         log_filename = now.strftime("%Y-%m-%d-%H%M%S")
-        self.logging = False
+        self.logging = logging
 
         # Conversation is logged if -log is specified in cmd line
         if len(sys.argv) > 1 and "-log" in sys.argv[1]:
             self.logging = True
 
-        # Log is placed in folder associated with test number
-        if len(sys.argv) > 2:
-            test_num = sys.argv[2]
-            self.log_filepath = "logs/{:}/{:}.txt".format(test_num, log_filename)
-        else:
-            self.log_filepath = "logs/{:}.txt".format(log_filename)
+        log_string = "logs/{:}.txt".format(log_filename)
+        self.log_filepath = os.path.join(script_path, log_string)
 
         if self.logging is True:
             log("Conversation is being logged in: {:}".format(
@@ -73,7 +69,6 @@ class SpeechInteractor:
         # Initialise TTS engine
         self.tts_engine = pyttsx.init()
         self.tts_engine.connect("finished-utterance", self.on_finish_utterance)
-        log("Callback connected.")
 
         self.work_queue = work_queue
         t1 = WorkerThread("SpeechInteractorThread", self, self.work_queue)
@@ -193,9 +188,6 @@ class SpeechInteractor:
             self.tts_engine.runAndWait()
 
     def on_finish_utterance(self, name, completed):
-        if self.app_skipped_event.isSet():
-            self.clear_queue_event.set()
-
         if self.finished_utt_callback:
             log("Finishing utterance and setting listen event flag.")
             self.listen_event.set()
@@ -210,7 +202,6 @@ class SpeechInteractor:
                 self.work_queue.put(item)
 
         # Clear app_skipped event after we finish clearing the queue
-        log("Clear app_skipped event")
         self.app_skipped_event.clear()
 
         # Setting clear queue event - new queue created.
