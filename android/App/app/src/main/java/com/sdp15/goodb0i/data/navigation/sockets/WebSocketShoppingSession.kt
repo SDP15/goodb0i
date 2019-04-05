@@ -112,6 +112,15 @@ class WebSocketShoppingSession(
                 }
                 is Message.IncomingMessage.Replan -> {
                     route.insertSubRoute(lastPointSeen, message.subRoute)
+                    lastStopLocation = message.subRoute.first() as Route.RoutePoint.IndexPoint
+                    val remaining = route.subList(max(0, index-1), route.size)
+                    val pointIndex = max(0, index-1) + remaining.indexOfFirst { rp -> rp is Route.RoutePoint.IndexPoint.IdentifiedPoint && rp.id == (lastStopLocation as Route.RoutePoint.IndexPoint.IdentifiedPoint).id     }
+                    index = pointIndex
+//                    lastStopLocation = message.subRoute.first() as Route.RoutePoint.IndexPoint
+//                    index += route.subList(index, route.size).indexOfFirst { point ->
+//                        (point as Route.RoutePoint.IndexPoint.IdentifiedPoint).id ==
+//                                (lastStopLocation)
+//                    }
                     if (state.value is ShoppingSessionState.NavigatingTo) {
                         postMovingState()
                     }
@@ -183,6 +192,7 @@ class WebSocketShoppingSession(
         if (point is Route.RoutePoint.IndexPoint.IdentifiedPoint.Stop) {
             // Post the upcoming products for
             val indices = point.productIndices
+            Timber.i("Posting upcoming products with indices $indices")
             remainingRackProducts.clear()
             remainingRackProducts.addAll(shoppingList.products.slice(indices))
             setState(

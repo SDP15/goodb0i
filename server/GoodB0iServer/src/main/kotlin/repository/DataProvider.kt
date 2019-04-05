@@ -43,6 +43,7 @@ object DataProvider {
                 Product.new(id) {
                     gtin = product.gtin
                     name = product.name
+                    shortName = product.shortName
                     averageSellingUnitWeight = product.averageSellingUnitWeight
                     contentsMeasureType = product.contentsMeasureType
                     contentsQuantity = product.contentsQuantity
@@ -97,7 +98,6 @@ object DataProvider {
         val arr = Gson().fromJson(file, Array<JSONList>::class.java)
         arr.forEach { list ->
             transaction {
-                if (!ShoppingList.all().empty()) return@transaction
                 ShoppingList.new {
                     code = list.code
                     time = System.currentTimeMillis()
@@ -156,6 +156,7 @@ object DataProvider {
             @SerializedName("id") val id: String? = null,
             @SerializedName("gtin") val gtin: String,
             @SerializedName("name") val name: String,
+            @SerializedName("shortName") val shortName: String,
             @SerializedName("averageSellingUnitWeight") val averageSellingUnitWeight: Double,
             @SerializedName("contentsMeasureType") val contentsMeasureType: String,
             @SerializedName("contentsQuantity") val contentsQuantity: Double,

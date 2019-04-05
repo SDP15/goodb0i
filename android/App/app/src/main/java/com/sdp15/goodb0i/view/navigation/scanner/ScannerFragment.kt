@@ -31,7 +31,7 @@ class ScannerFragment : BaseFragment() {
     private fun bindViewModel() {
         vm.bind()
         vm.reading.observe(this, Observer {
-            mp = MediaPlayer.create(this.requireContext(), R.raw.pop_up)
+            mp = MediaPlayer.create(context, R.raw.pop_up)
             mp.start ()
             Toast.makeText(context, "Reading: ${it.value}", Toast.LENGTH_SHORT).show()
         })
