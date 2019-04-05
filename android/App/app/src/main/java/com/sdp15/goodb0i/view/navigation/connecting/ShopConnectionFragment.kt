@@ -43,7 +43,6 @@ class ShopConnectionFragment : BaseFragment() {
         })
     }
 
-    //TODO: Allow cancelling session from here
     override fun onBackPressed(): Boolean = true
 
 }

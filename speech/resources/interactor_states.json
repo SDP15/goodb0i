@@ -1,7 +1,10 @@
 {"connection":
     {"connected":
-        {"reply": "", "listen": "False", "nextState":"init"},
-    "n/a": {"reply": "", "listen": "False", "nextState":"connection"}},
+        {"reply": "", "listen": "False", "nextState": "init"},
+     "connected_skip_tut":
+        {"reply": "Skipping tutorial", "listen": "False", "nextState": "shopping0"},
+     "n/a": 
+        {"reply": "", "listen": "False", "nextState":"connection"}},
 
     "init": 
     {"start": 
@@ -63,7 +66,7 @@
 
     "arrival": 
         {"scanned":
-            {"reply": "You have scanned in the ", "diff_item": " This item is not on your list", "prompt": " Would you like to hear more information about this product?", "listen": "True", "nextState": "identify"}},
+            {"reply": "You have scanned in the ", "diff_item": " This item is not on your list", "prompt": " Would you like to hear more information about this product?", "add_to_cart1": "You have added the ", "add_to_cart2": " to your cart.", "listen": "True", "nextState": "identify"}},
 
     "identify":
         {"yes":
@@ -73,7 +76,7 @@
         
     "cart":
         {"yes": 
-            {"reply_quantity0": "Shall we proceed to the next item on the list?", "nextState_quantity0": "continue", 
+            {"reply_quantity0": "Please push the button on the trolley to continue to the next item.", "nextState_quantity0": "continue", 
             "reply_quantity+": "You have ", "prompt": " more of this item on your list. Do you want to proceed and try to scan these items?", "nextState_quantity+": "scan",
             "reply_diff_item": "The next item on your list is on the shelf next to you. It is on the ", "reply_diff_item2": " shelf. Please try and scan in this item.", "nextState_diff_item": "arrival",
             "listen": "True"},
@@ -82,8 +85,8 @@
              
     "continue": 
         {"yes": 
-            {"reply": "Okay lets go and find the ", "nextState": "shopping0",
-             "reply_finished": "The shopping list is finished. We are now going to the tills.",
+            {"reply": "Please push the button on the trolley to continue to the next item and go and find the ", "nextState": "shopping0",
+             "reply_finished": "The shopping list is finished. Please push the button to continue to the tills.",
              "finishedState":"finished", "listen": "False"},
         "no": 
             {
@@ -91,7 +94,7 @@
 
     "scan":
         {"yes":{
-            "reply": "Please scan another item.", "listen": "True", "nextState": "arrival"},
+            "reply": "Please scan another item.", "listen": "False", "nextState": "arrival"},
         "no":{
             "reply": "Would you like to continue to the next item", "listen": "True", "nextState": "continue"}},
 

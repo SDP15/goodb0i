@@ -1,27 +1,21 @@
+
 import controller.lists
+import controller.products
 import controller.shelves
 import controller.sockets.sockets
-import controller.products
 import io.ktor.application.Application
 import io.ktor.application.install
 import io.ktor.features.*
 import io.ktor.gson.gson
 import io.ktor.routing.Routing
-import io.ktor.server.engine.applicationEngineEnvironment
 import io.ktor.server.engine.commandLineEnvironment
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.ktor.websocket.WebSockets
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import org.koin.core.Koin
-import org.koin.ktor.ext.getProperty
 import org.koin.ktor.ext.installKoin
 import repository.DataProvider
 import repository.DatabaseFactory
 import repository.exposedTypeAdapters
-import service.*
 import service.routing.IntRouteFinder
 import service.routing.RouteFinder
 import service.shopping.AppManager
@@ -33,7 +27,9 @@ import java.time.Duration
 fun Application.module() {
     install(DefaultHeaders)
     install(CallLogging) // Log all calls
-    install(WebSockets)
+    install(WebSockets) {
+        timeout = Duration.ofSeconds(60)
+    }
 
     // Automatic conversion according to ContentType headers
     install(ContentNegotiation) {

@@ -6,6 +6,7 @@ import com.sdp15.goodb0i.data.navigation.ShoppingSession
 import com.sdp15.goodb0i.data.navigation.ShoppingSessionManager
 import com.sdp15.goodb0i.data.navigation.ShoppingSessionState
 import com.sdp15.goodb0i.data.store.lists.ListItem
+import com.sdp15.goodb0i.data.store.lists.ShoppingList
 import com.sdp15.goodb0i.data.store.price.PriceComputer
 import com.sdp15.goodb0i.data.store.products.Product
 import com.sdp15.goodb0i.view.BaseViewModel
@@ -23,6 +24,8 @@ class CheckoutViewModel : BaseViewModel<Any>() {
 
     val totalPrice = MutableLiveData<Double>()
 
+    val shoppingList = MutableLiveData<ShoppingList>()
+
     override fun bind() {
         session.state.observeForever(observer)
     }
@@ -36,6 +39,7 @@ class CheckoutViewModel : BaseViewModel<Any>() {
             currentProducts.clear()
             currentProducts.addAll(state.products)
             Timber.i("Checkout out with products $products")
+            shoppingList.postValue(state.shoppingList)
             totalPrice.postValue(price)
             products.postValue(ListDiff.All(currentProducts))
         }

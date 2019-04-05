@@ -9,6 +9,7 @@ import kotlinx.android.parcel.Parcelize
 @Entity
 data class Product(
     @SerializedName("id") val id: String,
+    @SerializedName("gtin") val gtin: String,
     @SerializedName("name") val name: String,
     @SerializedName("averageSellingUnitWeight") val averageSellingUnitWeight: Double,
     @SerializedName("ContentsMeasureType") val contentsMeasureType: String,

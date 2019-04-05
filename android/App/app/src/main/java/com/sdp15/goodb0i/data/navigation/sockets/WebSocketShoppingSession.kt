@@ -13,10 +13,11 @@ import com.sdp15.goodb0i.data.store.lists.ListItem
 import com.sdp15.goodb0i.data.store.lists.ShoppingList
 import com.sdp15.goodb0i.data.store.products.Product
 import com.sdp15.goodb0i.data.store.products.ProductLoader
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import kotlin.math.max
 
 /**
  * Manages state across a shopping session
@@ -111,6 +112,15 @@ class WebSocketShoppingSession(
                 }
                 is Message.IncomingMessage.Replan -> {
                     route.insertSubRoute(lastPointSeen, message.subRoute)
+                    lastStopLocation = message.subRoute.first() as Route.RoutePoint.IndexPoint
+                    val remaining = route.subList(max(0, index-1), route.size)
+                    val pointIndex = max(0, index-1) + remaining.indexOfFirst { rp -> rp is Route.RoutePoint.IndexPoint.IdentifiedPoint && rp.id == (lastStopLocation as Route.RoutePoint.IndexPoint.IdentifiedPoint).id     }
+                    index = pointIndex
+//                    lastStopLocation = message.subRoute.first() as Route.RoutePoint.IndexPoint
+//                    index += route.subList(index, route.size).indexOfFirst { point ->
+//                        (point as Route.RoutePoint.IndexPoint.IdentifiedPoint).id ==
+//                                (lastStopLocation)
+//                    }
                     if (state.value is ShoppingSessionState.NavigatingTo) {
                         postMovingState()
                     }
@@ -142,8 +152,11 @@ class WebSocketShoppingSession(
 
      */
     private fun reachedPoint(id: String) {
-        val pointIndex = route.indexOfFirst { rp -> rp is Route.RoutePoint.IndexPoint.IdentifiedPoint && rp.id == id }
+        Timber.i("Searching for $id")
+        val remaining = route.subList(max(0, index-1), route.size)
+        val pointIndex = max(0, index-1) + remaining.indexOfFirst { rp -> rp is Route.RoutePoint.IndexPoint.IdentifiedPoint && rp.id == id }
         val point = route.getOrNull(pointIndex)
+        Timber.i("Found $point at $pointIndex")
         if (point is Route.RoutePoint.IndexPoint.IdentifiedPoint.Stop) {
             index = pointIndex
             Timber.i("At stop at $id")
@@ -152,7 +165,7 @@ class WebSocketShoppingSession(
         } else if (point is Route.RoutePoint.IndexPoint.IdentifiedPoint.Pass) {
             // I haven't seen this happen, but we REALLY don't want to change to a navigating state
             // while we are in the process of scanning
-            if (sessionState.value !is ShoppingSessionState.Scanning && sessionState.value !is ShoppingSessionState.Confirming) {
+            if (sessionState.value is ShoppingSessionState.NavigatingTo) {
                 index = pointIndex
                 // We should already be in a NavigatingTo state at this point, because we only switch to
                 // NavigatingTo once a shelf rack has been completed
@@ -163,7 +176,7 @@ class WebSocketShoppingSession(
                 )
             }
         } else if (point is Route.RoutePoint.IndexPoint.IdentifiedPoint.End) {
-            setState(ShoppingSessionState.Checkout(collectedProducts))
+            setState(ShoppingSessionState.Checkout(shoppingList, collectedProducts))
         } else {
             Timber.e("Unknown point $id at index $pointIndex")
         }
@@ -179,6 +192,7 @@ class WebSocketShoppingSession(
         if (point is Route.RoutePoint.IndexPoint.IdentifiedPoint.Stop) {
             // Post the upcoming products for
             val indices = point.productIndices
+            Timber.i("Posting upcoming products with indices $indices")
             remainingRackProducts.clear()
             remainingRackProducts.addAll(shoppingList.products.slice(indices))
             setState(
@@ -204,16 +218,16 @@ class WebSocketShoppingSession(
      TODO: Check against cached products for the current shelf
      */
     override suspend fun checkScannedCode(code: String): Product? {
-        sh.sendMessage(Message.OutgoingMessage.ProductScanned(code))
-        var product = shoppingList.products.firstOrNull { item -> item.product.id == code }?.product
+        var product = shoppingList.products.firstOrNull { item -> item.product.gtin == code }?.product
         if (product == null) {
-            val fromServer = productLoader.loadProduct(code)
+            val fromServer = productLoader.searchBarcode(code)
             if (fromServer is Result.Success) {
                 product = fromServer.data
             }
         }
         if (product != null) {
             lastScannedProduct = product
+            sh.sendMessage(Message.OutgoingMessage.ProductScanned(product.id))
             setState(ShoppingSessionState.Confirming(product))
         }
         return product
@@ -297,16 +311,20 @@ class WebSocketShoppingSession(
     }
 
     // Repeatedly attempt to reconnect to the server
+    private var isReconnecting = false
     private fun attemptReconnection() {
         //TODO: How to scope this
-        GlobalScope.launch {
+        if(isReconnecting) return
+        GlobalScope.launch(Dispatchers.IO) {
             //TODO: Break after some number of reconnection attempts
+            isReconnecting = true
             while (!sh.isConnected) {
                 sh.start(RetrofitProvider.root + "/app")
                 sh.sendMessage(Message.OutgoingMessage.Reconnect(uid))
-                delay(500)
+                Thread.sleep(500)
             }
-            setState(movingStates.last)
+            if(!movingStates.isEmpty) setState(movingStates.last)
+            isReconnecting = false
             Timber.i("Socket reconnected")
         }
     }

@@ -25,7 +25,6 @@ sealed class Message {
 
         /**
          *  Trolley has reached a tag
-         *  TODO: More information
          */
         data class ReachedPoint(val id: String) : IncomingMessage()
 

@@ -10,8 +10,12 @@ object ProductTypeAdapter : TypeAdapter<Product>() {
         out.beginObject()
         out.name("id")
         out.value(value.id.value.toString())
+        out.name("gtin")
+        out.value(value.gtin)
         out.name("name")
         out.value(value.name)
+        out.name("shortName")
+        out.value(value.shortName)
         out.name("superDepartment")
         out.value(value.superDepartment)
         out.name("ContentsMeasureType")
@@ -40,6 +44,6 @@ object ProductTypeAdapter : TypeAdapter<Product>() {
     }
 
     override fun read(`in`: JsonReader?): Product {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented")
     }
 }

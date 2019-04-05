@@ -132,7 +132,7 @@ sealed class Message {
                 "RejectedProduct" -> IncomingMessage.FromTrolley.TrolleyRejectedProduct(message)
                 "SkippedProduct" -> IncomingMessage.FromTrolley.TrolleySkippedProduct(message)
                 "UserReady" -> IncomingMessage.FromTrolley.UserReady(message)
-                "ReceivedRoute" -> IncomingMessage.FromTrolley.ReceivedRoute(message)
+                "RouteReceived" -> IncomingMessage.FromTrolley.ReceivedRoute(message)
                 "Ping" -> IncomingMessage.FromTrolley.Ping(message)
                 "RequestReplan" -> {
                     val points = message.substringAfter(DELIM).split('%')
@@ -168,33 +168,33 @@ sealed class Message {
             val sep = ','
             val delim = '%'
             var previous = route.first()
+            val stoppedAt = HashSet<Graph.Vertex<Int>>()
             route.forEach { vertex ->
+                // Add a turn if there's more than one way to get to this node
+                val edges = previous.edges
+                println("Out edges from ${previous.node.id} are ${edges}")
+                if (edges.size > 1) {
+                    val edge = edges.first { edge -> edge.to == vertex.node }
+                    when (edge.direction) {
+                        Graph.Direction.FORWARD -> builder.append("forward")
+                        Graph.Direction.LEFT -> builder.append("left")
+                        Graph.Direction.RIGHT -> builder.append("right")
+                    }
+
+                    builder.append(sep)
+                }
                 if (vertex == route.first()) {
                     builder.append("start$delim${vertex.node.id}")
                 } else if (vertex == route.last()) {
                     builder.append("end$delim${vertex.node.id}")
+                } else if (vertex.node in productMap.keys && vertex !in stoppedAt) {
+                    builder.append("stop$delim${vertex.node.id}")
+                    val products = productMap[vertex.node]?.map { "${it.first}$delim${it.second}" }
+                    builder.append(products?.joinToString(separator = "$delim", prefix = "$delim"))
+                    stoppedAt += vertex
                 } else {
-                    // Add a turn if there's more than one way to get to the next node
-                    val edges = previous.edges
-                    if (edges.size > 1) {
-                        val edge = edges.first { edge -> edge.to == vertex.node }
-                        when (edge.direction) {
-                            Graph.Direction.FORWARD -> builder.append("forward")
-                            Graph.Direction.LEFT -> builder.append("left")
-                            Graph.Direction.RIGHT -> builder.append("right")
-                        }
-
-                        builder.append(sep)
-                    }
-                    if (vertex.node in productMap.keys) {
-                        builder.append("stop$delim${vertex.node.id}")
-                        val products = productMap[vertex.node]?.map { "${it.first}$delim${it.second}" }
-                        builder.append(products?.joinToString(separator = "$delim", prefix = "$delim"))
-                    } else {
-                        builder.append("pass$delim${vertex.node.id}")
-                    }
+                    builder.append("pass$delim${vertex.node.id}")
                 }
-
                 builder.append(sep)
                 previous = vertex
             }

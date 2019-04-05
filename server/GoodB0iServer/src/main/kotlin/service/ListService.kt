@@ -40,9 +40,7 @@ class ListService {
                 list.products.forEach { it.delete() }
                 ListEntries.deleteWhere { ListEntries.id inList list.products.map { it.id } }
 
-                // TODO: This is a duplicate of the createList code.
                 // See if there is a nice way to extract the creation along with the error
-                // Perhaps return ListServiceError?
                 val ids = entries.map { it.first }
                 val matchingProducts = Product.find { Products.id inList ids }
 

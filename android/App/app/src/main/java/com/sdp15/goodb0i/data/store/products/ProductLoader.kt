@@ -6,6 +6,8 @@ interface ProductLoader {
 
     suspend fun loadProduct(id: String): Result<Product>
 
+    suspend fun searchBarcode(bardcode: String): Result<Product>
+
     suspend fun loadCategory(category: String): Result<List<Product>>
 
     suspend fun loadProductsForShelfRack(shelfId: Int): Result<List<Product>>

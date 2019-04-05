@@ -30,8 +30,9 @@ class NavigatingToFragment : BaseFragment() {
             if (destination is NavigationDestination.EndPoint) {
                 navigation_item_name.text = getString(R.string.label_navigation_to_tills)
             } else if (destination is NavigationDestination.ShelfRack) {
-                navigation_item_name.text = destination.toCollect.first().product.name
-                if (destination.toCollect.size > 1) {
+
+                if (destination.toCollect.size >= 1) {
+                    navigation_item_name.text = destination.toCollect.first().product.name
                     // TODO: Other products on the rack
                 }
                 //TODO: Next item, quantity information

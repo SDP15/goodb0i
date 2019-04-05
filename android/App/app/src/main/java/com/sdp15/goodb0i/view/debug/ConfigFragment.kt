@@ -8,14 +8,18 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import com.sdp15.goodb0i.R
+import com.sdp15.goodb0i.data.navigation.ShoppingSession
+import com.sdp15.goodb0i.data.navigation.ShoppingSessionManager
 import com.sdp15.goodb0i.data.store.RetrofitProvider
+import org.koin.android.ext.android.inject
 import retrofit2.Retrofit
 import timber.log.Timber
 
 class ConfigFragment : PreferenceFragmentCompat() {
 
     private lateinit var root: EditTextPreference
-
+    private val sessionManager: ShoppingSessionManager by inject()
+    private val session: ShoppingSession by sessionManager
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.preferences, rootKey)
         root = findPreference(getString(R.string.config_key_server_address)) as EditTextPreference
@@ -31,6 +35,8 @@ class ConfigFragment : PreferenceFragmentCompat() {
                     Retrofit.Builder().apply {
                         baseUrl(value)
                     }
+                    Timber.i("Attempting change to root value $value")
+                    RetrofitProvider.root = value
                     true
                 } catch (iae: IllegalArgumentException) {
                     Timber.e(iae, "Invalid base url")
@@ -39,6 +45,12 @@ class ConfigFragment : PreferenceFragmentCompat() {
                 }
             }
         }
+        findPreference(getString(R.string.config_kill_session)).setOnPreferenceClickListener {
+            session.endSession()
+            sessionManager.closeSession()
+            true
+        }
+
     }
 
     private val changeListener = SharedPreferences.OnSharedPreferenceChangeListener { prefs, key ->

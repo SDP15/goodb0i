@@ -2,6 +2,7 @@ package service.shopping
 
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import mu.KotlinLogging
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.koin.standalone.KoinComponent
 import org.koin.standalone.inject
@@ -16,9 +17,13 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class Session(
+        private val id: String,
+        private val sessionManager: SessionManager,
         private val appOut: SessionManager.AppMessageSender,
         private val trolleyOut: SessionManager.TrolleyMessageSender
 ) : IncomingMessageListener, KoinComponent {
+
+    private val kLogger = KotlinLogging.logger {  }
 
     private val routeFinder: RouteFinder by inject()
     private val listService: ListService by inject()
@@ -47,7 +52,11 @@ class Session(
                     val rackProductMap = racks.associate { rack ->
                         Graph.Node(rack.id.value) to rack.shelves.mapNotNull { shelf ->
                             val index = list.products.indexOfFirst { it.product == shelf.product }
-                            if (index == -1) null else Pair(index, shelf.position)
+                            if (index == -1) null else {
+
+                                kLogger.info("Found shelf ${shelf.rack.value} for product ${list.products.toList()[index].product.name}")
+                                Pair(index, shelf.position)
+                            }
                         }
                     }
                     val path = routeFinder.plan(racks.map { rack ->
@@ -62,13 +71,14 @@ class Session(
                             sendToTrolley(Message.OutgoingMessage.ToTrolley.RouteCalculated(routeString))
                         }
                         is RouteFinder.RoutingResult.RoutingError -> {
-                            println("Routing error $path")
+
+                            kLogger.error("Routing error $path")
                         }
                     }
                 }
             }
             is ListService.ListServiceResponse.ListServiceError -> {
-                println("List service error $listResponse")
+                kLogger.error("List service error $listResponse")
             }
         }
     }
@@ -83,7 +93,7 @@ class Session(
     override fun onAppMessage(message: Message.IncomingMessage.FromApp) {
         receivedMessages += message
         lastAppPing = System.currentTimeMillis()
-        println("IN: $message")
+        kLogger.info("IN: $message")
         when (message) {
             is Message.IncomingMessage.FromApp.PlanRoute -> {
                 plan(message.code)
@@ -99,7 +109,7 @@ class Session(
                 try {
                     collectedProducts.add(UUID.fromString(lastScannedProduct ?: ""))
                 } catch (e: IllegalArgumentException) {
-                    println("App accepted product but ID $lastScannedProduct not valid")
+                    kLogger.error("App accepted product but ID $lastScannedProduct not valid")
                 }
                 sendToTrolley(Message.OutgoingMessage.ToTrolley.AppAcceptedProduct)
             }
@@ -107,17 +117,22 @@ class Session(
                 sendToTrolley(Message.OutgoingMessage.ToTrolley.AppRejectedProduct)
             }
             is Message.IncomingMessage.FromApp.RequestHelp -> {
-                //TODO
                 Toolkit.getDefaultToolkit().beep()
+                Runtime.getRuntime().exec("paplay /usr/share/sounds/gnome/default/alerts/bark.ogg ")
             }
             is Message.IncomingMessage.FromApp.RequestStop -> {
-                //TODO
             }
             is Message.IncomingMessage.FromApp.AppSkippedProduct -> {
                 sendToTrolley(Message.OutgoingMessage.ToTrolley.AppSkippedProduct)
             }
+            is Message.IncomingMessage.FromApp.Reconnect -> {
+                val lastPoint = receivedMessages.last { message -> message is Message.IncomingMessage.FromTrolley.ReachedPoint } as? Message.IncomingMessage.FromTrolley.ReachedPoint
+                if(lastPoint != null) {
+                    sendToApp(Message.OutgoingMessage.ToApp.ReachedPoint(lastPoint.id))
+                }
+            }
             is Message.IncomingMessage.FromApp.SessionComplete -> {
-                //TODO: Close and dispose of session
+                sessionManager.closeSession(id)
                 sendToTrolley(Message.OutgoingMessage.ToTrolley.SessionComplete)
             }
         }
@@ -126,7 +141,7 @@ class Session(
     override fun onTrolleyMessage(message: Message.IncomingMessage.FromTrolley) {
         receivedMessages += message
         lastTrolleyPing = System.currentTimeMillis()
-        println("IN: $message")
+        kLogger.info("IN: $message")
         when (message) {
             is Message.IncomingMessage.FromTrolley.ReceivedRoute -> {
                 trolleyReceivedRoute = true
@@ -139,7 +154,7 @@ class Session(
                 try {
                     collectedProducts.add(UUID.fromString(lastScannedProduct ?: ""))
                 } catch (e: IllegalArgumentException) {
-                    println("Trolley accepted product but ID $lastScannedProduct not valid")
+                    kLogger.error("Trolley accepted product but ID $lastScannedProduct not valid")
                 }
                 sendToApp(Message.OutgoingMessage.ToApp.TrolleyAcceptedProduct)
             }
@@ -163,12 +178,12 @@ class Session(
     }
 
     private fun sendToApp(message: Message.OutgoingMessage.ToApp) {
-        println("OUT: $message")
+        kLogger.info("OUT: $message")
         GlobalScope.launch { appOut.sendToApp(message) }
     }
 
     private fun sendToTrolley(message: Message.OutgoingMessage.ToTrolley) {
-        println("OUT: $message")
+        kLogger.info("OUT: $message")
         GlobalScope.launch { trolleyOut.sendToTrolley(message) }
     }
 

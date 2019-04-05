@@ -34,13 +34,16 @@ object DataProvider {
         val file = File(productPath).bufferedReader()
         val products = Gson().fromJson(file, Array<JSONProduct>::class.java)
         transaction {
+            if (!Product.all().empty()) return@transaction
             products.forEachIndexed { index, product ->
 
                 val id = if (product.id == null) UUID.randomUUID() else UUID.fromString(product.id)
                 //UUID.nameUUIDFromBytes(index.toString().toByteArray())
                 kLogger.debug("Inserting product with ID $id")
                 Product.new(id) {
+                    gtin = product.gtin
                     name = product.name
+                    shortName = product.shortName
                     averageSellingUnitWeight = product.averageSellingUnitWeight
                     contentsMeasureType = product.contentsMeasureType
                     contentsQuantity = product.contentsQuantity
@@ -64,6 +67,7 @@ object DataProvider {
         racks.forEach { rackJSON ->
             // Exposed doesn't seem to like inserting multiple racks in a single transaction
             transaction {
+
                 val rackEntity = ShelfRack.new(rackJSON.id) {
                     info = rackJSON.info
                     capacity = rackJSON.capacity
@@ -150,7 +154,9 @@ object DataProvider {
 
     private data class JSONProduct(
             @SerializedName("id") val id: String? = null,
+            @SerializedName("gtin") val gtin: String,
             @SerializedName("name") val name: String,
+            @SerializedName("shortName") val shortName: String,
             @SerializedName("averageSellingUnitWeight") val averageSellingUnitWeight: Double,
             @SerializedName("contentsMeasureType") val contentsMeasureType: String,
             @SerializedName("contentsQuantity") val contentsQuantity: Double,

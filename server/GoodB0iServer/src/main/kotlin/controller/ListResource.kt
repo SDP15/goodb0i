@@ -3,7 +3,6 @@ package controller
 import com.google.gson.internal.LinkedTreeMap
 import io.ktor.application.call
 import io.ktor.features.toLogString
-import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.request.receiveOrNull
 import io.ktor.response.respond
@@ -26,9 +25,9 @@ fun Route.lists() {
             if (ids == null) {
                 call.respond(HttpStatusCode.BadRequest, "Post a list of pairs of UUID and quantity")
             } else {
-                //TODO: If this works the same as the implementation of ProductResourceTest,
+                //If this works the same as the implementation of ProductResourceTest,
                 // asking for an Array rather than a List may parse correctly (not a treemap)
-                //TODO: Error handling
+                println("Ids $ids}")
                 val flat = ids.map {
                     Pair(UUID.fromString(it.values.elementAt(0) as String), // UUID string
                             (it.values.elementAt(1) as Double).toInt())  // Quantity
@@ -59,7 +58,7 @@ fun Route.lists() {
                         Pair(UUID.fromString(it.values.elementAt(0) as String), // UUID string
                                 (it.values.elementAt(1) as Double).toInt())  // Quantity
                     }
-                    val response = listService.createList(flat)
+                    val response = listService.editList(code, flat)
                     when (response) {
                         is ListService.ListServiceResponse.ListResponse -> {
                             call.respondText(response.list.code.toString(), status = HttpStatusCode.OK)

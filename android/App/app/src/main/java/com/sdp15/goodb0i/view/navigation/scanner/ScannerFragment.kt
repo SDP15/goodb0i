@@ -13,6 +13,7 @@ import com.otaliastudios.cameraview.Gesture
 import com.otaliastudios.cameraview.GestureAction
 import com.sdp15.goodb0i.R
 import com.sdp15.goodb0i.view.BaseFragment
+import com.sdp15.goodb0i.watchText
 import kotlinx.android.synthetic.main.layout_scanner.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -30,11 +31,12 @@ class ScannerFragment : BaseFragment() {
     private fun bindViewModel() {
         vm.bind()
         vm.reading.observe(this, Observer {
-            mp = MediaPlayer.create(this.requireContext(), R.raw.pop_up)
+            mp = MediaPlayer.create(context, R.raw.pop_up)
             mp.start ()
             Toast.makeText(context, "Reading: ${it.value}", Toast.LENGTH_SHORT).show()
         })
         vm.transitions.observe(this, Observer {
+            camera_view.close()
             findNavController().navigate(it)
         })
     }
@@ -53,12 +55,15 @@ class ScannerFragment : BaseFragment() {
         camera_view.addFrameProcessor { frame ->
             vm.onImageCaptured(frame.data, frame.rotation, frame.size.width, frame.size.height)
         }
-
         camera_view.audio = Audio.OFF
         camera_view.mapGesture(Gesture.TAP, GestureAction.FOCUS_WITH_MARKER)
+        camera_manual_entry.watchText { code ->
+            vm.manualEntry(code)
+        }
     }
 
-    override fun onBackPressed(): Boolean = true
+    override fun onVolumeUpPressed() = vm.skip()
+
     interface ScannerFragmentInteractor {
 
         fun onImageCaptured(ba: ByteArray, rotation: Int, width: Int, height: Int)

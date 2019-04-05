@@ -3,6 +3,7 @@ package com.sdp15.goodb0i.view.navigation.scanner
 import android.os.Build
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import com.sdp15.goodb0i.data.ConfigProvider
 import com.sdp15.goodb0i.data.navigation.ShoppingSession
 import com.sdp15.goodb0i.data.navigation.ShoppingSessionManager
 import com.sdp15.goodb0i.data.navigation.ShoppingSessionState
@@ -20,6 +21,7 @@ class ScannerViewModel : BaseViewModel<Any>(),
     ScannerFragment.ScannerFragmentInteractor {
 
     private val sm: ShoppingSession by get<ShoppingSessionManager>()
+    private val configProvider: ConfigProvider by inject()
 
     private val reader: BarcodeReader by inject()
     private val isRunning = AtomicBoolean(false)
@@ -31,26 +33,18 @@ class ScannerViewModel : BaseViewModel<Any>(),
         isRunning.set(false)
         // Test code for emulator runs.
         // Automatically 'scans' the correct product
-        sm.state.observeForever(object: Observer<ShoppingSessionState> {
-            override fun onChanged(state: ShoppingSessionState) {
-                if (state is ShoppingSessionState.Scanning) {
-                    if(Build.FINGERPRINT.startsWith("generic")
-                        || Build.FINGERPRINT.startsWith("unknown")
-                        || Build.MODEL.contains("google_sdk")
-                        || Build.MODEL.contains("Emulator")
-                        || Build.MODEL.contains("Android SDK built for x86")
-                        || Build.MANUFACTURER.contains("Genymotion")
-                        || (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic"))
-                        || "google_sdk".equals(Build.PRODUCT)) {
-                        onRead(state.toScan.first().product.id)
-                    }
-                    sm.state.removeObserver(this)
-                } else if (state is ShoppingSessionState.Disconnected) {
-                    transitions.postValue(ScannerFragmentDirections.actionScannerFragmentToErrorFragment())
-                }
+        Timber.i("Fingerprint ${Build.FINGERPRINT}, model ${Build.MODEL}, brand ${Build.BRAND}")
+        if (configProvider.shouldSkipScanner) {
+            skip()
+        }
+        sm.state.observeForever { state ->
+            if (state is ShoppingSessionState.Disconnected) {
+                transitions.postValue(ScannerFragmentDirections.actionScannerFragmentToErrorFragment())
             }
-        })
+        }
     }
+
+
 
     private fun onRead(code: String) {
         isRunning.set(true)
@@ -81,6 +75,25 @@ class ScannerViewModel : BaseViewModel<Any>(),
 
             })
         }
+    }
+
+    fun manualEntry(code: String) {
+        if (code.length == 13) {
+            onRead(code)
+        }
+
+    }
+
+    fun skip() {
+        sm.state.observeForever(object : Observer<ShoppingSessionState> {
+            override fun onChanged(state: ShoppingSessionState?) {
+                if (state is ShoppingSessionState.Scanning) {
+                    Timber.i("Skipping product ${state.toScan.first()}")
+                    onRead(state.toScan.first().product.gtin)
+                }
+                sm.state.removeObserver(this)
+            }
+        })
     }
 
 }

@@ -1,8 +1,11 @@
 package service.shopping
 
+import io.ktor.http.cio.websocket.CloseReason
 import io.ktor.http.cio.websocket.Frame
 import io.ktor.http.cio.websocket.WebSocketSession
+import io.ktor.http.cio.websocket.close
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.runBlocking
 import org.koin.standalone.KoinComponent
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -14,15 +17,18 @@ class SessionManager : KoinComponent {
     fun createSession(id: String, appSocket: WebSocketSession, trolleySession: WebSocketSession): Session {
         val appOut = QueuedMessageSender(appSocket)
         outs[id] = appOut
-        val session = Session(appOut, SimpleMessageSender(trolleySession)
+        val session = Session(id, this, appOut, SimpleMessageSender(trolleySession)
         )
         sessions[id] = session
         return session
     }
 
     fun closeSession(id: String) {
-        //TODO: Cleanup session data
         sessions.remove(id)
+        runBlocking {
+            outs[id]?.close()
+            outs.remove(id)
+        }
     }
 
     fun updateAppSocket(id: String, newId: String, newSocket: WebSocketSession) {
@@ -35,11 +41,15 @@ class SessionManager : KoinComponent {
 
         suspend fun sendToTrolley(message: Message.OutgoingMessage.ToTrolley)
 
+        suspend fun close()
+
     }
 
     interface AppMessageSender {
 
         suspend fun sendToApp(message: Message.OutgoingMessage.ToApp)
+
+        suspend fun close()
 
     }
 
@@ -47,12 +57,17 @@ class SessionManager : KoinComponent {
         override suspend fun sendToTrolley(message: Message.OutgoingMessage.ToTrolley) {
             socket.send(Frame.Text(Message.Transformer.messageToString(message)))
         }
+
+        override suspend fun close() = socket.close(CloseReason(CloseReason.Codes.NORMAL, "Session Closed"))
     }
 
     private class MockTrolleySender : TrolleyMessageSender {
         override suspend fun sendToTrolley(message: Message.OutgoingMessage.ToTrolley) {
             println("Message to trolley $message")
         }
+
+        override suspend fun close() {}
+
     }
 
     private class QueuedMessageSender(var socket: WebSocketSession) : AppMessageSender {
@@ -74,6 +89,8 @@ class SessionManager : KoinComponent {
                 outGoingMessageQueue.addLast(Message.Transformer.messageToString(message))
             }
         }
+
+        override suspend fun close() = socket.close(CloseReason(CloseReason.Codes.NORMAL, "Session Closed"))
     }
 
 

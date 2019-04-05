@@ -90,9 +90,9 @@ fun Route.sockets(sessionManager: SessionManager,
                 e.printStackTrace()
                 println("Other exception $e")
             } finally {
-                println("$nonce closed socket")
-                sessionManager.closeSession(nonce)
-                appManager.removeApp(nonce, this)
+                println("$nonce not closed socket")
+                //sessionManager.closeSession(nonce)
+                //appManager.removeApp(nonce, this)
             }
         } else {
             println("No available trolley")

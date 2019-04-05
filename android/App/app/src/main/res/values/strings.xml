@@ -22,7 +22,7 @@
     <!-- Product screen -->
     <string name="action_skip">Skip</string>
     <string name="action_scan">Scan</string>
-    <string name="prompt_scan_item">Hold the item in front of the phone camera</string>
+    <string name="prompt_scan_item">Hold the item in front of the phone camera or enter barcode below</string>
 
     <!--Item confirmation screen -->
     <string name="action_add_to_cart">Add to cart</string>
@@ -77,6 +77,8 @@
     <string name="config_label_use_test_data">Use test data</string>
     <string name="config_key_use_test_data">use_test_data</string>
     <string name="error_invalid_server_address_format">Enter a URL</string>
-
+    <string name="config_kill_session">Kill session</string>
+    <string name="config_label_skip_scanner">Skip scanner</string>
+    <string name="config_key_skip_scanner">skip_scanner</string>
 
 </resources>

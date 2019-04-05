@@ -4,6 +4,7 @@ import time
 import websocket
 import socket
 
+from utils.logger import log
 
 class WebSocket:
     def __init__(self, ip_port, controller_queue):
@@ -12,20 +13,20 @@ class WebSocket:
         self.controller_queue = controller_queue
 
     def initialise_websocket(self):
-        print("initialise websocket")
+        log("Initialising WebSocket")
         websocket.enableTrace(False)
         def run(*args):
             args[0].run_forever(ping_interval=3)
 
         def on_message(ws, message):
-            print("Message: " + str(message))
+            log("[Server -> RPi]: {:}".format(str(message)))
             self.controller_queue.put(("on_message", message))
 
         def on_error(ws, error):
-            print(error)
+            log(error)
 
         def on_close(ws):
-            print("### closed ###")
+            log("### closed ###")
             # ws.on_open = self.on_open
             # ws.run_forever()
         
@@ -37,7 +38,7 @@ class WebSocket:
                                     on_error=on_error,
                                     on_close=on_close)
         ws.on_open = on_open    
-        print("Websocket connection")    
+        log("Connected to WebSocket")    
         t1 = threading.Thread(name='WebSocketThread', target=run, args=(ws,))
         t1.start()
         return ws
@@ -59,9 +60,41 @@ class TCPSocket:
             data = self.sock.recv(8192)
             if not data: break
             msg = data.decode('utf-8')
+
+            # Check if we are receiving several messages
+            if len(msg.split("\n")) > 2:
+                split_msg = msg.split("\n")
+                split_msg.remove("")
+                for msg in split_msg:
+                    log("[EV3 -> RPi]: {:}".format(msg))
             self.controller_queue.put(("on_message", msg))
 
     def send(self, msg):
+        log("[RPi -> EV3]: {:}".format(msg))
         msg += "\n"
         msg = msg.encode()
         self.sock.send(msg)
+
+# class TCPServer:
+#     def __init__(self, ip_addr):
+#         TCP_PORT = 5005
+#         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#         self.sock.bind((ip_addr, TCP_PORT))
+#         self.closed = False
+
+#         # Listens for connections to TCP server
+#         t3 = threading.Thread(name="TCPServerListenThread", target=self.listen_for_connection)
+#         t3.start()
+
+#     def listen_for_connection(self):
+#         while True:
+#             self.sock.listen(1)
+#             t4 = threading.Thread(name="TCPServerSendThread", target=self.send)
+#             t4.start()
+
+#     def send(self, msg):
+#         try:
+#             #code here
+#         except KeyboardInterrupt:
+#             self.sock.close()
+

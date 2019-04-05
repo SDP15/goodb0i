@@ -51,6 +51,10 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, ConfigActivity::class.java))
             //Config.showDialog(this)
             return true
+        } else if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+            val fragment = nav_host_fragment.childFragmentManager.fragments[0]
+            (fragment as? BaseFragment)?.onVolumeUpPressed()
+            return true
         }
         return super.onKeyDown(keyCode, event)
     }

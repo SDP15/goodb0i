@@ -12,8 +12,9 @@ import java.util.*
  */
 class Product(id: EntityID<UUID>) : UUIDEntity(id) {
     companion object : UUIDEntityClass<Product>(Products)
-
+    var gtin by Products.gtin
     var name by Products.name
+    var shortName by Products.shortName
     var averageSellingUnitWeight by Products.averageSellingUnitWeight
     var contentsMeasureType by Products.contentsMeasureType
     var contentsQuantity by Products.contentsQuantity
