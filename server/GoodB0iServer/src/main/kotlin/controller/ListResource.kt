@@ -25,9 +25,8 @@ fun Route.lists() {
             if (ids == null) {
                 call.respond(HttpStatusCode.BadRequest, "Post a list of pairs of UUID and quantity")
             } else {
-                //TODO: If this works the same as the implementation of ProductResourceTest,
+                //If this works the same as the implementation of ProductResourceTest,
                 // asking for an Array rather than a List may parse correctly (not a treemap)
-                //TODO: Error handling
                 println("Ids $ids}")
                 val flat = ids.map {
                     Pair(UUID.fromString(it.values.elementAt(0) as String), // UUID string

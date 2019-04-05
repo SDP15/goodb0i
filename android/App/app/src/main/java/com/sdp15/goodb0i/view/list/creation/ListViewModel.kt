@@ -97,7 +97,6 @@ class ListViewModel : BaseViewModel<ListViewModel.ListAction>(),
                 )
                 listStore.storeList(created)
             } else {
-                //TODO
                 Timber.e("Failure: $result")
             }
         }

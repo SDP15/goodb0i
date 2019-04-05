@@ -117,12 +117,10 @@ class Session(
                 sendToTrolley(Message.OutgoingMessage.ToTrolley.AppRejectedProduct)
             }
             is Message.IncomingMessage.FromApp.RequestHelp -> {
-                //TODO
                 Toolkit.getDefaultToolkit().beep()
                 Runtime.getRuntime().exec("paplay /usr/share/sounds/gnome/default/alerts/bark.ogg ")
             }
             is Message.IncomingMessage.FromApp.RequestStop -> {
-                //TODO
             }
             is Message.IncomingMessage.FromApp.AppSkippedProduct -> {
                 sendToTrolley(Message.OutgoingMessage.ToTrolley.AppSkippedProduct)
@@ -134,7 +132,6 @@ class Session(
                 }
             }
             is Message.IncomingMessage.FromApp.SessionComplete -> {
-                //TODO: Close and dispose of session
                 sessionManager.closeSession(id)
                 sendToTrolley(Message.OutgoingMessage.ToTrolley.SessionComplete)
             }

@@ -44,6 +44,6 @@ object ProductTypeAdapter : TypeAdapter<Product>() {
     }
 
     override fun read(`in`: JsonReader?): Product {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented")
     }
 }

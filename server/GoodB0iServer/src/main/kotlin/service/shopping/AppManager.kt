@@ -25,15 +25,6 @@ class AppManager(private val sessionManager: SessionManager) {
     }
 
     suspend fun joinApp(id: String, socket: WebSocketSession) {
-        /*TODO
-         - It is possible that an app instance disconnects from the server while shopping
-         - In this case we want to reconnect and re-establish with the server and resume the same
-         shopping session
-         - To do this the app can post its original session code rather than NEW_CONNECTION
-         - The server can then re-link the new session with the disconnected shopping session data
-         - Shopping session data should only be deleted when the app sends a disconnect message
-          or after an extended period of disconnection
-         */
         if (!members.contains(id)) {
             members[id] = socket
             socket.outgoing.send(joinKey(id)) // Send code back to app

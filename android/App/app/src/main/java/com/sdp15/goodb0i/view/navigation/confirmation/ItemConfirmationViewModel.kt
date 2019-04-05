@@ -24,10 +24,7 @@ class ItemConfirmationViewModel : BaseViewModel<Any>() {
             is ShoppingSessionState.NavigatingTo -> // Scan accepted, there is another products or tills to go to
                 transitions.postValue(ItemConfirmationFragmentDirections.actionConfirmationFragmentToNavigatingToFragment())
             is ShoppingSessionState.Scanning -> // Either scan rejected, or item on the same ShelfRack -> ScanningFragment or ItemFragment
-                //TODO: Check that this pops the ItemConfirmationFragment
                 transitions.postValue(ItemConfirmationFragmentDirections.actionConfirmationFragmentToItemFragment())
-            //TODO: Add check to go straight back to ScannerFragment ??
-            //transitions.postValue(ItemConfirmationFragmentDirections.actionConfirmationFragmentToScannerFragment())
             is ShoppingSessionState.Confirming -> product.postValue(state.product)
         }
     }

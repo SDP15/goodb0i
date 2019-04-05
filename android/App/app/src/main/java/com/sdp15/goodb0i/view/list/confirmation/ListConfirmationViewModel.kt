@@ -23,7 +23,6 @@ class ListConfirmationViewModel : BaseViewModel<Any>() {
 
     fun setShoppingList(list: ShoppingList) {
         sl = list
-        //TODO: Abstract into price computer
         price.postValue(priceComputer.itemsPrice(sl.products))
         code.postValue(list.code)
         time.postValue(list.time)

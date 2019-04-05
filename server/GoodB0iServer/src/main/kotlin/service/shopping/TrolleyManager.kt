@@ -27,7 +27,6 @@ class TrolleyManager {
         if (!members.contains(id)) {
             println("Trolley joined $id")
             members[id] = socket
-            //TODO: Send some confirmation information
         }
     }
 

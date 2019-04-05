@@ -25,7 +25,6 @@ class SessionManagerImpl(
     }
 
     override fun closeSession() {
-        //TODO
         socketHandler.stop()
     }
 }
