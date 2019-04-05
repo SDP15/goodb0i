@@ -29,7 +29,7 @@ Our app uses [Koin](https://github.com/InsertKoinIO/koin) for dependency injecti
 interface ProductLoader {
 
     suspend fun loadProduct(id: String): Result<Product>
-t
+
     suspend fun loadCategory(category: String): Result<List<Product>>
 
     suspend fun loadProductsForShelfRack(shelfId: Int): Result<List<Product>>
@@ -481,11 +481,9 @@ The route string is a comma separated list with each element being one of `start
 
 ### `ShoppingSessionManager` 
 
-This interface defines the state and functions of the session manager. This is a class which exists across the scope of all the `Fragments` in `view/navigation`. 
 
-It provides `LiveData` for the current product, most recently scanned product, and `ShoppingSessionState`. 
+An interface for managing shopping sessions. It provides the facilities for creation retrieval, and closing of a session.
 
-(The incoming messages are also accessible, but there probably isn't a use for this. The `ViewModels` shouldn't really be accessing this as that's the whole point of the `ShoppingSessionManager`)
 
 ### `SocketHandler`
 
@@ -494,22 +492,17 @@ This is a generic class with two type parameters `IN` and `OUT`. These are the t
 The `SocketHandler` manages opening a `WebSocket` with `OKHTTP`, sending message, emitting received messages as the `OUT` type, and providing a `LiveData` for the socket state. 
 
 
-### `SessionManager` 
+### `ShoppingSession`
 
-This is the implementation of `ShoppingSessionManager`. It's not finished. 
+An interface providing methods for user input to interact with the session, and to emit state
 
-It tracks
-- The app id provided by the server
-- The route
-- The index within the route
-- The `ShoppingList` that we are collecting products for
-- The scanned product
-- The current state of the session 
-- The state of the `WebSocket` through a `SocketHandler`
+#### `ShoppingSessionState`
 
-It manages all incoming and outgoing messages as well as actions coming from the `Fragments`. 
+A sealed class representing the current state of the session. Each subtype contains the information to be displayed.
 
-Currently it's ~200 lines, which is fairly acceptable. But it could quite easily become overly complicated, which would make it a pain to work with.
+### `WebSocketShoppingSession` 
+
+This is the implementation of `ShoppingSession`
 
 
 ## Testing
@@ -525,5 +518,3 @@ Some of the `ViewModels` are so simple that they aren't worth testing (There are
 Every time a commit is made to a branch containing the `.travis.yml` file, an automated build of the Android app will be run, and the unit tests will be run. The green tick/red cross showing up beside commits is whether the commit built successfully. 
 
 You can click on these to see the build log.
-
-## 
