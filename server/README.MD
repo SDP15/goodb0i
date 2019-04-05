@@ -65,6 +65,7 @@ We install 4 routes, `products`, `shelves`, `lists`, and `sockets` which form th
 /products {
     / 
     /search/{query}
+    /barcode/{barcode}
     /{id}
 }
 /shelves {
@@ -130,6 +131,8 @@ For example, the `Products` table extends `UUIDTable`
 ```kotlin
 object Products : UUIDTable() {
     val name = varchar("name", 255)
+    val shortName = varchar("shortName", 255)
+    val gtin = varchar("gtin", 13)
     val averageSellingUnitWeight = double("averageSellingUnitWeight")
     val contentsMeasureType = varchar("ContentsMeasureType", 20)
     val contentsQuantity = double("contentsQuantity")
@@ -174,8 +177,9 @@ For `Products`, the `Product` entity looks like this
 ```kotlin
 class Product(id: EntityID<UUID>) : UUIDEntity(id) {
     companion object : UUIDEntityClass<Product>(Products)
-
+    var gtin by Products.gtin
     var name by Products.name
+    var shortName by Products.shortName
     var averageSellingUnitWeight by Products.averageSellingUnitWeight
     var contentsMeasureType by Products.contentsMeasureType
     var contentsQuantity by Products.contentsQuantity
@@ -243,35 +247,55 @@ A `ShelfRack` references the shelves it contains with `referrersOn`.
 
 A graph is a generic class with a type used to index nodes. It is a collection of `Vertex` instances, which each have a `Node` (containing and ID) and a list of outgoing edges. (I don't like using `Node` and `Vertex` together. Nodes themselves should probably be the generic part, with some function to provide a `Comparable` id).
 
-`Graph` defines builder functions which let us construct a graph nicely like this: 
 
-```kotlin
-        val graph = graph<String> {
-            val cost = 5
-            ("a" to "b" cost 1 to "c" cost 2 to "d" cost 5) // a-1->b-2->c-5>d
-            "TEST" toFrom listOf("TEST2" cost 5, "TEST3" cost 6) // TEST<-5->TEST2 TEST<-6->TEST3 
-            "ENTRANCE" to "FRUITS" cost cost
-            "FRUITS" to "VEGETABLES" cost cost
-            "VEGETABLES" toFrom "VEG_CORNER" cost 2 * cost
-            "VEG_CORNER" toFrom "DAIRY_CORNER" cost 2 * cost
-            "DAIRY_CORNER" to "DAIRY" cost cost
-            "DAIRY" to listOf("BAKERY" cost cost, "SEAFOOD" cost 2 * cost)
-            "BAKERY" to listOf("MEAT", "BOTTOM_CORNER") costs listOf(cost, 2 * cost)
-            "BOTTOM_CORNER" to "TILLS" cost 2 * cost
-            "BOTTOM_CORNER" to "MEAT" cost cost
-            "MEAT" to "SEAFOOD" cost cost
-            "MEAT" to "BAKERY" cost 2 * cost
-            "SEAFOOD" to "SEAFOOD_CORNER" cost cost
-            "SEAFOOD" to "DAIRY" cost 2 * cost
-            "SEAFOOD_CORNER" to "FOOD_CUPBOARD_CORNER" cost cost
-            "FOOD_CUPBOARD_CORNER" to "FOOD_CUPBOARD" cost cost
-            "FOOD_CUPBOARD" to "SWEETS" cost cost
-            "SWEETS" to "TILLS" cost cost
+While the `Graph` class does provide builder functions, the integer indexed graph is generally read from a graph config JSON file.
 
-        }
+
+The graph below defines start and end points, as well as the out nodes from each other node. A node can either have a single out node, or two or more of "left", "right", and "center".
+
+The node ids corresponding to shelves must match those defined in the shelf racks configuration filel.
+
+```json
+{
+  "start" : 0,
+  "end" : 9,
+  "0": 1,
+  "1" : {
+    "left" : 2,
+    "right" : 10
+  },
+  "2" : 14,
+  "14" : 7,
+  "7" : {
+    "right": 19,
+    "left": 8
+  },
+  "19" : {
+    "forward" : 9,
+    "left" : 12
+  },
+  "8" : {
+    "left" : 16,
+    "right" : 19
+  },
+  "16" : 14,
+  "10" : 4,
+  "4" : {
+    "right" : 9,
+    "left" : 5
+  },
+  "5" : {
+    "right" : 6,
+    "left" : 12
+  },
+  "6" : 8,
+  "12" : 3,
+  "3" : {
+    "right" : 2,
+    "left" : 10
+  }
+}
 ```
-
-`to` defines an edge from LHS to RHS, while `toFrom` is bidirectional. The RHS can take a list of nodes followed by a single cost, or a list of nodes with individual costs.
 
 ### Dijkstra's
 
