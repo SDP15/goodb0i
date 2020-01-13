@@ -1,5 +1,5 @@
 import websocket
-import thread
+import _thread
 from pynput.keyboard import Key, Listener
 
 components = []

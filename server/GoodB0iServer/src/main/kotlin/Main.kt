@@ -47,7 +47,7 @@ fun Application.module() {
 
 
     environment.config.apply {
-        val root = System.getProperty("user.dir")
+        val root = "/home/theo/Documents/SDP/goodb0i/server/GoodB0iServer" // System.getProperty("user.dir")
         val productsPath = propertyOrNull("ktor.resources.products")?.getString() ?:"$root/src/main/resources/products.json"
         val racksPath = propertyOrNull("ktor.resources.racks")?.getString() ?: "$root/src/main/resources/racks.json"
         val graphPath =propertyOrNull("ktor.resources.graph")?.getString() ?:"$root/src/main/resources/graph.json"

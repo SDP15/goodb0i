@@ -118,6 +118,7 @@ object DataProvider {
     private fun loadGraphFromFile(graphPath: String): Graph<Int> {
         val file = File(graphPath).bufferedReader()
         val obj = JsonParser().parse(file).asJsonObject
+        //kLogger.debug("Graph JSON $obj")
         return graph {
             val defaultCost = 5
             obj.keySet().forEach { key ->
